@@ -1,0 +1,16 @@
+main: kr.toxicity.hud.MythicHudImpl
+version: ${version}
+name: MythicHud
+api-version: 1.17
+author: toxicity
+description: Make a hud in minecraft!
+commands:
+  mythichud:
+    aliases:
+      - hud
+    description: MythicHud's command.
+    usage: /<command>
+libraries:
+  - "net.kyori:adventure-api:${adventure}"
+  - "net.kyori:adventure-text-minimessage:${adventure}"
+  - "net.kyori:adventure-platform-bukkit:${platform}"
