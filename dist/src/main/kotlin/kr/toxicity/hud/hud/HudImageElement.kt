@@ -22,7 +22,8 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
     private val chars = run {
         val hud = image.image
 
-        val bit = (x shl (Hud.DEFAULT_BIT + 7)) + (y shl Hud.DEFAULT_BIT) + image.y + Hud.AND_BIT
+        var bit = (x shl (Hud.DEFAULT_BIT + 6)) + (y shl Hud.DEFAULT_BIT) + Hud.AND_BIT + Hud.ADD_HEIGHT
+        if (image.outline) bit += 1 shl (Hud.DEFAULT_BIT + 12)
         val maxWidth = hud.image.maxOf {
             it.second.width
         }
@@ -53,7 +54,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.first}")
                     else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.first}")
-                    addProperty("ascent", -finalBit - imageLocation.y.coerceAtLeast(-512).coerceAtMost(512))
+                    addProperty("ascent", -finalBit - (image.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT))
                     addProperty("height", round(pair.second.height.toDouble() * image.scale).toInt())
                     add("chars", JsonArray().apply {
                         add(c)

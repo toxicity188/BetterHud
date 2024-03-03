@@ -8,5 +8,6 @@ class ImageLayout(
     val x: Int,
     val y: Int,
     val scale: Double,
+    val outline: Boolean,
     val conditions: (HudPlayer) -> Boolean
 )

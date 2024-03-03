@@ -20,8 +20,9 @@ class HudLayout(section: ConfigurationSection) {
                         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
                     },
                     configurationSection.getInt("x"),
-                    configurationSection.getInt("y").coerceAtLeast(-512).coerceAtMost(512) + 512,
+                    configurationSection.getInt("y"),
                     configurationSection.getDouble("scale", 1.0),
+                    configurationSection.getBoolean("outline"),
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }
@@ -38,7 +39,7 @@ class HudLayout(section: ConfigurationSection) {
                         TextManager.getText(n).ifNull("this text doesn't exist: $n")
                     },
                     configurationSection.getInt("x"),
-                    configurationSection.getInt("y").coerceAtLeast(-512).coerceAtMost(512) + 512,
+                    configurationSection.getInt("y"),
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getInt("space", 2).coerceAtLeast(0),
                     configurationSection.getString("align")?.let {
@@ -49,6 +50,7 @@ class HudLayout(section: ConfigurationSection) {
                             TextColor.fromHexString(it)
                         } else NamedTextColor.NAMES.value(it)
                     } ?: NamedTextColor.WHITE,
+                    configurationSection.getBoolean("outline"),
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }

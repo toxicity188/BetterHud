@@ -26,7 +26,8 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
     private val sComponent = text.space.toSpaceComponent()
 
     init {
-        val bit = (x shl (Hud.DEFAULT_BIT + 7)) + (y shl Hud.DEFAULT_BIT) + text.y + Hud.AND_BIT
+        var bit = (x shl (Hud.DEFAULT_BIT + 6)) + (y shl Hud.DEFAULT_BIT) + Hud.AND_BIT + Hud.ADD_HEIGHT
+        if (text.outline) bit += 1 shl (Hud.DEFAULT_BIT + 12)
         animation.forEachIndexed { index2, imageLocation ->
             val array = JsonArray().apply {
                 add(JsonObject().apply {
@@ -40,7 +41,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
-                    addProperty("ascent", -bit - imageLocation.y.coerceAtLeast(-512).coerceAtMost(512))
+                    addProperty("ascent", -bit - (text.y + imageLocation.y).coerceAtLeast(-256).coerceAtMost(256))
                     addProperty("height", round(text.text.height * text.scale).toInt())
                     add("chars", it.chars)
                 })
