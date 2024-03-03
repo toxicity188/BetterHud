@@ -42,7 +42,10 @@ void main() {
 
     vertexDistance = fog_distance(ModelViewMat, IViewRotMat * pos, FogShape);
     texCoord0 = UV0;
-    vertexColor = Color;
+
+    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
+
+    vec3 color = Color.xyz;
 
     if (pos.y >= ScreenSize.y && pos.y >= DEFAULT_HEIGHT) {
         int bit = int(pos.y - DEFAULT_HEIGHT) >> HEIGHT_BIT;
@@ -58,16 +61,17 @@ void main() {
 
             pos.x -= int(ui.x * (0.5 - float(xBit - CHECK_AMOUNT) / 100.0));
             pos.y += int(ui.y * float(yBit - CHECK_AMOUNT) / 100.0);
+
+            vertexColor = (pos.z == 0) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0);
+        } else if (color == vec3(0)) {
+            vertexColor = vec4(0);
         }
-    }
-
-    vec3 exp = vec3(128.0, 255.0, 32.0);
-    vec3 color = Color.xyz;
-
-    if (ui.x >= 1 && ui.y >= 0.7 && ((more(color, exp / 257.0) == 1 && less(color , exp / 253.0) == 1) || color == vec3(0, 0, 0))) {
-        vertexColor = vec4(0, 0, 0, 0);
     } else {
-        vertexColor = Color;
+        vec3 exp = vec3(128.0, 255.0, 32.0);
+
+        if (ui.x >= 1 && ui.y >= 0.7 && ((more(color, exp / 257.0) == 1 && less(color , exp / 253.0) == 1) || color == vec3(0, 0, 0))) {
+            vertexColor = vec4(0);
+        }
     }
 
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
