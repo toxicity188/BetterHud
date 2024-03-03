@@ -26,7 +26,7 @@ import java.util.*
 
 class NMSImpl: NMS {
     companion object {
-        private const val INJECT_NAME = "mythichud"
+        private const val INJECT_NAME = MythicHud.DEFAULT_NAMESPACE
         private val bossBarMap = HashMap<UUID, PlayerBossBar>()
 
         @Suppress("UNCHECKED_CAST")
@@ -130,7 +130,7 @@ class NMSImpl: NMS {
                 runCatching {
                     val hud = MythicHud.getInstance().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponentTrusted())
-                    val key = Key.key("mythichud:default")
+                    val key = Key.key("$INJECT_NAME:default")
                     fun applyFont(component: Component): Component {
                         return component.font(key).children(component.children().map {
                             applyFont(it)

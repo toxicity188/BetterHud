@@ -31,7 +31,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
 
         animation.mapIndexed { index2, imageLocation ->
             val array = JsonArray()
-            val key = Key.key("mythichud:hud/$name/image/${hud.name}_${index + 1}_${index2 + 1}")
+            val key = Key.key("$NAME_SPACE:hud/$name/image/${hud.name}_${index + 1}_${index2 + 1}")
             val list = ArrayList<WidthComponent>()
             var i = 0xD0000
             if (hud is ListenerHudImage) {
@@ -40,7 +40,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
             hud.image.forEach { pair ->
                 val finalBit = bit //+ (index shl DEFAULT_BIT + 14)
                 val c = (++i).parseChar()
-                var finalWidth = WidthComponent(Component.text(c).font(key), round(pair.second.width.toDouble() * image.scale).toInt())
+                var finalWidth = WidthComponent(Component.text(c).font(key), ceil(pair.second.width.toDouble() * image.scale).toInt())
                 if (hud is ListenerHudImage) {
                     when (hud.splitType) {
                         SplitType.RIGHT -> {
@@ -51,8 +51,8 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                 }
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    if (isSingle) addProperty("file", "mythichud:image/${pair.first}")
-                    else addProperty("file", "mythichud:image/${hud.name}/${pair.first}")
+                    if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.first}")
+                    else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.first}")
                     addProperty("ascent", -finalBit - imageLocation.y.coerceAtLeast(-512).coerceAtMost(512))
                     addProperty("height", round(pair.second.height.toDouble() * image.scale).toInt())
                     add("chars", JsonArray().apply {

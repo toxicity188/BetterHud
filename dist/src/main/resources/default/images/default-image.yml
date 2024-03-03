@@ -1,0 +1,63 @@
+health_empty:
+  type: single
+  file: health_empty.png
+
+hunger_empty:
+  type: single
+  file: hunger_empty.png
+
+armor_empty:
+  type: single
+  file: armor_empty.png
+
+air_empty:
+  type: single
+  file: air_empty.png
+
+health_empty:
+  type: single
+  file: health_empty.png
+
+hunger_empty:
+  type: single
+  file: hunger_empty.png
+
+armor_empty:
+  type: single
+  file: armor_empty.png
+
+health_bar:
+  type: listener
+  file: health_bar.png
+  split: 25
+  split-type: left
+  setting:
+    listener:
+      class: health
+
+hunger_bar:
+  type: listener
+  file: hunger_bar.png
+  split: 25
+  split-type: right
+  setting:
+    listener:
+      class: food
+
+armor_bar:
+  type: listener
+  file: armor_bar.png
+  split: 25
+  split-type: left
+  setting:
+    listener:
+      class: armor
+
+air_bar:
+  type: listener
+  file: air_bar.png
+  split: 25
+  split-type: right
+  setting:
+    listener:
+      class: air

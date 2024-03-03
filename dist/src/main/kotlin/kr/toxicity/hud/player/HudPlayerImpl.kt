@@ -11,6 +11,9 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class HudPlayerImpl(private val player: Player): HudPlayer {
+    companion object {
+        private const val MAX_WIDTH = 4096
+    }
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
@@ -26,9 +29,7 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
             additionalComp?.let {
                 compList.add(it)
             }
-            val max = compList.maxOf {
-                it.width
-            }
+            val max = MAX_WIDTH
             val maxComp = (-max).toSpaceComponent()
             var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
             compList.forEachIndexed { index, it ->

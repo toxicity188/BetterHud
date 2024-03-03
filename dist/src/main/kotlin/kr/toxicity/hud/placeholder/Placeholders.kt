@@ -1,5 +1,6 @@
 package kr.toxicity.hud.placeholder
 
+import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.util.armor
@@ -10,29 +11,29 @@ object Placeholders {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
 
-    val number = PlaceholderBuilder(
+    val number: PlaceholderBuilder<Number> = PlaceholderBuilder(
         java.lang.Number::class.java,
-        0,
+        0.0,
         mapOf(
-            "health" to { player, _ ->
+            "health" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.health
             },
-            "food" to { player, _ ->
+            "food" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.foodLevel
             },
-            "armor" to { player, _ ->
+            "armor" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.armor
             },
-            "air" to { player, _ ->
+            "air" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.remainingAir
             },
-            "max_health" to { player, _ ->
+            "max_health" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
             },
-            "max_air" to { player, _ ->
+            "max_air" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.maximumAir
             },
-            "level" to { player, _ ->
+            "level" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.level
             }
         ),
@@ -43,8 +44,11 @@ object Placeholders {
         java.lang.String::class.java,
         "<none>",
         mapOf(
-            "name" to { player, _ ->
+            "name" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.name
+            },
+            "gamemode" to HudPlaceholder.of(0) { player, _ ->
+                player.bukkitPlayer.gameMode.name
             }
         )
     ) {
@@ -55,7 +59,7 @@ object Placeholders {
         java.lang.Boolean::class.java,
         false,
         mapOf(
-            "dead" to { player, _ ->
+            "dead" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.isDead
             }
         )
@@ -76,7 +80,7 @@ object Placeholders {
     class PlaceholderBuilder<T>(
         val clazz: Class<*>,
         val defaultValue: T,
-        private val defaultMap: Map<String, (HudPlayer, List<String>) -> T>,
+        private val defaultMap: Map<String, HudPlaceholder<T>>,
         val parser: (String) -> T?,
     ) {
         val map = HashMap(defaultMap)
@@ -86,7 +90,7 @@ object Placeholders {
             map += defaultMap
         }
 
-        fun addParser(name: String, mapper: (HudPlayer, List<String>) -> T) {
+        fun addParser(name: String, mapper: HudPlaceholder<T>) {
             map[name] = mapper
         }
     }
@@ -104,12 +108,13 @@ object Placeholders {
             }
         } ?: types.values.firstNotNullOfOrNull {
             it.parser(first)?.let { value ->
-                val func: (HudPlayer, List<String>) -> Any = { _, _ ->
+                val func: HudPlaceholder<Any> = HudPlaceholder.of(0) { _, _ ->
                     value
                 }
                 it to func
             }
         } ?: throw RuntimeException("this placeholder not found: $first")
+        if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
         val type = if (matcher.find()) matcher.group("type")?.let {
             types[it]

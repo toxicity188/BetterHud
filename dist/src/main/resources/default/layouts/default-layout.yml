@@ -1,0 +1,45 @@
+health:
+  images:
+    1:
+      name: health_empty
+      x: 0
+      y: 0
+    2:
+      name: health_bar
+      x: 15
+      y: 4
+    3:
+      name: armor_empty
+      x: 0
+      y: 15
+    4:
+      name: armor_bar
+      x: 15
+      y: 19
+  animations:
+    duration: 60
+    x-equation: 0
+    y-equation: 3cos(t/30 * pi)
+
+hunger:
+  images:
+    1:
+      name: hunger_empty
+      x: 0
+      y: 0
+    2:
+      name: hunger_bar
+      x: 3
+      y: 4
+    3:
+      name: air_empty
+      x: 0
+      y: 15
+    4:
+      name: air_bar
+      x: 3
+      y: 19
+  animations:
+    duration: 60
+    x-equation: 0
+    y-equation: 3cos(t/30 * pi)

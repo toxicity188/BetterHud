@@ -6,9 +6,13 @@ import org.bukkit.Bukkit
 val PLUGIN
     get() = MythicHud.getInstance()
 
+const val NAME_SPACE = MythicHud.DEFAULT_NAMESPACE
 val DATA_FOLDER
     get() = PLUGIN.dataFolder.apply {
-        if (!exists()) mkdir()
+        if (!exists()) {
+            mkdir()
+            PLUGIN.loadAssets("default", this)
+        }
     }
 
 val VERSION = PLUGIN.nms.version

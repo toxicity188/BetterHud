@@ -1,0 +1,10 @@
+test_hud:
+  layouts:
+    1:
+      name: health
+      x: 35
+      y: 90
+    2:
+      name: hunger
+      x: 65
+      y: 90

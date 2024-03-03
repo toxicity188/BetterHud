@@ -26,6 +26,13 @@ out vec2 texCoord0;
 #define ADD_OFFSET 512
 #define CHECK_AMOUNT 1
 
+int more(vec3 i1, vec3 i2) {
+    return (i1.x >= i2.x && i1.y >= i2.y && i1.z >= i2.z) ? 1 : 0;
+}
+int less(vec3 i1, vec3 i2) {
+    return (i1.x <= i2.x && i1.y <= i2.y && i1.z <= i2.z) ? 1 : 0;
+}
+
 void main() {
 
     vec3 pos = Position;
@@ -52,6 +59,15 @@ void main() {
             pos.x -= int(ui.x * (0.5 - float(xBit - CHECK_AMOUNT) / 100.0));
             pos.y += int(ui.y * float(yBit - CHECK_AMOUNT) / 100.0);
         }
+    }
+
+    vec3 exp = vec3(128.0, 255.0, 32.0);
+    vec3 color = Color.xyz;
+
+    if (ui.x >= 1 && ui.y >= 0.7 && ((more(color, exp / 257.0) == 1 && less(color , exp / 253.0) == 1) || color == vec3(0, 0, 0))) {
+        vertexColor = vec4(0, 0, 0, 0);
+    } else {
+        vertexColor = Color;
     }
 
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);

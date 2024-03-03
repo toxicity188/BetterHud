@@ -1,5 +1,6 @@
 package kr.toxicity.hud.command
 
+import kr.toxicity.hud.util.NAME_SPACE
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.toComponent
 import kr.toxicity.hud.util.warn
@@ -19,7 +20,7 @@ class CommandModule(
             aliases = listOf("h", "도움말")
             description = "Check the command list.".toComponent()
             usage = "help".toComponent()
-            permission = listOf("mythichud.help")
+            permission = listOf("$NAME_SPACE.help")
             executer = { sender, args ->
                 val index = (if (args.isNotEmpty()) {
                     try {

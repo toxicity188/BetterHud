@@ -1,16 +1,23 @@
 package kr.toxicity.hud.util
 
 import java.awt.AlphaComposite
+import java.awt.Image
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import javax.imageio.ImageIO
 
 fun RenderedImage.save(file: File) {
     ImageIO.write(this, "png", file)
 }
+fun RenderedImage.save(outputStream: OutputStream) {
+    ImageIO.write(this, "png", outputStream)
+}
 
 fun File.toImage(): BufferedImage = ImageIO.read(this)
+fun InputStream.toImage(): BufferedImage = ImageIO.read(this)
 
 fun BufferedImage.removeEmptyWidth(): BufferedImage? {
 

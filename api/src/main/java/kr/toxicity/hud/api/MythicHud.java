@@ -13,6 +13,10 @@ import java.util.Objects;
 
 public abstract class MythicHud extends JavaPlugin {
     private static MythicHud instance;
+
+    public static final String DEFAULT_NAMESPACE = "mythichud";
+
+
     @Override
     public void onLoad() {
         if (instance != null) throw new RuntimeException();

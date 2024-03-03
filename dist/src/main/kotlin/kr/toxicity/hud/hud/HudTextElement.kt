@@ -20,7 +20,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
     }
 
     private val key = animation.mapIndexed { index2, imageLocation ->
-        imageLocation.x.toSpaceComponent() to Style.style(text.color).font(Key.key("mythichud:hud/$name/text/text_${index + 1}_${index2 + 1}"))
+        imageLocation.x.toSpaceComponent() to Style.style(text.color).font(Key.key("$NAME_SPACE:hud/$name/text/text_${index + 1}_${index2 + 1}"))
     }
     private val xComponent = text.x.toSpaceComponent()
     private val sComponent = text.space.toSpaceComponent()
@@ -39,7 +39,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
             text.text.array.forEach {
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "mythichud:text/${text.text.fontName}/${it.file}")
+                    addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
                     addProperty("ascent", -bit - imageLocation.y.coerceAtLeast(-512).coerceAtMost(512))
                     addProperty("height", round(text.text.height * text.scale).toInt())
                     add("chars", it.chars)

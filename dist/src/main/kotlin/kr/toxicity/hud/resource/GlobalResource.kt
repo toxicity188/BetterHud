@@ -1,9 +1,6 @@
 package kr.toxicity.hud.resource
 
-import kr.toxicity.hud.util.DATA_FOLDER
-import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.clearFolder
-import kr.toxicity.hud.util.subFolder
+import kr.toxicity.hud.util.*
 
 class GlobalResource {
     private val build = DATA_FOLDER.subFolder("build").clearFolder().apply {
@@ -11,15 +8,13 @@ class GlobalResource {
     }
     private val assets = build.subFolder("assets")
 
-    private val mythichud = assets.subFolder("mythichud")
+    private val hud = assets.subFolder(NAME_SPACE)
 
     val bossBar = assets
         .subFolder("minecraft")
         .subFolder("textures")
         .subFolder("gui")
-        .subFolder("sprites")
-        .subFolder("boss_bar")
 
-    val font = mythichud.subFolder("font")
-    val textures = mythichud.subFolder("textures")
+    val font = hud.subFolder("font")
+    val textures = hud.subFolder("textures")
 }

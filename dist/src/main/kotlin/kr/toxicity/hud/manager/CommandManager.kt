@@ -12,7 +12,7 @@ object CommandManager: MythicHudManager {
             aliases = listOf("re", "rl", "리로드")
             description = "Reload this plugin.".toComponent()
             usage = "reload".toComponent()
-            permission = listOf("mythichud.reload")
+            permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
                 asyncTask {
                     val result = PLUGIN.reload()

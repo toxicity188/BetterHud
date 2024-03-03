@@ -30,7 +30,7 @@ object Operations {
             a != b
         }
     ))
-    val string = Operation<Double>(mapOf(
+    val string = Operation<String>(mapOf(
         "==" to { a, b ->
             a == b
         },

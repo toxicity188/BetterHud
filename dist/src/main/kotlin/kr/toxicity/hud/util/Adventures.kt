@@ -8,9 +8,9 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
-val SPACE_KEY = Key.key("mythichud:space")
-val LEGACY_SPACE_KEY = Key.key("mythichud:legacy_space")
-val BOSS_BAR_KEY = Key.key("mythichud:bossbar")
+val SPACE_KEY = Key.key("$NAME_SPACE:space")
+val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
+val BOSS_BAR_KEY = Key.key("$NAME_SPACE:bossbar")
 
 val MINI_MESSAGE = MiniMessage.builder()
     .tags(TagResolver.standard())

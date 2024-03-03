@@ -69,7 +69,7 @@ object TextManager: MythicHudManager {
         parseDefault.array.forEach {
             defaultArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
-                addProperty("file", "mythichud:font/default/${it.file}")
+                addProperty("file", "$NAME_SPACE:font/default/${it.file}")
                 addProperty("ascent", 8)
                 addProperty("height", 9)
                 add("chars", it.chars)
