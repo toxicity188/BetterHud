@@ -41,7 +41,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
-                    addProperty("ascent", -bit - (text.y + imageLocation.y).coerceAtLeast(-256).coerceAtMost(256))
+                    addProperty("ascent", -bit - (text.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT))
                     addProperty("height", round(text.text.height * text.scale).toInt())
                     add("chars", it.chars)
                 })
