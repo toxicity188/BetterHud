@@ -1,9 +1,8 @@
 package kr.toxicity.hud.api;
 
-import kr.toxicity.hud.api.listener.ListenerManager;
+import kr.toxicity.hud.api.manager.ListenerManager;
 import kr.toxicity.hud.api.manager.PlaceholderManager;
 import kr.toxicity.hud.api.nms.NMS;
-import kr.toxicity.hud.api.placeholder.HudPlaceholder;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;

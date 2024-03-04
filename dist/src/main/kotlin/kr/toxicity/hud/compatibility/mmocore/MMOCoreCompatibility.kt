@@ -100,6 +100,10 @@ class MMOCoreCompatibility: Compatibility {
             },
             "guild_name" to HudPlaceholder.of(0) { p, _ ->
                 api.getPlayerData(p.bukkitPlayer).guild?.name ?: "<none>"
+            },
+            "skill_name" to HudPlaceholder.of(1) { p, a ->
+                val mmo = api.getPlayerData(p.bukkitPlayer)
+                mmo.getBoundSkill(a[0].toIntOrNull() ?: 0)?.skill?.name ?: "<none>"
             }
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>

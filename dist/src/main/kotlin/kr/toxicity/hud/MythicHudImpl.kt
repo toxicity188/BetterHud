@@ -1,7 +1,7 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.MythicHud
-import kr.toxicity.hud.api.listener.ListenerManager
+import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer

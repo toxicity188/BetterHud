@@ -6,6 +6,7 @@ import java.io.File
 fun File.subFolder(dir: String) = File(this, dir).apply {
     if (!exists()) mkdir()
 }
+
 fun File.subFile(name: String) = File(this, name).apply {
     if (!exists()) createNewFile()
 }

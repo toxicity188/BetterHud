@@ -1,7 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.listener.HudListener
-import kr.toxicity.hud.api.listener.ListenerManager
+import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.armor
 import kr.toxicity.hud.util.ifNull
@@ -36,6 +36,17 @@ object ListenerManagerImpl: MythicHudManager, ListenerManager {
             HudListener { p ->
                 p.bukkitPlayer.exp.toDouble()
             }
+        },
+        "placeholder" to { c ->
+            val value = PlaceholderManagerImpl.find(c.getString("value").ifNull("value not set."))
+            val max = PlaceholderManagerImpl.find(c.getString("max").ifNull("max not set."))
+            if (value.clazz == max.clazz && value.clazz == java.lang.Number::class.java) {
+                HudListener {
+                    runCatching {
+                        (value(it) as Number).toDouble() / (max(it) as Number).toDouble()
+                    }.getOrNull() ?: 0.0
+                }
+            } else throw RuntimeException("this type is not a number: ${value.clazz.simpleName} and ${max.clazz.simpleName}")
         }
     )
 

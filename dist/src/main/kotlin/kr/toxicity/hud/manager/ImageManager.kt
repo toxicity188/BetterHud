@@ -83,7 +83,8 @@ object ImageManager: MythicHudManager {
             if (list.isNotEmpty()) {
                 val imageSaveLocation = if (list.size == 1) saveLocation else saveLocation.subFolder(value.name)
                 list.forEach {
-                    it.second.save(File(imageSaveLocation, it.first))
+                    val file = File(imageSaveLocation, it.first)
+                    if (!file.exists()) it.second.save(file)
                 }
             }
         }
