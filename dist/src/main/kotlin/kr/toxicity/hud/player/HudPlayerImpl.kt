@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.HudManager
+import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
@@ -17,7 +18,9 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
+    private val variable = HashMap<String, String>()
     private val task = asyncTaskTimer(1, 1) {
+        PlaceholderManagerImpl.update(this)
         tick++
         val compList = ArrayList<WidthComponent>()
         ConfigManager.defaultHud.forEach {
@@ -59,6 +62,7 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
 
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player
+    override fun getVariableMap(): MutableMap<String, String> = variable
     override fun cancel() {
         PLUGIN.nms.removeBossBar(player)
         task.cancel()

@@ -5,14 +5,19 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.placeholder.Placeholder
+import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.armor
+import kr.toxicity.hud.util.*
+import me.clip.placeholderapi.PlaceholderAPI
+import org.bukkit.Bukkit
 import org.bukkit.attribute.Attribute
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
+
+    private val updateTask = ArrayList<PlaceholderTask>()
 
     private val number: PlaceholderContainerImpl<Number> = PlaceholderContainerImpl(
         java.lang.Number::class.java,
@@ -38,6 +43,9 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
             },
             "level" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.level
+            },
+            "number" to HudPlaceholder.of(1) { player, args ->
+                player.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
             }
         ),
     ) {
@@ -52,6 +60,9 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
             },
             "gamemode" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.gameMode.name
+            },
+            "string" to HudPlaceholder.of(1) { player, args ->
+                player.variableMap[args[0]] ?: "<none>"
             }
         )
     ) {
@@ -64,6 +75,9 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
         mapOf(
             "dead" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.isDead
+            },
+            "boolean" to HudPlaceholder.of(1) { player, args ->
+                player.variableMap[args[0]] == "true"
             }
         )
     ) {
@@ -188,6 +202,41 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
     }
 
     override fun reload(resource: GlobalResource) {
+        updateTask.clear()
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+
+            DATA_FOLDER.subFolder("placeholders").forEachAllYaml { file, s, configurationSection ->
+                runCatching {
+                    val variable = configurationSection.getString("variable").ifNull("variable not set.")
+                    val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
+                    val update = configurationSection.getInt("update", 1).coerceAtLeast(1)
+                    updateTask.add(object : PlaceholderTask {
+                        override val tick: Int
+                            get() = update
+
+                        override fun invoke(p1: HudPlayer) {
+                            runCatching {
+                                p1.variableMap[variable] = PlaceholderAPI.setPlaceholders(p1.bukkitPlayer, placeholder)
+                            }
+                        }
+                    })
+                }.onFailure { e ->
+                    warn("Unable to read this placeholder task: $s in ${file.name}")
+                    warn("Reason: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun update(hudPlayer: HudPlayer) {
+        val task = updateTask.filter {
+            hudPlayer.tick % it.tick == 0L
+        }
+        if (task.isNotEmpty()) task {
+            task.forEach {
+                it(hudPlayer)
+            }
+        }
     }
 
     override fun end() {

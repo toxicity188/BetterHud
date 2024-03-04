@@ -1,6 +1,8 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.MythicHud
+import kr.toxicity.hud.api.listener.ListenerManager
+import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
@@ -29,7 +31,9 @@ class MythicHudImpl: MythicHud() {
         ImageManager,
         TextManager,
         LayoutManager,
-        HudManager
+        HudManager,
+
+        CompatibilityManager
     )
 
     private lateinit var nms: NMS
@@ -115,5 +119,6 @@ class MythicHudImpl: MythicHud() {
         }
     }
 
-    override fun getPlaceholderManager(): kr.toxicity.hud.api.manager.PlaceholderManager = PlaceholderManagerImpl
+    override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
+    override fun getListenerManager(): ListenerManager = ListenerManagerImpl
 }

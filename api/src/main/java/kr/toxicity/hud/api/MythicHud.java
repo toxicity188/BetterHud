@@ -1,5 +1,6 @@
 package kr.toxicity.hud.api;
 
+import kr.toxicity.hud.api.listener.ListenerManager;
 import kr.toxicity.hud.api.manager.PlaceholderManager;
 import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.placeholder.HudPlaceholder;
@@ -36,4 +37,5 @@ public abstract class MythicHud extends JavaPlugin {
     public abstract @NotNull HudPlayer getHudPlayer(@NotNull Player player);
 
     public abstract @NotNull PlaceholderManager getPlaceholderManager();
+    public abstract @NotNull ListenerManager getListenerManager();
 }

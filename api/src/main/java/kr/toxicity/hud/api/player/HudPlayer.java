@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 public interface HudPlayer {
     @NotNull Player getBukkitPlayer();
     @NotNull WidthComponent getHudComponent();
@@ -15,6 +17,7 @@ public interface HudPlayer {
     long getTick();
     void cancel();
 
+    @NotNull Map<String, String> getVariableMap();
     @Nullable BarColor getBarColor();
     void setBarColor(@Nullable BarColor color);
 }

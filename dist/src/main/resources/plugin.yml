@@ -4,6 +4,11 @@ name: MythicHud
 api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
+softdepend:
+  - MythicLib
+  - MythicMobs
+  - MMOCore
+  - PlaceholderAPI
 commands:
   mythichud:
     aliases:

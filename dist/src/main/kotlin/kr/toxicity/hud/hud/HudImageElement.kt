@@ -14,6 +14,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.io.File
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.round
 
 class HudImageElement(name: String, file: File, private val image: ImageLayout, index: Int, x: Int, y: Int, animation: List<ImageLocation>) {
@@ -47,9 +48,18 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                         SplitType.RIGHT -> {
                             finalWidth = (maxWidth - finalWidth.width).toSpaceComponent() + finalWidth
                         }
+                        SplitType.UP, SplitType.DOWN -> {
+                            if (maxWidth > pair.second.width) {
+                                val minus = (maxWidth.toDouble() - pair.second.width.toDouble()) / 2
+                                finalWidth =
+                                    (ceil(minus).toInt().toSpaceComponent() + finalWidth + floor(minus).toInt().toSpaceComponent())
+                            }
+                        }
                         else -> {}
                     }
                 }
+
+
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.first}")
