@@ -35,6 +35,11 @@ class CommandModule(
                 }
                 sender.info("----------------------------".toComponent().color(NamedTextColor.WHITE))
             }
+            tabCompleter = { _, _ ->
+                (0..(moduleMap.size / 6)).map {
+                    (it + 1).toString()
+                }
+            }
         }
     }
 

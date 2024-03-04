@@ -1,6 +1,6 @@
 package kr.toxicity.hud.image
 
-import kr.toxicity.hud.manager.ListenerManager
+import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.util.ifNull
 import org.bukkit.configuration.ConfigurationSection
 import java.awt.image.BufferedImage
@@ -12,5 +12,5 @@ class ListenerHudImage(
     val splitType: SplitType,
     setting: ConfigurationSection
 ): HudImage(name, image, type, setting) {
-    val listener = ListenerManager.getListener(setting.getConfigurationSection("listener").ifNull("listener configuration not set."))
+    val listener = ListenerManagerImpl.getListener(setting.getConfigurationSection("listener").ifNull("listener configuration not set."))
 }

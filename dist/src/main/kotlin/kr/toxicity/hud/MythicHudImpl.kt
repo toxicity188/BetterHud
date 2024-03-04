@@ -1,16 +1,15 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.MythicHud
-import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
-import kr.toxicity.hud.util.toSpaceComponent
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -24,7 +23,8 @@ class MythicHudImpl: MythicHud() {
         CommandManager,
         PlayerManager,
 
-        ListenerManager,
+        ListenerManagerImpl,
+        PlaceholderManagerImpl,
 
         ImageManager,
         TextManager,
@@ -114,4 +114,6 @@ class MythicHudImpl: MythicHud() {
             }
         }
     }
+
+    override fun getPlaceholderManager(): kr.toxicity.hud.api.manager.PlaceholderManager = PlaceholderManagerImpl
 }

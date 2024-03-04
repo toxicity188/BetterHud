@@ -1,6 +1,7 @@
 package kr.toxicity.hud.placeholder
 
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.warn
@@ -42,8 +43,8 @@ object Conditions {
 
     @Suppress("UNCHECKED_CAST")
     private fun parse0(section: ConfigurationSection): (HudPlayer) -> Boolean {
-        val first = Placeholders.find(section.getString("first").ifNull("first value not set."))
-        val second = Placeholders.find(section.getString("second").ifNull("second value not set."))
+        val first = PlaceholderManagerImpl.find(section.getString("first").ifNull("first value not set."))
+        val second = PlaceholderManagerImpl.find(section.getString("second").ifNull("second value not set."))
         val operationValue = section.getString("operation").ifNull("operation value not set")
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")

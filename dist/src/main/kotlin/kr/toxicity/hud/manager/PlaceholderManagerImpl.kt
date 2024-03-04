@@ -1,17 +1,20 @@
-package kr.toxicity.hud.placeholder
+package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
+import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.placeholder.Placeholder
+import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.armor
 import org.bukkit.attribute.Attribute
 import java.util.regex.Pattern
 
-object Placeholders {
+object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
 
-    val number: PlaceholderBuilder<Number> = PlaceholderBuilder(
+    private val number: PlaceholderContainerImpl<Number> = PlaceholderContainerImpl(
         java.lang.Number::class.java,
         0.0,
         mapOf(
@@ -40,7 +43,7 @@ object Placeholders {
     ) {
         it.toDoubleOrNull()
     }
-    val string = PlaceholderBuilder(
+    private val string = PlaceholderContainerImpl(
         java.lang.String::class.java,
         "<none>",
         mapOf(
@@ -55,7 +58,7 @@ object Placeholders {
         val matcher = stringPattern.matcher(it)
         if (matcher.find()) matcher.group("content") else null
     }
-    val boolean = PlaceholderBuilder(
+    private val boolean = PlaceholderContainerImpl(
         java.lang.Boolean::class.java,
         false,
         mapOf(
@@ -77,12 +80,12 @@ object Placeholders {
         "string" to string
     )
 
-    class PlaceholderBuilder<T>(
+    class PlaceholderContainerImpl<T>(
         val clazz: Class<*>,
         val defaultValue: T,
         private val defaultMap: Map<String, HudPlaceholder<T>>,
         val parser: (String) -> T?,
-    ) {
+    ): PlaceholderContainer<T> {
         val map = HashMap(defaultMap)
 
         fun init() {
@@ -90,8 +93,8 @@ object Placeholders {
             map += defaultMap
         }
 
-        fun addParser(name: String, mapper: HudPlaceholder<T>) {
-            map[name] = mapper
+        override fun addPlaceholder(name: String, placeholder: HudPlaceholder<T>) {
+            map[name] = placeholder
         }
     }
 
@@ -175,5 +178,18 @@ object Placeholders {
             }
         }
         return sb.toString()
+    }
+
+    override fun getNumberContainer(): PlaceholderContainer<Number> = number
+    override fun getBooleanContainer(): PlaceholderContainer<Boolean> = boolean
+    override fun getStringContainer(): PlaceholderContainer<String> = string
+    override fun start() {
+
+    }
+
+    override fun reload(resource: GlobalResource) {
+    }
+
+    override fun end() {
     }
 }

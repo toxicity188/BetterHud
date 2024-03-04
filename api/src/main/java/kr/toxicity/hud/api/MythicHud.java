@@ -1,6 +1,8 @@
 package kr.toxicity.hud.api;
 
+import kr.toxicity.hud.api.manager.PlaceholderManager;
 import kr.toxicity.hud.api.nms.NMS;
+import kr.toxicity.hud.api.placeholder.HudPlaceholder;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -32,4 +34,6 @@ public abstract class MythicHud extends JavaPlugin {
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     public abstract int getWidth(char target);
     public abstract @NotNull HudPlayer getHudPlayer(@NotNull Player player);
+
+    public abstract @NotNull PlaceholderManager getPlaceholderManager();
 }

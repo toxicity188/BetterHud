@@ -1,13 +1,15 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.listener.HudListener
+import kr.toxicity.hud.api.listener.ListenerManager
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.armor
 import kr.toxicity.hud.util.ifNull
 import org.bukkit.attribute.Attribute
 import org.bukkit.configuration.ConfigurationSection
+import java.util.function.Function
 
-object ListenerManager: MythicHudManager {
+object ListenerManagerImpl: MythicHudManager, ListenerManager {
 
     private val listenerMap = mutableMapOf<String, (ConfigurationSection) -> HudListener>(
         "health" to { _ ->
@@ -46,6 +48,11 @@ object ListenerManager: MythicHudManager {
         return listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
     }
 
+    override fun addListener(name: String, listenerFunction: Function<ConfigurationSection, HudListener>) {
+        listenerMap[name] = { c ->
+            listenerFunction.apply(c)
+        }
+    }
     override fun reload(resource: GlobalResource) {
     }
 
