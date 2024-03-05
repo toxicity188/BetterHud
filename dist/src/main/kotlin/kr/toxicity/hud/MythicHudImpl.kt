@@ -33,7 +33,9 @@ class MythicHudImpl: MythicHud() {
         LayoutManager,
         HudManager,
 
-        CompatibilityManager
+        CompatibilityManager,
+
+        ShaderManager
     )
 
     private lateinit var nms: NMS

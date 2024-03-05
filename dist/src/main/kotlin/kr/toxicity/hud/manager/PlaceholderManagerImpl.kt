@@ -46,6 +46,9 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
             },
             "number" to HudPlaceholder.of(1) { player, args ->
                 player.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
+            },
+            "hotbar_slot" to HudPlaceholder.of(0) { player, _ ->
+                player.bukkitPlayer.inventory.heldItemSlot
             }
         ),
     ) {

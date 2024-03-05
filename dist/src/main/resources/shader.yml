@@ -1,0 +1,77 @@
+bar-color: yellow
+
+disable-level-text: false
+
+hotbar:
+  disable: false
+  locations:
+    1:
+      gui:
+        x: 15
+        y: 75
+      pixel:
+        x: -30
+        y: 0
+    2:
+      gui:
+        x: 15
+        y: 75
+      pixel:
+        x: 30
+        y: 0
+    3:
+      gui:
+        x: 15
+        y: 75
+      pixel:
+        x: 0
+        y: -30
+    4:
+      gui:
+        x: 15
+        y: 75
+      pixel:
+        x: 0
+        y: 30
+    5:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: -50
+    6:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: -30
+    7:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: -10
+    8:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: 10
+    9:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: 30
+    10:
+      gui:
+        x: 90
+        y: 50
+      pixel:
+        x: 0
+        y: 50

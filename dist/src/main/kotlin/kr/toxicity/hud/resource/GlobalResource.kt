@@ -15,6 +15,11 @@ class GlobalResource {
         .subFolder("textures")
         .subFolder("gui")
 
+    val core = assets
+        .subFolder("minecraft")
+        .subFolder("shaders")
+        .subFolder("core")
+
     val font = hud.subFolder("font")
     val textures = hud.subFolder("textures")
 }

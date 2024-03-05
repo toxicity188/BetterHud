@@ -8,6 +8,7 @@ import kr.toxicity.hud.util.toSpaceComponent
 import kotlin.math.max
 
 class LayoutComponentContainer {
+
     private var widthComponent = EMPTY_WIDTH_COMPONENT
     private var max = 0
 

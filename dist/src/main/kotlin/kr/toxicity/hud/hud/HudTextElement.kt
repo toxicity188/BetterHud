@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.TextLayout
+import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -14,7 +15,7 @@ import java.io.File
 import kotlin.math.ceil
 import kotlin.math.round
 
-class HudTextElement(name: String, file: File, private val text: TextLayout, index: Int, x: Int, y: Int, animation: List<ImageLocation>) {
+class HudTextElement(name: String, file: File, private val text: TextLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
     companion object {
         private val spaceComponent = 4.toSpaceComponent()
     }
@@ -26,8 +27,12 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
     private val sComponent = text.space.toSpaceComponent()
 
     init {
-        var bit = (x shl (Hud.DEFAULT_BIT + 6)) + (y shl Hud.DEFAULT_BIT) + Hud.AND_BIT + Hud.ADD_HEIGHT
-        if (text.outline) bit += 1 shl (Hud.DEFAULT_BIT + 12)
+        val shader = HudShader(
+            HudShader.GuiLocation(x, y),
+            text.layout + index,
+            text.outline
+        )
+
         animation.forEachIndexed { index2, imageLocation ->
             val array = JsonArray().apply {
                 add(JsonObject().apply {
@@ -41,7 +46,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
-                    addProperty("ascent", -bit - (text.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT))
+                    addProperty("ascent", Hud.createBit((text.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
                     addProperty("height", round(text.text.height * text.scale).toInt())
                     add("chars", it.chars)
                 })

@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.HudManager
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
+import kr.toxicity.hud.manager.ShaderManager
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
@@ -44,8 +45,8 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
             }
             last = comp
 
-            PLUGIN.nms.showBossBar(player, color ?: ConfigManager.barColor, comp.component)
-        } else PLUGIN.nms.showBossBar(player, color ?: ConfigManager.barColor, EMPTY_COMPONENT)
+            PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, comp.component)
+        } else PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, EMPTY_COMPONENT)
     }
     private var color: BarColor? = null
 

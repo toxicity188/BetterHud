@@ -23,6 +23,7 @@ class HudLayout(section: ConfigurationSection) {
                     configurationSection.getInt("y"),
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
+                    configurationSection.getInt("layout"),
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }
@@ -51,6 +52,7 @@ class HudLayout(section: ConfigurationSection) {
                         } else NamedTextColor.NAMES.value(it)
                     } ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
+                    configurationSection.getInt("layout"),
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }
@@ -58,6 +60,9 @@ class HudLayout(section: ConfigurationSection) {
             )
         }
     }
+    val conditions = section.getConfigurationSection("conditions")?.let {
+        Conditions.parse(it)
+    } ?: { true }
 
     val animation = section.getConfigurationSection("animations")?.let { animations ->
         EquationLocation(

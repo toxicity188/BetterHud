@@ -15,6 +15,7 @@ class TextLayout(
     val align: Align,
     val color: TextColor,
     val outline: Boolean,
+    val layout: Int,
     val conditions: (HudPlayer) -> Boolean
 ) {
     enum class Align {

@@ -1,7 +1,5 @@
 info: "<gold><b>[!]</gold> "
 warn: "<red><b>[!]</red> "
 
-bar-color: yellow
-
 default-hud:
   - test_hud
