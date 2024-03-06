@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
 
-class HudLayout(section: ConfigurationSection) {
+class LayoutGroup(section: ConfigurationSection) {
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
         section.getConfigurationSection("images")?.forEachSubConfiguration { s, configurationSection ->
             add(
@@ -19,8 +19,10 @@ class HudLayout(section: ConfigurationSection) {
                     configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
                         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
                     },
-                    configurationSection.getInt("x"),
-                    configurationSection.getInt("y"),
+                    ImageLocation(
+                        configurationSection.getInt("x"),
+                        configurationSection.getInt("y")
+                    ),
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layout"),
@@ -39,8 +41,7 @@ class HudLayout(section: ConfigurationSection) {
                     configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
                         TextManager.getText(n).ifNull("this text doesn't exist: $n")
                     },
-                    configurationSection.getInt("x"),
-                    configurationSection.getInt("y"),
+                    ImageLocation(configurationSection),
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getInt("space", 2).coerceAtLeast(0),
                     configurationSection.getString("align")?.let {
@@ -52,7 +53,7 @@ class HudLayout(section: ConfigurationSection) {
                         } else NamedTextColor.NAMES.value(it)
                     } ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
-                    configurationSection.getInt("layout"),
+                    configurationSection.getInt("layer"),
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }
@@ -65,10 +66,6 @@ class HudLayout(section: ConfigurationSection) {
     } ?: { true }
 
     val animation = section.getConfigurationSection("animations")?.let { animations ->
-        EquationLocation(
-            animations.getInt("duration", 20).coerceAtLeast(1),
-            animations.getString("x-equation").ifNull("x-equation value not set."),
-            animations.getString("y-equation").ifNull("y-equation value not set.")
-        ).location
+        EquationLocation(animations).location
     } ?: listOf(ImageLocation.zero)
 }

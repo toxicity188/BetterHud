@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.compatibility.mmocore.MMOCoreCompatibility
 import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
+import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
 import org.bukkit.Bukkit
@@ -14,6 +15,9 @@ object CompatibilityManager: MythicHudManager {
         },
         "MythicMobs" to {
             MythicMobsCompatibility()
+        },
+        "WorldGuard" to {
+            WorldGuardCompatibility()
         }
     )
 

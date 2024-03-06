@@ -2,6 +2,7 @@ package kr.toxicity.hud.api;
 
 import kr.toxicity.hud.api.manager.ListenerManager;
 import kr.toxicity.hud.api.manager.PlaceholderManager;
+import kr.toxicity.hud.api.manager.PopupManager;
 import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
@@ -37,4 +38,5 @@ public abstract class MythicHud extends JavaPlugin {
 
     public abstract @NotNull PlaceholderManager getPlaceholderManager();
     public abstract @NotNull ListenerManager getListenerManager();
+    public abstract @NotNull PopupManager getPopupManager();
 }

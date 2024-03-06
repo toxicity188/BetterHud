@@ -2,10 +2,8 @@ package kr.toxicity.hud.player
 
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.manager.ConfigManager
-import kr.toxicity.hud.manager.HudManager
-import kr.toxicity.hud.manager.PlaceholderManagerImpl
-import kr.toxicity.hud.manager.ShaderManager
+import kr.toxicity.hud.api.popup.PopupIteratorGroup
+import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
@@ -20,14 +18,24 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
     private val variable = HashMap<String, String>()
+    private val popupGroup = HashMap<String, PopupIteratorGroup>()
     private val task = asyncTaskTimer(1, 1) {
         PlaceholderManagerImpl.update(this)
         tick++
         val compList = ArrayList<WidthComponent>()
+        ConfigManager.defaultPopup.forEach {
+            PopupManagerImpl.getPopup(it)?.show(this)
+        }
         ConfigManager.defaultHud.forEach {
             HudManager.getHud(it)?.let { hud ->
                 compList.addAll(hud.getComponent(this))
             }
+        }
+        popupGroup.forEach {
+            compList.addAll(it.value.next())
+        }
+        popupGroup.values.removeIf {
+            !it.available()
         }
         if (compList.isNotEmpty()) {
             additionalComp?.let {
@@ -60,6 +68,9 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     override fun setBarColor(color: BarColor?) {
         this.color = color
     }
+
+
+    override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
 
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player

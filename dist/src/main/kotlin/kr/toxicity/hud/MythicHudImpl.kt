@@ -3,6 +3,7 @@ package kr.toxicity.hud
 import kr.toxicity.hud.api.MythicHud
 import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.manager.PlaceholderManager
+import kr.toxicity.hud.api.manager.PopupManager
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
@@ -32,6 +33,7 @@ class MythicHudImpl: MythicHud() {
         TextManager,
         LayoutManager,
         HudManager,
+        PopupManagerImpl,
 
         CompatibilityManager,
 
@@ -123,4 +125,5 @@ class MythicHudImpl: MythicHud() {
 
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
+    override fun getPopupManager(): PopupManager = PopupManagerImpl
 }

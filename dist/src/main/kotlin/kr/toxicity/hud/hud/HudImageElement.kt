@@ -5,10 +5,10 @@ import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.image.ImageType
 import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.layout.ImageLayout
+import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
@@ -29,7 +29,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
         val isSingle = hud.image.size == 1
 
         val shader = HudShader(
-            HudShader.GuiLocation(x, y),
+            GuiLocation(x, y),
             image.layer + index,
             image.outline
         )
@@ -67,13 +67,13 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.first}")
                     else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.first}")
-                    addProperty("ascent", Hud.createBit((image.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
+                    addProperty("ascent", Hud.createBit((image.location.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
                     addProperty("height", round(pair.second.height.toDouble() * image.scale).toInt())
                     add("chars", JsonArray().apply {
                         add(c)
                     })
                 })
-                list.add(image.x.toSpaceComponent() + imageLocation.x.toSpaceComponent() + finalWidth)
+                list.add(image.location.x.toSpaceComponent() + imageLocation.x.toSpaceComponent() + finalWidth)
             }
             JsonObject().apply {
                 add("providers", array)

@@ -1,6 +1,7 @@
 package kr.toxicity.hud.api.player;
 
 import kr.toxicity.hud.api.component.WidthComponent;
+import kr.toxicity.hud.api.popup.PopupIteratorGroup;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ public interface HudPlayer {
     long getTick();
     void cancel();
 
+    @NotNull Map<String, PopupIteratorGroup> getPopupGroupIteratorMap();
     @NotNull Map<String, String> getVariableMap();
     @Nullable BarColor getBarColor();
     void setBarColor(@Nullable BarColor color);

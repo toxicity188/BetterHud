@@ -17,9 +17,10 @@ allprojects {
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://mvn.lumine.io/repository/maven/")
         maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
+        maven("https://maven.enginehub.org/repo/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+        maven("https://mvn.lumine.io/repository/maven/")
     }
 
     dependencies {

@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.TextLayout
+import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
@@ -23,13 +24,13 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
     private val key = animation.mapIndexed { index2, imageLocation ->
         imageLocation.x.toSpaceComponent() to Style.style(text.color).font(Key.key("$NAME_SPACE:hud/$name/text/text_${index + 1}_${index2 + 1}"))
     }
-    private val xComponent = text.x.toSpaceComponent()
+    private val xComponent = text.location.x.toSpaceComponent()
     private val sComponent = text.space.toSpaceComponent()
 
     init {
         val shader = HudShader(
-            HudShader.GuiLocation(x, y),
-            text.layout + index,
+            GuiLocation(x, y),
+            text.layer + index,
             text.outline
         )
 
@@ -46,7 +47,7 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
-                    addProperty("ascent", Hud.createBit((text.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
+                    addProperty("ascent", Hud.createBit((text.location.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
                     addProperty("height", round(text.text.height * text.scale).toInt())
                     add("chars", it.chars)
                 })

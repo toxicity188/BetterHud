@@ -16,6 +16,7 @@ object ConfigManager: MythicHudManager {
     var warn = EMPTY_COMPONENT
         private set
     var defaultHud = emptyList<String>()
+    var defaultPopup = emptyList<String>()
 
     var numberFormat = DecimalFormat("#,###.#")
 
@@ -35,6 +36,7 @@ object ConfigManager: MythicHudManager {
                 warn = it.deserializeToComponent()
             }
             defaultHud = yaml.getStringList("default-hud")
+            defaultPopup = yaml.getStringList("default-popup")
             numberFormat = yaml.getString("number-format")?.let {
                 runCatching {
                     DecimalFormat(it)
