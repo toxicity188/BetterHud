@@ -13,6 +13,7 @@ import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
+import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
@@ -27,15 +28,19 @@ class PopupLayout(
     private val layout: LayoutGroup,
     private val parent: PopupImpl,
     private val name: String,
-    file: File,
-    val condition: (HudPlayer) -> Boolean,
+    private val globalLocation: GuiLocation,
+    file: File
 ) {
     private var imageChar = 0xCE000
     private var textIndex = 0
 
-    private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
+    companion object {
+        private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
 
-    private val imageKey = Key.key("$NAME_SPACE:popup/${parent.name}/$name/image.json")
+        fun clear() = textKeyMap.clear()
+    }
+
+    private val imageKey = Key.key("$NAME_SPACE:popup/${parent.name}/$name/image")
     private val groups = parent.move.locations.run {
         val json = JsonArray()
         val textFolder = file.subFolder("text")
@@ -48,24 +53,28 @@ class PopupLayout(
         map
     }
 
-    fun getComponents(index: Int, player: HudPlayer) = groups.map {
-        it.getComponent(index, player)
-    }
-    fun getComponents(player: HudPlayer) = groups.map {
-        it.getComponents(player)
+    fun getComponent(index: Int, animationIndex: Int, player: HudPlayer) = groups[index % groups.size].getComponent(animationIndex, player)
+    fun getComponent(player: HudPlayer): (Int, Int) -> WidthComponent {
+        val map = groups.map {
+            it.getComponent(player)
+        }
+        return { index, frame ->
+            val get = map[index % map.size]
+            get[frame % get.size]
+        }
     }
 
     private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray, textFolder: File) {
         val elements = layout.animation.map { location ->
             PopupElement(pair, array, location, textFolder)
         }
-        fun getComponent(index: Int, player: HudPlayer) = elements[index].getComponent(player)
-        fun getComponents(player: HudPlayer) = elements.map {
+        fun getComponent(animationIndex: Int, player: HudPlayer) = elements[animationIndex % elements.size].getComponent(player)
+        fun getComponent(player: HudPlayer) = elements.map {
             it.getComponent(player)
         }
     }
     private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: File) {
-        private val gui = pair.gui + parent.gui
+        private val gui = pair.gui + parent.gui + globalLocation
 
         fun getComponent(player: HudPlayer) = LayoutComponentContainer()
             .append(image.map {
@@ -138,7 +147,8 @@ class PopupLayout(
                 textLayout.layer,
                 textLayout.outline
             )
-            val textKey = textKeyMap[ShaderGroup(textShader, pixel.y)] ?: run {
+            val group = ShaderGroup(textShader, textLayout.text.name, pixel.y)
+            val textKey = textKeyMap[group] ?: run {
                 val index = ++textIndex
                 val array = JsonArray().apply {
                     add(JsonObject().apply {
@@ -151,7 +161,7 @@ class PopupLayout(
                 textLayout.text.array.forEach {
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE:text/${textLayout.text.name}/${it.file}")
+                        addProperty("file", "$NAME_SPACE:text/${textLayout.text.fontName}/${it.file}")
                         addProperty("ascent", Hud.createBit(pixel.y, textShader))
                         addProperty("height", ceil(textLayout.text.height.toDouble() * textLayout.scale).toInt())
                         add("chars", it.chars)
@@ -160,7 +170,9 @@ class PopupLayout(
                 JsonObject().apply {
                     add("providers", array)
                 }.save(File(textFolder, "text_${index}.json"))
-                Key.key("$NAME_SPACE:popup/${parent.name}/$name/text/text_${index}")
+                val key = Key.key("$NAME_SPACE:popup/${parent.name}/$name/text/text_${index}")
+                textKeyMap[group] = key
+                key
             }
             TextRenderer(
                 textLayout.text.charWidth,

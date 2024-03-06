@@ -44,10 +44,10 @@ object TextManager: MythicHudManager {
                 val fontTarget = fontDir?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
-                val fontFile = fontTarget?.inputStream()?.buffered().use {
-                    Font.createFont(Font.TRUETYPE_FONT, it).deriveFont(section.getInt("scale").toFloat())
-                } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
-                val saveName = "${fontTarget?.nameWithoutExtension ?: "system_default"}_$scale"
+                val fontFile = (fontTarget?.inputStream()?.buffered()?.use {
+                    Font.createFont(Font.TRUETYPE_FONT, it)
+                } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
+                val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
                 textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.getConfigurationSection("conditions")?.let {
                     Conditions.parse(it)
                 } ?: { true })

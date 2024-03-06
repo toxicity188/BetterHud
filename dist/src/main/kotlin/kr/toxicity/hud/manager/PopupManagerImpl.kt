@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.manager.PopupManager
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.popup.PopupImpl
+import kr.toxicity.hud.popup.PopupLayout
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.DATA_FOLDER
 import kr.toxicity.hud.util.forEachAllYaml
@@ -16,6 +17,7 @@ object PopupManagerImpl: MythicHudManager, PopupManager {
     }
 
     override fun reload(resource: GlobalResource) {
+        PopupLayout.clear()
         popupMap.clear()
         val save = resource.font.subFolder("popup")
         DATA_FOLDER.subFolder("popups").forEachAllYaml { file, s, configurationSection ->

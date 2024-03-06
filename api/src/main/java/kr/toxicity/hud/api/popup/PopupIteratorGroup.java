@@ -11,4 +11,5 @@ public interface PopupIteratorGroup {
     @NotNull @Unmodifiable List<WidthComponent> next();
     int getIndex();
     void addIterator(@NotNull PopupIterator iterator);
+    boolean contains(@NotNull String name);
 }

@@ -31,11 +31,11 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
                 compList.addAll(hud.getComponent(this))
             }
         }
-        popupGroup.forEach {
-            compList.addAll(it.value.next())
-        }
         popupGroup.values.removeIf {
             !it.available()
+        }
+        popupGroup.forEach {
+            compList.addAll(it.value.next())
         }
         if (compList.isNotEmpty()) {
             additionalComp?.let {

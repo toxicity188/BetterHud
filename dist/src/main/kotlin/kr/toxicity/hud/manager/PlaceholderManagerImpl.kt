@@ -10,7 +10,10 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
+import org.bukkit.potion.PotionEffectType
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
@@ -49,6 +52,18 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
             },
             "hotbar_slot" to HudPlaceholder.of(0) { player, _ ->
                 player.bukkitPlayer.inventory.heldItemSlot
+            },
+            "potion_effect_duration" to HudPlaceholder.of(1) { player, args ->
+                (runCatching {
+                    NamespacedKey.fromString(args[0])?.let { key ->
+                        Registry.EFFECT.get(key)
+                    }
+                }.onFailure {
+                    @Suppress("DEPRECATION")
+                    PotionEffectType.getByName(args[0])
+                }.getOrNull()?.let {
+                    player.bukkitPlayer.getPotionEffect(it)?.duration
+                } ?: 0) / 20
             }
         ),
     ) {
