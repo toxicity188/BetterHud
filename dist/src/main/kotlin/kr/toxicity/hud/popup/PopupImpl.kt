@@ -71,12 +71,12 @@ class PopupImpl(
         val cond: () -> Boolean  = {
             layouts[get.index % layouts.size].condition(player)
         }
-        PopupIteratorImpl(
+        get.addIterator(PopupIteratorImpl(
             mapper,
             layouts.size,
             duration
         ) {
             conditions(player) && cond()
-        }
+        })
     }
 }
