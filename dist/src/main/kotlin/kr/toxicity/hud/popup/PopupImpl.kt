@@ -55,6 +55,7 @@ class PopupImpl(
         val get = playerMap.getOrPut(group) {
             PopupIteratorGroupImpl()
         }
+        if (get.index >= layouts.size) return
         val mapper: (Int) -> List<WidthComponent> = if (update) {
             { index ->
                 layouts[get.index % layouts.size].getComponents(index, player)
