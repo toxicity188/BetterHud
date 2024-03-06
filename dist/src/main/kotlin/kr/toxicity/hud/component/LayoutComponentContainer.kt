@@ -5,6 +5,7 @@ import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.NEGATIVE_ONE_SPACE_COMPONENT
 import kr.toxicity.hud.util.NEW_LAYER
 import kr.toxicity.hud.util.toSpaceComponent
+import kotlin.math.abs
 import kotlin.math.max
 
 class LayoutComponentContainer {

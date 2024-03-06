@@ -34,6 +34,9 @@ object PlayerManager: MythicHudManager {
     fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")
 
     override fun reload(resource: GlobalResource) {
+        hudPlayer.values.forEach {
+            it.popupGroupIteratorMap.clear()
+        }
     }
 
     override fun end() {

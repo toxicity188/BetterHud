@@ -73,7 +73,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                         add(c)
                     })
                 })
-                list.add(image.location.x.toSpaceComponent() + imageLocation.x.toSpaceComponent() + finalWidth)
+                list.add((image.location.x + imageLocation.x).toSpaceComponent() + finalWidth)
             }
             JsonObject().apply {
                 add("providers", array)

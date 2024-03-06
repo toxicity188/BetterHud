@@ -13,6 +13,6 @@ class EquationPair(val x: TEquation, val y: TEquation) {
 
     constructor(section: ConfigurationSection): this(
         section.getString("x-equation").ifNull("x-equation value not set.").toEquation(),
-        section.getString("y-equation").ifNull("x-equation value not set.").toEquation()
+        section.getString("y-equation").ifNull("y-equation value not set.").toEquation()
     )
 }

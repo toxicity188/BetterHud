@@ -44,9 +44,9 @@ class TextRenderer(
         }
         when (align) {
             TextLayout.Align.LEFT -> {
-                comp = (comp.width.toDouble() / 2).toInt().toSpaceComponent() + comp
+                comp = (-comp.width).toSpaceComponent() + comp
             }
-            TextLayout.Align.RIGHT -> {
+            TextLayout.Align.CENTER -> {
                 comp = (-comp.width / 2).toSpaceComponent() + comp
             }
             else -> {}

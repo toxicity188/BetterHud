@@ -109,7 +109,7 @@ class PopupLayout(
                             add(char)
                         })
                     })
-                    var comp =  WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt())
+                    var comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                     if (hudImage is ListenerHudImage) {
                         when (hudImage.splitType) {
                             SplitType.RIGHT -> {
@@ -134,10 +134,11 @@ class PopupLayout(
                             add(char)
                         })
                     })
-                    pixel.x.toSpaceComponent() + WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt())
+                    val comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt())
+                    pixel.x.toSpaceComponent() + comp
                 })
             ) {
-                layout.conditions(it) && target.conditions(it)
+                hudImage.conditions(it) && target.conditions(it)
             }
         }
         val texts = layout.text.map { textLayout ->

@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import kotlin.math.abs
 
 val SPACE_KEY = Key.key("$NAME_SPACE:space")
 val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
@@ -43,8 +44,10 @@ fun Int.parseChar(): String {
         return "${((t ushr 10) + 0xD800).toChar()}${((t and 1023) + 0xDC00).toChar()}"
     }
 }
-fun Int.toSpaceComponent() = if (VERSION.version <= 18) {
-    WidthComponent(Component.text((this + 0xFFC00).parseChar()).font(LEGACY_SPACE_KEY), this)
+
+fun Int.toSpaceComponent() = toSpaceComponent(this)
+fun Int.toSpaceComponent(width: Int) = if (VERSION.version <= 18) {
+    WidthComponent(Component.text((this + 0xFFC00).parseChar()).font(LEGACY_SPACE_KEY), width)
 } else {
-    WidthComponent(Component.text((this + 0xD0000).parseChar()).font(SPACE_KEY), this)
+    WidthComponent(Component.text((this + 0xD0000).parseChar()).font(SPACE_KEY), width)
 }

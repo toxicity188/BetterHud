@@ -4,7 +4,10 @@ import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.compatibility.Compatibility
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.ifNull
+import net.Indyuce.mmocore.MMOCore
 import net.Indyuce.mmocore.api.MMOCoreAPI
+import net.Indyuce.mmocore.manager.SkillManager
 import org.bukkit.configuration.ConfigurationSection
 
 class MMOCoreCompatibility: Compatibility {
@@ -35,13 +38,21 @@ class MMOCoreCompatibility: Compatibility {
                     mmo.experience / mmo.levelUpExperience
                 }
             },
-            "cooldown" to { c ->
+            "cooldown_slot" to { c ->
                 val slot = c.getInt("slot", 0)
                 HudListener { p ->
                     val mmo = api.getPlayerData(p.bukkitPlayer)
                     (mmo.getBoundSkill(slot)?.let {
                         mmo.cooldownMap.getCooldown(it) / it.skill.getModifier("cooldown", mmo.getSkillLevel(it.skill))
                     } ?: 0.0)
+                }
+            },
+            "cooldown_skill" to { c ->
+                val name = c.getString("skill").ifNull("skill value not set.")
+                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull("the skill named \"$name\" doesn't exist.")
+                HudListener { p ->
+                    val mmo = api.getPlayerData(p.bukkitPlayer)
+                    mmo.cooldownMap.getCooldown("skill_" + skill.handler.id) / skill.getModifier("cooldown", mmo.getSkillLevel(skill))
                 }
             }
         )
@@ -86,11 +97,17 @@ class MMOCoreCompatibility: Compatibility {
                     it.getModifier("cooldown", mmo.getSkillLevel(it))
                 } ?: -1
             },
-            "current_cooldown" to HudPlaceholder.of(1) { p, a ->
+            "current_cooldown_slot" to HudPlaceholder.of(1) { p, a ->
                 val mmo = api.getPlayerData(p.bukkitPlayer)
                 mmo.getBoundSkill(a[0].toIntOrNull() ?: 0)?.let {
                     mmo.cooldownMap.getCooldown(it)
                 } ?: -1
+            },
+            "current_cooldown_skill" to HudPlaceholder.of(1) { p, a ->
+                val mmo = api.getPlayerData(p.bukkitPlayer)
+                MMOCore.plugin.skillManager.getSkill(a[0])?.let { skill ->
+                    mmo.cooldownMap.getCooldown("skill_" + skill.handler.id)
+                } ?: 0.0
             }
         )
     override val strings: Map<String, HudPlaceholder<String>>
@@ -108,6 +125,15 @@ class MMOCoreCompatibility: Compatibility {
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
-
+            "bounded_skill" to HudPlaceholder.of(1) { p, a ->
+                val mmo = api.getPlayerData(p.bukkitPlayer)
+                mmo.boundSkills.any {
+                    it.skill.handler.id == a[0]
+                }
+            },
+            "bounded_slot" to HudPlaceholder.of(1) { p, a ->
+                val mmo = api.getPlayerData(p.bukkitPlayer)
+                mmo.getBoundSkill(a[0].toIntOrNull() ?: 0) != null
+            }
         )
 }

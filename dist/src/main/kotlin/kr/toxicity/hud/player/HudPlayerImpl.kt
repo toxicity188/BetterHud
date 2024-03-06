@@ -7,6 +7,7 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -18,7 +19,7 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
     private val variable = HashMap<String, String>()
-    private val popupGroup = HashMap<String, PopupIteratorGroup>()
+    private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
     private val task = asyncTaskTimer(1, 1) {
         PlaceholderManagerImpl.update(this)
         tick++

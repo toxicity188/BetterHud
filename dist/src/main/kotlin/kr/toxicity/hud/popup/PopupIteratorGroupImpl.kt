@@ -5,7 +5,7 @@ import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.util.sum
 
-class PopupIteratorGroupImpl: PopupIteratorGroup {
+class PopupIteratorGroupImpl(val dispose: Boolean): PopupIteratorGroup {
     private val list = ArrayList<PopupIterator>()
     override fun available(): Boolean {
         return list.isNotEmpty() && list.any {
@@ -30,9 +30,11 @@ class PopupIteratorGroupImpl: PopupIteratorGroup {
                 iterator.remove()
             } else i++
         }
-        return list.map {
+        val result = list.map {
             it.next()
         }.sum()
+        if (dispose) list.clear()
+        return result
     }
 
     override fun contains(name: String): Boolean {

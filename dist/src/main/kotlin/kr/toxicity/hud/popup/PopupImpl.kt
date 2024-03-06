@@ -28,6 +28,7 @@ class PopupImpl(
     private val update = section.getBoolean("update", true)
     private val group = section.getString("group") ?: name
     private val unique = section.getBoolean("unique", true)
+    private val dispose = section.getBoolean("dispose")
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
         val target = file.subFolder(name)
@@ -54,7 +55,7 @@ class PopupImpl(
     override fun show(player: HudPlayer) {
         val playerMap = player.popupGroupIteratorMap
         val get = playerMap.getOrPut(group) {
-            PopupIteratorGroupImpl()
+            PopupIteratorGroupImpl(dispose)
         }
         if (unique && get.contains(name)) return
         if (get.index >= move.locations.size) return

@@ -1,6 +1,8 @@
 info: "<gold><b>[!]</gold> "
 warn: "<red><b>[!]</red> "
 
+number-format: "#,###.#"
+
 default-hud:
   - test_hud
 
