@@ -237,6 +237,12 @@ class MMOCoreCompatibility: Compatibility {
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
+            "is_casting_mode" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    val mmo = api.getPlayerData(p.bukkitPlayer)
+                    mmo.isCasting
+                }
+            },
             "bounded_skill" to object : HudPlaceholder<Boolean> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(
