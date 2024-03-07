@@ -126,4 +126,5 @@ class MythicHudImpl: MythicHud() {
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
     override fun getPopupManager(): PopupManager = PopupManagerImpl
+    override fun isOnReload(): Boolean = onReload
 }

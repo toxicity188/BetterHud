@@ -1,10 +1,12 @@
 package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.text.HudText
 import net.kyori.adventure.text.format.TextColor
+import java.text.DecimalFormat
 
 class TextLayout(
     val pattern: String,
@@ -16,6 +18,8 @@ class TextLayout(
     val color: TextColor,
     val outline: Boolean,
     val layer: Int,
+    val numberEquation: TEquation,
+    val numberFormat: DecimalFormat,
     val conditions: (HudPlayer) -> Boolean
 ) {
     enum class Align {

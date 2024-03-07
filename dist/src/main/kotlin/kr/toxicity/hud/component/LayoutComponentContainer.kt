@@ -1,5 +1,6 @@
 package kr.toxicity.hud.component
 
+import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.NEGATIVE_ONE_SPACE_COMPONENT
@@ -9,26 +10,25 @@ import kotlin.math.abs
 import kotlin.math.max
 
 class LayoutComponentContainer {
+    private val list = ArrayList<PixelComponent>()
 
-    private var widthComponent = EMPTY_WIDTH_COMPONENT
-    private var max = 0
-
-    private fun append(other: WidthComponent): LayoutComponentContainer {
-        widthComponent += other + (-other.width).toSpaceComponent()
-        if (max < other.width) max = other.width
-        return this
+    private fun append(other: PixelComponent) {
+        list.add(other)
     }
-    fun append(others: List<WidthComponent>): LayoutComponentContainer {
-        others.forEach { c ->
-            append(c)
+    fun append(others: List<PixelComponent>): LayoutComponentContainer {
+        others.forEach {
+            append(it)
         }
         return this
     }
 
-    fun build() = widthComponent + max.toSpaceComponent()
-
-    operator fun plus(other: LayoutComponentContainer) = LayoutComponentContainer().also {
-        it.widthComponent = widthComponent + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER + other.widthComponent
-        it.max = max(max, other.max)
+    fun build(): WidthComponent {
+        var comp = EMPTY_WIDTH_COMPONENT
+        var max = 0
+        list.forEach {
+            if (max < it.component.width) max = it.component.width
+            comp += it.pixel.toSpaceComponent() + it.component + (-it.pixel - it.component.width).toSpaceComponent()
+        }
+        return (-max / 2).toSpaceComponent() + comp
     }
 }

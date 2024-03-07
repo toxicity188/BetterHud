@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.Placeholder
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.resource.GlobalResource
@@ -19,6 +20,7 @@ import java.util.regex.Pattern
 object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
+    private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")
 
     private val updateTask = ArrayList<PlaceholderTask>()
 
@@ -131,7 +133,20 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
     }
 
     fun find(target: String): Placeholder<*> {
-        val pattern = target.split(':')
+        val equation = equationPatter.matcher(target)
+        val numberMapper: (Double) -> Double = if (equation.find()) {
+            TEquation(equation.group("equation")).let { mapper ->
+                { t ->
+                    mapper.evaluate(t)
+                }
+            }
+        } else {
+            {
+                it
+            }
+        }
+
+        val pattern = equation.replaceAll("").split(':')
 
         val matcher = castPattern.matcher(pattern[0])
         val first = matcher.replaceAll("")
@@ -166,6 +181,9 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
                 type?.let {
                     value = it.parser(value.toString()) ?: it.defaultValue
                 }
+                (value as? Number)?.let {
+                    value = numberMapper(it.toDouble())
+                }
                 return value
             }
         }
@@ -194,7 +212,7 @@ object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
                         return@forEach
                     }
                     number.map[pattern[0]]?.let {
-                        sb.append(ConfigManager.numberFormat.format(it(t, list)))
+                        sb.append(it(t, list))
                         return@forEach
                     }
                     parserSb.setLength(0)

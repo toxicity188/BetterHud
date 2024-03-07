@@ -7,6 +7,7 @@ import kotlin.math.PI
 
 class TEquation(expression: String) {
     companion object {
+        val t = TEquation("t")
         val zero = TEquation("0")
     }
 

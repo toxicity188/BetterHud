@@ -12,9 +12,6 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class HudPlayerImpl(private val player: Player): HudPlayer {
-    companion object {
-        private const val MAX_WIDTH = 4096
-    }
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
@@ -24,33 +21,32 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
         PlaceholderManagerImpl.update(this)
         tick++
         val compList = ArrayList<WidthComponent>()
-        ConfigManager.defaultPopup.forEach {
-            PopupManagerImpl.getPopup(it)?.show(this)
-        }
-        ConfigManager.defaultHud.forEach {
-            HudManager.getHud(it)?.let { hud ->
-                compList.addAll(hud.getComponent(this))
+
+        if (!PLUGIN.isOnReload) {
+            ConfigManager.defaultPopup.forEach {
+                PopupManagerImpl.getPopup(it)?.show(this)
             }
-        }
-        popupGroup.values.removeIf {
-            !it.available()
-        }
-        popupGroup.forEach {
-            compList.addAll(it.value.next())
+            ConfigManager.defaultHud.forEach {
+                HudManager.getHud(it)?.let { hud ->
+                    compList.addAll(hud.getComponent(this))
+                }
+            }
+            popupGroup.values.removeIf {
+                !it.available()
+            }
+            popupGroup.forEach {
+                compList.addAll(it.value.next())
+            }
+        } else {
+            popupGroup.clear()
         }
         if (compList.isNotEmpty()) {
             additionalComp?.let {
                 compList.add(it)
             }
-            val max = MAX_WIDTH
-            val maxComp = (-max).toSpaceComponent()
             var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-            compList.forEachIndexed { index, it ->
-                val minus = (max - it.width).toDouble() / 2
-                val fMinus = floor(minus).toInt()
-                val cMinus = ceil(minus).toInt()
-                comp += fMinus.toSpaceComponent() + it + cMinus.toSpaceComponent()
-                if (index < compList.lastIndex) comp += maxComp
+            compList.forEach {
+                comp += it + (-it.width).toSpaceComponent()
             }
             last = comp
 

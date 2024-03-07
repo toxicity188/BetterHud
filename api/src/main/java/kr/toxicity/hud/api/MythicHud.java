@@ -39,4 +39,5 @@ public abstract class MythicHud extends JavaPlugin {
     public abstract @NotNull PlaceholderManager getPlaceholderManager();
     public abstract @NotNull ListenerManager getListenerManager();
     public abstract @NotNull PopupManager getPopupManager();
+    public abstract boolean isOnReload();
 }

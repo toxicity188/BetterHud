@@ -1,7 +1,9 @@
 package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.equation.EquationLocation
+import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.placeholder.Conditions
@@ -10,6 +12,7 @@ import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
+import java.text.DecimalFormat
 
 class LayoutGroup(section: ConfigurationSection) {
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
@@ -54,6 +57,12 @@ class LayoutGroup(section: ConfigurationSection) {
                     } ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
+                    configurationSection.getString("number-equation")?.let {
+                        TEquation(it)
+                    } ?: TEquation.t,
+                    configurationSection.getString("number-format")?.let {
+                        DecimalFormat(it)
+                    } ?: ConfigManager.numberFormat,
                     configurationSection.getConfigurationSection("conditions")?.let {
                         Conditions.parse(it)
                     } ?: { true }

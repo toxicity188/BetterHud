@@ -108,6 +108,14 @@ class MMOCoreCompatibility: Compatibility {
                 MMOCore.plugin.skillManager.getSkill(a[0])?.let { skill ->
                     mmo.cooldownMap.getCooldown("skill_" + skill.handler.id)
                 } ?: 0.0
+            },
+            "skill_bound_index" to HudPlaceholder.of(1) { p, a ->
+                val mmo = api.getPlayerData(p.bukkitPlayer)
+                MMOCore.plugin.skillManager.getSkill(a[0])?.let { skill ->
+                    (0..8).firstOrNull {
+                        mmo.getBoundSkill(it)?.skill?.handler?.id == skill.handler.id
+                    }
+                } ?: -1
             }
         )
     override val strings: Map<String, HudPlaceholder<String>>

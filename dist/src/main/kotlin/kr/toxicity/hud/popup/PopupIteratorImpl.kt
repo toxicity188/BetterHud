@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.popup.PopupIterator
 class PopupIteratorImpl(
     private val name: String,
     private val mapper: (Int,  Int) -> List<WidthComponent>,
+    val value: () -> Int,
     private val duration: Int,
     private val condition: () -> Boolean
 ): PopupIterator {
@@ -21,5 +22,6 @@ class PopupIteratorImpl(
         return mapper(i, tick++)
     }
 
+    override fun getPriority(): Int = value()
     override fun name(): String = name
 }

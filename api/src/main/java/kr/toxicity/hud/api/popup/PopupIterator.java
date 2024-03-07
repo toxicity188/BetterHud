@@ -12,4 +12,5 @@ public interface PopupIterator {
     boolean available();
     @NotNull @Unmodifiable List<WidthComponent> next();
     @NotNull String name();
+    int getPriority();
 }

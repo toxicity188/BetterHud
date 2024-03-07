@@ -5,7 +5,7 @@ import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.util.sum
 
-class PopupIteratorGroupImpl(val dispose: Boolean): PopupIteratorGroup {
+class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
     private val list = ArrayList<PopupIterator>()
     override fun available(): Boolean {
         return list.isNotEmpty() && list.any {
@@ -14,8 +14,21 @@ class PopupIteratorGroupImpl(val dispose: Boolean): PopupIteratorGroup {
     }
 
     override fun addIterator(iterator: PopupIterator) {
-        iterator.index = index
+        iterator.index = if (iterator.priority >= 0 && list.none {
+            it.index == iterator.priority
+        }) iterator.priority else run {
+            var i = 0
+            val map = list.map {
+                it.index
+            }
+            while (map.contains(i)) i++
+            i
+        }
         list.add(iterator)
+    }
+
+    override fun clear() {
+        list.clear()
     }
 
     override fun next(): List<WidthComponent> {
@@ -25,7 +38,7 @@ class PopupIteratorGroupImpl(val dispose: Boolean): PopupIteratorGroup {
             val next = iterator.next()
             if (!next.available()) {
                 list.subList(i, list.size).forEach {
-                    it.index --
+                    it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }
                 iterator.remove()
             } else i++

@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.equation.EquationPairLocation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.LayoutManager
+import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.forEachSubConfiguration
@@ -29,6 +30,15 @@ class PopupImpl(
     private val group = section.getString("group") ?: name
     private val unique = section.getBoolean("unique", true)
     private val dispose = section.getBoolean("dispose")
+    private val index: ((HudPlayer) -> Int)? = section.getString("index")?.let {
+        PlaceholderManagerImpl.find(it).apply {
+            if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
+        }.let {
+            { player ->
+                (it.value(player) as Number).toInt()
+            }
+        }
+    }
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
         val target = file.subFolder(name)
@@ -86,9 +96,18 @@ class PopupImpl(
                 (++i < duration) && old()
             }
         }
+        var valueGetter: () -> Int = {
+            -1
+        }
+        index?.let {
+            valueGetter = {
+                it(player)
+            }
+        }
         get.addIterator(PopupIteratorImpl(
             name,
             mapper,
+            valueGetter,
             duration,
             cond
         ))

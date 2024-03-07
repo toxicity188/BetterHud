@@ -35,6 +35,9 @@ object PlayerManager: MythicHudManager {
 
     override fun reload(resource: GlobalResource) {
         hudPlayer.values.forEach {
+            it.popupGroupIteratorMap.forEach { value ->
+                value.value.clear()
+            }
             it.popupGroupIteratorMap.clear()
         }
     }

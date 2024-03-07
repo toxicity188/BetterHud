@@ -1,16 +1,18 @@
 package kr.toxicity.hud.renderer
 
+import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
-import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
-import kr.toxicity.hud.util.NEGATIVE_ONE_SPACE_COMPONENT
-import kr.toxicity.hud.util.NEW_LAYER
-import kr.toxicity.hud.util.toSpaceComponent
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
+import java.text.DecimalFormat
+import java.util.LinkedList
+import java.util.regex.Pattern
 import kotlin.math.ceil
 
 class TextRenderer(
@@ -19,19 +21,40 @@ class TextRenderer(
     private val pattern: String,
     private val align: TextLayout.Align,
     private val scale: Double,
-    x: Int,
+    private val x: Int,
+
     space: Int,
+
+    private val numberEquation: TEquation,
+    private val numberPattern: DecimalFormat,
+
     private val condition: (HudPlayer) -> Boolean
 ) {
-    private val sComponent = space.toSpaceComponent()
-    private val xComponent = x.toSpaceComponent()
     companion object {
+        private val textPattern = Pattern.compile("([0-9]+((.([0-9]+))?))")
         private val spaceComponent = 4.toSpaceComponent()
     }
-    fun getText(player: HudPlayer): WidthComponent {
+
+    private val sComponent = space.toSpaceComponent()
+    fun getText(player: HudPlayer): PixelComponent {
         var comp = EMPTY_WIDTH_COMPONENT
-        val original = if (condition(player)) PlaceholderManagerImpl.parse(player, pattern) else ""
-        if (original == "") return comp
+        var original = if (condition(player)) PlaceholderManagerImpl.parse(player, pattern) else ""
+        if (original == "") return EMPTY_PIXEL_COMPONENT
+        val matcher = textPattern.matcher(original)
+        val number = LinkedList<String>()
+        while (matcher.find()) {
+            number.add(numberPattern.format(numberEquation.evaluate(matcher.group().toDouble())))
+        }
+        if (number.isNotEmpty()) {
+            val sb = StringBuilder()
+            original.split(textPattern).forEach {
+                sb.append(it)
+                number.poll()?.let { n ->
+                    sb.append(n)
+                }
+            }
+            original = sb.toString()
+        }
         original.forEachIndexed { index, char ->
             if (char == ' ') {
                 comp += spaceComponent
@@ -51,6 +74,6 @@ class TextRenderer(
             }
             else -> {}
         }
-        return xComponent + comp
+        return comp.toPixelComponent(x)
     }
 }

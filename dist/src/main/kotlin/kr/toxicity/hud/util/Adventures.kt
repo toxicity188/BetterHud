@@ -1,5 +1,6 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -33,9 +34,12 @@ fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).deco
 
 val EMPTY_COMPONENT: Component = Component.empty()
 val EMPTY_WIDTH_COMPONENT = WidthComponent(Component.empty().color(NamedTextColor.WHITE), 0)
+val EMPTY_PIXEL_COMPONENT = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 val NEW_LAYER = WidthComponent(Component.text(0xC0000.parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
 val FORWARD_ONE_SPACE_COMPONENT = WidthComponent(Component.text((0xD0000 + 1).parseChar()).font(SPACE_KEY), 0)
+
+fun WidthComponent.toPixelComponent(pixel: Int) = PixelComponent(this, pixel)
 
 fun Int.parseChar(): String {
     return if (this <= 0xFFFF) this.toChar().toString()

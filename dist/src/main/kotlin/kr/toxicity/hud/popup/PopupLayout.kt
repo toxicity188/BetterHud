@@ -2,6 +2,7 @@ package kr.toxicity.hud.popup
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.component.LayoutComponentContainer
@@ -96,47 +97,52 @@ class PopupLayout(
             val maxWidth = ceil(hudImage.image.maxOf {
                 it.second.width.toDouble()
             } * target.scale).toInt()
+            val list = ArrayList<PixelComponent>()
+
+            if (hudImage is ListenerHudImage) list.add(EMPTY_PIXEL_COMPONENT)
+            if (hudImage.image.size > 1) hudImage.image.forEach {
+                val char = (++imageChar).parseChar()
+                array.add(JsonObject().apply {
+                    addProperty("type", "bitmap")
+                    addProperty("file", "$NAME_SPACE:image/${hudImage.name}/${it.first}")
+                    addProperty("ascent", Hud.createBit(pixel.y, imageShader))
+                    addProperty("height", ceil(it.second.height * target.scale).toInt())
+                    add("chars", JsonArray().apply {
+                        add(char)
+                    })
+                })
+                var comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                if (hudImage is ListenerHudImage) {
+                    when (hudImage.splitType) {
+                        SplitType.RIGHT -> {
+                            comp = (maxWidth - comp.width).toSpaceComponent() + comp
+                        }
+                        SplitType.UP, SplitType.DOWN -> {
+                            val minus = (maxWidth - comp.width).toDouble()
+                            comp = ceil(minus / 2).toInt().toSpaceComponent() + comp + floor(minus / 2).toInt().toSpaceComponent()
+                        }
+                        else -> {}
+                    }
+                }
+                list.add(comp.toPixelComponent(pixel.x))
+            } else hudImage.image[0].let {
+                val char = (++imageChar).parseChar()
+                array.add(JsonObject().apply {
+                    addProperty("type", "bitmap")
+                    addProperty("file", "$NAME_SPACE:image/${it.first}")
+                    addProperty("ascent", Hud.createBit(pixel.y, imageShader))
+                    addProperty("height", ceil(it.second.height * target.scale).toInt())
+                    add("chars", JsonArray().apply {
+                        add(char)
+                    })
+                })
+                val comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                list.add(comp.toPixelComponent(pixel.x))
+            }
+
             ImageRenderer(
                 hudImage,
-                if (hudImage.image.size > 1) hudImage.image.map {
-                    val char = (++imageChar).parseChar()
-                    array.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE:image/${hudImage.name}/${it.first}")
-                        addProperty("ascent", Hud.createBit(pixel.y, imageShader))
-                        addProperty("height", ceil(it.second.height * target.scale).toInt())
-                        add("chars", JsonArray().apply {
-                            add(char)
-                        })
-                    })
-                    var comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                    if (hudImage is ListenerHudImage) {
-                        when (hudImage.splitType) {
-                            SplitType.RIGHT -> {
-                                comp = (maxWidth - comp.width).toSpaceComponent() + comp
-                            }
-                            SplitType.UP, SplitType.DOWN -> {
-                                val minus = (maxWidth - comp.width).toDouble()
-                                comp = ceil(minus / 2).toInt().toSpaceComponent() + comp + floor(minus / 2).toInt().toSpaceComponent()
-                            }
-                            else -> {}
-                        }
-                    }
-                    pixel.x.toSpaceComponent() + comp
-                } else listOf(hudImage.image[0].let {
-                    val char = (++imageChar).parseChar()
-                    array.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE:image/${it.first}")
-                        addProperty("ascent", Hud.createBit(pixel.y, imageShader))
-                        addProperty("height", ceil(it.second.height * target.scale).toInt())
-                        add("chars", JsonArray().apply {
-                            add(char)
-                        })
-                    })
-                    val comp = WidthComponent(Component.text(char).font(imageKey), ceil(it.second.width.toDouble() * target.scale).toInt())
-                    pixel.x.toSpaceComponent() + comp
-                })
+                list
             ) {
                 hudImage.conditions(it) && target.conditions(it)
             }
@@ -183,6 +189,8 @@ class PopupLayout(
                 textLayout.scale,
                 pixel.x,
                 textLayout.space,
+                textLayout.numberEquation,
+                textLayout.numberFormat
             ) {
                 textLayout.conditions(it) && textLayout.text.conditions(it)
             }
