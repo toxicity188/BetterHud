@@ -14,7 +14,7 @@ object CommandManager: MythicHudManager {
             usage = "reload".toComponent()
             permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
-                s.info("try to start reloading. please wait...")
+                s.info("Try to start reloading. please wait...")
                 asyncTask {
                     val result = PLUGIN.reload()
                     when (result.state) {

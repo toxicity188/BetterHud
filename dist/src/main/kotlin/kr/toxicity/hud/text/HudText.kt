@@ -1,6 +1,6 @@
 package kr.toxicity.hud.text
 
-import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.placeholder.ConditionBuilder
 
 class HudText(
     val name: String,
@@ -8,5 +8,5 @@ class HudText(
     val height: Int,
     val array: List<HudTextArray>,
     val charWidth: Map<Char, Int>,
-    val conditions: (HudPlayer) -> Boolean
+    val conditions: ConditionBuilder
 )

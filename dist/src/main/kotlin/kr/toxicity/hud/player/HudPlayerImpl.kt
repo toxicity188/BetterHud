@@ -3,6 +3,7 @@ package kr.toxicity.hud.player
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
@@ -24,11 +25,19 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
 
         if (!PLUGIN.isOnReload) {
             ConfigManager.defaultPopup.forEach {
-                PopupManagerImpl.getPopup(it)?.show(this)
+                runCatching {
+                    PopupManagerImpl.getPopup(it)?.show(UpdateEvent.EMPTY, this)
+                }.onFailure { e ->
+                    warn("Unable to update popup. reason: ${e.message}")
+                }
             }
             ConfigManager.defaultHud.forEach {
                 HudManager.getHud(it)?.let { hud ->
-                    compList.addAll(hud.getComponent(this))
+                    runCatching {
+                        compList.addAll(hud.getComponent(this))
+                    }.onFailure { e ->
+                        warn("Unable to update hud. reason: ${e.message}")
+                    }
                 }
             }
             popupGroup.values.removeIf {
@@ -42,7 +51,7 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
         }
         if (compList.isNotEmpty()) {
             additionalComp?.let {
-                compList.add(it)
+                compList.add((-it.width / 2).toSpaceComponent() + it)
             }
             var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
             compList.forEach {
@@ -73,6 +82,9 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     override fun getBukkitPlayer(): Player = player
     override fun getVariableMap(): MutableMap<String, String> = variable
     override fun cancel() {
+        popupGroup.forEach {
+            it.value.clear()
+        }
         PLUGIN.nms.removeBossBar(player)
         task.cancel()
     }

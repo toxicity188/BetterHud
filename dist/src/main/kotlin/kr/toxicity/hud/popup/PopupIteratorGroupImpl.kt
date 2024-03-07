@@ -28,6 +28,9 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
     }
 
     override fun clear() {
+        list.forEach {
+            it.remove()
+        }
         list.clear()
     }
 
@@ -40,6 +43,7 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
                 list.subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }
+                next.remove()
                 iterator.remove()
             } else i++
         }

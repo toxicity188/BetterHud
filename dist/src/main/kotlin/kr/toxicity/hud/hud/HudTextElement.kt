@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.renderer.TextRenderer
@@ -54,12 +55,12 @@ class HudTextElement(name: String, file: File, private val text: TextLayout, ind
                 text.location.x + imageLocation.x,
                 text.space,
                 text.numberEquation,
-                text.numberFormat
-            ) {
-                text.conditions(it) && text.text.conditions(it)
-            }
+                text.numberFormat,
+                text.conditions.and(text.text.conditions)
+            )
         }
     }
 
-    fun getText(player: HudPlayer): PixelComponent = renderer[(player.tick % renderer.size).toInt()].getText(player)
+    fun getText(player: HudPlayer): PixelComponent = renderer[(player.tick % renderer.size).toInt()].getText(
+        UpdateEvent.EMPTY)(player)
 }

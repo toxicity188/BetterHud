@@ -1,6 +1,7 @@
 package kr.toxicity.hud.hud
 
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
@@ -21,7 +22,7 @@ class HudElement(name: String, file: File, layout: LayoutGroup, x: Double, y: Do
         }
     }
 
-    val conditions = layout.conditions
+    val conditions = layout.conditions.build(UpdateEvent.EMPTY)
 
     fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer()
         .append(imageElement.map {

@@ -1,5 +1,7 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.placeholder.Conditions
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -13,3 +15,7 @@ fun ConfigurationSection.forEachSubConfiguration(block: (String, ConfigurationSe
         }
     }
 }
+
+fun ConfigurationSection.toConditions() = getConfigurationSection("conditions")?.let {
+    Conditions.parse(it)
+} ?: ConditionBuilder.alwaysTrue

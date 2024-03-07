@@ -9,6 +9,7 @@ import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
+import kr.toxicity.hud.util.toConditions
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
@@ -29,9 +30,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layout"),
-                    configurationSection.getConfigurationSection("conditions")?.let {
-                        Conditions.parse(it)
-                    } ?: { true }
+                    configurationSection.toConditions()
                 )
             )
         }
@@ -63,16 +62,12 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("number-format")?.let {
                         DecimalFormat(it)
                     } ?: ConfigManager.numberFormat,
-                    configurationSection.getConfigurationSection("conditions")?.let {
-                        Conditions.parse(it)
-                    } ?: { true }
+                    configurationSection.toConditions()
                 )
             )
         }
     }
-    val conditions = section.getConfigurationSection("conditions")?.let {
-        Conditions.parse(it)
-    } ?: { true }
+    val conditions = section.toConditions()
 
     val animation = section.getConfigurationSection("animations")?.let { animations ->
         EquationLocation(animations).location

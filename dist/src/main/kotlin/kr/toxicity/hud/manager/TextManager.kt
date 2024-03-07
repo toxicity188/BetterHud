@@ -2,8 +2,7 @@ package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.placeholder.Conditions
+import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
@@ -48,9 +47,7 @@ object TextManager: MythicHudManager {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
-                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.getConfigurationSection("conditions")?.let {
-                    Conditions.parse(it)
-                } ?: { true })
+                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.toConditions())
             }.onFailure { e ->
                 warn("Unable to load this text: $s in ${file.name}")
                 warn("Reason: ${e.message}")
@@ -64,7 +61,7 @@ object TextManager: MythicHudManager {
                 })
             })
         }
-        val parseDefault = parseFont("default", "default", BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font.deriveFont(12F), 12, resource.textures.subFolder("font")) { true }
+        val parseDefault = parseFont("default", "default", BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font.deriveFont(12F), 12, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = ceil(it.value.toDouble() / 2).toInt()
         }
@@ -82,7 +79,7 @@ object TextManager: MythicHudManager {
         }.save(resource.font.subFile("default.json"))
     }
 
-    private fun parseFont(s: String, saveName: String, fontFile: Font, scale: Int, imageSaveFolder: File, condition: (HudPlayer) -> Boolean): HudText {
+    private fun parseFont(s: String, saveName: String, fontFile: Font, scale: Int, imageSaveFolder: File, condition: ConditionBuilder): HudText {
         val height = (scale.toDouble() * 1.4).toInt()
         val pairMap = HashMap<Int, MutableList<Pair<Char, BufferedImage>>>()
         (Char.MIN_VALUE..Char.MAX_VALUE).forEach { char ->

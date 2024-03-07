@@ -2,17 +2,16 @@ package kr.toxicity.hud.hud
 
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
-import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.subFolder
-import net.kyori.adventure.text.format.TextColor
+import kr.toxicity.hud.util.toConditions
 import org.bukkit.configuration.ConfigurationSection
 import java.io.File
-import kotlin.math.round
 
 class Hud(name: String, file: File, section: ConfigurationSection) {
     companion object {
@@ -42,9 +41,7 @@ class Hud(name: String, file: File, section: ConfigurationSection) {
             throw RuntimeException("layout is empty.")
         }
     }
-    private val conditions = section.getConfigurationSection("conditions")?.let {
-        Conditions.parse(it)
-    } ?: { true }
+    private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
 
     fun getComponent(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.SplitType
@@ -82,14 +83,14 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
             }.save(File(file, "${hud.name}_${index + 1}_${index2 + 1}.json"))
             ImageRenderer(
                 hud,
-                list
-            ) {
-                image.conditions(it) && hud.conditions(it)
-            }
+                list,
+                image.conditions.and(image.image.conditions)
+            )
         }
 
     }
 
-    fun getComponent(player: HudPlayer): PixelComponent = chars[(player.tick % chars.size).toInt()].getComponent(player)
+    fun getComponent(player: HudPlayer): PixelComponent = chars[(player.tick % chars.size).toInt()].getComponent(
+        UpdateEvent.EMPTY)(player)
 
 }

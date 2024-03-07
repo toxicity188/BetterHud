@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.Hud
 import kr.toxicity.hud.image.ImageLocation
@@ -54,13 +55,19 @@ class PopupLayout(
         map
     }
 
-    fun getComponent(index: Int, animationIndex: Int, player: HudPlayer) = groups[index % groups.size].getComponent(animationIndex, player)
-    fun getComponent(player: HudPlayer): (Int, Int) -> WidthComponent {
-        val map = groups.map {
-            it.getComponent(player)
+    fun getComponent(index: Int, animationIndex: Int, reason: UpdateEvent): (HudPlayer) -> WidthComponent {
+        val get = groups[index % groups.size].getComponent(reason)
+        return { player ->
+            val list = get(player)
+            list[animationIndex % list.size]
         }
-        return { index, frame ->
-            val get = map[index % map.size]
+    }
+    fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
+        val map = groups.map {
+            it.getComponent(reason)
+        }
+        return { player, index, frame ->
+            val get = map[index % map.size](player)
             get[frame % get.size]
         }
     }
@@ -69,22 +76,44 @@ class PopupLayout(
         val elements = layout.animation.map { location ->
             PopupElement(pair, array, location, textFolder)
         }
-        fun getComponent(animationIndex: Int, player: HudPlayer) = elements[animationIndex % elements.size].getComponent(player)
-        fun getComponent(player: HudPlayer) = elements.map {
-            it.getComponent(player)
+        fun getComponent(animationIndex: Int, reason: UpdateEvent): (HudPlayer) -> WidthComponent {
+            val get = elements[animationIndex % elements.size].getComponent(reason)
+            return { p ->
+                get(p)
+            }
+        }
+        fun getComponent(reason: UpdateEvent): (HudPlayer) -> List<WidthComponent> {
+            val map = elements.map {
+                it.getComponent(reason)
+            }
+            return { p ->
+                map.map {
+                    it(p)
+                }
+            }
         }
     }
     private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: File) {
         private val gui = pair.gui + parent.gui + globalLocation
 
-        fun getComponent(player: HudPlayer) = LayoutComponentContainer()
-            .append(image.map {
-                it.getComponent(player)
-            })
-            .append(texts.map {
-                it.getText(player)
-            })
-            .build()
+        fun getComponent(reason: UpdateEvent): (HudPlayer) -> WidthComponent {
+            val imageProcessing = image.map {
+                it.getComponent(reason)
+            }
+            val textProcessing = texts.map {
+                it.getText(reason)
+            }
+            return { player ->
+                LayoutComponentContainer()
+                    .append(imageProcessing.map {
+                        it(player)
+                    })
+                    .append(textProcessing.map {
+                        it(player)
+                    })
+                    .build()
+            }
+        }
 
         val image = layout.image.map { target ->
             val hudImage = target.image
@@ -142,10 +171,9 @@ class PopupLayout(
 
             ImageRenderer(
                 hudImage,
-                list
-            ) {
-                hudImage.conditions(it) && target.conditions(it)
-            }
+                list,
+                hudImage.conditions.and(target.conditions)
+            )
         }
         val texts = layout.text.map { textLayout ->
             val pixel = location + pair.pixel + textLayout.location
@@ -190,10 +218,9 @@ class PopupLayout(
                 pixel.x,
                 textLayout.space,
                 textLayout.numberEquation,
-                textLayout.numberFormat
-            ) {
-                textLayout.conditions(it) && textLayout.text.conditions(it)
-            }
+                textLayout.numberFormat,
+                textLayout.conditions.and(textLayout.text.conditions)
+            )
         }
     }
 }

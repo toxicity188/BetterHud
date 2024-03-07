@@ -1,22 +1,35 @@
 package kr.toxicity.hud.renderer
 
 import kr.toxicity.hud.api.component.PixelComponent
-import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageType
+import kr.toxicity.hud.image.ListenerHudImage
+import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
-import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
-import kr.toxicity.hud.util.NEGATIVE_ONE_SPACE_COMPONENT
-import kr.toxicity.hud.util.NEW_LAYER
 
 class ImageRenderer(
-    private val image: HudImage,
+    image: HudImage,
     private val components: List<PixelComponent>,
-    private val conditions: (HudPlayer) -> Boolean
+    private val conditions: ConditionBuilder
 ) {
     private val type: ImageType = image.type
-    fun getComponent(player: HudPlayer): PixelComponent {
-        return if (conditions(player)) type.getComponent(image, components, player) else EMPTY_PIXEL_COMPONENT
+    val listener: (UpdateEvent) -> HudListener = (image as? ListenerHudImage)?.let {
+        { event ->
+            it.listener(event)
+        }
+    } ?: HudListener.ZERO.let {
+        { _ ->
+            it
+        }
+    }
+    fun getComponent(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
+        val cond = conditions.build(reason)
+        val listen = listener(reason)
+        return { player ->
+            if (cond(player)) type.getComponent(listen, components, player) else EMPTY_PIXEL_COMPONENT
+        }
     }
 }

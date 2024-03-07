@@ -1,6 +1,6 @@
 package kr.toxicity.hud.image
 
-import kr.toxicity.hud.placeholder.Conditions
+import kr.toxicity.hud.util.toConditions
 import org.bukkit.configuration.ConfigurationSection
 import java.awt.image.BufferedImage
 
@@ -10,7 +10,5 @@ open class HudImage(
     val type: ImageType,
     setting: ConfigurationSection
 ) {
-    val conditions = setting.getConfigurationSection("conditions")?.let {
-        Conditions.parse(it)
-    } ?: { true }
+    val conditions = setting.toConditions()
 }
