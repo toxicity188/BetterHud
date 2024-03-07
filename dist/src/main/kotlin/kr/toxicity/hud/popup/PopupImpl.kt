@@ -71,7 +71,10 @@ class PopupImpl(
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
             if (keyMapping) {
-                keyMap[event.uuid]?.update()
+                keyMap[event.uuid]?.let {
+                    it.update()
+                    return@task true
+                }
             }
             PlayerManager.getHudPlayer(uuid)?.let { player ->
                 show(event, player, event.uuid)?.let {
