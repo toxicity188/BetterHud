@@ -5,7 +5,7 @@ import kr.toxicity.hud.command.CommandModule
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 
-object CommandManager: MythicHudManager {
+object CommandManager: BetterHudManager {
 
     private val command = CommandModule("hud")
         .addCommand("reload") {
@@ -30,7 +30,7 @@ object CommandManager: MythicHudManager {
         }
 
     override fun start() {
-        PLUGIN.getCommand("mythichud")?.setExecutor(command.createTabExecutor())
+        PLUGIN.getCommand(NAME_SPACE)?.setExecutor(command.createTabExecutor())
     }
 
     override fun reload(resource: GlobalResource) {

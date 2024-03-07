@@ -7,7 +7,7 @@ import kr.toxicity.hud.util.forEachAllYaml
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.warn
 
-object HudManager: MythicHudManager {
+object HudManager: BetterHudManager {
 
     private val hudMap = HashMap<String, Hud>()
 

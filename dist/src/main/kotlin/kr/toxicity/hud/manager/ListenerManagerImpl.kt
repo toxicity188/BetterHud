@@ -13,7 +13,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityEvent
 import java.util.function.Function
 
-object ListenerManagerImpl: MythicHudManager, ListenerManager {
+object ListenerManagerImpl: BetterHudManager, ListenerManager {
 
     private val listenerMap = mutableMapOf<String, (ConfigurationSection) -> (UpdateEvent) -> HudListener>(
         "health" to { _ ->

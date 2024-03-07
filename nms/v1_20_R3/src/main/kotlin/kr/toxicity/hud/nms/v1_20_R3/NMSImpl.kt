@@ -4,7 +4,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
-import kr.toxicity.hud.api.MythicHud
+import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
@@ -26,7 +26,7 @@ import java.util.*
 
 class NMSImpl: NMS {
     companion object {
-        private const val INJECT_NAME = MythicHud.DEFAULT_NAMESPACE
+        private const val INJECT_NAME = BetterHud.DEFAULT_NAMESPACE
         private val bossBarMap = HashMap<UUID, PlayerBossBar>()
 
         @Suppress("UNCHECKED_CAST")
@@ -128,7 +128,7 @@ class NMSImpl: NMS {
             ))
             fun sendName(targetBuf: FriendlyByteBuf = buf) {
                 runCatching {
-                    val hud = MythicHud.getInstance().getHudPlayer(player)
+                    val hud = BetterHud.getInstance().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponentTrusted())
                     val key = Key.key("$INJECT_NAME:default")
                     fun applyFont(component: Component): Component {
@@ -141,7 +141,7 @@ class NMSImpl: NMS {
                         return component.children().sumOf {
                             getWidth(it)
                         } + ((component as? TextComponent)?.content()?.sumOf {
-                            var t = MythicHud.getInstance().getWidth(it)
+                            var t = BetterHud.getInstance().getWidth(it)
                             if (style.hasDecoration(TextDecoration.BOLD)) t++
                             if (style.hasDecoration(TextDecoration.ITALIC)) t++
                             t + 1
@@ -188,7 +188,7 @@ class NMSImpl: NMS {
                             } ?: run {
                                 saveUUID = uuid
                                 onUse = false
-                                MythicHud.getInstance().getHudPlayer(player).additionalComponent = null
+                                BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
                                 listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
                                 listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))
                                 listener.send(ClientboundBossEventPacket.createUpdatePropertiesPacket(last))

@@ -9,7 +9,7 @@ import kr.toxicity.hud.util.PLUGIN
 import org.bukkit.Bukkit
 import java.util.function.Function
 
-object CompatibilityManager: MythicHudManager {
+object CompatibilityManager: BetterHudManager {
 
     private val compatibilities = mapOf(
         "MMOCore" to {

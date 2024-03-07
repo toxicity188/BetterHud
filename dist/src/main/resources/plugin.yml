@@ -1,6 +1,6 @@
-main: kr.toxicity.hud.MythicHudImpl
+main: kr.toxicity.hud.BetterHudImpl
 version: ${version}
-name: MythicHud
+name: BetterHud
 api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
@@ -11,10 +11,10 @@ softdepend:
   - PlaceholderAPI
   - WorldGuard
 commands:
-  mythichud:
+  betterhud:
     aliases:
       - hud
-    description: MythicHud's command.
+    description: BetterHud's command.
     usage: /<command>
 libraries:
   - "net.kyori:adventure-api:${adventure}"

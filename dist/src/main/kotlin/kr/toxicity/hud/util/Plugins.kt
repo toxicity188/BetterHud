@@ -1,12 +1,12 @@
 package kr.toxicity.hud.util
 
-import kr.toxicity.hud.api.MythicHud
+import kr.toxicity.hud.api.BetterHud
 import org.bukkit.Bukkit
 
 val PLUGIN
-    get() = MythicHud.getInstance()
+    get() = BetterHud.getInstance()
 
-const val NAME_SPACE = MythicHud.DEFAULT_NAMESPACE
+const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
 val DATA_FOLDER
     get() = PLUGIN.dataFolder.apply {
         if (!exists()) {

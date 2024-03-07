@@ -7,7 +7,7 @@ import kr.toxicity.hud.util.forEachAllYaml
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.warn
 
-object LayoutManager: MythicHudManager {
+object LayoutManager: BetterHudManager {
 
     private val layoutMap = HashMap<String, LayoutGroup>()
 

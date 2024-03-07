@@ -9,7 +9,7 @@ import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
 
-object ImageManager: MythicHudManager {
+object ImageManager: BetterHudManager {
 
     private val imageMap = HashMap<String, HudImage>()
     private val emptySetting = MemoryConfiguration()

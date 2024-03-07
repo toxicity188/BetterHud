@@ -15,10 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Objects;
 
-public abstract class MythicHud extends JavaPlugin {
-    private static MythicHud instance;
+public abstract class BetterHud extends JavaPlugin {
+    private static BetterHud instance;
 
-    public static final String DEFAULT_NAMESPACE = "mythichud";
+    public static final String DEFAULT_NAMESPACE = "betterhud";
 
 
     @Override
@@ -26,7 +26,7 @@ public abstract class MythicHud extends JavaPlugin {
         if (instance != null) throw new RuntimeException();
         instance = this;
     }
-    public static @NotNull MythicHud getInstance() {
+    public static @NotNull BetterHud getInstance() {
         return Objects.requireNonNull(instance);
     }
 

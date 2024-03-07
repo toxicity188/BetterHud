@@ -2,7 +2,7 @@
     "providers": [
         {
             "type": "ttf",
-            "file": "mythichud:spaces.ttf",
+            "file": "betterhud:spaces.ttf",
             "size": 2.5,
             "oversample": 1.0,
             "shift": [0.0, 0.0],

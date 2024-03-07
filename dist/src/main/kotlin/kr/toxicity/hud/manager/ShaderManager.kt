@@ -11,7 +11,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.util.regex.Pattern
 
-object ShaderManager: MythicHudManager {
+object ShaderManager: BetterHudManager {
     var barColor = BarColor.YELLOW
         private set
 

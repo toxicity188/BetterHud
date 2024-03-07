@@ -23,7 +23,7 @@ import org.bukkit.potion.PotionEffectType
 import java.util.function.Function
 import java.util.regex.Pattern
 
-object PlaceholderManagerImpl: PlaceholderManager, MythicHudManager {
+object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")

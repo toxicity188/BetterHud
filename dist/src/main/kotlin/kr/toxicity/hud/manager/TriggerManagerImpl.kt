@@ -17,7 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import java.util.UUID
 import java.util.function.Function
 
-object TriggerManagerImpl: MythicHudManager, TriggerManager {
+object TriggerManagerImpl: BetterHudManager, TriggerManager {
     private val listener = object : Listener {}
 
     private val map = mutableMapOf<String, HudTrigger<*>>(

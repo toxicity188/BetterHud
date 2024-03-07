@@ -1,6 +1,6 @@
 package kr.toxicity.hud
 
-import kr.toxicity.hud.api.MythicHud
+import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.manager.PopupManager
@@ -21,7 +21,7 @@ import org.bukkit.entity.Player
 import java.io.File
 import java.util.jar.JarFile
 
-class MythicHudImpl: MythicHud() {
+class BetterHudImpl: BetterHud() {
     private val managers = listOf(
         ConfigManager,
         CommandManager,

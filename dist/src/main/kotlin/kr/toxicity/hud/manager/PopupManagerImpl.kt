@@ -10,7 +10,7 @@ import kr.toxicity.hud.util.forEachAllYaml
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.warn
 
-object PopupManagerImpl: MythicHudManager, PopupManager {
+object PopupManagerImpl: BetterHudManager, PopupManager {
     private val popupMap = HashMap<String, PopupImpl>()
     override fun start() {
 

@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 
-object PlayerManager: MythicHudManager {
+object PlayerManager: BetterHudManager {
 
     private val hudPlayer = HashMap<UUID, HudPlayer>()
 

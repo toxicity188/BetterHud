@@ -2,14 +2,10 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import org.bukkit.boss.BarColor
-import java.awt.AlphaComposite
-import java.awt.Color
-import java.awt.image.BufferedImage
 import java.io.File
 import java.text.DecimalFormat
 
-object ConfigManager: MythicHudManager {
+object ConfigManager: BetterHudManager {
 
     var info = EMPTY_COMPONENT
         private set

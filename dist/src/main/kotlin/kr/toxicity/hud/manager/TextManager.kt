@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.math.ceil
 
-object TextManager: MythicHudManager {
+object TextManager: BetterHudManager {
 
     private const val CHAR_LENGTH = 16
 
