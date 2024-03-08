@@ -117,6 +117,21 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         }
                     } else throw RuntimeException("Unsupported event.")
                 } else throw RuntimeException("Unsupported event.")
+            },
+            "air" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.remainingAir
+                }
+            },
+            "max_air" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.maximumAir
+                }
+            },
+            "food" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.foodLevel
+                }
             }
         ),
     ) {
@@ -294,29 +309,13 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         sb.setLength(0)
                     }
                     ']' -> {
-                        val pattern = sb.toString().split(':')
-                        val list = pattern[pattern.lastIndex].split(',')
+                        val result = sb.toString()
                         sb.setLength(0)
-                        string.map[pattern[0]]?.let {
-                            val func = it(list, r)
-                            builder.add { p ->
-                                func.apply(p).toString()
+                        runCatching {
+                            val find = find(result).build(r)
+                            builder.add {
+                                find(it).toString()
                             }
-                            return@forEach
-                        }
-                        boolean.map[pattern[0]]?.let {
-                            val func = it(list, r)
-                            builder.add { p ->
-                                func.apply(p).toString()
-                            }
-                            return@forEach
-                        }
-                        number.map[pattern[0]]?.let {
-                            val func = it(list, r)
-                            builder.add { p ->
-                                func.apply(p).toString()
-                            }
-                            return@forEach
                         }
                     }
                     else -> {
