@@ -12,7 +12,6 @@ import kotlin.math.abs
 
 val SPACE_KEY = Key.key("$NAME_SPACE:space")
 val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
-val BOSS_BAR_KEY = Key.key("$NAME_SPACE:bossbar")
 
 val MINI_MESSAGE = MiniMessage.builder()
     .tags(TagResolver.standard())
@@ -37,7 +36,6 @@ val EMPTY_WIDTH_COMPONENT = WidthComponent(Component.empty().color(NamedTextColo
 val EMPTY_PIXEL_COMPONENT = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 val NEW_LAYER = WidthComponent(Component.text(0xC0000.parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
-val FORWARD_ONE_SPACE_COMPONENT = WidthComponent(Component.text((0xD0000 + 1).parseChar()).font(SPACE_KEY), 0)
 
 fun WidthComponent.toPixelComponent(pixel: Int) = PixelComponent(this, pixel)
 

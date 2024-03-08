@@ -21,7 +21,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.round
 
-class HudImageElement(name: String, file: File, private val image: ImageLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
+class HudImageElement(parent: Hud, file: File, private val image: ImageLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
 
 
     private val chars = run {
@@ -38,17 +38,14 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
         )
 
 
-        animation.mapIndexed { index2, imageLocation ->
-            val array = JsonArray()
-            val key = Key.key("$NAME_SPACE:hud/$name/image/${hud.name}_${index + 1}_${index2 + 1}")
+        animation.map { imageLocation ->
             val list = ArrayList<PixelComponent>()
-            var i = 0xD0000
             if (hud is ListenerHudImage) {
                 list.add(EMPTY_PIXEL_COMPONENT)
             }
             hud.image.forEach { pair ->
-                val c = (++i).parseChar()
-                var finalWidth = WidthComponent(Component.text(c).font(key), ceil(pair.second.width.toDouble() * image.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val c = (++parent.imageChar).parseChar()
+                var finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), ceil(pair.second.width.toDouble() * image.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 if (hud is ListenerHudImage) {
                     when (hud.splitType) {
                         SplitType.RIGHT -> {
@@ -66,7 +63,7 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                 }
 
 
-                array.add(JsonObject().apply {
+                parent.jsonArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.first}")
                     else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.first}")
@@ -78,9 +75,6 @@ class HudImageElement(name: String, file: File, private val image: ImageLayout, 
                 })
                 list.add(finalWidth.toPixelComponent(image.location.x + imageLocation.x))
             }
-            JsonObject().apply {
-                add("providers", array)
-            }.save(File(file, "${hud.name}_${index + 1}_${index2 + 1}.json"))
             ImageRenderer(
                 hud,
                 list,
