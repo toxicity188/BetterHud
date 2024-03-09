@@ -1,9 +1,6 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.image.HudImage
-import kr.toxicity.hud.image.ImageType
-import kr.toxicity.hud.image.ListenerHudImage
-import kr.toxicity.hud.image.SplitType
+import kr.toxicity.hud.image.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
@@ -19,7 +16,10 @@ object ImageManager: BetterHudManager {
 
     fun getImage(name: String) = imageMap[name]
 
+
+
     override fun reload(resource: GlobalResource) {
+
         imageMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYaml { file, s, configurationSection ->
@@ -28,10 +28,13 @@ object ImageManager: BetterHudManager {
                     ImageType.SINGLE -> {
                         HudImage(
                             s,
-                            listOf("$s.png" to File(assets, configurationSection.getString("file").ifNull("file value not set."))
-                                .toImage()
-                                .removeEmptySide()
-                                .ifNull("Invalid image.")),
+                            listOf(NamedLoadedImage(
+                                "$s.png",
+                                File(assets, configurationSection.getString("file").ifNull("file value not set."))
+                                    .toImage()
+                                    .removeEmptySide()
+                                    .ifNull("Invalid image."),
+                            )),
                             type,
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
                         )
@@ -44,12 +47,10 @@ object ImageManager: BetterHudManager {
                         } ?: SplitType.LEFT)
                         ListenerHudImage(
                             s,
-                            splitType.split(File(assets, configurationSection.getString("file").ifNull("file value not set."))
+                            splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set."))
                                 .toImage()
                                 .removeEmptySide()
-                                .ifNull("Invalid image."), configurationSection.getInt("split", 25).coerceAtLeast(1)).mapIndexed { index, bufferedImage ->
-                                "${s}_${index + 1}.png" to bufferedImage
-                            },
+                                .ifNull("Invalid image.").image, configurationSection.getInt("split", 25).coerceAtLeast(1)),
                             type,
                             splitType,
                             configurationSection.getConfigurationSection("setting").ifNull("setting configuration not found.")
@@ -62,10 +63,11 @@ object ImageManager: BetterHudManager {
                                 warn("files is empty.")
                                 return@forEachAllYaml
                             }.mapIndexed { index, string ->
-                                "${s}_${index + 1}.png" to File(assets, string)
+                                File(assets, string)
                                     .toImage()
                                     .removeEmptyWidth()
                                     .ifNull("Invalid image: $string")
+                                    .toNamed("${s}_${index + 1}.png")
                             },
                             type,
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
@@ -83,8 +85,8 @@ object ImageManager: BetterHudManager {
             if (list.isNotEmpty()) {
                 val imageSaveLocation = if (list.size == 1) saveLocation else saveLocation.subFolder(value.name)
                 list.forEach {
-                    val file = File(imageSaveLocation, it.first)
-                    if (!file.exists()) it.second.save(file)
+                    val file = File(imageSaveLocation, it.name)
+                    if (!file.exists()) it.image.image.save(file)
                 }
             }
         }

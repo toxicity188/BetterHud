@@ -3,11 +3,10 @@ package kr.toxicity.hud.image
 import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.util.ifNull
 import org.bukkit.configuration.ConfigurationSection
-import java.awt.image.BufferedImage
 
 class ListenerHudImage(
     name: String,
-    image: List<Pair<String, BufferedImage>>,
+    image: List<NamedLoadedImage>,
     type: ImageType,
     val splitType: SplitType,
     setting: ConfigurationSection

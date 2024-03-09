@@ -208,6 +208,18 @@ class MMOCoreCompatibility: Compatibility {
                     }
                 }
             },
+            "skill_level" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(
+                    args: MutableList<String>,
+                    reason: UpdateEvent
+                ): Function<HudPlayer, Number> {
+                    val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
+                    return Function { p ->
+                        api.getPlayerData(p.bukkitPlayer).getSkillLevel(skill)
+                    }
+                }
+            },
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(

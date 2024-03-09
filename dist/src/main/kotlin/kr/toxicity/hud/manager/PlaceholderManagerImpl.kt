@@ -168,6 +168,16 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         }
                     } else throw RuntimeException("Unsupported event.")
                 } else throw RuntimeException("Unsupported event.")
+            },
+            "entity_type" to HudPlaceholder.of { _, e ->
+                if (e is BukkitEventUpdateEvent) {
+                    val event = e.event
+                    if (event is EntityEvent) {
+                        Function { _ ->
+                            event.entity.type.name
+                        }
+                    } else throw RuntimeException("Unsupported event.")
+                } else throw RuntimeException("Unsupported event.")
             }
         )
     ) {

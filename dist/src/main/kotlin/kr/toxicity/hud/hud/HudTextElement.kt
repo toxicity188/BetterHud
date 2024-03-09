@@ -28,7 +28,8 @@ class HudTextElement(parent: Hud, name: String, file: File, private val text: Te
         )
         animation.map { imageLocation ->
             val yAxis = (text.location.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT)
-            val group = ShaderGroup(shader, text.text.fontName, yAxis)
+            val group = ShaderGroup(shader, text.text.name, yAxis)
+            val scale = ceil(text.text.height * text.scale).toInt()
             val key = TextManager.getKey(group) ?: run {
                 val index2 = (++parent.textIndex)
                 val key = Key.key("$NAME_SPACE:hud/$name/text/text_${index + 1}_${index2 + 1}")
@@ -45,7 +46,7 @@ class HudTextElement(parent: Hud, name: String, file: File, private val text: Te
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
                         addProperty("ascent", Hud.createBit(yAxis, shader))
-                        addProperty("height", ceil(text.text.height * text.scale).toInt())
+                        addProperty("height", scale)
                         add("chars", it.chars)
                     })
                 }
@@ -60,7 +61,7 @@ class HudTextElement(parent: Hud, name: String, file: File, private val text: Te
                 Style.style(text.color).font(key),
                 text.pattern,
                 text.align,
-                text.scale,
+                scale.toDouble() / text.text.height,
                 text.location.x + imageLocation.x,
                 text.space,
                 text.numberEquation,

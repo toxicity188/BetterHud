@@ -103,9 +103,9 @@ object TextManager: BetterHudManager {
                         dispose()
                     }
                 }.removeEmptyWidth()?.let {
-                    pairMap.getOrPut(it.width) {
+                    pairMap.getOrPut(it.image.width) {
                         ArrayList()
-                    }.add(char to it)
+                    }.add(char to it.image)
                 }
             }
         }
