@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation("net.objecthunter:exp4j:0.4.8")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 
     implementation(project(":api"))
     implementation(project(":nms:v1_17_R1", configuration = "reobf"))

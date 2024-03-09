@@ -68,6 +68,7 @@ tasks {
         }
         prefix("kotlin")
         prefix("net.objecthunter.exp4j")
+        prefix("org.bstats")
     }
 }
 

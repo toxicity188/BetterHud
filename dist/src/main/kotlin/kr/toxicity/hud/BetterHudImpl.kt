@@ -16,6 +16,7 @@ import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.io.File
@@ -46,6 +47,9 @@ class BetterHudImpl: BetterHud() {
     private lateinit var audience: BukkitAudiences
 
     override fun onEnable() {
+        runCatching {
+            Metrics(this, 21287)
+        }
         nms = when (val version = Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
             "v1_17_R1" -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             "v1_18_R1" -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
