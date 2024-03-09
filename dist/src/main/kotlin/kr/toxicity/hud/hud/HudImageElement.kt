@@ -44,16 +44,7 @@ class HudImageElement(parent: Hud, private val image: ImageLayout, x: Double, y:
                 val c = (++parent.imageChar).parseChar()
                 val height = round(pair.image.image.height.toDouble() * image.scale).toInt()
                 val scale = height.toDouble() / pair.image.image.height
-                var finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), ceil((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                if (hud is ListenerHudImage) {
-                    when (hud.splitType) {
-                        SplitType.RIGHT -> {
-                            finalWidth = (maxWidth - finalWidth.width).toSpaceComponent() + finalWidth
-                        }
-                        else -> {}
-                    }
-                }
-
+                val finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), ceil((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 parent.jsonArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")

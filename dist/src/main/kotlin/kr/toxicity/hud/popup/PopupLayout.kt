@@ -140,15 +140,7 @@ class PopupLayout(
                 })
                 val xOffset = round(it.image.xOffset * scale).toInt()
                 val xWidth = round(it.image.image.width.toDouble() * scale).toInt()
-                var comp = WidthComponent(Component.text(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                if (hudImage is ListenerHudImage) {
-                    when (hudImage.splitType) {
-                        SplitType.RIGHT -> {
-                            comp = (maxWidth - comp.width).toSpaceComponent() + comp
-                        }
-                        else -> {}
-                    }
-                }
+                val comp = WidthComponent(Component.text(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
                 val char = (++imageChar).parseChar()
