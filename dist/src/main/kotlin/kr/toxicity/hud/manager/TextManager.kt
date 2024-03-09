@@ -4,9 +4,11 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.key.Key
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.RenderingHints
@@ -24,6 +26,12 @@ object TextManager: BetterHudManager {
     private val textMap = HashMap<String, HudText>()
 
     private val textWidthMap = HashMap<Char, Int>()
+    private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
+
+    fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
+    fun setKey(shaderGroup: ShaderGroup, key: Key) {
+        textKeyMap[shaderGroup] = key
+    }
 
     override fun start() {
     }
@@ -34,6 +42,7 @@ object TextManager: BetterHudManager {
     override fun reload(resource: GlobalResource) {
         textMap.clear()
         textWidthMap.clear()
+        textKeyMap.clear()
         val fontFolder = DATA_FOLDER.subFolder("fonts")
         val globalSaveFolder = resource.textures.subFolder("text")
         DATA_FOLDER.subFolder("texts").forEachAllYaml { file, s, section ->

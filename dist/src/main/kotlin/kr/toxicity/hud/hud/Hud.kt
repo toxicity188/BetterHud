@@ -28,6 +28,8 @@ class Hud(name: String, file: File, section: ConfigurationSection) {
     val imageKey = Key.key("$NAME_SPACE:hud/$name/image")
     val jsonArray = JsonArray()
 
+    var textIndex = 0
+
     private val elements = run {
         val subFile = file.subFolder(name)
         ArrayList<HudElement>().apply {

@@ -21,7 +21,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.round
 
-class HudImageElement(parent: Hud, file: File, private val image: ImageLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
+class HudImageElement(parent: Hud, private val image: ImageLayout, x: Double, y: Double, animation: List<ImageLocation>) {
 
 
     private val chars = run {
@@ -33,7 +33,7 @@ class HudImageElement(parent: Hud, file: File, private val image: ImageLayout, i
 
         val shader = HudShader(
             GuiLocation(x, y),
-            image.layer + index,
+            image.layer,
             image.outline
         )
 

@@ -17,7 +17,6 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
     }
 
     override fun reload(resource: GlobalResource) {
-        PopupLayout.clear()
         popupMap.clear()
         val save = resource.font.subFolder("popup")
         DATA_FOLDER.subFolder("popups").forEachAllYaml { file, s, configurationSection ->

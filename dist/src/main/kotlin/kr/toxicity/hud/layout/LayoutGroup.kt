@@ -16,6 +16,9 @@ import org.bukkit.configuration.ConfigurationSection
 import java.text.DecimalFormat
 
 class LayoutGroup(section: ConfigurationSection) {
+
+    private val loc = ImageLocation(section)
+
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
         section.getConfigurationSection("images")?.forEachSubConfiguration { s, configurationSection ->
             add(
@@ -23,10 +26,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
                         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
                     },
-                    ImageLocation(
-                        configurationSection.getInt("x"),
-                        configurationSection.getInt("y")
-                    ),
+                    ImageLocation(configurationSection) + loc,
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layout"),
@@ -43,7 +43,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
                         TextManager.getText(n).ifNull("this text doesn't exist: $n")
                     },
-                    ImageLocation(configurationSection),
+                    ImageLocation(configurationSection) + loc,
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getInt("space", 2).coerceAtLeast(0),
                     configurationSection.getString("align")?.let {

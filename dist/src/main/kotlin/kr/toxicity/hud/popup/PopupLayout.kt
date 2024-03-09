@@ -13,6 +13,7 @@ import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.layout.LayoutGroup
+import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.GuiLocation
@@ -35,12 +36,6 @@ class PopupLayout(
 ) {
     private var imageChar = 0xCE000
     private var textIndex = 0
-
-    companion object {
-        private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
-
-        fun clear() = textKeyMap.clear()
-    }
 
     private val imageKey = Key.key("$NAME_SPACE:popup/${parent.name}/$name/image")
     private val groups = parent.move.locations.run {
@@ -182,8 +177,8 @@ class PopupLayout(
                 textLayout.layer,
                 textLayout.outline
             )
-            val group = ShaderGroup(textShader, textLayout.text.name, pixel.y)
-            val textKey = textKeyMap[group] ?: run {
+            val group = ShaderGroup(textShader, textLayout.text.fontName, pixel.y)
+            val textKey = TextManager.getKey(group) ?: run {
                 val index = ++textIndex
                 val array = JsonArray().apply {
                     add(JsonObject().apply {
@@ -206,7 +201,7 @@ class PopupLayout(
                     add("providers", array)
                 }.save(File(textFolder, "text_${index}.json"))
                 val key = Key.key("$NAME_SPACE:popup/${parent.name}/$name/text/text_${index}")
-                textKeyMap[group] = key
+                TextManager.setKey(group, key)
                 key
             }
             TextRenderer(

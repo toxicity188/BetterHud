@@ -9,16 +9,13 @@ import kr.toxicity.hud.util.subFolder
 import java.io.File
 
 class HudElement(hud: Hud, name: String, file: File, layout: LayoutGroup, x: Double, y: Double) {
-    private val imageElement = run {
-        val subFile = file.subFolder("image")
-        layout.image.mapIndexed { index, image ->
-            HudImageElement(hud, subFile, image, index, x, y, layout.animation)
-        }
+    private val imageElement = layout.image.map {image ->
+        HudImageElement(hud, image, x, y, layout.animation)
     }
     private val textElement = run {
         val subFile = file.subFolder("text")
         layout.text.mapIndexed { index, textLayout ->
-            HudTextElement(name, subFile, textLayout, index, x, y, layout.animation)
+            HudTextElement(hud, name, subFile, textLayout, index, x, y, layout.animation)
         }
     }
 
