@@ -15,6 +15,7 @@ object ConfigManager: BetterHudManager {
     var defaultPopup = emptyList<String>()
 
     var numberFormat = DecimalFormat("#,###.#")
+    var defaultFontName = "font.ttf"
 
     override fun start() {
 
@@ -33,6 +34,9 @@ object ConfigManager: BetterHudManager {
             }
             defaultHud = yaml.getStringList("default-hud")
             defaultPopup = yaml.getStringList("default-popup")
+            yaml.getString("default-font-name")?.let {
+                defaultFontName = it
+            }
             numberFormat = yaml.getString("number-format")?.let {
                 runCatching {
                     DecimalFormat(it)

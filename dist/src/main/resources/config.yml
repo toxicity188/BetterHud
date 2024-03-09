@@ -3,6 +3,8 @@ warn: "<red><b>[!]</red> "
 
 number-format: "#,###.#"
 
+default-font-name: "font.ttf"
+
 default-hud:
   - test_hud
 

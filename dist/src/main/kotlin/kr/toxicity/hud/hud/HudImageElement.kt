@@ -23,9 +23,6 @@ class HudImageElement(parent: Hud, private val image: ImageLayout, x: Double, y:
 
     private val chars = run {
         val hud = image.image
-        val maxWidth = hud.image.maxOf {
-            it.image.image.width
-        }
         val isSingle = hud.image.size == 1
 
         val shader = HudShader(

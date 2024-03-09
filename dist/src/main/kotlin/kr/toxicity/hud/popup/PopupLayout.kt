@@ -117,10 +117,6 @@ class PopupLayout(
                 target.outline
             )
             val pixel = location + pair.pixel + target.location
-            val maxWidth = round(hudImage.image.maxOf {
-                val height = round(it.image.image.height * target.scale).toInt()
-                it.image.image.width * height.toDouble() / it.image.image.height
-            } * target.scale).toInt()
             val list = ArrayList<PixelComponent>()
 
             if (hudImage is ListenerHudImage) list.add(EMPTY_PIXEL_COMPONENT)

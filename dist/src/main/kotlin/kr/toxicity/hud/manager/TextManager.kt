@@ -70,7 +70,14 @@ object TextManager: BetterHudManager {
                 })
             })
         }
-        val parseDefault = parseFont("default", "default", BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font.deriveFont(12F), 12, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
+        val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
+            (if (exists()) runCatching {
+                inputStream().buffered().use {
+                    Font.createFont(Font.TRUETYPE_FONT, it)
+                }
+            }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
+        }.deriveFont(12F)
+        val parseDefault = parseFont("default", "default", defaultFont, 12, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = ceil(it.value.toDouble() / 2).toInt()
         }
