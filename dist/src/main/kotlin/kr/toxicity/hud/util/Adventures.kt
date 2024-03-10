@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import kotlin.math.abs
 
 val SPACE_KEY = Key.key("$NAME_SPACE:space")
 val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
