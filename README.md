@@ -9,6 +9,7 @@ Welcome to BetterHud!
 [![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/toxicity188/BetterHud?style=for-the-badge&logo=github)](https://github.com/toxicity188/BetterHud/issues) 
 [![bStats Servers](https://img.shields.io/bstats/servers/21287?style=for-the-badge&logo=minecraft&label=bStats&color=0%2C150%2C136%2C0)](https://bstats.org/plugin/bukkit/BetterHud/21287)
 [![Static Badge](https://img.shields.io/badge/WIKI-blue?style=for-the-badge)](https://github.com/toxicity188/BetterHud/wiki)
+![Static Badge](https://img.shields.io/badge/paypal-toxicity-blue?style=for-the-badge&logo=paypal&link=https%3A%2F%2Fpaypal.me%2Ftoxicity188%3Fcountry.x%3DKR%26locale.x%3Den_US)
 
 </div>
 
