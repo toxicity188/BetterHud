@@ -20,6 +20,10 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.jar.JarFile
 
 class BetterHudImpl: BetterHud() {
@@ -50,6 +54,18 @@ class BetterHudImpl: BetterHud() {
     override fun onEnable() {
         runCatching {
             Metrics(this, 21287)
+            HttpClient.newHttpClient().sendAsync(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
+                    .GET()
+                    .build(), HttpResponse.BodyHandlers.ofString()
+            ).thenAccept {
+                val body = it.body()
+                if (description.version != body) {
+                    warn("New version found: $body")
+                    warn("Download: https://www.spigotmc.org/resources/115559")
+                }
+            }
         }
         nms = when (val version = Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
             "v1_17_R1" -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()

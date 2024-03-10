@@ -4,6 +4,7 @@ name: BetterHud
 api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
+website: "https://www.spigotmc.org/resources/115559"
 softdepend:
   - MythicLib
   - MythicMobs
