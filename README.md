@@ -47,13 +47,13 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 
 ![preview](https://github.com/toxicity188/BetterHud/assets/114675706/cb20b9a1-3069-4bfc-ad41-de7e9783f5d9)  
 
-![311129059-612dcfa5-f727-4a5d-a4d3-a1b14f3b7c46](https://github.com/toxicity188/BetterHud/assets/114675706/c1c8c944-b142-403c-92bf-57adcc9c5570)  
-![311129426-3bef5f14-9d94-498d-95f2-c484e5cc6ef1](https://github.com/toxicity188/BetterHud/assets/114675706/a0e029e3-9615-49ca-95c8-42664f82ee6b)  
-![녹화_2024_03_08_12_32_18_793](https://github.com/toxicity188/BetterHud/assets/114675706/dd5d731f-4b97-4108-83a4-78afa8ea527d)  
-![녹화_2024_03_08_11_28_37_764](https://github.com/toxicity188/BetterHud/assets/114675706/a86238f9-2367-4286-b461-d8ae4b8e110b)  
+![1](https://github.com/toxicity188/BetterHud/assets/114675706/5c2e3fc3-1a52-4c48-81a6-981f5a702f0a)  
+![2](https://github.com/toxicity188/BetterHud/assets/114675706/3518b4eb-5b09-41f5-ad84-07942e446abb)  
+![3](https://github.com/toxicity188/BetterHud/assets/114675706/f3663739-a1b5-4cb2-904e-9770283cae1f)  
+![4](https://github.com/toxicity188/BetterHud/assets/114675706/805cb131-ccb0-49a9-8318-fa1cfba41636)  
+
 ![2024_03_09_17_33_45_816](https://github.com/toxicity188/BetterHud/assets/114675706/e99d1522-4975-4f3d-8bea-eb93bb62fd21)  
 
-![info](https://github.com/toxicity188/BetterHud/assets/114675706/850e54a0-d1b2-4952-9482-132e68560fcd)  
 ### Dependency
 No
 
