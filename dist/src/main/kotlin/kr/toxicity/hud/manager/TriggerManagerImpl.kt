@@ -7,7 +7,9 @@ import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.ifNull
 import org.bukkit.Bukkit
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
@@ -20,69 +22,39 @@ import java.util.function.Function
 object TriggerManagerImpl: BetterHudManager, TriggerManager {
     private val listener = object : Listener {}
 
-    private val map = mutableMapOf<String, HudTrigger<*>>(
-        "attack" to object : HudBukkitEventTrigger<EntityDamageByEntityEvent> {
-            override fun getEventClass(): Class<EntityDamageByEntityEvent> {
-                return EntityDamageByEntityEvent::class.java
-            }
-
-            override fun getKeyMapper(): Function<in EntityDamageByEntityEvent, UUID> {
-                return Function { e ->
-                    e.entity.uniqueId
-                }
-            }
-
-            override fun getValueMapper(): Function<in EntityDamageByEntityEvent, UUID?> {
-                return Function { e ->
-                    val attacker = e.damager
-                    if (attacker is Player) attacker.uniqueId else null
-                }
-            }
-        }
-    )
-    private val actionMap = HashMap<String, MutableList<(UpdateEvent, UUID) -> Boolean>>()
+    private val map = mutableMapOf<String, (ConfigurationSection) -> HudTrigger<*>>()
 
     override fun start() {
 
     }
 
-    override fun addTrigger(name: String, trigger: HudTrigger<*>) {
-        map[name] = trigger
-    }
-
-    fun addTask(name: String, task: (UpdateEvent, UUID) -> Boolean) {
-        if (map.containsKey(name)) {
-            actionMap.getOrPut(name) {
-                ArrayList()
-            }.add(task)
-        } else {
-            throw RuntimeException("Unable to find this trigger: $name")
+    override fun addTrigger(name: String, trigger: Function<ConfigurationSection, HudTrigger<*>>) {
+        map[name] = {
+            trigger.apply(it)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun reload(resource: GlobalResource) {
-        HandlerList.unregisterAll(listener)
-        actionMap.clear()
-        map.forEach {
-            when (val type = it.value) {
-                is HudBukkitEventTrigger<out Event> -> {
-                    Bukkit.getPluginManager().registerEvent(type.eventClass, listener, EventPriority.NORMAL, { _, e ->
-                        if (type.eventClass.isAssignableFrom(e.javaClass)) {
-                            actionMap[it.key]?.let { action ->
-                                val cast = type.eventClass.cast(e)
-                                (type.valueMapper as Function<Event, UUID?>).apply(cast)?.let { uuid ->
-                                    val wrapper = BukkitEventUpdateEvent(cast, (type.keyMapper as Function<Event, UUID>).apply(cast))
-                                    action.removeIf { act ->
-                                        !act(wrapper, uuid)
-                                    }
-                                }
-                            }
+    fun addTask(section: ConfigurationSection, task: (UpdateEvent, UUID) -> Boolean) {
+        val clazz = section.getString("class").ifNull("class value not set.")
+        when (val get = map[clazz].ifNull("unable to find this trigger: $clazz")(section)) {
+            is HudBukkitEventTrigger<out Event> -> {
+                Bukkit.getPluginManager().registerEvent(get.eventClass, listener, EventPriority.NORMAL, { _, e ->
+                    if (get.eventClass.isAssignableFrom(e.javaClass)) {
+                        val cast = get.eventClass.cast(e)
+                        val t = (get as HudBukkitEventTrigger<Event>)
+                        t.getValue(cast)?.let { uuid ->
+                            val wrapper = BukkitEventUpdateEvent(cast, get.getKey(cast))
+                            task(wrapper, uuid)
                         }
-                    }, PLUGIN)
-                }
+                    }
+                }, PLUGIN)
             }
         }
+    }
+
+    override fun reload(resource: GlobalResource) {
+        HandlerList.unregisterAll(listener)
     }
     override fun end() {
     }

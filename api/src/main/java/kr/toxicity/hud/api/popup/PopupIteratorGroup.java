@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.List;
 
 public interface PopupIteratorGroup {
-    boolean available();
     @NotNull @Unmodifiable List<WidthComponent> next();
     int getIndex();
     void addIterator(@NotNull PopupIterator iterator);

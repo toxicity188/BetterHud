@@ -3,6 +3,7 @@ package kr.toxicity.hud.popup
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
+import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.EquationPairLocation
@@ -22,7 +23,7 @@ class PopupImpl(
     section: ConfigurationSection
 ): Popup {
     companion object {
-        private val keyMap = HashMap<UUID, PopupUpdater>()
+        private val keyMap = HashMap<Any, PopupUpdater>()
     }
     val gui = GuiLocation(section)
     val move = section.getConfigurationSection("move")?.let {
@@ -47,6 +48,9 @@ class PopupImpl(
             }
         }
     }
+    private val sortType = section.getString("sort")?.let {
+        PopupSortType.valueOf(it.uppercase())
+    } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
         val target = file.subFolder(name)
@@ -71,27 +75,27 @@ class PopupImpl(
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
             if (keyMapping) {
-                keyMap[event.uuid]?.let {
-                    it.update()
-                    return@task true
+                keyMap[event.key]?.let {
+                    if (it.update()) return@task true
+                    else keyMap.remove(event.key)
                 }
             }
             PlayerManager.getHudPlayer(uuid)?.let { player ->
-                show(event, player, event.uuid)?.let {
+                show(event, player, event.key)?.let {
                     if (keyMapping) {
-                        keyMap[event.uuid] = it
+                        keyMap[event.key] = it
                     }
                 }
             }
             true
         }
-        section.getStringList("triggers").forEach {
-            TriggerManagerImpl.addTask(it, task)
+        section.getConfigurationSection("triggers")?.forEachSubConfiguration { _, configurationSection ->
+            TriggerManagerImpl.addTask(configurationSection, task)
         }
     }
 
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? = show(reason, player, UUID.randomUUID())
-    private fun show(reason: UpdateEvent, player: HudPlayer, uuid: UUID): PopupUpdater? {
+    private fun show(reason: UpdateEvent, player: HudPlayer, key: Any): PopupUpdater? {
         val playerMap = player.popupGroupIteratorMap
         val get = playerMap.getOrPut(group) {
             PopupIteratorGroupImpl(dispose)
@@ -99,6 +103,7 @@ class PopupImpl(
         if (unique && get.contains(name)) return null
         if (get.index >= move.locations.size) return null
         val buildCondition = conditions.build(reason)
+        if (!buildCondition(player)) return null
         var updater = {
         }
         val mapper: (Int, Int) -> List<WidthComponent> = if (update) {
@@ -155,22 +160,29 @@ class PopupImpl(
                 parse(player)
             }
         }
+        val remove0 = {
+            ifRemove = false
+            keyMap.remove(key)
+            Unit
+        }
         get.addIterator(PopupIteratorImpl(
-            uuid,
+            move.locations.lastIndex,
+            key,
+            sortType,
             name,
             mapper,
             valueGetter,
-            cond
-        ) {
-            ifRemove = false
-            keyMap.remove(uuid)
-        })
+            cond,
+            remove0
+        ))
         return object : PopupUpdater {
-            override fun update() {
+            override fun update(): Boolean {
+                if (!ifRemove) return false
                 updater()
+                return true
             }
             override fun remove() {
-                ifRemove = false
+                remove0()
             }
         }
     }

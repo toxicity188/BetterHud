@@ -98,26 +98,6 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     }
                 }
             },
-            "entity_max_health" to HudPlaceholder.of { _, e ->
-                if (e is BukkitEventUpdateEvent) {
-                    val event = e.event
-                    if (event is EntityEvent) {
-                        Function { _ ->
-                            (event.entity as? LivingEntity)?.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0
-                        }
-                    } else throw RuntimeException("Unsupported event.")
-                } else throw RuntimeException("Unsupported event.")
-            },
-            "entity_health" to HudPlaceholder.of { _, e ->
-                if (e is BukkitEventUpdateEvent) {
-                    val event = e.event
-                    if (event is EntityEvent) {
-                        Function { _ ->
-                            (event.entity as? LivingEntity)?.health ?: 0
-                        }
-                    } else throw RuntimeException("Unsupported event.")
-                } else throw RuntimeException("Unsupported event.")
-            },
             "air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.remainingAir
@@ -158,26 +138,6 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         p.variableMap[args[0]] ?: "<none>"
                     }
                 }
-            },
-            "entity_name" to HudPlaceholder.of { _, e ->
-                if (e is BukkitEventUpdateEvent) {
-                    val event = e.event
-                    if (event is EntityEvent) {
-                        Function { _ ->
-                            event.entity.name
-                        }
-                    } else throw RuntimeException("Unsupported event.")
-                } else throw RuntimeException("Unsupported event.")
-            },
-            "entity_type" to HudPlaceholder.of { _, e ->
-                if (e is BukkitEventUpdateEvent) {
-                    val event = e.event
-                    if (event is EntityEvent) {
-                        Function { _ ->
-                            event.entity.type.name
-                        }
-                    } else throw RuntimeException("Unsupported event.")
-                } else throw RuntimeException("Unsupported event.")
             }
         )
     ) {

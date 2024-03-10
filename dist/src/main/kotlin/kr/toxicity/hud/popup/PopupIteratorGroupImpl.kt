@@ -3,26 +3,35 @@ package kr.toxicity.hud.popup
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
+import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.util.sum
 
 class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
     private val list = ArrayList<PopupIterator>()
-    override fun available(): Boolean {
-        return list.isNotEmpty() && list.any {
-            it.available()
-        }
-    }
 
     override fun addIterator(iterator: PopupIterator) {
-        iterator.index = if (iterator.priority >= 0 && list.none {
-            it.index == iterator.priority
-        }) iterator.priority else run {
+        val i = if (iterator.priority >= 0 && list.none {
+                it.index == iterator.priority
+            }) iterator.priority else run {
             var i = 0
             val map = list.map {
                 it.index
             }
             while (map.contains(i)) i++
             i
+        }
+        iterator.index = i
+        if (iterator.sortType == PopupSortType.FIRST) {
+            var t = 0
+            var biggest = i
+            val more = list.filter {
+                it.index >= i
+            }
+            while (t < more.size && more[t].index >= biggest) {
+                more[t].index++
+                biggest = more[t].index
+                t++
+            }
         }
         list.add(iterator)
     }
@@ -39,7 +48,7 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
         var i = 0
         while (iterator.hasNext()) {
             val next = iterator.next()
-            if (!next.available()) {
+            if (next.index > next.maxIndex || !next.available()) {
                 list.subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }

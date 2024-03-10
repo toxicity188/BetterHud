@@ -51,20 +51,6 @@ object ListenerManagerImpl: BetterHudManager, ListenerManager {
                 }
             }
         },
-        "entity_health" to { _ ->
-            { e ->
-                if (e is BukkitEventUpdateEvent) {
-                    val evt = e.event
-                    if (evt is EntityEvent) {
-                        (evt.entity as? LivingEntity)?.let { entity ->
-                            HudListener {
-                                entity.health / (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0)
-                            }
-                        } ?: HudListener.ZERO
-                    } else throw RuntimeException("Unsupported event.")
-                } else throw RuntimeException("Unsupported event.")
-            }
-        },
         "placeholder" to placeholder@ { c ->
             val v = PlaceholderManagerImpl.find(c.getString("value").ifNull("value value not set."))
             val m = PlaceholderManagerImpl.find(c.getString("max").ifNull("max value not set."))

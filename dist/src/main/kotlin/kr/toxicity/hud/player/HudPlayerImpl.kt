@@ -40,11 +40,12 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
                     }
                 }
             }
-            popupGroup.values.removeIf {
-                !it.available()
-            }
-            popupGroup.forEach {
-                compList.addAll(it.value.next())
+            val popupGroupIterator = popupGroup.values.iterator()
+            while (popupGroupIterator.hasNext()) {
+                val comp = popupGroupIterator.next().next()
+                if (comp.isEmpty()) {
+                    popupGroupIterator.remove()
+                } else compList.addAll(comp)
             }
         } else {
             popupGroup.clear()

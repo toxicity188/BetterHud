@@ -3,6 +3,7 @@ package kr.toxicity.hud.api.trgger;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -20,13 +21,13 @@ public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
             }
 
             @Override
-            public @NotNull Function<E, UUID> getValueMapper() {
-                return mapper;
+            public @Nullable UUID getValue(E e) {
+                return mapper.apply(e);
             }
 
             @Override
-            public @NotNull Function<? super E, UUID> getKeyMapper() {
-                return e -> UUID.randomUUID();
+            public @NotNull UUID getKey(E e) {
+                return UUID.randomUUID();
             }
         };
     }
@@ -39,13 +40,13 @@ public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
             }
 
             @Override
-            public @NotNull Function<E, UUID> getValueMapper() {
-                return e -> e.getPlayer().getUniqueId();
+            public @NotNull UUID getValue(E e) {
+                return e.getPlayer().getUniqueId();
             }
 
             @Override
-            public @NotNull Function<? super E, UUID> getKeyMapper() {
-                return e -> UUID.randomUUID();
+            public @NotNull UUID getKey(E e) {
+                return UUID.randomUUID();
             }
         };
     }

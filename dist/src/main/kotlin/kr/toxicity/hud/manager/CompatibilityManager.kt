@@ -6,6 +6,7 @@ import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.warn
 import org.bukkit.Bukkit
 import java.util.function.Function
 
@@ -33,7 +34,7 @@ object CompatibilityManager: BetterHudManager {
                         PLUGIN.listenerManager.addListener("${namespace}_${entry.key}") { c ->
                             val reason = entry.value(c)
                             Function { u: UpdateEvent ->
-                                reason.invoke(u)
+                                reason(u)
                             }
                         }
                     }
@@ -46,6 +47,9 @@ object CompatibilityManager: BetterHudManager {
                     obj.booleans.forEach { entry ->
                         PLUGIN.placeholderManager.booleanContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
                     }
+                }.onFailure { e ->
+                    warn("Unable to load ${it.key} support.")
+                    warn("Reason: ${e.message}")
                 }
             }
         }

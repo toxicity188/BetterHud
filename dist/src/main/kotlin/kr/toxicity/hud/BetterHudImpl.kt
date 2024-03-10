@@ -27,6 +27,7 @@ class BetterHudImpl: BetterHud() {
         ConfigManager,
         CommandManager,
         PlayerManager,
+        ModuleManager,
 
         ListenerManagerImpl,
         PlaceholderManagerImpl,

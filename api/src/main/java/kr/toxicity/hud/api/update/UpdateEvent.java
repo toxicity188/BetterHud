@@ -12,10 +12,10 @@ public interface UpdateEvent {
         }
 
         @Override
-        public @NotNull UUID getUUID() {
+        public @NotNull Object getKey() {
             return UUID.randomUUID();
         }
     };
     @NotNull UpdateReason getType();
-    @NotNull UUID getUUID();
+    @NotNull Object getKey();
 }

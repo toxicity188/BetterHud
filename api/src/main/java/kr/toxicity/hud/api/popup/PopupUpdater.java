@@ -1,6 +1,6 @@
 package kr.toxicity.hud.api.popup;
 
 public interface PopupUpdater {
-    void update();
+    boolean update();
     void remove();
 }
