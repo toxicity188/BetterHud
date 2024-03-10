@@ -51,3 +51,25 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 ![녹화_2024_03_08_12_32_18_793](https://github.com/toxicity188/BetterHud/assets/114675706/dd5d731f-4b97-4108-83a4-78afa8ea527d)  
 ![녹화_2024_03_08_11_28_37_764](https://github.com/toxicity188/BetterHud/assets/114675706/a86238f9-2367-4286-b461-d8ae4b8e110b)  
 ![2024_03_09_17_33_45_816](https://github.com/toxicity188/BetterHud/assets/114675706/e99d1522-4975-4f3d-8bea-eb93bb62fd21)  
+
+![info](https://github.com/toxicity188/BetterHud/assets/114675706/850e54a0-d1b2-4952-9482-132e68560fcd)  
+### Dependency
+No
+
+### Version
+1.17-1.20.4
+
+### Build
+./gradlew build
+
+### API
+``` kotlin
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.toxicity188:BetterHud:VERSION)
+}
+```
