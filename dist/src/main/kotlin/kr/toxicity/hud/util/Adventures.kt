@@ -34,8 +34,14 @@ fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).deco
 val EMPTY_COMPONENT: Component = Component.empty()
 val EMPTY_WIDTH_COMPONENT = WidthComponent(Component.empty().color(NamedTextColor.WHITE), 0)
 val EMPTY_PIXEL_COMPONENT = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
-val NEW_LAYER = WidthComponent(Component.text(0xC0000.parseChar()).font(SPACE_KEY), 0)
-val NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
+val NEW_LAYER
+    get() = if (VERSION.version <= 18) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text(0xC0000.parseChar()).font(SPACE_KEY), 0)
+val NEGATIVE_ONE_SPACE_COMPONENT
+    get() = if (VERSION.version <= 18) {
+        WidthComponent(Component.text((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+    } else {
+        WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
+    }
 
 fun WidthComponent.toPixelComponent(pixel: Int) = PixelComponent(this, pixel)
 
