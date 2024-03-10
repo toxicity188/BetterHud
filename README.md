@@ -13,7 +13,8 @@ Welcome to BetterHud!
 
 </div>
 
-![feature](https://github.com/toxicity188/BetterHud/assets/114675706/71d081e8-1104-4a39-857e-489ec83d385b)  
+ ![156ab45b912cc836](https://github.com/toxicity188/BetterHud/assets/114675706/9ff14900-9c8a-46b1-952b-8c401f0b5973)  
+
 
 ### Making your own hud
 This plugin allows you to create a HUD without any mods.
@@ -45,7 +46,7 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 ✅ relocate hotbar  
 ✅ remove xp text
 
-![preview](https://github.com/toxicity188/BetterHud/assets/114675706/cb20b9a1-3069-4bfc-ad41-de7e9783f5d9)  
+![0](https://github.com/toxicity188/BetterHud/assets/114675706/b9723d82-fe50-4aa3-8c06-11d24bf26c10)  
 
 ![1](https://github.com/toxicity188/BetterHud/assets/114675706/5c2e3fc3-1a52-4c48-81a6-981f5a702f0a)  
 ![2](https://github.com/toxicity188/BetterHud/assets/114675706/3518b4eb-5b09-41f5-ad84-07942e446abb)  
