@@ -18,7 +18,7 @@ Welcome to BetterHud!
 ### Making your own hud
 This plugin allows you to create a HUD without any mods.
 
-### Exteremely fast
+### Extremely fast
 The following plugin operates completely asynchronously and does not cause any server TPS degradation.
 
 ### Easy to learn
