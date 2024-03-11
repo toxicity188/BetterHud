@@ -1,6 +1,6 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.hud.Hud
+import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
@@ -52,10 +52,10 @@ object ShaderManager: BetterHudManager {
     private val constants = mutableMapOf<String, String>()
 
     private val shaderConstants = mapOf(
-        "HEIGHT_BIT" to Hud.DEFAULT_BIT.toString(),
-        "MAX_BIT" to Hud.MAX_BIT.toString(),
+        "HEIGHT_BIT" to HudImpl.DEFAULT_BIT.toString(),
+        "MAX_BIT" to HudImpl.MAX_BIT.toString(),
         "DEFAULT_OFFSET" to "64",
-        "ADD_OFFSET" to Hud.ADD_HEIGHT.toString()
+        "ADD_OFFSET" to HudImpl.ADD_HEIGHT.toString()
     )
 
     override fun start() {

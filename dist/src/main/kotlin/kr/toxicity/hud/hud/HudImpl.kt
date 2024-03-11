@@ -3,6 +3,7 @@ package kr.toxicity.hud.hud
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.LayoutManager
@@ -13,7 +14,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection
 import java.io.File
 
-class Hud(name: String, file: File, section: ConfigurationSection) {
+class HudImpl(private val internalName: String, file: File, section: ConfigurationSection) : Hud {
     companion object {
         const val DEFAULT_BIT = 13
         const val MAX_BIT = 23 - DEFAULT_BIT
@@ -25,18 +26,18 @@ class Hud(name: String, file: File, section: ConfigurationSection) {
     }
 
     var imageChar = 0xCE000
-    val imageKey = Key.key("$NAME_SPACE:hud/$name/image")
+    val imageKey = Key.key("$NAME_SPACE:hud/$internalName/image")
     val jsonArray = JsonArray()
 
     var textIndex = 0
 
     private val elements = run {
-        val subFile = file.subFolder(name)
+        val subFile = file.subFolder(internalName)
         ArrayList<HudElement>().apply {
             section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
                 add(HudElement(
-                    this@Hud,
-                    name,
+                    this@HudImpl,
+                    internalName,
                     subFile,
                     configurationSection.getString("name").ifNull("name value not set: $s").let {
                         LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
@@ -52,16 +53,32 @@ class Hud(name: String, file: File, section: ConfigurationSection) {
     init {
         JsonObject().apply {
             add("providers", jsonArray)
-        }.save(file.subFolder(name).subFile("image.json"))
+        }.save(file.subFolder(internalName).subFile("image.json"))
     }
 
 
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
 
-    fun getComponent(player: HudPlayer): List<WidthComponent> {
+    override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()
         return elements.map {
             it.getComponent(player)
         }
     }
+
+    override fun getName(): String = internalName
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as HudImpl
+
+        return internalName == other.internalName
+    }
+
+    override fun hashCode(): Int {
+        return internalName.hashCode()
+    }
+
+
 }

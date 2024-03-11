@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.subFolder
 import java.io.File
 
-class HudElement(hud: Hud, name: String, file: File, layout: LayoutGroup, x: Double, y: Double) {
+class HudElement(hud: HudImpl, name: String, file: File, layout: LayoutGroup, x: Double, y: Double) {
     private val imageElement = layout.image.map {image ->
         HudImageElement(hud, image, x, y, layout.animation)
     }

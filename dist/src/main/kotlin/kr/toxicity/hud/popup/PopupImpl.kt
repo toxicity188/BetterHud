@@ -19,7 +19,7 @@ import java.util.UUID
 
 class PopupImpl(
     file: File,
-    val name: String,
+    val internalName: String,
     section: ConfigurationSection
 ): Popup {
     companion object {
@@ -31,7 +31,7 @@ class PopupImpl(
     } ?: EquationPairLocation.zero
     private val duration = section.getInt("duration", -1)
     private val update = section.getBoolean("update", true)
-    private val group = section.getString("group") ?: name
+    private val group = section.getString("group") ?: internalName
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
     private val keyMapping = section.getBoolean("key-mapping")
@@ -53,7 +53,7 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
-        val target = file.subFolder(name)
+        val target = file.subFolder(internalName)
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
@@ -100,7 +100,7 @@ class PopupImpl(
         val get = playerMap.getOrPut(group) {
             PopupIteratorGroupImpl(dispose)
         }
-        if (unique && get.contains(name)) return null
+        if (unique && get.contains(internalName)) return null
         if (get.index >= move.locations.size) return null
         val buildCondition = conditions.build(reason)
         if (!buildCondition(player)) return null
@@ -169,7 +169,7 @@ class PopupImpl(
             move.locations.lastIndex,
             key,
             sortType,
-            name,
+            internalName,
             mapper,
             valueGetter,
             cond,
@@ -186,4 +186,19 @@ class PopupImpl(
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PopupImpl
+
+        return internalName == other.internalName
+    }
+
+    override fun getName(): String = internalName
+
+    override fun hashCode(): Int = internalName.hashCode()
+
+
 }

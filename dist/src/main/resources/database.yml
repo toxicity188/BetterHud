@@ -1,0 +1,6 @@
+type: yml #yml, mysql
+info:
+  host: localhost
+  database: betterhud
+  name: root
+  password: write your password here!

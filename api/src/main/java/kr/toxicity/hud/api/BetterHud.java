@@ -1,9 +1,6 @@
 package kr.toxicity.hud.api;
 
-import kr.toxicity.hud.api.manager.ListenerManager;
-import kr.toxicity.hud.api.manager.PlaceholderManager;
-import kr.toxicity.hud.api.manager.PopupManager;
-import kr.toxicity.hud.api.manager.TriggerManager;
+import kr.toxicity.hud.api.manager.*;
 import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
@@ -41,5 +38,7 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract @NotNull ListenerManager getListenerManager();
     public abstract @NotNull PopupManager getPopupManager();
     public abstract @NotNull TriggerManager getTriggerManager();
+    public abstract @NotNull HudManager getHudManager();
+    public abstract @NotNull DatabaseManager getDatabaseManager();
     public abstract boolean isOnReload();
 }

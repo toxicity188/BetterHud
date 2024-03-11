@@ -18,7 +18,7 @@ import net.kyori.adventure.text.format.Style
 import java.io.File
 import kotlin.math.ceil
 
-class HudTextElement(parent: Hud, name: String, file: File, private val text: TextLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
+class HudTextElement(parent: HudImpl, name: String, file: File, private val text: TextLayout, index: Int, x: Double, y: Double, animation: List<ImageLocation>) {
 
     private val renderer = run {
         val shader = HudShader(
@@ -27,7 +27,7 @@ class HudTextElement(parent: Hud, name: String, file: File, private val text: Te
             text.outline
         )
         animation.map { imageLocation ->
-            val yAxis = (text.location.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT)
+            val yAxis = (text.location.y + imageLocation.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
             val group = ShaderGroup(shader, text.text.name, yAxis)
             val scale = ceil(text.text.height * text.scale).toInt()
             val key = TextManager.getKey(group) ?: run {
@@ -45,7 +45,7 @@ class HudTextElement(parent: Hud, name: String, file: File, private val text: Te
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
-                        addProperty("ascent", Hud.createBit(yAxis, shader))
+                        addProperty("ascent", HudImpl.createBit(yAxis, shader))
                         addProperty("height", scale)
                         add("chars", it.chars)
                     })

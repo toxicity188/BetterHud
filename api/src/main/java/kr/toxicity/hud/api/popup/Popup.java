@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface Popup {
-
+    @NotNull String getName();
     @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer player);
     default @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull Player player) {
         return show(reason, BetterHud.getInstance().getHudPlayer(player));

@@ -1,10 +1,7 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
-import kr.toxicity.hud.api.manager.ListenerManager
-import kr.toxicity.hud.api.manager.PlaceholderManager
-import kr.toxicity.hud.api.manager.PopupManager
-import kr.toxicity.hud.api.manager.TriggerManager
+import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
@@ -32,6 +29,7 @@ class BetterHudImpl: BetterHud() {
         CommandManager,
         PlayerManager,
         ModuleManager,
+        DatabaseManagerImpl,
 
         ListenerManagerImpl,
         PlaceholderManagerImpl,
@@ -40,7 +38,7 @@ class BetterHudImpl: BetterHud() {
         ImageManager,
         TextManager,
         LayoutManager,
-        HudManager,
+        HudManagerImpl,
         PopupManagerImpl,
 
         CompatibilityManager,
@@ -150,5 +148,7 @@ class BetterHudImpl: BetterHud() {
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
     override fun getPopupManager(): PopupManager = PopupManagerImpl
     override fun getTriggerManager(): TriggerManager = TriggerManagerImpl
+    override fun getHudManager(): HudManager = HudManagerImpl
+    override fun getDatabaseManager(): DatabaseManager = DatabaseManagerImpl
     override fun isOnReload(): Boolean = onReload
 }

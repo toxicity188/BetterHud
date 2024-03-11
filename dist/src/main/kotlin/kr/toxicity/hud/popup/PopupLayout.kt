@@ -7,11 +7,10 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
-import kr.toxicity.hud.hud.Hud
+import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.LocationGroup
-import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.renderer.ImageRenderer
@@ -36,7 +35,7 @@ class PopupLayout(
     private var imageChar = 0xCE000
     private var textIndex = 0
 
-    private val imageKey = Key.key("$NAME_SPACE:popup/${parent.name}/$name/image")
+    private val imageKey = Key.key("$NAME_SPACE:popup/${parent.internalName}/$name/image")
     private val groups = parent.move.locations.run {
         val json = JsonArray()
         val textFolder = file.subFolder("text")
@@ -128,7 +127,7 @@ class PopupLayout(
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:image/${hudImage.name}/${it.name}")
-                    addProperty("ascent", Hud.createBit(pixel.y, imageShader))
+                    addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
                         add(char)
@@ -143,7 +142,7 @@ class PopupLayout(
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:image/${it.name}")
-                    addProperty("ascent", Hud.createBit(pixel.y, imageShader))
+                    addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
                     addProperty("height", round(it.image.image.height * target.scale).toInt())
                     add("chars", JsonArray().apply {
                         add(char)
@@ -182,7 +181,7 @@ class PopupLayout(
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE:text/${textLayout.text.fontName}/${it.file}")
-                        addProperty("ascent", Hud.createBit(pixel.y, textShader))
+                        addProperty("ascent", HudImpl.createBit(pixel.y, textShader))
                         addProperty("height", scale)
                         add("chars", it.chars)
                     })
@@ -190,7 +189,7 @@ class PopupLayout(
                 JsonObject().apply {
                     add("providers", array)
                 }.save(File(textFolder, "text_${index}.json"))
-                val key = Key.key("$NAME_SPACE:popup/${parent.name}/$name/text/text_${index}")
+                val key = Key.key("$NAME_SPACE:popup/${parent.internalName}/$name/text/text_${index}")
                 TextManager.setKey(group, key)
                 key
             }

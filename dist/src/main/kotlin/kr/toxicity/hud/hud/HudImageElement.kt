@@ -8,7 +8,6 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.ListenerHudImage
-import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.shader.GuiLocation
@@ -18,7 +17,7 @@ import net.kyori.adventure.text.Component
 import kotlin.math.ceil
 import kotlin.math.round
 
-class HudImageElement(parent: Hud, private val image: ImageLayout, x: Double, y: Double, animation: List<ImageLocation>) {
+class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double, y: Double, animation: List<ImageLocation>) {
 
 
     private val chars = run {
@@ -46,7 +45,7 @@ class HudImageElement(parent: Hud, private val image: ImageLayout, x: Double, y:
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")
                     else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.name}")
-                    addProperty("ascent", Hud.createBit((image.location.y + imageLocation.y).coerceAtLeast(-Hud.ADD_HEIGHT).coerceAtMost(Hud.ADD_HEIGHT), shader))
+                    addProperty("ascent", HudImpl.createBit((image.location.y + imageLocation.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
                         add(c)
