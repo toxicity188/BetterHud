@@ -31,19 +31,27 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                 val yaml = getFile(player).toYaml()
                 hud.popups.addAll(yaml.getStringList("popups").mapNotNull {
                     PopupManagerImpl.getPopup(it)
+                }.filter {
+                    !it.isDefault
                 })
                 hud.huds.addAll(yaml.getStringList("huds").mapNotNull {
                     HudManagerImpl.getHud(it)
+                }.filter {
+                    !it.isDefault
                 })
                 return hud
             }
 
             override fun save(player: HudPlayer): Boolean {
                 YamlConfiguration().run {
-                    set("popups", player.popups.map {
+                    set("popups", player.popups.filter {
+                        !it.isDefault
+                    }.map {
                         it.name
                     }.toTypedArray())
-                    set("huds", player.huds.map {
+                    set("huds", player.huds.filter {
+                        !it.isDefault
+                    }.map {
                         it.name
                     }.toTypedArray())
                     save(getFile(player.bukkitPlayer))
@@ -78,11 +86,11 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                         val result = s.executeQuery()
                         while (result.next()) {
                             when (result.getString("type")) {
-                                "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let {
-                                    hud.huds.add(it)
+                                "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
+                                    if (!h.isDefault) hud.huds.add(h)
                                 }
-                                "popup" -> HudManagerImpl.getHud(result.getString("popup"))?.let {
-                                    hud.huds.add(it)
+                                "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
+                                    if (!p.isDefault) hud.popups.add(p)
                                 }
                             }
                         }
@@ -96,7 +104,9 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                         prepareStatement("DELETE FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
                             s.executeUpdate()
                         }
-                        player.huds.forEach { h ->
+                        player.huds.filter { h ->
+                            !h.isDefault
+                        }.forEach { h ->
                             prepareStatement("INSERT INTO enabled_hud(uuid, type, name) VALUES(?, ?, ?);").use { s ->
                                 s.setString(1, uuid)
                                 s.setString(2, "hud")
@@ -104,7 +114,9 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                                 s.executeUpdate()
                             }
                         }
-                        player.popups.forEach { p ->
+                        player.popups.filter { p ->
+                            !p.isDefault
+                        }.forEach { p ->
                             prepareStatement("INSERT INTO enabled_hud(uuid, type, name) VALUES(?, ?, ?);").use { s ->
                                 s.setString(1, uuid)
                                 s.setString(2, "popup")

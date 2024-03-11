@@ -14,12 +14,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class HudPlayerImpl(private val player: Player): HudPlayer {
 
-    private val popups = ConfigManager.defaultPopup.mapNotNull {
-        PopupManagerImpl.getPopup(it)
-    }.toMutableSet()
-    private val huds = ConfigManager.defaultHud.mapNotNull {
-        HudManagerImpl.getHud(it)
-    }.toMutableSet()
+    private var popups = PopupManagerImpl.defaultPopups.toMutableSet()
+    private var huds = HudManagerImpl.defaultHuds.toMutableSet()
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -96,8 +92,21 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player
     override fun getVariableMap(): MutableMap<String, String> = variable
-    private fun save() {
+    override fun save() {
         DatabaseManagerImpl.currentDatabase.save(this)
+    }
+
+    override fun resetElements() {
+        popups = popups.mapNotNull {
+            PopupManagerImpl.getPopup(it.name)
+        }.toMutableSet().apply {
+            addAll(PopupManagerImpl.defaultPopups)
+        }
+        huds = huds.mapNotNull {
+            HudManagerImpl.getHud(it.name)
+        }.toMutableSet().apply {
+            addAll(HudManagerImpl.defaultHuds)
+        }
     }
     override fun cancel() {
         popupGroup.forEach {
@@ -106,6 +115,5 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
         PLUGIN.nms.removeBossBar(player)
         task.cancel()
         autoSave.cancel()
-        save()
     }
 }

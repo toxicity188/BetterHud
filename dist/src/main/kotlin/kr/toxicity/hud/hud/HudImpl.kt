@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
 import kr.toxicity.hud.shader.HudShader
@@ -28,7 +29,7 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
     var imageChar = 0xCE000
     val imageKey = Key.key("$NAME_SPACE:hud/$internalName/image")
     val jsonArray = JsonArray()
-
+    private val default = ConfigManager.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
 
     private val elements = run {
@@ -80,5 +81,5 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
         return internalName.hashCode()
     }
 
-
+    override fun isDefault(): Boolean = default
 }

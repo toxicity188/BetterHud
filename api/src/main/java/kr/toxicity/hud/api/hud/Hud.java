@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface Hud {
     @NotNull String getName();
+    boolean isDefault();
     @NotNull List<WidthComponent> getComponents(@NotNull HudPlayer hudPlayer);
 }

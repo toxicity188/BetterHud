@@ -15,6 +15,7 @@ import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.math.ceil
+import kotlin.math.round
 
 object TextManager: BetterHudManager {
 
@@ -70,23 +71,29 @@ object TextManager: BetterHudManager {
                 })
             })
         }
+        val fontConfig = File(DATA_FOLDER, "font.yml").apply {
+            if (!exists()) PLUGIN.saveResource("font.yml", false)
+        }.toYaml()
+        val configScale = fontConfig.getInt("scale", 16)
+        val configHeight = fontConfig.getInt("height", 9)
         val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
             (if (exists()) runCatching {
                 inputStream().buffered().use {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 }
             }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
-        }.deriveFont(12F)
-        val parseDefault = parseFont("default", "default", defaultFont, 12, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
+        }.deriveFont(configScale.toFloat())
+        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
+        val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
-            textWidthMap[it.key] = ceil(it.value.toDouble() / 2).toInt()
+            textWidthMap[it.key] = round(it.value.toDouble() * heightMultiply).toInt()
         }
         parseDefault.array.forEach {
             defaultArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
                 addProperty("file", "$NAME_SPACE:font/default/${it.file}")
-                addProperty("ascent", 8)
-                addProperty("height", 9)
+                addProperty("ascent", configHeight - 1)
+                addProperty("height", configHeight)
                 add("chars", it.chars)
             })
         }

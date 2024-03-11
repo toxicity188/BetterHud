@@ -9,6 +9,8 @@ import kr.toxicity.hud.util.DATA_FOLDER
 import kr.toxicity.hud.util.forEachAllYaml
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.warn
+import java.util.*
+import kotlin.collections.HashMap
 
 object PopupManagerImpl: BetterHudManager, PopupManager {
     private val popupMap = HashMap<String, PopupImpl>()
@@ -29,7 +31,11 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
         }
     }
 
+    override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(popupMap.keys)
     override fun getPopup(name: String): Popup? = popupMap[name]
+    override fun getDefaultPopups(): Set<Popup> = popupMap.values.filter {
+        it.isDefault
+    }.toSet()
     override fun end() {
     }
 }

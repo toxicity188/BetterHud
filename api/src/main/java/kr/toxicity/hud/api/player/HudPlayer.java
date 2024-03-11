@@ -25,5 +25,7 @@ public interface HudPlayer {
 
     @NotNull Set<Popup> getPopups();
     @NotNull Set<Hud> getHuds();
+    void resetElements();
+    void save();
     void setBarColor(@Nullable BarColor color);
 }

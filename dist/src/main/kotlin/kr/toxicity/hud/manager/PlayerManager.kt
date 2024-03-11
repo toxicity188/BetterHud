@@ -24,14 +24,17 @@ object PlayerManager: BetterHudManager {
             fun join(e: PlayerJoinEvent) {
                 val player = e.player
                 asyncTask {
-                    hudPlayer[player.uniqueId] = DatabaseManagerImpl.currentDatabase.load(player)
+                    hudPlayer.computeIfAbsent(player.uniqueId) {
+                        DatabaseManagerImpl.currentDatabase.load(player)
+                    }
                 }
             }
             @EventHandler
             fun quit(e: PlayerQuitEvent) {
                 hudPlayer.remove(e.player.uniqueId)?.let {
+                    it.cancel()
                     asyncTask {
-                        it.cancel()
+                        it.save()
                     }
                 }
             }
@@ -46,9 +49,13 @@ object PlayerManager: BetterHudManager {
                 value.value.clear()
             }
             it.popupGroupIteratorMap.clear()
+            it.resetElements()
         }
     }
 
     override fun end() {
+        hudPlayer.values.forEach {
+            it.save()
+        }
     }
 }

@@ -27,7 +27,6 @@ class BetterHudImpl: BetterHud() {
     private val managers = listOf(
         ConfigManager,
         CommandManager,
-        PlayerManager,
         ModuleManager,
         DatabaseManagerImpl,
 
@@ -43,7 +42,8 @@ class BetterHudImpl: BetterHud() {
 
         CompatibilityManager,
 
-        ShaderManager
+        ShaderManager,
+        PlayerManager
     )
 
     private lateinit var nms: NMS

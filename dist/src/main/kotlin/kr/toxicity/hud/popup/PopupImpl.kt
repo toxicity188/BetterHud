@@ -7,10 +7,7 @@ import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.EquationPairLocation
-import kr.toxicity.hud.manager.LayoutManager
-import kr.toxicity.hud.manager.PlaceholderManagerImpl
-import kr.toxicity.hud.manager.PlayerManager
-import kr.toxicity.hud.manager.TriggerManagerImpl
+import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.ConfigurationSection
@@ -34,6 +31,7 @@ class PopupImpl(
     private val group = section.getString("group") ?: internalName
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
+    private val default = ConfigManager.defaultPopup.contains(internalName) || section.getBoolean("default")
     private val keyMapping = section.getBoolean("key-mapping")
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.getString("index")?.let {
         PlaceholderManagerImpl.find(it).apply {
@@ -199,6 +197,5 @@ class PopupImpl(
     override fun getName(): String = internalName
 
     override fun hashCode(): Int = internalName.hashCode()
-
-
+    override fun isDefault(): Boolean = default
 }

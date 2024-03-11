@@ -8,6 +8,7 @@ import kr.toxicity.hud.util.DATA_FOLDER
 import kr.toxicity.hud.util.forEachAllYaml
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.warn
+import java.util.Collections
 
 object HudManagerImpl: BetterHudManager, HudManager {
 
@@ -31,6 +32,12 @@ object HudManagerImpl: BetterHudManager, HudManager {
             }
         }
     }
+
+    override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)
+
+    override fun getDefaultHuds(): Set<Hud> = hudMap.values.filter {
+        it.isDefault
+    }.toSet()
 
     override fun end() {
     }
