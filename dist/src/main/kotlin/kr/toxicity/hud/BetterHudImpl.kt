@@ -9,13 +9,19 @@ import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
@@ -27,6 +33,7 @@ class BetterHudImpl: BetterHud() {
     private val managers = listOf(
         ConfigManager,
         CommandManager,
+        CompatibilityManager,
         ModuleManager,
         DatabaseManagerImpl,
 
@@ -39,8 +46,6 @@ class BetterHudImpl: BetterHud() {
         LayoutManager,
         HudManagerImpl,
         PopupManagerImpl,
-
-        CompatibilityManager,
 
         ShaderManager,
         PlayerManager
@@ -62,6 +67,20 @@ class BetterHudImpl: BetterHud() {
                 if (description.version != body) {
                     warn("New version found: $body")
                     warn("Download: https://www.spigotmc.org/resources/115559")
+                    Bukkit.getPluginManager().registerEvents(object : Listener {
+                        @EventHandler
+                        fun join(e: PlayerJoinEvent) {
+                            val player = e.player
+                            if (player.isOp) {
+                                player.info("New BetterHud version found: $body")
+                                player.info(Component.text("Download: https://www.spigotmc.org/resources/115559")
+                                    .clickEvent(ClickEvent.clickEvent(
+                                        ClickEvent.Action.OPEN_URL,
+                                        "https://www.spigotmc.org/resources/115559"
+                                    )))
+                            }
+                        }
+                    }, PLUGIN)
                 }
             }
         }

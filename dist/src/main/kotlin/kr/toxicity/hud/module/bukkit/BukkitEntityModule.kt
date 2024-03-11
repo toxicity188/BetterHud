@@ -82,7 +82,7 @@ class BukkitEntityModule: BukkitModule {
                         (e.entity as? LivingEntity)?.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0
                     }
                 }
-            }
+            },
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(

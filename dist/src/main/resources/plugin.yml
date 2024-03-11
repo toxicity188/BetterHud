@@ -5,12 +5,14 @@ api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
 website: "https://www.spigotmc.org/resources/115559"
+load: STARTUP
 softdepend:
   - MythicLib
   - MythicMobs
   - MMOCore
   - PlaceholderAPI
   - WorldGuard
+  - Vault
 commands:
   betterhud:
     aliases:
@@ -21,3 +23,20 @@ libraries:
   - "net.kyori:adventure-api:${adventure}"
   - "net.kyori:adventure-text-minimessage:${adventure}"
   - "net.kyori:adventure-platform-bukkit:${platform}"
+permissions:
+  hud.reload:
+    description: Access to reload command.
+    default: op
+  hud.hud:
+    description: Access to hud command.
+    default: op
+    children:
+      hud.hud.add: true
+      hud.hud.remove: true
+  hud.popup:
+    description: Access to popup command.
+    default: op
+    children:
+      hud.popup.add: true
+      hud.popup.remove: true
+      hud.popup.show: true

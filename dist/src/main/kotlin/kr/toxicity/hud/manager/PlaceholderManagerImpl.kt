@@ -4,7 +4,6 @@ import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.Placeholder
@@ -14,11 +13,10 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
-import org.bukkit.entity.LivingEntity
-import org.bukkit.event.entity.EntityEvent
 import org.bukkit.potion.PotionEffectType
 import java.util.function.Function
 import java.util.regex.Pattern
@@ -34,6 +32,11 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         java.lang.Number::class.java,
         0.0,
         mapOf(
+            "empty_space" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.emptySpace
+                }
+            },
             "health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.health
@@ -75,7 +78,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                 }
             },
             "number" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 0
+                override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     return Function { p ->
                         p.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
@@ -83,7 +86,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                 }
             },
             "potion_effect_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 0
+                override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     val potion = (runCatching {
                         NamespacedKey.fromString(args[0])?.let { key ->
@@ -95,6 +98,24 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     }.getOrNull() ?: throw RuntimeException("this potion effect doesn't exist: ${args[0]}"))
                     return Function { p ->
                         p.bukkitPlayer.getPotionEffect(potion)?.duration ?: 0
+                    }
+                }
+            },
+            "total_amount" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    val item = Material.valueOf(args[0].uppercase())
+                    return Function { p ->
+                        p.bukkitPlayer.totalAmount(item)
+                    }
+                }
+            },
+            "storage" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    val item = Material.valueOf(args[0].uppercase())
+                    return Function { p ->
+                        p.bukkitPlayer.storage(item)
                     }
                 }
             },

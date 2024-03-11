@@ -16,6 +16,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven("https://jitpack.io")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
         maven("https://maven.enginehub.org/repo/")
