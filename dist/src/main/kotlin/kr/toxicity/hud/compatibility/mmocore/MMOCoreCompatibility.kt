@@ -117,12 +117,17 @@ class MMOCoreCompatibility: Compatibility {
                     api.getPlayerData(p.bukkitPlayer).experience
                 }
             },
+            "max_exp" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    api.getPlayerData(p.bukkitPlayer).levelUpExperience
+                }
+            },
             "level" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     api.getPlayerData(p.bukkitPlayer).level
                 }
             },
-            "stat" to object : HudPlaceholder<Number> {
+            "" to object : HudPlaceholder<Number> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(
                     args: MutableList<String>,
