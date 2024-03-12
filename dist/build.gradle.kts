@@ -7,6 +7,8 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     implementation(project(":api"))
+    implementation(project(":scheduler:standard"))
+    implementation(project(":scheduler:folia"))
     implementation(project(":nms:v1_17_R1", configuration = "reobf"))
     implementation(project(":nms:v1_18_R1", configuration = "reobf"))
     implementation(project(":nms:v1_18_R2", configuration = "reobf"))

@@ -22,7 +22,7 @@ object PlayerManager: BetterHudManager {
         Bukkit.getPluginManager().registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
             fun join(e: PlayerJoinEvent) {
-                val player = e.player
+                val player = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(e.player) else e.player
                 asyncTask {
                     hudPlayer.computeIfAbsent(player.uniqueId) {
                         DatabaseManagerImpl.currentDatabase.load(player)

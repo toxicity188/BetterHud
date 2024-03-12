@@ -76,6 +76,7 @@ object TextManager: BetterHudManager {
         }.toYaml()
         val configScale = fontConfig.getInt("scale", 16)
         val configHeight = fontConfig.getInt("height", 9)
+        val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
         val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
             (if (exists()) runCatching {
                 inputStream().buffered().use {
@@ -92,7 +93,7 @@ object TextManager: BetterHudManager {
             defaultArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
                 addProperty("file", "$NAME_SPACE:font/default/${it.file}")
-                addProperty("ascent", configHeight - 1)
+                addProperty("ascent", configAscent)
                 addProperty("height", configHeight)
                 add("chars", it.chars)
             })

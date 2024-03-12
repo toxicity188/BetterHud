@@ -21,6 +21,9 @@
             <option value="$PROJECT_DIR$/nms/v1_20_R1" />
             <option value="$PROJECT_DIR$/nms/v1_20_R2" />
             <option value="$PROJECT_DIR$/nms/v1_20_R3" />
+            <option value="$PROJECT_DIR$/scheduler" />
+            <option value="$PROJECT_DIR$/scheduler/folia" />
+            <option value="$PROJECT_DIR$/scheduler/standard" />
           </set>
         </option>
       </GradleProjectSettings>

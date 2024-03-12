@@ -20,9 +20,6 @@ val VERSION = PLUGIN.nms.version
 fun info(message: String) = PLUGIN.logger.info(message)
 fun warn(message: String) = PLUGIN.logger.warning(message)
 
-fun task(block: () -> Unit) = Bukkit.getScheduler().runTask(PLUGIN, block)
-fun asyncTask(block: () -> Unit) = Bukkit.getScheduler().runTaskAsynchronously(PLUGIN, block)
-fun taskLater(delay: Long, block: () -> Unit) = Bukkit.getScheduler().runTaskLater(PLUGIN, block, delay)
-fun asyncTaskLater(delay: Long, block: () -> Unit) = Bukkit.getScheduler().runTaskLaterAsynchronously(PLUGIN, block, delay)
-fun taskTimer(delay: Long, period: Long, block: () -> Unit) = Bukkit.getScheduler().runTaskTimer(PLUGIN, block, delay, period)
-fun asyncTaskTimer(delay: Long, period: Long, block: () -> Unit) = Bukkit.getScheduler().runTaskTimerAsynchronously(PLUGIN, block, delay, period)
+fun task(block: () -> Unit) = PLUGIN.scheduler.task(PLUGIN, block)
+fun asyncTask(block: () -> Unit) = PLUGIN.scheduler.asyncTask(PLUGIN, block)
+fun asyncTaskTimer(delay: Long, period: Long, block: () -> Unit) = PLUGIN.scheduler.asyncTaskTimer(PLUGIN, delay, period, block)

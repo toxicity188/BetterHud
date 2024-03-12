@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.manager.*;
 import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
+import kr.toxicity.hud.api.scheduler.HudScheduler;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,8 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract @NotNull NMS getNMS();
     public abstract @NotNull ReloadResult reload();
     public abstract @NotNull BukkitAudiences getAudiences();
+    public abstract @NotNull HudScheduler getScheduler();
+    public abstract boolean isFolia();
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     public abstract int getWidth(char target);
     public abstract @NotNull HudPlayer getHudPlayer(@NotNull Player player);

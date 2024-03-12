@@ -16,10 +16,14 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
+import org.bukkit.Bukkit
 import org.bukkit.boss.BarColor
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
 import org.bukkit.entity.Player
 import java.util.*
@@ -65,6 +69,18 @@ class NMSImpl: NMS {
 
     override fun getVersion(): NMSVersion {
         return NMSVersion.V1_19_R1
+    }
+
+    override fun getFoliaAdaptedPlayer(player: Player): Player {
+        val handle = (player as CraftPlayer).handle
+        return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {
+            override fun getPersistentDataContainer(): CraftPersistentDataContainer {
+                return player.persistentDataContainer
+            }
+            override fun getHandle(): ServerPlayer {
+                return handle
+            }
+        }
     }
 
     private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BarColor, component: Component): ChannelDuplexHandler() {
@@ -193,9 +209,9 @@ class NMSImpl: NMS {
                                 onUse = false
                                 BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
                                 listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
+                                listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
                                 listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))
                                 listener.send(ClientboundBossEventPacket.createUpdatePropertiesPacket(last))
-                                listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
                             }
                         }
                         2 -> {

@@ -6,9 +6,12 @@ import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
+import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.scheduler.FoliaScheduler
+import kr.toxicity.hud.scheduler.StandardScheduler
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
@@ -53,6 +56,13 @@ class BetterHudImpl: BetterHud() {
 
     private lateinit var nms: NMS
     private lateinit var audience: BukkitAudiences
+
+    private val isFolia = runCatching {
+        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
+        true
+    }.getOrDefault(false)
+
+    private val scheduler = if (isFolia) FoliaScheduler() else StandardScheduler()
 
     override fun onEnable() {
         runCatching {
@@ -163,6 +173,8 @@ class BetterHudImpl: BetterHud() {
         }
     }
 
+    override fun getScheduler(): HudScheduler = scheduler
+    override fun isFolia(): Boolean = isFolia
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
     override fun getPopupManager(): PopupManager = PopupManagerImpl

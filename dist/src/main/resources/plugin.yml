@@ -4,6 +4,7 @@ name: BetterHud
 api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
+folia-supported: true
 website: "https://www.spigotmc.org/resources/115559"
 load: STARTUP
 softdepend:
@@ -24,6 +25,9 @@ libraries:
   - "net.kyori:adventure-text-minimessage:${adventure}"
   - "net.kyori:adventure-platform-bukkit:${platform}"
 permissions:
+  hud.help:
+    description: Access to help command.
+    default: op
   hud.reload:
     description: Access to reload command.
     default: op

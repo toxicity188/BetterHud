@@ -14,5 +14,8 @@ include(
     "nms:v1_19_R3",
     "nms:v1_20_R1",
     "nms:v1_20_R2",
-    "nms:v1_20_R3"
+    "nms:v1_20_R3",
+
+    "scheduler:standard",
+    "scheduler:folia"
 )
