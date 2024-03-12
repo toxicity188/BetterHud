@@ -14,7 +14,6 @@ import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import kotlin.math.ceil
 import kotlin.math.round
 
 class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double, y: Double, animation: List<ImageLocation>) {
@@ -40,7 +39,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double
                 val c = (++parent.imageChar).parseChar()
                 val height = round(pair.image.image.height.toDouble() * image.scale).toInt()
                 val scale = height.toDouble() / pair.image.image.height
-                val finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), ceil((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 parent.jsonArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")

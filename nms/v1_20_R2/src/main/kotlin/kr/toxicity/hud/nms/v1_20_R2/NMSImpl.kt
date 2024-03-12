@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -17,6 +18,7 @@ import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
@@ -39,6 +41,21 @@ class NMSImpl: NMS {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
+        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (Bukkit.getConsoleSender() is Audience) {
+            {
+                it.connection
+            }
+        } else {
+            ServerCommonPacketListenerImpl::class.java.declaredFields.first { f ->
+                f.type == Connection::class.java
+            }.apply {
+                isAccessible = true
+            }.let { get ->
+                {
+                    get[it] as Connection
+                }
+            }
+        }
 
         private fun toAdventure(component: net.minecraft.network.chat.Component) = GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(component))
         private fun fromAdventure(component: Component) = CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(component))
@@ -95,7 +112,7 @@ class NMSImpl: NMS {
         private var toggle = false
 
         init {
-            val pipeLine = listener.connection.channel.pipeline()
+            val pipeLine = getConnection(listener).channel.pipeline()
             pipeLine.toMap().forEach {
                 if (it.value is Connection) pipeLine.addBefore(it.key, INJECT_NAME, this)
             }
@@ -109,7 +126,7 @@ class NMSImpl: NMS {
 
         fun remove() {
             listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            val channel = listener.connection.channel
+            val channel = getConnection(listener).channel
             channel.eventLoop().submit {
                 channel.pipeline().remove(INJECT_NAME)
             }
