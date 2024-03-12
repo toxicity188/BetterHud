@@ -12,10 +12,17 @@ import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
 
-class HudPlayerImpl(private val player: Player): HudPlayer {
-
-    private var popups = PopupManagerImpl.defaultPopups.toMutableSet()
-    private var huds = HudManagerImpl.defaultHuds.toMutableSet()
+class HudPlayerImpl(
+    private val player: Player,
+    huds: MutableSet<Hud>,
+    popups: MutableSet<Popup>
+): HudPlayer {
+    private var huds = huds.apply {
+        addAll(HudManagerImpl.defaultHuds)
+    }
+    private var popups = popups.apply {
+        addAll(PopupManagerImpl.defaultPopups)
+    }
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -71,6 +78,9 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
+    init {
+        PLUGIN.nms.inject(player, ShaderManager.barColor)
+    }
 
     override fun getHudComponent(): WidthComponent = last
     override fun getAdditionalComponent(): WidthComponent? = additionalComp
@@ -108,6 +118,7 @@ class HudPlayerImpl(private val player: Player): HudPlayer {
             addAll(HudManagerImpl.defaultHuds)
         }
     }
+
     override fun cancel() {
         popupGroup.forEach {
             it.value.clear()

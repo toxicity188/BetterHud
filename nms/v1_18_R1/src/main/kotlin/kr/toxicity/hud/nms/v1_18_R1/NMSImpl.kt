@@ -49,11 +49,14 @@ class NMSImpl: NMS {
         }
     }
 
-    override fun showBossBar(player: Player, color: BarColor, component: Component) {
+    override fun inject(player: Player, color: BarColor) {
         player as CraftPlayer
-        bossBarMap.getOrPut(player.uniqueId) {
-            PlayerBossBar(player, player.handle.connection, color, component)
-        }.update(color, component)
+        bossBarMap.computeIfAbsent(player.uniqueId) {
+            PlayerBossBar(player, player.handle.connection, color, Component.empty())
+        }
+    }
+    override fun showBossBar(player: Player, color: BarColor, component: Component) {
+        bossBarMap[player.uniqueId]?.update(color, component)
     }
 
     override fun removeBossBar(player: Player) {

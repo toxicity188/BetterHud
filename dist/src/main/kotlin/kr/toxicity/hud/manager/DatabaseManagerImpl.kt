@@ -2,8 +2,10 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.database.HudDatabase
 import kr.toxicity.hud.api.database.HudDatabaseConnector
+import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.manager.DatabaseManager
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -27,19 +29,20 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
             }
 
             override fun load(player: Player): HudPlayer {
-                val hud = HudPlayerImpl(player)
                 val yaml = getFile(player).toYaml()
-                hud.popups.addAll(yaml.getStringList("popups").mapNotNull {
-                    PopupManagerImpl.getPopup(it)
-                }.filter {
-                    !it.isDefault
-                })
-                hud.huds.addAll(yaml.getStringList("huds").mapNotNull {
-                    HudManagerImpl.getHud(it)
-                }.filter {
-                    !it.isDefault
-                })
-                return hud
+                return HudPlayerImpl(
+                    player,
+                    yaml.getStringList("huds").mapNotNull {
+                        HudManagerImpl.getHud(it)
+                    }.filter {
+                        !it.isDefault
+                    }.toMutableSet(),
+                    yaml.getStringList("popups").mapNotNull {
+                        PopupManagerImpl.getPopup(it)
+                    }.filter {
+                        !it.isDefault
+                    }.toMutableSet()
+                )
             }
 
             override fun save(player: HudPlayer): Boolean {
@@ -81,21 +84,22 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
 
                 override fun load(player: Player): HudPlayer {
                     val uuid = player.uniqueId.toString()
-                    val hud = HudPlayerImpl(player)
+                    val huds = HashSet<Hud>()
+                    val popups = HashSet<Popup>()
                     mysql.prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
                         val result = s.executeQuery()
                         while (result.next()) {
                             when (result.getString("type")) {
                                 "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
-                                    if (!h.isDefault) hud.huds.add(h)
+                                    if (!h.isDefault) huds.add(h)
                                 }
                                 "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
-                                    if (!p.isDefault) hud.popups.add(p)
+                                    if (!p.isDefault) popups.add(p)
                                 }
                             }
                         }
                     }
-                    return hud
+                    return HudPlayerImpl(player, huds, popups)
                 }
 
                 override fun save(player: HudPlayer): Boolean {
