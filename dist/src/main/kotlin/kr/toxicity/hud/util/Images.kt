@@ -40,13 +40,7 @@ fun BufferedImage.removeEmptyWidth(): LoadedImage? {
     if (finalWidth <= 0) return null
 
     return LoadedImage(
-        BufferedImage(finalWidth, height, BufferedImage.TYPE_INT_ARGB).also {
-            it.createGraphics().run {
-                composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                drawImage(getSubimage(widthB, 0, finalWidth, height), null, null)
-                dispose()
-            }
-        },
+        getSubimage(widthB, 0, finalWidth, height),
         widthB,
         0
     )
@@ -74,13 +68,7 @@ fun BufferedImage.removeEmptySide(): LoadedImage? {
     if (finalWidth <= 0 || finalHeight <= 0) return null
 
     return LoadedImage(
-        BufferedImage(finalWidth, finalHeight, BufferedImage.TYPE_INT_ARGB).also {
-            it.createGraphics().run {
-                composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                drawImage(getSubimage(widthB, heightB, finalWidth, finalHeight), null, null)
-                dispose()
-            }
-        },
+        getSubimage(widthB, heightB, finalWidth, finalHeight),
         widthB,
         heightB
     )

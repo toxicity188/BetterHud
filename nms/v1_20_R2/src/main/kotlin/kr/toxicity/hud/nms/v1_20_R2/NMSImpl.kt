@@ -9,7 +9,9 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextDecoration
@@ -22,12 +24,19 @@ import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
+import org.bukkit.WorldBorder
 import org.bukkit.boss.BarColor
 import org.bukkit.craftbukkit.v1_20_R2.CraftServer
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_20_R2.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.v1_20_R2.util.CraftChatMessage
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.inventory.EntityEquipment
+import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.PlayerInventory
+import org.bukkit.permissions.Permission
 import java.util.*
 
 class NMSImpl: NMS {
@@ -96,6 +105,66 @@ class NMSImpl: NMS {
             }
             override fun getHandle(): ServerPlayer {
                 return handle
+            }
+            override fun getHealth(): Double {
+                return player.health
+            }
+            override fun getScaledHealth(): Float {
+                return player.scaledHealth
+            }
+            override fun getFirstPlayed(): Long {
+                return player.firstPlayed
+            }
+            override fun getInventory(): PlayerInventory {
+                return player.inventory
+            }
+            override fun getEnderChest(): Inventory {
+                return player.enderChest
+            }
+            override fun isOp(): Boolean {
+                return player.isOp
+            }
+            override fun getGameMode(): GameMode {
+                return player.gameMode
+            }
+            override fun getEquipment(): EntityEquipment {
+                return player.equipment
+            }
+            override fun hasPermission(name: String): Boolean {
+                return player.hasPermission(name)
+            }
+            override fun hasPermission(perm: Permission): Boolean {
+                return player.hasPermission(perm)
+            }
+            override fun isPermissionSet(name: String): Boolean {
+                return player.isPermissionSet(name)
+            }
+            override fun isPermissionSet(perm: Permission): Boolean {
+                return player.isPermissionSet(perm)
+            }
+            override fun hasPlayedBefore(): Boolean {
+                return player.hasPlayedBefore()
+            }
+            override fun getWorldBorder(): WorldBorder? {
+                return player.getWorldBorder()
+            }
+            override fun showBossBar(bar: BossBar) {
+                player.showBossBar(bar)
+            }
+            override fun hideBossBar(bar: BossBar) {
+                player.hideBossBar(bar)
+            }
+            override fun sendMessage(message: String) {
+                player.sendMessage(message)
+            }
+            override fun getLastDamageCause(): EntityDamageEvent? {
+                return player.lastDamageCause
+            }
+            override fun pointers(): Pointers {
+                return player.pointers()
+            }
+            override fun spigot(): Player.Spigot {
+                return player.spigot()
             }
         }
     }
