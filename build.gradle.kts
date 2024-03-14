@@ -27,6 +27,7 @@ allprojects {
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
 
+        compileOnly("com.mojang:authlib:6.0.52")
         compileOnly("net.kyori:adventure-api:$adventure")
         compileOnly("net.kyori:adventure-text-minimessage:$adventure")
         compileOnly("net.kyori:adventure-platform-bukkit:$platform")

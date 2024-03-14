@@ -1,5 +1,6 @@
 package kr.toxicity.hud.nms.v1_19_R1
 
+import com.mojang.authlib.GameProfile
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
@@ -94,6 +95,10 @@ class NMSImpl: NMS {
 
     override fun getVersion(): NMSVersion {
         return NMSVersion.V1_19_R1
+    }
+
+    override fun getGameProfile(player: Player): GameProfile {
+        return (player as CraftPlayer).handle.gameProfile
     }
 
     override fun getFoliaAdaptedPlayer(player: Player): Player {

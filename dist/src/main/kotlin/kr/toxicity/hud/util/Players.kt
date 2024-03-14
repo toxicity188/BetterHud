@@ -24,6 +24,9 @@ val Player.armor
         return attribute
     }
 
+val Player.gameProfile
+    get() = PLUGIN.nms.getGameProfile(this)
+
 val Player.emptySpace
     get(): Int {
         val inv: Inventory = inventory

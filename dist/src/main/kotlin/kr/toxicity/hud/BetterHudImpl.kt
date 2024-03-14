@@ -46,6 +46,7 @@ class BetterHudImpl: BetterHud() {
 
         ImageManager,
         TextManager,
+        PlayerHeadManager,
         LayoutManager,
         HudManagerImpl,
         PopupManagerImpl,

@@ -6,7 +6,6 @@ import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.TextManager
-import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toConditions
@@ -18,6 +17,12 @@ import java.text.DecimalFormat
 class LayoutGroup(section: ConfigurationSection) {
 
     private val loc = ImageLocation(section)
+
+    val align = section.getString("align")?.let {
+        runCatching {
+            LayoutAlign.valueOf(it.uppercase())
+        }.getOrNull()
+    } ?: LayoutAlign.LEFT
 
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
         section.getConfigurationSection("images")?.forEachSubConfiguration { s, configurationSection ->

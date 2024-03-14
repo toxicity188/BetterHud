@@ -17,10 +17,10 @@ class HudPlayerImpl(
     huds: MutableSet<Hud>,
     popups: MutableSet<Popup>
 ): HudPlayer {
-    private var huds = huds.apply {
+    private val huds = huds.apply {
         addAll(HudManagerImpl.defaultHuds)
     }
-    private var popups = popups.apply {
+    private val popups = popups.apply {
         addAll(PopupManagerImpl.defaultPopups)
     }
 
@@ -107,15 +107,29 @@ class HudPlayerImpl(
     }
 
     override fun resetElements() {
-        popups = popups.mapNotNull {
-            PopupManagerImpl.getPopup(it.name)
-        }.toMutableSet().apply {
-            addAll(PopupManagerImpl.defaultPopups)
+        val popupNames = popups.filter {
+            !it.isDefault
+        }.map {
+            it.name
         }
-        huds = huds.mapNotNull {
-            HudManagerImpl.getHud(it.name)
-        }.toMutableSet().apply {
-            addAll(HudManagerImpl.defaultHuds)
+        popups.clear()
+        popups.addAll(PopupManagerImpl.defaultPopups)
+        popupNames.forEach {
+            PopupManagerImpl.getPopup(it)?.let { popup ->
+                if (!popup.isDefault) popups.add(popup)
+            }
+        }
+        val hudNames = popups.filter {
+            !it.isDefault
+        }.map {
+            it.name
+        }
+        huds.clear()
+        huds.addAll(HudManagerImpl.defaultHuds)
+        hudNames.forEach {
+            HudManagerImpl.getHud(it)?.let { hud ->
+                if (!hud.isDefault) huds.add(hud)
+            }
         }
     }
 

@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.subFolder
 import java.io.File
 
-class HudElement(hud: HudImpl, name: String, file: File, layout: LayoutGroup, x: Double, y: Double) {
+class HudElement(hud: HudImpl, name: String, file: File, private val layout: LayoutGroup, x: Double, y: Double) {
     private val imageElement = layout.image.map {image ->
         HudImageElement(hud, image, x, y, layout.animation)
     }
@@ -21,7 +21,11 @@ class HudElement(hud: HudImpl, name: String, file: File, layout: LayoutGroup, x:
 
     val conditions = layout.conditions.build(UpdateEvent.EMPTY)
 
-    fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer()
+    private val max = imageElement.maxOf {
+        it.max
+    }
+
+    fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer(layout.align, max)
         .append(imageElement.map {
             it.getComponent(player)
         })

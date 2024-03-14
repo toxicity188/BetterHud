@@ -32,4 +32,8 @@ class ImageRenderer(
             if (cond(player)) type.getComponent(listen, components, player) else EMPTY_PIXEL_COMPONENT
         }
     }
+
+    fun max() = components.maxOf {
+        it.component.width
+    }
 }

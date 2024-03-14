@@ -61,6 +61,10 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double
 
     }
 
+    val max = chars.maxOf {
+        it.max()
+    }
+
     fun getComponent(player: HudPlayer): PixelComponent = chars[(player.tick % chars.size).toInt()].getComponent(
         UpdateEvent.EMPTY)(player)
 

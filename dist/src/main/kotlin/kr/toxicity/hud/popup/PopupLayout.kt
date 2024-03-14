@@ -97,7 +97,7 @@ class PopupLayout(
                 it.getText(reason)
             }
             return { player ->
-                LayoutComponentContainer()
+                LayoutComponentContainer(layout.align, max)
                     .append(imageProcessing.map {
                         it(player)
                     })
@@ -158,6 +158,11 @@ class PopupLayout(
                 hudImage.conditions.and(target.conditions)
             )
         }
+
+        private val max = image.maxOf {
+            it.max()
+        }
+
         val texts = layout.text.map { textLayout ->
             val pixel = location + pair.pixel + textLayout.location
             val textShader = HudShader(
