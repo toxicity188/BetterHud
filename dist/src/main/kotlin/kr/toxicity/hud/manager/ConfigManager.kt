@@ -12,10 +12,16 @@ object ConfigManager: BetterHudManager {
     var warn = EMPTY_COMPONENT
         private set
     var defaultHud = emptyList<String>()
+        private set
     var defaultPopup = emptyList<String>()
+        private set
 
     var numberFormat = DecimalFormat("#,###.#")
+        private set
     var defaultFontName = "font.ttf"
+        private set
+    var tickSpeed = 1L
+        private set
 
     override fun start() {
 
@@ -37,6 +43,7 @@ object ConfigManager: BetterHudManager {
             yaml.getString("default-font-name")?.let {
                 defaultFontName = it
             }
+            tickSpeed = yaml.getLong("tick-speed", 1)
             numberFormat = yaml.getString("number-format")?.let {
                 runCatching {
                     DecimalFormat(it)

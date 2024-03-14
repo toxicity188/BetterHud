@@ -19,6 +19,9 @@ public interface HudPlayer {
     @Nullable WidthComponent getAdditionalComponent();
     long getTick();
     void cancel();
+    void update();
+    void startTick();
+    void cancelTick();
     @NotNull Map<String, PopupIteratorGroup> getPopupGroupIteratorMap();
     @NotNull Map<String, String> getVariableMap();
     @Nullable BarColor getBarColor();

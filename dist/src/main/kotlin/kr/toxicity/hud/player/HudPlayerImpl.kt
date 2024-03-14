@@ -29,7 +29,51 @@ class HudPlayerImpl(
     private var additionalComp: WidthComponent? = null
     private val variable = HashMap<String, String>()
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
-    private val task = asyncTaskTimer(1, 1) {
+    private var task = asyncTaskTimer(1, ConfigManager.tickSpeed) {
+        update()
+    }
+    private var color: BarColor? = null
+    private val autoSave = asyncTaskTimer(6000, 6000) {
+        save()
+    }
+    init {
+        PLUGIN.nms.inject(player, ShaderManager.barColor)
+    }
+
+    override fun getHudComponent(): WidthComponent = last
+    override fun getAdditionalComponent(): WidthComponent? = additionalComp
+    override fun setAdditionalComponent(component: WidthComponent?) {
+        additionalComp = component
+    }
+
+    override fun getBarColor(): BarColor? = color
+    override fun setBarColor(color: BarColor?) {
+        this.color = color
+    }
+
+    override fun cancelTick() {
+        task.cancel()
+    }
+
+    override fun startTick() {
+        task = asyncTaskTimer(1, ConfigManager.tickSpeed) {
+            update()
+        }
+    }
+
+    override fun getHuds(): MutableSet<Hud> = huds
+    override fun getPopups(): MutableSet<Popup> = popups
+
+    override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
+
+    override fun getTick(): Long = tick
+    override fun getBukkitPlayer(): Player = player
+    override fun getVariableMap(): MutableMap<String, String> = variable
+    override fun save() {
+        DatabaseManagerImpl.currentDatabase.save(this)
+    }
+
+    override fun update() {
         PlaceholderManagerImpl.update(this)
         tick++
         val compList = ArrayList<WidthComponent>()
@@ -73,37 +117,6 @@ class HudPlayerImpl(
 
             PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, comp.component)
         } else PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, EMPTY_COMPONENT)
-    }
-    private var color: BarColor? = null
-    private val autoSave = asyncTaskTimer(6000, 6000) {
-        save()
-    }
-    init {
-        PLUGIN.nms.inject(player, ShaderManager.barColor)
-    }
-
-    override fun getHudComponent(): WidthComponent = last
-    override fun getAdditionalComponent(): WidthComponent? = additionalComp
-    override fun setAdditionalComponent(component: WidthComponent?) {
-        additionalComp = component
-    }
-
-    override fun getBarColor(): BarColor? = color
-    override fun setBarColor(color: BarColor?) {
-        this.color = color
-    }
-
-
-    override fun getHuds(): MutableSet<Hud> = huds
-    override fun getPopups(): MutableSet<Popup> = popups
-
-    override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
-
-    override fun getTick(): Long = tick
-    override fun getBukkitPlayer(): Player = player
-    override fun getVariableMap(): MutableMap<String, String> = variable
-    override fun save() {
-        DatabaseManagerImpl.currentDatabase.save(this)
     }
 
     override fun resetElements() {

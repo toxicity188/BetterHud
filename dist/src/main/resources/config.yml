@@ -2,6 +2,7 @@ info: "<gold><b>[!]</gold> "
 warn: "<red><b>[!]</red> "
 
 number-format: "#,###.#"
+tick-speed: 1
 
 default-font-name: "font.ttf"
 
