@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
+import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
@@ -29,15 +30,14 @@ class HudPlayerImpl(
     private var additionalComp: WidthComponent? = null
     private val variable = HashMap<String, String>()
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
-    private var task = asyncTaskTimer(1, ConfigManager.tickSpeed) {
-        update()
-    }
+    private var task: HudTask? = null
     private var color: BarColor? = null
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
     init {
         PLUGIN.nms.inject(player, ShaderManager.barColor)
+        startTick()
     }
 
     override fun getHudComponent(): WidthComponent = last
@@ -52,11 +52,13 @@ class HudPlayerImpl(
     }
 
     override fun cancelTick() {
-        task.cancel()
+        task?.cancel()
     }
 
     override fun startTick() {
-        task = asyncTaskTimer(1, ConfigManager.tickSpeed) {
+        cancelTick()
+        val speed = ConfigManager.tickSpeed
+        if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
         }
     }
@@ -151,7 +153,7 @@ class HudPlayerImpl(
             it.value.clear()
         }
         PLUGIN.nms.removeBossBar(player)
-        task.cancel()
+        cancelTick()
         autoSave.cancel()
     }
 }
