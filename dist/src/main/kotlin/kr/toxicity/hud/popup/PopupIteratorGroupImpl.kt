@@ -10,27 +10,27 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
     private val list = ArrayList<PopupIterator>()
 
     override fun addIterator(iterator: PopupIterator) {
-        val i = if (iterator.priority >= 0 && list.none {
-                it.index == iterator.priority
-            }) iterator.priority else run {
-            var i = 0
-            val map = list.map {
-                it.index
+        val p = iterator.priority
+        val map = list.map {
+            it.index
+        }.toSet()
+        val i = when (iterator.sortType) {
+            PopupSortType.FIRST -> if (p >= 0) p else 0
+            PopupSortType.LAST -> if (p >= 0) p else run {
+                var i = 0
+                while (map.contains(i)) i++
+                i
             }
-            while (map.contains(i)) i++
-            i
         }
         iterator.index = i
-        if (iterator.sortType == PopupSortType.FIRST) {
+        if (map.contains(i)) {
             var t = 0
             var biggest = i
             val more = list.filter {
                 it.index >= i
             }
             while (t < more.size && more[t].index >= biggest) {
-                more[t].index++
-                biggest = more[t].index
-                t++
+                biggest = more[t++].index++
             }
         }
         list.add(iterator)
@@ -48,7 +48,8 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
         var i = 0
         while (iterator.hasNext()) {
             val next = iterator.next()
-            if (next.index > next.maxIndex || !next.available()) {
+            val index = next.index
+            if (index < 0 || index > next.maxIndex || !next.available()) {
                 list.subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }

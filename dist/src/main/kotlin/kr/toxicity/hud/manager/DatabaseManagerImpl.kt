@@ -154,6 +154,7 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
             val info = db.getConfigurationSection("info").ifNull("info configuration not set.")
             current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
         }.onFailure { e ->
+            current = defaultConnector.connect(MemoryConfiguration())
             warn("Unable to connect the database.")
             warn("Reason: ${e.message}")
         }

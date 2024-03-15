@@ -127,17 +127,6 @@ class MMOCoreCompatibility: Compatibility {
                     api.getPlayerData(p.bukkitPlayer).level
                 }
             },
-            "" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
-                    return Function { p ->
-                        api.getPlayerData(p.bukkitPlayer).stats.getStat(args[0])
-                    }
-                }
-            },
             "stat" to object : HudPlaceholder<Number> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(
@@ -233,6 +222,11 @@ class MMOCoreCompatibility: Compatibility {
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
+            "class" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    api.getPlayerData(p.bukkitPlayer).profess.name
+                }
+            },
             "guild_id" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     api.getPlayerData(p.bukkitPlayer).guild?.id ?: "<none>"

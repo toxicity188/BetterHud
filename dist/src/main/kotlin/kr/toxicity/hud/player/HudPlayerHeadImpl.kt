@@ -27,7 +27,7 @@ class HudPlayerHeadImpl(player: Player): HudPlayerHead {
     ).body().buffered().use {
         val image = it.toImage().getSubimage(8, 8, 8, 8)
         (0..63).map { i ->
-            TextColor.color(image.getRGB(i % 8, i / 8) ushr 8)
+            TextColor.color(image.getRGB(i % 8, i / 8) and 0xFFFFFF)
         }
     }
 }

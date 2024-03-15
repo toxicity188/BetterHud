@@ -1,7 +1,6 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.asyncTask
@@ -13,10 +12,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object PlayerManager: BetterHudManager {
 
-    private val hudPlayer = HashMap<UUID, HudPlayer>()
+    private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
 
     override fun start() {
         Bukkit.getPluginManager().registerEvents(object : Listener {
@@ -50,6 +50,7 @@ object PlayerManager: BetterHudManager {
             }
             it.popupGroupIteratorMap.clear()
             it.resetElements()
+            it.startTick()
         }
     }
 
