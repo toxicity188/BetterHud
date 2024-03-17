@@ -13,6 +13,7 @@ import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.GuiLocation
@@ -96,12 +97,18 @@ class PopupLayout(
             val textProcessing = texts.map {
                 it.getText(reason)
             }
+            val headProcessing = heads.map {
+                it.getHead(reason)
+            }
             return { player ->
                 LayoutComponentContainer(layout.align, max)
                     .append(imageProcessing.map {
                         it(player)
                     })
                     .append(textProcessing.map {
+                        it(player)
+                    })
+                    .append(headProcessing.map {
                         it(player)
                     })
                     .build()
@@ -159,9 +166,9 @@ class PopupLayout(
             )
         }
 
-        private val max = image.maxOf {
+        private val max = image.maxOfOrNull {
             it.max()
-        }
+        } ?: 0
 
         val texts = layout.text.map { textLayout ->
             val pixel = location + pair.pixel + textLayout.location
@@ -209,6 +216,33 @@ class PopupLayout(
                 textLayout.numberEquation,
                 textLayout.numberFormat,
                 textLayout.conditions.and(textLayout.text.conditions)
+            )
+        }
+
+        val heads = layout.head.map { headLayout ->
+            val pixel = location + pair.pixel + headLayout.location
+            val shader = HudShader(
+                gui,
+                headLayout.layer,
+                headLayout.outline
+            )
+            HeadRenderer(
+                (0..7).map { i ->
+                    val char = (++imageChar).parseChar()
+                    array.add(JsonObject().apply {
+                        addProperty("type", "bitmap")
+                        addProperty("file", "$NAME_SPACE:head/pixel_${headLayout.head.pixel}.png")
+                        addProperty("ascent", HudImpl.createBit(pixel.y - (7 - i) * headLayout.head.pixel, shader))
+                        addProperty("height", headLayout.head.pixel)
+                        add("chars", JsonArray().apply {
+                            add(char)
+                        })
+                    })
+                    Component.text(char).font(imageKey)
+                },
+                headLayout.head.pixel,
+                pixel.x,
+                headLayout.conditions.and(headLayout.head.conditions)
             )
         }
     }

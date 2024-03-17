@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface HudPlayer {
+    @NotNull HudPlayerHead getHead();
     @NotNull Player getBukkitPlayer();
     @NotNull WidthComponent getHudComponent();
     void setAdditionalComponent(@Nullable WidthComponent component);

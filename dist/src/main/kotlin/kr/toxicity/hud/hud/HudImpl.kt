@@ -6,9 +6,11 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
+import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
@@ -34,18 +36,22 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
 
     private val elements = run {
         val subFile = file.subFolder(internalName)
-        ArrayList<HudElement>().apply {
+        ArrayList<List<HudElement>>().apply {
             section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
-                add(HudElement(
-                    this@HudImpl,
-                    internalName,
-                    subFile,
-                    configurationSection.getString("name").ifNull("name value not set: $s").let {
-                        LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
-                    },
-                    configurationSection.getDouble("x").coerceAtLeast(0.0).coerceAtMost(100.0),
-                    configurationSection.getDouble("y").coerceAtLeast(0.0).coerceAtMost(100.0)
-                ))
+                val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
+                    LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
+                }
+                val gui = GuiLocation(configurationSection)
+                add(layout.animation.map {
+                    HudElement(
+                        this@HudImpl,
+                        internalName,
+                        subFile,
+                        layout,
+                        gui,
+                        ImageLocation(it.x, it.y)
+                    )
+                })
             }
         }.ifEmpty {
             throw RuntimeException("layout is empty.")
@@ -63,7 +69,7 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
     override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()
         return elements.map {
-            it.getComponent(player)
+            it[(player.tick % it.size).toInt()].getComponent(player)
         }
     }
 

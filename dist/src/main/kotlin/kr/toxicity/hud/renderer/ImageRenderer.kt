@@ -33,7 +33,7 @@ class ImageRenderer(
         }
     }
 
-    fun max() = components.maxOf {
+    fun max() = components.maxOfOrNull {
         it.component.width
-    }
+    } ?: 0
 }

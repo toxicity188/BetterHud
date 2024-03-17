@@ -16,7 +16,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import kotlin.math.round
 
-class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double, y: Double, animation: List<ImageLocation>) {
+class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: ImageLocation) {
 
 
     private val chars = run {
@@ -24,48 +24,44 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, x: Double
         val isSingle = hud.image.size == 1
 
         val shader = HudShader(
-            GuiLocation(x, y),
+            gui,
             image.layer,
             image.outline
         )
 
-
-        animation.map { imageLocation ->
-            val list = ArrayList<PixelComponent>()
-            if (hud is ListenerHudImage) {
-                list.add(EMPTY_PIXEL_COMPONENT)
-            }
-            hud.image.forEach { pair ->
-                val c = (++parent.imageChar).parseChar()
-                val height = round(pair.image.image.height.toDouble() * image.scale).toInt()
-                val scale = height.toDouble() / pair.image.image.height
-                val finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                parent.jsonArray.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")
-                    else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.name}")
-                    addProperty("ascent", HudImpl.createBit((image.location.y + imageLocation.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader))
-                    addProperty("height", height)
-                    add("chars", JsonArray().apply {
-                        add(c)
-                    })
-                })
-                list.add(finalWidth.toPixelComponent(image.location.x + imageLocation.x + round(pair.image.xOffset * scale).toInt()))
-            }
-            ImageRenderer(
-                hud,
-                list,
-                image.conditions.and(image.image.conditions)
-            )
+        val list = ArrayList<PixelComponent>()
+        if (hud is ListenerHudImage) {
+            list.add(EMPTY_PIXEL_COMPONENT)
         }
+        val finalPixel = image.location + pixel
+        hud.image.forEach { pair ->
 
+            val c = (++parent.imageChar).parseChar()
+            val height = round(pair.image.image.height.toDouble() * image.scale).toInt()
+            val scale = height.toDouble() / pair.image.image.height
+            val finalWidth = WidthComponent(Component.text(c).font(parent.imageKey), round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+            parent.jsonArray.add(JsonObject().apply {
+                addProperty("type", "bitmap")
+                if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")
+                else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.name}")
+                addProperty("ascent", HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader))
+                addProperty("height", height)
+                add("chars", JsonArray().apply {
+                    add(c)
+                })
+            })
+            list.add(finalWidth.toPixelComponent(finalPixel.x + round(pair.image.xOffset * scale).toInt()))
+        }
+        ImageRenderer(
+            hud,
+            list,
+            image.conditions.and(image.image.conditions)
+        )
     }
 
-    val max = chars.maxOf {
-        it.max()
-    }
+    val max = chars.max()
 
-    fun getComponent(player: HudPlayer): PixelComponent = chars[(player.tick % chars.size).toInt()].getComponent(
+    fun getComponent(player: HudPlayer): PixelComponent = chars.getComponent(
         UpdateEvent.EMPTY)(player)
 
 }

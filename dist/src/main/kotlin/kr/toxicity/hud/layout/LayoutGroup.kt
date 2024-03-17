@@ -5,6 +5,7 @@ import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.ImageManager
+import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
@@ -67,6 +68,21 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("number-format")?.let {
                         DecimalFormat(it)
                     } ?: ConfigManager.numberFormat,
+                    configurationSection.toConditions()
+                )
+            )
+        }
+    }
+    val head: List<HeadLayout> = ArrayList<HeadLayout>().apply {
+        section.getConfigurationSection("heads")?.forEachSubConfiguration { s, configurationSection ->
+            add(
+                HeadLayout(
+                    configurationSection.getString("name").ifNull("name value not set.").let {
+                        PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it")
+                    },
+                    ImageLocation(configurationSection) + loc,
+                    configurationSection.getBoolean("outline"),
+                    configurationSection.getInt("layer"),
                     configurationSection.toConditions()
                 )
             )

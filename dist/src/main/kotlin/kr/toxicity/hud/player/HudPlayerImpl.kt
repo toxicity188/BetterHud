@@ -3,6 +3,7 @@ package kr.toxicity.hud.player
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.scheduler.HudTask
@@ -18,6 +19,9 @@ class HudPlayerImpl(
     huds: MutableSet<Hud>,
     popups: MutableSet<Popup>
 ): HudPlayer {
+
+    private val h = HudPlayerHeadImpl(player)
+
     private val huds = huds.apply {
         addAll(HudManagerImpl.defaultHuds)
     }
@@ -71,6 +75,7 @@ class HudPlayerImpl(
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player
     override fun getVariableMap(): MutableMap<String, String> = variable
+    override fun getHead(): HudPlayerHead = h
     override fun save() {
         DatabaseManagerImpl.currentDatabase.save(this)
     }
