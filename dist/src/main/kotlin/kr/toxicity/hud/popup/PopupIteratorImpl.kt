@@ -39,4 +39,21 @@ class PopupIteratorImpl(
 
     override fun getPriority(): Int = value()
     override fun name(): String = name
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PopupIteratorImpl
+
+        return i == other.i
+    }
+
+    override fun hashCode(): Int {
+        return i
+    }
+
+    override fun compareTo(other: PopupIterator): Int {
+        return i.compareTo(other.index)
+    }
+
 }

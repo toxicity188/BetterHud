@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
-public interface PopupIterator {
+public interface PopupIterator extends Comparable<PopupIterator> {
     int getIndex();
     int getMaxIndex();
     void setIndex(int index);

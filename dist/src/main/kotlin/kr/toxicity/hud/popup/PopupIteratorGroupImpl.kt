@@ -5,9 +5,12 @@ import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.util.sum
+import java.util.Collections
+import java.util.Comparator
+import java.util.TreeSet
 
 class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
-    private val list = ArrayList<PopupIterator>()
+    private val list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
 
     override fun addIterator(iterator: PopupIterator) {
         val p = iterator.priority
@@ -50,7 +53,7 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
             val next = iterator.next()
             val index = next.index
             if (index < 0 || index > next.maxIndex || !next.available()) {
-                list.subList(i, list.size).forEach {
+                list.toList().subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }
                 next.remove()
