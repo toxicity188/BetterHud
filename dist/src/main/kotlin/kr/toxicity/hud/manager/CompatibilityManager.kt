@@ -30,33 +30,31 @@ object CompatibilityManager: BetterHudManager {
     )
 
     override fun start() {
-        task {
-            compatibilities.forEach {
-                if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
-                    runCatching {
-                        val obj = it.value()
-                        val namespace = it.key.lowercase()
-                        obj.listeners.forEach { entry ->
-                            PLUGIN.listenerManager.addListener("${namespace}_${entry.key}") { c ->
-                                val reason = entry.value(c)
-                                Function { u: UpdateEvent ->
-                                    reason(u)
-                                }
+        compatibilities.forEach {
+            if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
+                runCatching {
+                    val obj = it.value()
+                    val namespace = it.key.lowercase()
+                    obj.listeners.forEach { entry ->
+                        PLUGIN.listenerManager.addListener("${namespace}_${entry.key}") { c ->
+                            val reason = entry.value(c)
+                            Function { u: UpdateEvent ->
+                                reason(u)
                             }
                         }
-                        obj.numbers.forEach { entry ->
-                            PLUGIN.placeholderManager.numberContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
-                        }
-                        obj.strings.forEach { entry ->
-                            PLUGIN.placeholderManager.stringContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
-                        }
-                        obj.booleans.forEach { entry ->
-                            PLUGIN.placeholderManager.booleanContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
-                        }
-                    }.onFailure { e ->
-                        warn("Unable to load ${it.key} support.")
-                        warn("Reason: ${e.message}")
                     }
+                    obj.numbers.forEach { entry ->
+                        PLUGIN.placeholderManager.numberContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
+                    }
+                    obj.strings.forEach { entry ->
+                        PLUGIN.placeholderManager.stringContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
+                    }
+                    obj.booleans.forEach { entry ->
+                        PLUGIN.placeholderManager.booleanContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
+                    }
+                }.onFailure { e ->
+                    warn("Unable to load ${it.key} support.")
+                    warn("Reason: ${e.message}")
                 }
             }
         }

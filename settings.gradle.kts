@@ -17,5 +17,8 @@ include(
     "nms:v1_20_R3",
 
     "scheduler:standard",
-    "scheduler:folia"
+    "scheduler:folia",
+
+    "bedrock:geyser",
+    "bedrock:floodgate"
 )

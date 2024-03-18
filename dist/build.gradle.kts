@@ -9,6 +9,8 @@ dependencies {
     implementation(project(":api"))
     implementation(project(":scheduler:standard"))
     implementation(project(":scheduler:folia"))
+    implementation(project(":bedrock:geyser"))
+    implementation(project(":bedrock:floodgate"))
     implementation(project(":nms:v1_17_R1", configuration = "reobf"))
     implementation(project(":nms:v1_18_R1", configuration = "reobf"))
     implementation(project(":nms:v1_18_R2", configuration = "reobf"))
@@ -27,5 +29,5 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    compileOnly("org.geysermc.geyser:api:2.2.0-SNAPSHOT")
+    compileOnly("com.github.SkriptLang:Skript:2.8.3")
 }

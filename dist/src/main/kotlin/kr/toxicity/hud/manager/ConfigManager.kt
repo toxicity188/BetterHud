@@ -22,6 +22,8 @@ object ConfigManager: BetterHudManager {
         private set
     var tickSpeed = 1L
         private set
+    var disableToBedrockPlayer = true
+        private set
 
     override fun start() {
 
@@ -51,6 +53,7 @@ object ConfigManager: BetterHudManager {
             } ?: DecimalFormat("#,###.#")).apply {
                 maximumFractionDigits = 0
             }
+            disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
         }.onFailure { e ->
             warn("Unable to load config.yml")
             warn("Reason: ${e.message}")

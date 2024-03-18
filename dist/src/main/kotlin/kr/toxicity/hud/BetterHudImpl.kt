@@ -1,12 +1,15 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
+import kr.toxicity.hud.api.bedrock.BedrockAdapter
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.scheduler.HudScheduler
+import kr.toxicity.hud.bedrock.FloodgateAdapter
+import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
@@ -57,6 +60,7 @@ class BetterHudImpl: BetterHud() {
 
     private lateinit var nms: NMS
     private lateinit var audience: BukkitAudiences
+    private lateinit var bedrockAdapter: BedrockAdapter
 
     private val isFolia = runCatching {
         Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
@@ -95,6 +99,7 @@ class BetterHudImpl: BetterHud() {
                 }
             }
         }
+        val pluginManager = Bukkit.getPluginManager()
         nms = when (val version = Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
             "v1_17_R1" -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             "v1_18_R1" -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
@@ -107,10 +112,15 @@ class BetterHudImpl: BetterHud() {
             "v1_20_R3" -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
             else -> {
                 warn("Unsupported bukkit version: $version")
-                Bukkit.getPluginManager().disablePlugin(this)
+                pluginManager.disablePlugin(this)
                 return
             }
         }
+        bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
+            GeyserAdapter()
+        } else if (pluginManager.isPluginEnabled("floodgate")) {
+            FloodgateAdapter()
+        } else BedrockAdapter { false }
         audience = BukkitAudiences.create(this)
 
         managers.forEach {
@@ -147,6 +157,7 @@ class BetterHudImpl: BetterHud() {
 
     override fun getNMS(): NMS = nms
     override fun getWidth(target: Char): Int = TextManager.getWidth(target)
+    override fun getBedrockAdapter(): BedrockAdapter = bedrockAdapter
     override fun getAudiences(): BukkitAudiences = audience
     override fun getHudPlayer(player: Player): HudPlayer = PlayerManager.getHudPlayer(player)
 

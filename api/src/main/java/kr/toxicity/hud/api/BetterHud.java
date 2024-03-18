@@ -1,5 +1,6 @@
 package kr.toxicity.hud.api;
 
+import kr.toxicity.hud.api.bedrock.BedrockAdapter;
 import kr.toxicity.hud.api.manager.*;
 import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
@@ -32,6 +33,7 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract @NotNull ReloadResult reload();
     public abstract @NotNull BukkitAudiences getAudiences();
     public abstract @NotNull HudScheduler getScheduler();
+    public abstract @NotNull BedrockAdapter getBedrockAdapter();
     public abstract boolean isFolia();
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     public abstract int getWidth(char target);

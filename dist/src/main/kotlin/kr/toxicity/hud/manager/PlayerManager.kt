@@ -22,6 +22,7 @@ object PlayerManager: BetterHudManager {
         Bukkit.getPluginManager().registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
             fun join(e: PlayerJoinEvent) {
+                if (ConfigManager.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(e.player.uniqueId)) return
                 val player = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(e.player) else e.player
                 asyncTask {
                     hudPlayer.computeIfAbsent(player.uniqueId) {

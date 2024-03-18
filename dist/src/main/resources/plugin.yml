@@ -6,7 +6,6 @@ author: toxicity
 description: Make a hud in minecraft!
 folia-supported: true
 website: "https://www.spigotmc.org/resources/115559"
-load: STARTUP
 softdepend:
   - MythicLib
   - MythicMobs
@@ -14,6 +13,8 @@ softdepend:
   - PlaceholderAPI
   - WorldGuard
   - Vault
+  - floodgate
+  - Geyser-Spigot
 commands:
   betterhud:
     aliases:

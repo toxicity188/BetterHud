@@ -27,7 +27,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 parent.jsonArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:head/pixel_${head.head.pixel}.png")
-                    addProperty("ascent", HudImpl.createBit(final.y - (7 - i) * head.head.pixel, shader))
+                    addProperty("ascent", HudImpl.createBit(final.y + i * head.head.pixel, shader))
                     addProperty("height", head.head.pixel)
                     add("chars", JsonArray().apply {
                         add(char)

@@ -6,6 +6,8 @@ tick-speed: 1
 
 default-font-name: "font.ttf"
 
+disable-to-bedrock-player: true
+
 default-hud:
   - test_hud
 

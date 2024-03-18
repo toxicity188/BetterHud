@@ -231,7 +231,7 @@ class PopupLayout(
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE:head/pixel_${headLayout.head.pixel}.png")
-                        addProperty("ascent", HudImpl.createBit(pixel.y - (7 - i) * headLayout.head.pixel, shader))
+                        addProperty("ascent", HudImpl.createBit(pixel.y + i * headLayout.head.pixel, shader))
                         addProperty("height", headLayout.head.pixel)
                         add("chars", JsonArray().apply {
                             add(char)

@@ -18,6 +18,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
 import org.bukkit.potion.PotionEffectType
+import java.text.DecimalFormat
 import java.util.function.Function
 import java.util.regex.Pattern
 
@@ -26,9 +27,13 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")
 
+    private val doubleDecimal = DecimalFormat("#").apply {
+        maximumFractionDigits = 0
+    }
+
     private val updateTask = ArrayList<PlaceholderTask>()
 
-    private val number: PlaceholderContainerImpl<Number> = PlaceholderContainerImpl(
+    private val number = PlaceholderContainerImpl(
         java.lang.Number::class.java,
         0.0,
         mapOf(
@@ -134,10 +139,12 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     p.bukkitPlayer.foodLevel
                 }
             }
-        ),
-    ) {
-        it.toDoubleOrNull()
-    }
+        ), {
+            it.toDoubleOrNull()
+        }, {
+            doubleDecimal.format(it)
+        }
+    )
     private val string = PlaceholderContainerImpl(
         java.lang.String::class.java,
         "<none>",
@@ -160,11 +167,13 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     }
                 }
             }
-        )
-    ) {
-        val matcher = stringPattern.matcher(it)
-        if (matcher.find()) matcher.group("content") else null
-    }
+        ), {
+            val matcher = stringPattern.matcher(it)
+            if (matcher.find()) matcher.group("content") else null
+        }, {
+            it.toString()
+        }
+    )
     private val boolean = PlaceholderContainerImpl(
         java.lang.Boolean::class.java,
         false,
@@ -182,14 +191,16 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     }
                 }
             }
-        )
-    ) {
-        when (it) {
-            "true" -> true
-            "false" -> false
-            else -> null
+        ), {
+            when (it) {
+                "true" -> true
+                "false" -> false
+                else -> null
+            }
+        }, {
+            it.toString()
         }
-    }
+    )
 
     private val types = mapOf(
         "number" to number,
@@ -197,17 +208,23 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         "string" to string
     )
 
-    class PlaceholderContainerImpl<T>(
-        val clazz: Class<*>,
+    class PlaceholderContainerImpl<T, R>(
+        val clazz: Class<R>,
         val defaultValue: T,
         private val defaultMap: Map<String, HudPlaceholder<T>>,
         val parser: (String) -> T?,
+        val stringMapper: (R) -> String
     ): PlaceholderContainer<T> {
         val map = HashMap(defaultMap)
 
         fun init() {
             map.clear()
             map += defaultMap
+        }
+
+        fun stringValue(any: Any): String {
+            return if (clazz.isAssignableFrom(any.javaClass)) stringMapper(clazz.cast(any))
+            else any.toString()
         }
 
         override fun addPlaceholder(name: String, placeholder: HudPlaceholder<T>) {
@@ -279,6 +296,10 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         }
                         return value
                     }
+
+                    override fun stringValue(player: HudPlayer): String {
+                        return get.first.stringValue(invoke(player))
+                    }
                 }
             }
         }
@@ -305,7 +326,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         runCatching {
                             val find = find(result).build(r)
                             builder.add {
-                                find(it).toString()
+                                find.stringValue(it)
                             }
                         }
                     }

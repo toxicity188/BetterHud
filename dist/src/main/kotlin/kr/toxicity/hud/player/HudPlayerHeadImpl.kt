@@ -33,9 +33,13 @@ class HudPlayerHeadImpl(player: Player): HudPlayerHead {
                 .build(),
             BodyHandlers.ofInputStream()
         ).body().buffered().use {
-            val image = it.toImage().getSubimage(8, 8, 8, 8)
+            val ready = it.toImage()
+            val image = ready.getSubimage(8, 8, 8, 8)
+            val layer = ready.getSubimage(40, 8, 8, 8)
             (0..63).map { i ->
-                TextColor.color(image.getRGB(i % 8, i / 8))
+                val layerColor = layer.getRGB(i % 8, i / 8)
+                val imageColor = image.getRGB(i % 8, i / 8)
+                TextColor.color(if (layerColor ushr 24 != 0) layerColor else imageColor)
             }
         }
     }.getOrNull() ?: allBlack
