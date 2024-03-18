@@ -12,7 +12,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-4.3"
+    version = "beta-5"
 
     repositories {
         mavenCentral()
@@ -20,6 +20,7 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
         maven("https://maven.enginehub.org/repo/")
+        maven("https://repo.opencollab.dev/main/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://mvn.lumine.io/repository/maven/")
     }

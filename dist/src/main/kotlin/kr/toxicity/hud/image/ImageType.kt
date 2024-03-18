@@ -8,17 +8,31 @@ import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 enum class ImageType {
     SINGLE {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
-            return if (list.isNotEmpty()) list[0] else EMPTY_PIXEL_COMPONENT
+            val get = listener.getValue(player)
+            return if (list.isNotEmpty()) {
+                if (get >= 0) list[(get * list.lastIndex)
+                    .toInt()
+                    .coerceAtLeast(0)
+                    .coerceAtMost(list.lastIndex)] else list[0]
+            } else EMPTY_PIXEL_COMPONENT
         }
     },
     LISTENER {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
-            return list[(listener.getValue(player) * list.size).toInt().coerceAtLeast(0).coerceAtMost(list.lastIndex)]
+            val get = listener.getValue(player)
+            return if (get >= 0) list[(get * list.lastIndex)
+                .toInt()
+                .coerceAtLeast(0)
+                .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
         }
     },
     SEQUENCE {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
-            return list[(player.tick % list.size).toInt()]
+            val get = listener.getValue(player)
+            return if (get >= 0) list[(get * list.lastIndex)
+                .toInt()
+                .coerceAtLeast(0)
+                .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
         }
     }
     ;

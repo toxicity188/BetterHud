@@ -45,14 +45,13 @@ object ImageManager: BetterHudManager {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
                         } ?: SplitType.LEFT)
-                        ListenerHudImage(
+                        HudImage(
                             s,
                             splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set."))
                                 .toImage()
                                 .removeEmptySide()
                                 .ifNull("Invalid image.").image, configurationSection.getInt("split", 25).coerceAtLeast(1)),
                             type,
-                            splitType,
                             configurationSection.getConfigurationSection("setting").ifNull("setting configuration not found.")
                         )
                     }

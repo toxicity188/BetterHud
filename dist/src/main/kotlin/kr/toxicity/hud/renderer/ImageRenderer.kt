@@ -6,7 +6,6 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageType
-import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 
@@ -16,11 +15,7 @@ class ImageRenderer(
     private val conditions: ConditionBuilder
 ) {
     private val type: ImageType = image.type
-    val listener: (UpdateEvent) -> HudListener = (image as? ListenerHudImage)?.let {
-        { event ->
-            it.listener(event)
-        }
-    } ?: HudListener.ZERO.let {
+    val listener: (UpdateEvent) -> HudListener = image.listener ?: HudListener.ZERO.let {
         { _ ->
             it
         }

@@ -44,11 +44,13 @@ object ConfigManager: BetterHudManager {
                 defaultFontName = it
             }
             tickSpeed = yaml.getLong("tick-speed", 1)
-            numberFormat = yaml.getString("number-format")?.let {
+            numberFormat = (yaml.getString("number-format")?.let {
                 runCatching {
                     DecimalFormat(it)
                 }.getOrNull()
-            } ?: DecimalFormat("#,###.#")
+            } ?: DecimalFormat("#,###.#")).apply {
+                maximumFractionDigits = 0
+            }
         }.onFailure { e ->
             warn("Unable to load config.yml")
             warn("Reason: ${e.message}")

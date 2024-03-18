@@ -9,7 +9,6 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
@@ -125,7 +124,7 @@ class PopupLayout(
             val pixel = location + pair.pixel + target.location
             val list = ArrayList<PixelComponent>()
 
-            if (hudImage is ListenerHudImage) list.add(EMPTY_PIXEL_COMPONENT)
+            if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
             if (hudImage.image.size > 1) hudImage.image.forEach {
                 val char = (++imageChar).parseChar()
                 val height = round(it.image.image.height * target.scale).toInt()

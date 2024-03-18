@@ -6,5 +6,5 @@ import org.jetbrains.annotations.NotNull;
 public interface HudListener {
     double getValue(@NotNull HudPlayer player);
 
-    HudListener ZERO = p -> 0;
+    HudListener ZERO = p -> -1;
 }

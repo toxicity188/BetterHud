@@ -7,7 +7,6 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.image.ListenerHudImage
 import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.shader.GuiLocation
@@ -30,7 +29,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         )
 
         val list = ArrayList<PixelComponent>()
-        if (hud is ListenerHudImage) {
+        if (hud.listener != null) {
             list.add(EMPTY_PIXEL_COMPONENT)
         }
         val finalPixel = image.location + pixel

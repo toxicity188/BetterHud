@@ -66,7 +66,9 @@ class LayoutGroup(section: ConfigurationSection) {
                         TEquation(it)
                     } ?: TEquation.t,
                     configurationSection.getString("number-format")?.let {
-                        DecimalFormat(it)
+                        DecimalFormat(it).apply {
+                            maximumFractionDigits = 0
+                        }
                     } ?: ConfigManager.numberFormat,
                     configurationSection.toConditions()
                 )

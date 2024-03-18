@@ -138,6 +138,7 @@ class BetterHudImpl: BetterHud() {
 
 
     override fun onDisable() {
+        audience.close()
         managers.forEach {
             it.end()
         }
