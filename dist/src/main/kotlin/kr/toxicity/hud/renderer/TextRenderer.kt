@@ -32,7 +32,7 @@ class TextRenderer(
     private val condition: ConditionBuilder
 ) {
     companion object {
-        private val textPattern = Pattern.compile("([0-9]+((.([0-9]+))?))")
+        private val textPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val spaceComponent = 4.toSpaceComponent()
     }
 
