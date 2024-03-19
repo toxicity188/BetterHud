@@ -28,6 +28,10 @@ object CommandManager: BetterHudManager {
                         ReloadState.SUCCESS -> {
                             s.info("Reload success. (${result.time} ms)")
                         }
+                        ReloadState.FAIL -> {
+                            s.info("Reload failed.")
+                            s.info("Check your server log to find the problem.")
+                        }
                     }
                 }
             }
