@@ -1,22 +1,25 @@
 package kr.toxicity.hud.resource
 
+import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.util.*
 
 class GlobalResource {
-    private val build = DATA_FOLDER.subFolder("build").clearFolder().apply {
-        PLUGIN.loadAssets("pack", this)
+    private val accept = DATA_FOLDER.parentFile.subFolder(ConfigManager.buildFolderLocation).let {
+        if (ConfigManager.separateResourcePackNameSpace) it else it.subFolder("assets").clearFolder()
     }
-    private val assets = build.subFolder("assets")
 
-    private val hud = assets.subFolder(NAME_SPACE)
+    private val hud = accept.subFolder(NAME_SPACE).clearFolder().apply {
+        PLUGIN.loadAssets(NAME_SPACE, this)
+    }
+    private val minecraft = accept.subFolder("minecraft").clearFolder().apply {
+        PLUGIN.loadAssets("minecraft", this)
+    }
 
-    val bossBar = assets
-        .subFolder("minecraft")
+    val bossBar = minecraft
         .subFolder("textures")
         .subFolder("gui")
 
-    val core = assets
-        .subFolder("minecraft")
+    val core = minecraft
         .subFolder("shaders")
         .subFolder("core")
 

@@ -24,12 +24,19 @@ object ConfigManager: BetterHudManager {
         private set
     var disableToBedrockPlayer = true
         private set
+    var buildFolderLocation = "BetterHud\\build"
+        private set
+    var separateResourcePackNameSpace = false
+        private set
 
     override fun start() {
 
     }
 
     override fun reload(resource: GlobalResource) {
+    }
+
+    override fun preReload() {
         val file = File(DATA_FOLDER, "config.yml")
         if (!file.exists()) PLUGIN.saveResource("config.yml", false)
         runCatching {
@@ -54,12 +61,15 @@ object ConfigManager: BetterHudManager {
                 maximumFractionDigits = 0
             }
             disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
+            separateResourcePackNameSpace = yaml.getBoolean("separate-resource-pack-namespace", false)
+            yaml.getString("build-folder-location")?.let {
+                buildFolderLocation = it
+            }
         }.onFailure { e ->
             warn("Unable to load config.yml")
             warn("Reason: ${e.message}")
         }
     }
-
     override fun end() {
     }
 }

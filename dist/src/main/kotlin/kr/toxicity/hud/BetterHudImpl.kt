@@ -2,6 +2,7 @@ package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.bedrock.BedrockAdapter
+import kr.toxicity.hud.api.event.PluginReloadedEvent
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.player.HudPlayer
@@ -16,10 +17,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
 import kr.toxicity.hud.skript.SkriptManager
-import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.info
-import kr.toxicity.hud.util.task
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -140,12 +138,29 @@ class BetterHudImpl: BetterHud() {
         if (onReload) return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
         onReload = true
         val time = System.currentTimeMillis()
-        val resource = GlobalResource()
-        managers.forEach {
-            it.reload(resource)
+        return runCatching {
+            managers.forEach {
+                it.preReload()
+            }
+            val resource = GlobalResource()
+            managers.forEach {
+                it.reload(resource)
+            }
+            managers.forEach {
+                it.postReload()
+            }
+            onReload = false
+            val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+            task {
+                PluginReloadedEvent(result).call()
+            }
+            result
+        }.getOrElse { e ->
+            warn("Unable to reload.")
+            warn("Reason: ${e.message}")
+            onReload = false
+            ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
         }
-        onReload = false
-        return ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
     }
 
 

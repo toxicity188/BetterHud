@@ -7,6 +7,8 @@ tick-speed: 1
 default-font-name: "font.ttf"
 
 disable-to-bedrock-player: true
+build-folder-location: "BetterHud/build"
+separate-resource-pack-namespace: false
 
 default-hud:
   - test_hud
