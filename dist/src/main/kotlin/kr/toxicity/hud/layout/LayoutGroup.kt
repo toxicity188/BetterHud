@@ -10,6 +10,7 @@ import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toConditions
+import kr.toxicity.hud.util.toTextColor
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
@@ -32,6 +33,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
                         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
                     },
+                    configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     ImageLocation(configurationSection) + loc,
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
@@ -55,11 +57,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("align")?.let {
                         TextLayout.Align.valueOf(it.uppercase())
                     } ?: TextLayout.Align.LEFT,
-                    configurationSection.getString("color")?.let {
-                        if (it.startsWith('#') && it.length == 7) {
-                            TextColor.fromHexString(it)
-                        } else NamedTextColor.NAMES.value(it)
-                    } ?: NamedTextColor.WHITE,
+                    configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
                     configurationSection.getString("number-equation")?.let {

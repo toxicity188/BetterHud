@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -42,6 +43,9 @@ val NEGATIVE_ONE_SPACE_COMPONENT
         WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
     }
 
+fun String.toTextColor() = if (startsWith('#') && length == 7) {
+    TextColor.fromHexString(this)
+} else NamedTextColor.NAMES.value(this) ?: NamedTextColor.WHITE
 fun WidthComponent.toPixelComponent(pixel: Int) = PixelComponent(this, pixel)
 
 fun Int.parseChar(): String {

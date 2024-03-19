@@ -53,6 +53,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         }
         ImageRenderer(
             hud,
+            image.color,
             list,
             image.conditions.and(image.image.conditions)
         )

@@ -160,6 +160,7 @@ class PopupLayout(
 
             ImageRenderer(
                 hudImage,
+                target.color,
                 list,
                 hudImage.conditions.and(target.conditions)
             )
