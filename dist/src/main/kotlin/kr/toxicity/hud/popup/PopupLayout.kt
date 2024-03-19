@@ -243,6 +243,7 @@ class PopupLayout(
                 },
                 headLayout.head.pixel,
                 pixel.x,
+                headLayout.align,
                 headLayout.conditions.and(headLayout.head.conditions)
             )
         }

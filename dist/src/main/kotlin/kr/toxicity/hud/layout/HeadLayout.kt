@@ -9,5 +9,6 @@ class HeadLayout(
     val location: ImageLocation,
     val outline: Boolean,
     val layer: Int,
+    val align: LayoutAlign,
     val conditions: ConditionBuilder
 )

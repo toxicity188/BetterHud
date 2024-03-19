@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.trgger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.layout.LayoutAlign
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import java.util.UUID
@@ -14,6 +15,7 @@ fun <T> T?.ifNull(message: String): T & Any {
 
 fun String.toEquation() = TEquation(this)
 
+fun String?.toLayoutAlign(): LayoutAlign = if (this != null) LayoutAlign.valueOf(uppercase()) else LayoutAlign.LEFT
 
 inline fun <reified T : Event, R : Any> UpdateEvent.unwrap(block: (T) -> R): R {
     return if (this is BukkitEventUpdateEvent) {

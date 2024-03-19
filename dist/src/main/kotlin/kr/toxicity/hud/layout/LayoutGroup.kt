@@ -7,10 +7,7 @@ import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.TextManager
-import kr.toxicity.hud.util.forEachSubConfiguration
-import kr.toxicity.hud.util.ifNull
-import kr.toxicity.hud.util.toConditions
-import kr.toxicity.hud.util.toTextColor
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
@@ -54,9 +51,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     ImageLocation(configurationSection) + loc,
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getInt("space", 2).coerceAtLeast(0),
-                    configurationSection.getString("align")?.let {
-                        TextLayout.Align.valueOf(it.uppercase())
-                    } ?: TextLayout.Align.LEFT,
+                    configurationSection.getString("align").toLayoutAlign(),
                     configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
@@ -77,12 +72,13 @@ class LayoutGroup(section: ConfigurationSection) {
         section.getConfigurationSection("heads")?.forEachSubConfiguration { s, configurationSection ->
             add(
                 HeadLayout(
-                    configurationSection.getString("name").ifNull("name value not set.").let {
-                        PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it")
+                    configurationSection.getString("name").ifNull("name value not set: $s").let {
+                        PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
                     },
                     ImageLocation(configurationSection) + loc,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
+                    configurationSection.getString("align").toLayoutAlign(),
                     configurationSection.toConditions()
                 )
             )

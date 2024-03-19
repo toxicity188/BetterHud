@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
@@ -26,7 +27,7 @@ class TextRenderer(
     private val defaultColor: TextColor,
     private val key: Key,
     pattern: String,
-    private val align: TextLayout.Align,
+    private val align: LayoutAlign,
     private val scale: Double,
     private val x: Int,
 
@@ -197,10 +198,10 @@ class TextRenderer(
                     if (index < original.lastIndex) comp += sComponent
                 }
             }
-            comp.toPixelComponent(when (align) {
-                TextLayout.Align.LEFT -> x
-                TextLayout.Align.CENTER -> x - comp.width / 2
-                TextLayout.Align.RIGHT -> x - comp.width
+            if (comp === EMPTY_WIDTH_COMPONENT) EMPTY_PIXEL_COMPONENT else comp.toPixelComponent(when (align) {
+                LayoutAlign.LEFT -> x
+                LayoutAlign.CENTER -> x - comp.width / 2
+                LayoutAlign.RIGHT -> x - comp.width
             })
         }
     }

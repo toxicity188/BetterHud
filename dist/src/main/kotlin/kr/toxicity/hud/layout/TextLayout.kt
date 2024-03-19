@@ -13,17 +13,11 @@ class TextLayout(
     val location: ImageLocation,
     val scale: Double,
     val space: Int,
-    val align: Align,
+    val align: LayoutAlign,
     val color: TextColor,
     val outline: Boolean,
     val layer: Int,
     val numberEquation: TEquation,
     val numberFormat: DecimalFormat,
     val conditions: ConditionBuilder
-) {
-    enum class Align {
-        LEFT,
-        CENTER,
-        RIGHT
-    }
-}
+)
