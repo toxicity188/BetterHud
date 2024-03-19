@@ -169,9 +169,11 @@ class TextRenderer(
         }
         val cond = condition.build(reason)
         return build@ { player ->
+            if (!cond(player)) return@build EMPTY_PIXEL_COMPONENT
             var comp = EMPTY_WIDTH_COMPONENT
             for (mappedComponentStyle in patternMap) {
-                var original = if (cond(player)) mappedComponentStyle.value(player) else continue
+                var original = mappedComponentStyle.value(player)
+                if (original == "") continue
                 val matcher = decimalPattern.matcher(original)
                 val number = LinkedList<String>()
                 while (matcher.find()) {
