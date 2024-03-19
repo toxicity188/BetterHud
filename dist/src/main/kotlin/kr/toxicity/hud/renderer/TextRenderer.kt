@@ -9,6 +9,7 @@ import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -133,7 +134,7 @@ class TextRenderer(
         })
 
         fun build() = ComponentStyle(
-            pattern,
+            PlaceholderManagerImpl.parse(pattern),
             Style.style(color)
                 .decorations(decoration)
                 .font(key),
@@ -146,12 +147,12 @@ class TextRenderer(
         )
     }
     private class ComponentStyle(
-        val pattern: String,
+        val pattern: (UpdateEvent) -> (HudPlayer) -> String,
         val style: Style,
         val multiply: Int
     ) {
         fun map(updateEvent: UpdateEvent) = MappedComponentStyle(
-            PlaceholderManagerImpl.parse(updateEvent, pattern),
+            pattern(updateEvent),
             style,
             multiply
         )

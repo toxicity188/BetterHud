@@ -15,6 +15,7 @@ import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
+import kr.toxicity.hud.skript.SkriptManager
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
@@ -40,6 +41,7 @@ class BetterHudImpl: BetterHud() {
         ConfigManager,
         CommandManager,
         CompatibilityManager,
+        SkriptManager,
         ModuleManager,
         DatabaseManagerImpl,
 

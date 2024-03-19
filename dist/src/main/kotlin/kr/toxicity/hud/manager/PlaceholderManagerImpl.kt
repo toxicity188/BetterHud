@@ -1,5 +1,6 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.event.CustomPopupEvent
 import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
@@ -166,6 +167,17 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         p.variableMap[args[0]] ?: "<none>"
                     }
                 }
+            },
+            "custom_variable" to object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    val key = args[0]
+                    return reason.unwrap { e: CustomPopupEvent ->
+                        Function { _ ->
+                            e.variables[key] ?: "<none>"
+                        }
+                    }
+                }
             }
         ), {
             val matcher = stringPattern.matcher(it)
@@ -305,9 +317,9 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         }
     }
 
-    fun parse(r: UpdateEvent, target: String): (HudPlayer) -> String {
+    fun parse(target: String): (UpdateEvent) -> (HudPlayer) -> String {
         var skip = false
-        val builder = ArrayList<(HudPlayer) -> String>()
+        val builder = ArrayList<(UpdateEvent) -> (HudPlayer) -> String>()
         val sb = StringBuilder()
         target.forEach { char ->
             if (!skip) {
@@ -316,17 +328,23 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     '[' -> {
                         val build = sb.toString()
                         builder.add {
-                            build
+                            {
+                                build
+                            }
                         }
                         sb.setLength(0)
                     }
                     ']' -> {
                         val result = sb.toString()
                         sb.setLength(0)
+                        val find = find(result)
                         runCatching {
-                            val find = find(result).build(r)
-                            builder.add {
-                                find.stringValue(it)
+                            builder.add { r ->
+                                find.build(r).let { b ->
+                                    {
+                                        b.stringValue(it)
+                                    }
+                                }
                             }
                         }
                     }
@@ -342,15 +360,23 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         if (sb.isNotEmpty()) {
             val build = sb.toString()
             builder.add {
-                build
+                {
+                    build
+                }
             }
         }
-        return { p ->
-            val result = StringBuilder()
-            builder.forEach {
-                result.append(it(p))
+        return { r ->
+            builder.map {
+                it(r)
+            }.let { bb ->
+                { p ->
+                    val result = StringBuilder()
+                    bb.forEach {
+                        result.append(it(p))
+                    }
+                    result.toString()
+                }
             }
-            result.toString()
         }
     }
 
