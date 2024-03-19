@@ -32,6 +32,8 @@ class TextRenderer(
     private val scale: Double,
     private val x: Int,
 
+    private val deserializeText: Boolean,
+
     space: Int,
 
     private val numberEquation: TEquation,
@@ -95,16 +97,20 @@ class TextRenderer(
 
     private val sComponent = space.toSpaceComponent()
 
-    private val patternMapper = run {
+    private val patternMapper = parseStyle(pattern) {
+        it.build()
+    }
+
+    private fun <T> parseStyle(target: String, mapper: (ComponentStyleBuilder) -> T): List<T> {
         val format = ArrayList<ComponentFormat>()
-        val matcher = componentPattern.matcher(pattern)
+        val matcher = componentPattern.matcher(target)
         while (matcher.find()) format.add(
             ComponentFormat(
                 matcher.group("name"),
                 matcher.group("argument")?.split(':') ?: emptyList()
             )
         )
-        val strings = pattern.split(componentPattern).map {
+        val strings = target.split(componentPattern).map {
             ComponentStyleBuilder(it)
         }
         for ((i, componentFormat) in format.withIndex()) {
@@ -116,8 +122,8 @@ class TextRenderer(
                 }
             }
         }
-        strings.map {
-            it.build()
+        return strings.map {
+            mapper(it)
         }
     }
 
@@ -145,6 +151,21 @@ class TextRenderer(
                 i
             }
         )
+
+        fun buildRaw() = RawComponentStyle(
+            pattern,
+            Style.style()
+                .decorations(decoration)
+                .color(color)
+                .font(key)
+                .build(),
+            run {
+                var i = 0
+                if (decoration[TextDecoration.BOLD] == TextDecoration.State.TRUE) i++
+                if (decoration[TextDecoration.ITALIC] == TextDecoration.State.TRUE) i++
+                i
+            }
+        )
     }
     private class ComponentStyle(
         val pattern: (UpdateEvent) -> (HudPlayer) -> String,
@@ -162,6 +183,11 @@ class TextRenderer(
         val style: Style,
         val multiply: Int
     )
+    private class RawComponentStyle(
+        val value: String,
+        val style: Style,
+        val multiply: Int
+    )
 
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
@@ -169,12 +195,14 @@ class TextRenderer(
             it.map(reason)
         }
         val cond = condition.build(reason)
+
         return build@ { player ->
             if (!cond(player)) return@build EMPTY_PIXEL_COMPONENT
             var comp = EMPTY_WIDTH_COMPONENT
-            for (mappedComponentStyle in patternMap) {
-                var original = mappedComponentStyle.value(player)
-                if (original == "") continue
+
+            fun applyString(targetString: String, style: Style, multiply: Int) {
+                var original = targetString
+                if (original == "") return
                 val matcher = decimalPattern.matcher(original)
                 val number = LinkedList<String>()
                 while (matcher.find()) {
@@ -190,16 +218,25 @@ class TextRenderer(
                     }
                     original = sb.toString()
                 }
-                original.forEachIndexed { index, char ->
+                original.forEach { char ->
                     if (char == ' ') {
                         comp += spaceComponent
                     } else {
                         widthMap[char]?.let { width ->
-                            comp += WidthComponent(Component.text().content(char.toString()).style(mappedComponentStyle.style), ceil(width.toDouble() * scale).toInt() + mappedComponentStyle.multiply) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                            comp += WidthComponent(Component.text().content(char.toString()).style(style), ceil(width.toDouble() * scale).toInt() + multiply) + NEGATIVE_ONE_SPACE_COMPONENT + sComponent
                         }
                     }
-                    if (index < original.lastIndex) comp += sComponent
                 }
+            }
+            for (mappedComponentStyle in patternMap) {
+                val target = mappedComponentStyle.value(player)
+                if (deserializeText) {
+                    parseStyle(target) {
+                        it.buildRaw()
+                    }.forEach {
+                        applyString(it.value, it.style, it.multiply)
+                    }
+                } else applyString(target, mappedComponentStyle.style, mappedComponentStyle.multiply)
             }
             comp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x

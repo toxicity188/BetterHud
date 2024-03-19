@@ -1,0 +1,37 @@
+package kr.toxicity.hud.equation
+
+import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.layout.LayoutAnimationType
+import org.bukkit.configuration.ConfigurationSection
+import kotlin.math.round
+
+class AnimationLocation(
+    val type: LayoutAnimationType,
+    val location: List<ImageLocation>
+) {
+    companion object {
+        val zero = AnimationLocation(LayoutAnimationType.LOOP, listOf(ImageLocation.zero))
+    }
+    constructor(
+        type: LayoutAnimationType,
+        duration: Int,
+        equationPair: EquationPair
+    ): this(
+        type,
+        (0..<duration).map {
+            val d = it.toDouble()
+            ImageLocation(
+                round(equationPair.x.evaluate(d)).toInt(),
+                round(equationPair.y.evaluate(d)).toInt()
+            )
+        }
+    )
+
+    constructor(section: ConfigurationSection): this(
+        section.getString("type")?.let {
+            LayoutAnimationType.valueOf(it.uppercase())
+        } ?: LayoutAnimationType.LOOP,
+        section.getInt("duration", 20).coerceAtLeast(1),
+        EquationPair(section)
+    )
+}

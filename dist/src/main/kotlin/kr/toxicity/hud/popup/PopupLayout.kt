@@ -10,6 +10,7 @@ import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocationGroup
+import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.renderer.HeadRenderer
@@ -46,33 +47,22 @@ class PopupLayout(
         }.save(File(file, "image.json"))
         map
     }
-
-    fun getComponent(index: Int, animationIndex: Int, reason: UpdateEvent): (HudPlayer) -> WidthComponent {
-        val get = groups[index % groups.size].getComponent(reason)
-        return { player ->
-            val list = get(player)
-            list[animationIndex % list.size]
-        }
-    }
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
         val map = groups.map {
             it.getComponent(reason)
         }
         return { player, index, frame ->
             val get = map[index % map.size](player)
-            get[frame % get.size]
+            get[when (layout.animation.type) {
+                LayoutAnimationType.LOOP -> frame % get.size
+                LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
+            }]
         }
     }
 
     private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray, textFolder: File) {
-        val elements = layout.animation.map { location ->
+        val elements = layout.animation.location.map { location ->
             PopupElement(pair, array, location, textFolder)
-        }
-        fun getComponent(animationIndex: Int, reason: UpdateEvent): (HudPlayer) -> WidthComponent {
-            val get = elements[animationIndex % elements.size].getComponent(reason)
-            return { p ->
-                get(p)
-            }
         }
         fun getComponent(reason: UpdateEvent): (HudPlayer) -> List<WidthComponent> {
             val map = elements.map {
@@ -212,6 +202,7 @@ class PopupLayout(
                 textLayout.align,
                 scale.toDouble() / textLayout.text.height,
                 pixel.x,
+                textLayout.deserializeText,
                 textLayout.space,
                 textLayout.numberEquation,
                 textLayout.numberFormat,

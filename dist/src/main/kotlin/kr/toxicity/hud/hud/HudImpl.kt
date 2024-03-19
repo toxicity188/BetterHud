@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
@@ -36,22 +37,25 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
 
     private val elements = run {
         val subFile = file.subFolder(internalName)
-        ArrayList<List<HudElement>>().apply {
+        ArrayList<HudAnimation>().apply {
             section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
                     LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
                 }
                 val gui = GuiLocation(configurationSection)
-                add(layout.animation.map {
-                    HudElement(
-                        this@HudImpl,
-                        internalName,
-                        subFile,
-                        layout,
-                        gui,
-                        ImageLocation(it.x, it.y)
-                    )
-                })
+                add(HudAnimation(
+                    layout.animation.type,
+                    layout.animation.location.map {
+                        HudElement(
+                            this@HudImpl,
+                            internalName,
+                            subFile,
+                            layout,
+                            gui,
+                            ImageLocation(it.x, it.y)
+                        )
+                    }
+                ))
             }
         }.ifEmpty {
             throw RuntimeException("layout is empty.")
@@ -69,7 +73,11 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
     override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()
         return elements.map {
-            it[(player.tick % it.size).toInt()].getComponent(player)
+            val elements = it.elements
+            elements[when (it.animationType) {
+                LayoutAnimationType.LOOP -> (player.tick % elements.size).toInt()
+                LayoutAnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(elements.lastIndex)
+            }].getComponent(player)
         }
     }
 
@@ -88,4 +96,9 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
     }
 
     override fun isDefault(): Boolean = default
+
+    private class HudAnimation(
+        val animationType: LayoutAnimationType,
+        val elements: List<HudElement>
+    )
 }

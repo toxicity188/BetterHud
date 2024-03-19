@@ -65,6 +65,7 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
             text.align,
             scale.toDouble() / text.text.height,
             loc.x,
+            text.deserializeText,
             text.space,
             text.numberEquation,
             text.numberFormat,

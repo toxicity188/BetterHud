@@ -1,6 +1,6 @@
 package kr.toxicity.hud.layout
 
-import kr.toxicity.hud.equation.EquationLocation
+import kr.toxicity.hud.equation.AnimationLocation
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.ConfigManager
@@ -9,7 +9,6 @@ import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
 import java.text.DecimalFormat
 
@@ -55,6 +54,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
+                    configurationSection.getBoolean("deserialize-text"),
                     configurationSection.getString("number-equation")?.let {
                         TEquation(it)
                     } ?: TEquation.t,
@@ -87,6 +87,6 @@ class LayoutGroup(section: ConfigurationSection) {
     val conditions = section.toConditions()
 
     val animation = section.getConfigurationSection("animations")?.let { animations ->
-        EquationLocation(animations).location
-    } ?: listOf(ImageLocation.zero)
+        AnimationLocation(animations)
+    } ?: AnimationLocation.zero
 }
