@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 
 class ImageRenderer(
@@ -19,7 +20,7 @@ class ImageRenderer(
     private val type = image.type
     private val components = components.map {
         val comp = it.component
-        PixelComponent(WidthComponent(comp.component.color(color), comp.width), it.pixel)
+        PixelComponent(WidthComponent(Component.text().append(comp.component).color(color), comp.width), it.pixel)
     }
 
     val listener: (UpdateEvent) -> HudListener = image.listener ?: HudListener.ZERO.let {
