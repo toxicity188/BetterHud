@@ -59,7 +59,8 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
         }
         TextRenderer(
             text.text.charWidth,
-            Style.style(text.color).font(key),
+            text.color,
+            key,
             text.pattern,
             text.align,
             scale.toDouble() / text.text.height,

@@ -206,7 +206,8 @@ class PopupLayout(
             }
             TextRenderer(
                 textLayout.text.charWidth,
-                Style.style(textLayout.color).font(textKey),
+                textLayout.color,
+                textKey,
                 textLayout.pattern,
                 textLayout.align,
                 scale.toDouble() / textLayout.text.height,
