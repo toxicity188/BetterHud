@@ -51,17 +51,17 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             })
             list.add(finalWidth.toPixelComponent(finalPixel.x + round(pair.image.xOffset * scale).toInt()))
         }
-        ImageRenderer(
+        val renderer = ImageRenderer(
             hud,
             image.color,
             list,
             image.conditions.and(image.image.conditions)
         )
+        renderer.max() to renderer.getComponent(UpdateEvent.EMPTY)
     }
 
-    val max = chars.max()
+    val max = chars.first
 
-    fun getComponent(player: HudPlayer): PixelComponent = chars.getComponent(
-        UpdateEvent.EMPTY)(player)
+    fun getComponent(player: HudPlayer): PixelComponent = chars.second(player)
 
 }

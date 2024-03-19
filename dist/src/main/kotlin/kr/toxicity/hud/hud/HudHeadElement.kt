@@ -38,8 +38,8 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             head.head.pixel,
             final.x,
             head.conditions.and(head.head.conditions)
-        )
+        ).getHead(UpdateEvent.EMPTY)
     }
 
-    fun getHead(player: HudPlayer) = renderer.getHead(UpdateEvent.EMPTY)(player)
+    fun getHead(player: HudPlayer) = renderer(player)
 }

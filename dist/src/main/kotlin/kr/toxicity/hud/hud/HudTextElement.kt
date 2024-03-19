@@ -70,8 +70,7 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
             text.numberFormat,
             text.conditions.and(text.text.conditions)
         )
-    }
+    }.getText(UpdateEvent.EMPTY)
 
-    fun getText(player: HudPlayer): PixelComponent = renderer.getText(
-        UpdateEvent.EMPTY)(player)
+    fun getText(player: HudPlayer): PixelComponent = renderer(player)
 }
