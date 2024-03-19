@@ -33,7 +33,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                         add(char)
                     })
                 })
-                Component.text(char).font(parent.imageKey)
+                Component.text().content(char).font(parent.imageKey)
             },
             head.head.pixel,
             final.x,

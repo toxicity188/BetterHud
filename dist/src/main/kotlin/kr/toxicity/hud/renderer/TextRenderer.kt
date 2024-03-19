@@ -192,13 +192,13 @@ class TextRenderer(
                         comp += spaceComponent
                     } else {
                         widthMap[char]?.let { width ->
-                            comp += WidthComponent(Component.text(char).style(mappedComponentStyle.style), ceil(width.toDouble() * scale).toInt() + mappedComponentStyle.multiply) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                            comp += WidthComponent(Component.text().content(char.toString()).style(mappedComponentStyle.style), ceil(width.toDouble() * scale).toInt() + mappedComponentStyle.multiply) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                         }
                     }
                     if (index < original.lastIndex) comp += sComponent
                 }
             }
-            if (comp === EMPTY_WIDTH_COMPONENT) EMPTY_PIXEL_COMPONENT else comp.toPixelComponent(when (align) {
+            comp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
                 LayoutAlign.CENTER -> x - comp.width / 2
                 LayoutAlign.RIGHT -> x - comp.width

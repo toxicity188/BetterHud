@@ -21,7 +21,6 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.Style
 import java.io.File
 import kotlin.math.round
 
@@ -141,7 +140,7 @@ class PopupLayout(
                 })
                 val xOffset = round(it.image.xOffset * scale).toInt()
                 val xWidth = round(it.image.image.width.toDouble() * scale).toInt()
-                val comp = WidthComponent(Component.text(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val comp = WidthComponent(Component.text().content(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
                 val char = (++imageChar).parseChar()
@@ -154,7 +153,7 @@ class PopupLayout(
                         add(char)
                     })
                 })
-                val comp = WidthComponent(Component.text(char).font(imageKey), round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val comp = WidthComponent(Component.text().content(char).font(imageKey), round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x))
             }
 
@@ -239,7 +238,7 @@ class PopupLayout(
                             add(char)
                         })
                     })
-                    Component.text(char).font(imageKey)
+                    Component.text().content(char).font(imageKey)
                 },
                 headLayout.head.pixel,
                 pixel.x,

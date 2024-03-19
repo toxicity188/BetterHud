@@ -6,7 +6,6 @@ import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.HudImage
-import kr.toxicity.hud.image.ImageType
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 import net.kyori.adventure.text.format.TextColor

@@ -9,10 +9,11 @@ import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import java.util.UUID
 
 class HeadRenderer(
-    private val components: List<Component>,
+    private val components: List<TextComponent.Builder>,
     private val pixel: Int,
     private val x: Int,
     private val align: LayoutAlign,

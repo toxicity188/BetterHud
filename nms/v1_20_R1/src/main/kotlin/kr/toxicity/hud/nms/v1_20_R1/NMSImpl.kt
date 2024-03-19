@@ -255,7 +255,7 @@ class NMSImpl: NMS {
                             t + 1
                         } ?: 0)
                     }
-                    hud.additionalComponent = WidthComponent(applyFont(comp), getWidth(comp))
+                    hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(comp))
                 }
             }
 

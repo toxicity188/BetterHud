@@ -32,15 +32,20 @@ fun String.deserializeToComponent() = MINI_MESSAGE.deserialize(this)
 fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).decorations(DEFAULT_TEXT_DECORATION)
 
 val EMPTY_COMPONENT: Component = Component.empty()
-val EMPTY_WIDTH_COMPONENT = WidthComponent(Component.empty().color(NamedTextColor.WHITE), 0)
-val EMPTY_PIXEL_COMPONENT = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
+val EMPTY_WIDTH_COMPONENT
+    get() = WidthComponent(Component.text().color(NamedTextColor.WHITE), 0)
+val EMPTY_PIXEL_COMPONENT
+    get() = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 val NEW_LAYER
-    get() = if (VERSION.version <= 18) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text(0xC0000.parseChar()).font(SPACE_KEY), 0)
+    get() = if (VERSION.version <= 18) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
+
+private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
     get() = if (VERSION.version <= 18) {
-        WidthComponent(Component.text((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+        CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
     } else {
-        WidthComponent(Component.text((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
+        LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
     }
 
 fun String.toTextColor() = if (startsWith('#') && length == 7) {
@@ -58,7 +63,7 @@ fun Int.parseChar(): String {
 
 fun Int.toSpaceComponent() = toSpaceComponent(this)
 fun Int.toSpaceComponent(width: Int) = if (VERSION.version <= 18) {
-    WidthComponent(Component.text((this + 0xFFC00).parseChar()).font(LEGACY_SPACE_KEY), width)
+    WidthComponent(Component.text().content((this + 0xFFC00).parseChar()).font(LEGACY_SPACE_KEY), width)
 } else {
-    WidthComponent(Component.text((this + 0xD0000).parseChar()).font(SPACE_KEY), width)
+    WidthComponent(Component.text().content((this + 0xD0000).parseChar()).font(SPACE_KEY), width)
 }

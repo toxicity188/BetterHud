@@ -127,7 +127,7 @@ class HudPlayerImpl(
             }
             last = comp
 
-            PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, comp.component)
+            PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, comp.component.build())
         } else PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, EMPTY_COMPONENT)
     }
 
