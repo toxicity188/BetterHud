@@ -12,4 +12,7 @@ public interface PopupIteratorGroup {
     void addIterator(@NotNull PopupIterator iterator);
     void clear();
     boolean contains(@NotNull String name);
+    default boolean contains(@NotNull Popup popup) {
+        return contains(popup.getName());
+    }
 }

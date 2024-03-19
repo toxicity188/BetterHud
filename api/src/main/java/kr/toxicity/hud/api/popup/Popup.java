@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public interface Popup {
     @NotNull String getName();
+    @NotNull String getGroupName();
     boolean isDefault();
     @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer player);
     default @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull Player player) {

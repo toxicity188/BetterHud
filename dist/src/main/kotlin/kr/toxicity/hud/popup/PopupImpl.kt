@@ -195,7 +195,7 @@ class PopupImpl(
     }
 
     override fun getName(): String = internalName
-
+    override fun getGroupName(): String = group
     override fun hashCode(): Int = internalName.hashCode()
     override fun isDefault(): Boolean = default
 }
