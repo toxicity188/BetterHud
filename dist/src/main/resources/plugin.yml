@@ -38,6 +38,12 @@ permissions:
     children:
       hud.hud.add: true
       hud.hud.remove: true
+  hud.turn:
+    description: Access to turn command.
+    default: op
+    children:
+      hud.turn.on: true
+      hud.turn.off: true
   hud.popup:
     description: Access to popup command.
     default: op

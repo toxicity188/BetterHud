@@ -18,6 +18,8 @@ public interface HudPlayer {
     @NotNull WidthComponent getHudComponent();
     void setAdditionalComponent(@Nullable WidthComponent component);
     @Nullable WidthComponent getAdditionalComponent();
+    boolean isHudEnabled();
+    void setHudEnabled(boolean toEnable);
     long getTick();
     void cancel();
     void update();

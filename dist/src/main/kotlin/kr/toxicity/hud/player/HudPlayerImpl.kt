@@ -36,6 +36,7 @@ class HudPlayerImpl(
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
     private var task: HudTask? = null
     private var color: BarColor? = null
+    private var enabled = true
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
@@ -76,6 +77,10 @@ class HudPlayerImpl(
     override fun getBukkitPlayer(): Player = player
     override fun getVariableMap(): MutableMap<String, String> = variable
     override fun getHead(): HudPlayerHead = h
+    override fun isHudEnabled(): Boolean = enabled
+    override fun setHudEnabled(toEnable: Boolean) {
+        enabled = toEnable
+    }
     override fun save() {
         DatabaseManagerImpl.currentDatabase.save(this)
     }
@@ -85,7 +90,7 @@ class HudPlayerImpl(
         tick++
         val compList = ArrayList<WidthComponent>()
 
-        if (!PLUGIN.isOnReload) {
+        if (enabled && !PLUGIN.isOnReload) {
             popups.removeIf {
                 runCatching {
                     it.show(UpdateEvent.EMPTY, this)

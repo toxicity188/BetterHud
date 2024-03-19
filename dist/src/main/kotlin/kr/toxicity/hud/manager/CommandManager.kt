@@ -3,9 +3,11 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.CommandModule
+import kr.toxicity.hud.command.SenderType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 
 object CommandManager: BetterHudManager {
 
@@ -213,6 +215,34 @@ object CommandManager: BetterHudManager {
                         }
                         else -> null
                     }
+                }
+            }
+        }
+        .addCommandModule("turn", {
+            aliases = listOf("t")
+            permission = listOf("$NAME_SPACE.turn")
+            allowedSender = listOf(SenderType.PLAYER)
+        }) {
+            addCommand("on") {
+                description = "Turns on your hud.".toComponent()
+                usage = "off".toComponent()
+                permission = listOf("$NAME_SPACE.turn.on")
+                executer = { sender, _ ->
+                    PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
+                        it.isHudEnabled = true
+                        sender.info("Successfully turns on.")
+                    } ?: sender.warn("You are not available player!")
+                }
+            }
+            addCommand("off") {
+                description = "Turns off your hud.".toComponent()
+                usage = "off".toComponent()
+                permission = listOf("$NAME_SPACE.turn.off")
+                executer = { sender, _ ->
+                    PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
+                        it.isHudEnabled = false
+                        sender.info("Successfully turns off.")
+                    } ?: sender.warn("You are not available player!")
                 }
             }
         }
