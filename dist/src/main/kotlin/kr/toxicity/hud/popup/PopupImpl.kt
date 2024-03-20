@@ -19,9 +19,6 @@ class PopupImpl(
     val internalName: String,
     section: ConfigurationSection
 ): Popup {
-    companion object {
-        private val keyMap = HashMap<Any, PopupUpdater>()
-    }
     val gui = GuiLocation(section)
     val move = section.getConfigurationSection("move")?.let {
         EquationPairLocation(it)
@@ -72,16 +69,16 @@ class PopupImpl(
 
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
-            if (keyMapping) {
-                keyMap[event.key]?.let {
-                    if (it.update()) return@task true
-                    else keyMap.remove(event.key)
-                }
-            }
             PlayerManager.getHudPlayer(uuid)?.let { player ->
+                if (keyMapping) {
+                    player.popupKeyMap[event.key]?.let {
+                        if (it.update()) return@task true
+                        else player.popupKeyMap.remove(event.key)
+                    }
+                }
                 show(event, player, event.key)?.let {
                     if (keyMapping) {
-                        keyMap[event.key] = it
+                        player.popupKeyMap[event.key] = it
                     }
                 }
             }
@@ -160,7 +157,7 @@ class PopupImpl(
         }
         val remove0 = {
             ifRemove = false
-            keyMap.remove(key)
+            player.popupKeyMap.remove(key)
             Unit
         }
         get.addIterator(PopupIteratorImpl(

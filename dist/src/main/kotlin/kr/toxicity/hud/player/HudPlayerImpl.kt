@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
+import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.*
@@ -34,6 +35,7 @@ class HudPlayerImpl(
     private var additionalComp: WidthComponent? = null
     private val variable = HashMap<String, String>()
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
+    private val popupKey = HashMap<Any, PopupUpdater>()
     private var task: HudTask? = null
     private var color: BarColor? = null
     private var enabled = true
@@ -72,6 +74,7 @@ class HudPlayerImpl(
     override fun getPopups(): MutableSet<Popup> = popups
 
     override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
+    override fun getPopupKeyMap(): MutableMap<Any, PopupUpdater> = popupKey
 
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player
