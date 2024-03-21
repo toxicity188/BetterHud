@@ -39,6 +39,7 @@ class EffShowPopup: Effect() {
     override fun execute(p0: Event) {
         val popup = PopupManagerImpl.getPopup(popup.getSingle(p0) ?: return) ?: return
         val obj = objects?.getAll(p0) ?: emptyArray()
+        val getKey = key?.getSingle(p0)
         player.getAll(p0).forEach { p ->
             val event = CustomPopupEvent(p, "").apply {
                 obj.forEachIndexed { i, s ->
@@ -46,7 +47,7 @@ class EffShowPopup: Effect() {
                 }
             }
             runCatching {
-                popup.show(BukkitEventUpdateEvent(event, key?.getSingle(p0) ?: UUID.randomUUID()), p)
+                popup.show(BukkitEventUpdateEvent(event, getKey ?: UUID.randomUUID()), p)
             }
         }
 
