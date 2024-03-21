@@ -22,13 +22,7 @@ object PlayerManager: BetterHudManager {
         Bukkit.getPluginManager().registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
             fun join(e: PlayerJoinEvent) {
-                if (ConfigManager.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(e.player.uniqueId)) return
-                val player = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(e.player) else e.player
-                asyncTask {
-                    hudPlayer.computeIfAbsent(player.uniqueId) {
-                        DatabaseManagerImpl.currentDatabase.load(player)
-                    }
-                }
+                register(e.player)
             }
             @EventHandler
             fun quit(e: PlayerQuitEvent) {
@@ -40,6 +34,15 @@ object PlayerManager: BetterHudManager {
                 }
             }
         }, PLUGIN)
+    }
+    fun register(player: Player) {
+        if (ConfigManager.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
+        val adaptedPlayer = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(player) else player
+        asyncTask {
+            hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
+                DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
+            }
+        }
     }
 
     fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")

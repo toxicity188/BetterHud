@@ -128,6 +128,9 @@ class BetterHudImpl: BetterHud() {
         }
         task {
             reload()
+            Bukkit.getOnlinePlayers().forEach {
+                PlayerManager.register(it)
+            }
             info("Plugin enabled.")
         }
     }

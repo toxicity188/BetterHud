@@ -28,7 +28,7 @@ class PopupImpl(
     private val group = section.getString("group") ?: internalName
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
-    private val queue = section.getBoolean("queue")
+    private val queue = duration > 0 && section.getBoolean("queue")
     private val alwaysCheckCondition = section.getBoolean("always-check-condition", true)
     private val default = ConfigManager.defaultPopup.contains(internalName) || section.getBoolean("default")
     private val keyMapping = section.getBoolean("key-mapping")
