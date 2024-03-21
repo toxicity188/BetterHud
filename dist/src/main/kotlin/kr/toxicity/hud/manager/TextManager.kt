@@ -14,8 +14,6 @@ import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
-import kotlin.math.ceil
-import kotlin.math.round
 
 object TextManager: BetterHudManager {
 
@@ -87,7 +85,7 @@ object TextManager: BetterHudManager {
         val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
         val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
-            textWidthMap[it.key] = round(it.value.toDouble() * heightMultiply).toInt()
+            textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
         }
         parseDefault.array.forEach {
             defaultArray.add(JsonObject().apply {

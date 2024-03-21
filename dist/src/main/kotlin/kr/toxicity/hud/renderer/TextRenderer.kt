@@ -6,10 +6,8 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
-import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
-import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -21,7 +19,6 @@ import java.text.DecimalFormat
 import java.util.EnumMap
 import java.util.LinkedList
 import java.util.regex.Pattern
-import kotlin.math.ceil
 
 class TextRenderer(
     private val widthMap: Map<Char, Int>,
@@ -44,7 +41,6 @@ class TextRenderer(
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val componentPattern = Pattern.compile("<(?<name>(([a-zA-Z]|#|[0-9]|/)+))((:(?<argument>([a-zA-Z]|[0-9]|:|,)+))?)>")
-        private val spaceComponent = 4.toSpaceComponent()
 
         private val formats: MutableMap<String, (List<String>, ComponentStyleBuilder) -> Unit> = HashMap()
 
@@ -96,6 +92,7 @@ class TextRenderer(
     }
 
     private val sComponent = space.toSpaceComponent()
+    private val spaceComponent = 4.toSpaceComponent()
 
     private val patternMapper = parseStyle(pattern) {
         it.build()
@@ -141,11 +138,13 @@ class TextRenderer(
 
         fun build() = ComponentStyle(
             PlaceholderManagerImpl.parse(pattern),
-            Style.style(color)
+            Style.style()
+                .color(color)
                 .decorations(decoration)
-                .font(key),
+                .font(key)
+                .build(),
             run {
-                var i = 0
+                var i = 1
                 if (decoration[TextDecoration.BOLD] == TextDecoration.State.TRUE) i++
                 if (decoration[TextDecoration.ITALIC] == TextDecoration.State.TRUE) i++
                 i
@@ -160,7 +159,7 @@ class TextRenderer(
                 .font(key)
                 .build(),
             run {
-                var i = 0
+                var i = 1
                 if (decoration[TextDecoration.BOLD] == TextDecoration.State.TRUE) i++
                 if (decoration[TextDecoration.ITALIC] == TextDecoration.State.TRUE) i++
                 i
@@ -223,7 +222,7 @@ class TextRenderer(
                         comp += spaceComponent
                     } else {
                         widthMap[char]?.let { width ->
-                            comp += WidthComponent(Component.text().content(char.toString()).style(style), ceil(width.toDouble() * scale).toInt() + multiply) + NEGATIVE_ONE_SPACE_COMPONENT + sComponent
+                            comp += WidthComponent(Component.text().content(char.toString()).style(style), Math.round(width.toDouble() * scale).toInt() + multiply) + sComponent
                         }
                     }
                 }

@@ -23,7 +23,6 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.io.File
-import kotlin.math.round
 
 class PopupLayout(
     private val layout: LayoutGroup,
@@ -116,7 +115,7 @@ class PopupLayout(
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
             if (hudImage.image.size > 1) hudImage.image.forEach {
                 val char = (++imageChar).parseChar()
-                val height = round(it.image.image.height * target.scale).toInt()
+                val height = Math.round(it.image.image.height * target.scale).toInt()
                 val scale = height.toDouble() / it.image.image.height
 
                 array.add(JsonObject().apply {
@@ -128,8 +127,8 @@ class PopupLayout(
                         add(char)
                     })
                 })
-                val xOffset = round(it.image.xOffset * scale).toInt()
-                val xWidth = round(it.image.image.width.toDouble() * scale).toInt()
+                val xOffset = Math.round(it.image.xOffset * scale).toInt()
+                val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
                 val comp = WidthComponent(Component.text().content(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
@@ -138,12 +137,12 @@ class PopupLayout(
                     addProperty("type", "bitmap")
                     addProperty("file", "$NAME_SPACE:image/${it.name}")
                     addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
-                    addProperty("height", round(it.image.image.height * target.scale).toInt())
+                    addProperty("height", Math.round(it.image.image.height * target.scale).toInt())
                     add("chars", JsonArray().apply {
                         add(char)
                     })
                 })
-                val comp = WidthComponent(Component.text().content(char).font(imageKey), round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val comp = WidthComponent(Component.text().content(char).font(imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x))
             }
 
@@ -166,8 +165,8 @@ class PopupLayout(
                 textLayout.layer,
                 textLayout.outline
             )
-            val scale = round(textLayout.text.height.toDouble() * textLayout.scale).toInt()
-            val group = ShaderGroup(textShader, textLayout.text.name, pixel.y)
+            val scale = Math.round(textLayout.text.height.toDouble() * textLayout.scale).toInt()
+            val group = ShaderGroup(textShader, textLayout.text.name, scale, pixel.y)
             val textKey = TextManager.getKey(group) ?: run {
                 val index = ++textIndex
                 val array = JsonArray().apply {
@@ -200,7 +199,7 @@ class PopupLayout(
                 textKey,
                 textLayout.pattern,
                 textLayout.align,
-                scale.toDouble() / textLayout.text.height,
+                scale.toDouble() / textLayout.text.height.toDouble(),
                 pixel.x,
                 textLayout.deserializeText,
                 textLayout.space,

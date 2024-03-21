@@ -14,10 +14,7 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.format.Style
 import java.io.File
-import kotlin.math.ceil
-import kotlin.math.round
 
 class HudTextElement(parent: HudImpl, name: String, file: File, private val text: TextLayout, index: Int, gui: GuiLocation, pixel: ImageLocation) {
 
@@ -29,8 +26,8 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
         )
         val loc = text.location + pixel
         val yAxis = (loc.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
-        val group = ShaderGroup(shader, text.text.name, yAxis)
-        val scale = round(text.text.height * text.scale).toInt()
+        val scale = Math.round(text.text.height * text.scale).toInt()
+        val group = ShaderGroup(shader, text.text.name, scale, yAxis)
         val key = TextManager.getKey(group) ?: run {
             val index2 = (++parent.textIndex)
             val key = Key.key("$NAME_SPACE:hud/$name/text/text_${index + 1}_${index2 + 1}")
@@ -63,7 +60,7 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
             key,
             text.pattern,
             text.align,
-            scale.toDouble() / text.text.height,
+            scale.toDouble() / text.text.height.toDouble(),
             loc.x,
             text.deserializeText,
             text.space,

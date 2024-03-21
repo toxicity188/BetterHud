@@ -13,7 +13,6 @@ import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import kotlin.math.round
 
 class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: ImageLocation) {
 
@@ -36,9 +35,9 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         hud.image.forEach { pair ->
 
             val c = (++parent.imageChar).parseChar()
-            val height = round(pair.image.image.height.toDouble() * image.scale).toInt()
+            val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
-            val finalWidth = WidthComponent(Component.text().content(c).font(parent.imageKey), round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+            val finalWidth = WidthComponent(Component.text().content(c).font(parent.imageKey), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
             parent.jsonArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
                 if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")
@@ -49,7 +48,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                     add(c)
                 })
             })
-            list.add(finalWidth.toPixelComponent(finalPixel.x + round(pair.image.xOffset * scale).toInt()))
+            list.add(finalWidth.toPixelComponent(finalPixel.x + Math.round(pair.image.xOffset * scale).toInt()))
         }
         val renderer = ImageRenderer(
             hud,

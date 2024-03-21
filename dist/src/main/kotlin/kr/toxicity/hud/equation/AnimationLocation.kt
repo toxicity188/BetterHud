@@ -3,7 +3,6 @@ package kr.toxicity.hud.equation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
 import org.bukkit.configuration.ConfigurationSection
-import kotlin.math.round
 
 class AnimationLocation(
     val type: LayoutAnimationType,
@@ -21,8 +20,8 @@ class AnimationLocation(
         (0..<duration).map {
             val d = it.toDouble()
             ImageLocation(
-                round(equationPair.x.evaluate(d)).toInt(),
-                round(equationPair.y.evaluate(d)).toInt()
+                Math.round(equationPair.x.evaluate(d)).toInt(),
+                Math.round(equationPair.y.evaluate(d)).toInt()
             )
         }
     )
