@@ -51,11 +51,15 @@ class PopupLayout(
             it.getComponent(reason)
         }
         return { player, index, frame ->
-            val get = map[index % map.size](player)
-            get[when (layout.animation.type) {
-                LayoutAnimationType.LOOP -> frame % get.size
-                LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
-            }]
+            if (index > map.lastIndex) {
+                EMPTY_WIDTH_COMPONENT
+            } else {
+                val get = map[index](player)
+                get[when (layout.animation.type) {
+                    LayoutAnimationType.LOOP -> frame % get.size
+                    LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
+                }]
+            }
         }
     }
 

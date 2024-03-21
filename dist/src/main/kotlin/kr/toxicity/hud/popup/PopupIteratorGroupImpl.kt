@@ -9,7 +9,9 @@ import java.util.Collections
 import java.util.Comparator
 import java.util.TreeSet
 
-class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
+class PopupIteratorGroupImpl(
+    private val dispose: Boolean,
+): PopupIteratorGroup {
     private val list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
 
     override fun addIterator(iterator: PopupIterator) {
@@ -48,19 +50,24 @@ class PopupIteratorGroupImpl(private val dispose: Boolean): PopupIteratorGroup {
 
     override fun next(): List<WidthComponent> {
         val iterator = list.iterator()
+        val send = ArrayList<PopupIterator>()
         var i = 0
         while (iterator.hasNext()) {
             val next = iterator.next()
             val index = next.index
-            if (index < 0 || index > next.maxIndex || !next.available()) {
+            if (index > next.maxIndex) continue
+            if (index < 0 || !next.available()) {
                 list.toList().subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
                 }
                 next.remove()
                 iterator.remove()
-            } else i++
+            } else {
+                i++
+                send.add(next)
+            }
         }
-        val result = list.map {
+        val result = send.map {
             it.next()
         }.sum()
         if (dispose) list.clear()

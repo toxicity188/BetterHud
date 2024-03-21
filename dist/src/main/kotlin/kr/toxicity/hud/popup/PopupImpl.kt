@@ -28,6 +28,7 @@ class PopupImpl(
     private val group = section.getString("group") ?: internalName
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
+    private val queue = section.getBoolean("queue")
     private val default = ConfigManager.defaultPopup.contains(internalName) || section.getBoolean("default")
     private val keyMapping = section.getBoolean("key-mapping")
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.getString("index")?.let {
@@ -96,7 +97,7 @@ class PopupImpl(
             PopupIteratorGroupImpl(dispose)
         }
         if (unique && get.contains(internalName)) return null
-        if (get.index >= move.locations.size) return null
+        if (!queue && get.index >= move.locations.size) return null
         val buildCondition = conditions.build(reason)
         if (!buildCondition(player)) return null
         var updater = {

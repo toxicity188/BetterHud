@@ -68,6 +68,11 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 }
             },
+            "health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value * 100.0
+                }
+            },
             "max_air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.maximumAir
