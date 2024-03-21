@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
     id("com.github.johnrengelman.shadow") version("8.1.1")
 }
 

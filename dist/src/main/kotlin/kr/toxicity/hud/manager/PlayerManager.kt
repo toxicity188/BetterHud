@@ -50,6 +50,7 @@ object PlayerManager: BetterHudManager {
                 value.value.clear()
             }
             it.popupGroupIteratorMap.clear()
+            it.popupKeyMap.clear()
             it.resetElements()
             it.startTick()
         }
