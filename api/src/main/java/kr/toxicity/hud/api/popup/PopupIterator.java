@@ -11,7 +11,9 @@ public interface PopupIterator extends Comparable<PopupIterator> {
     int getMaxIndex();
     void setIndex(int index);
     boolean available();
+    boolean alwaysCheckCondition();
     void remove();
+    boolean canSave();
     @NotNull PopupSortType getSortType();
     @NotNull Object getKey();
     @NotNull @Unmodifiable List<WidthComponent> next();

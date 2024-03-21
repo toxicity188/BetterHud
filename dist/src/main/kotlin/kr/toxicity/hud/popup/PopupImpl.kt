@@ -29,6 +29,7 @@ class PopupImpl(
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
     private val queue = section.getBoolean("queue")
+    private val alwaysCheckCondition = section.getBoolean("always-check-condition", true)
     private val default = ConfigManager.defaultPopup.contains(internalName) || section.getBoolean("default")
     private val keyMapping = section.getBoolean("key-mapping")
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.getString("index")?.let {
@@ -166,6 +167,8 @@ class PopupImpl(
             key,
             sortType,
             internalName,
+            queue,
+            alwaysCheckCondition,
             mapper,
             valueGetter,
             cond,

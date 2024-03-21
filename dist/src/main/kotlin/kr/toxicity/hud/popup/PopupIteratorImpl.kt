@@ -10,6 +10,8 @@ class PopupIteratorImpl(
     private val key: Any,
     private val sortType: PopupSortType,
     private val name: String,
+    private val save: Boolean,
+    private val alwaysCheckCondition: Boolean,
     private val mapper: (Int,  Int) -> List<WidthComponent>,
     val value: () -> Int,
     private val condition: () -> Boolean,
@@ -22,6 +24,9 @@ class PopupIteratorImpl(
     override fun getSortType(): PopupSortType {
         return sortType
     }
+
+    override fun canSave(): Boolean = save
+    override fun alwaysCheckCondition(): Boolean = alwaysCheckCondition
     override fun getIndex(): Int = i
     override fun setIndex(index: Int) {
         i = index

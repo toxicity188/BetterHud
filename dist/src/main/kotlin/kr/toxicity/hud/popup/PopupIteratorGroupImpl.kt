@@ -55,7 +55,13 @@ class PopupIteratorGroupImpl(
         while (iterator.hasNext()) {
             val next = iterator.next()
             val index = next.index
-            if (index > next.maxIndex) continue
+            if (index > next.maxIndex) {
+                if (!next.canSave() || (next.alwaysCheckCondition() && !next.available())) {
+                    next.remove()
+                    iterator.remove()
+                }
+                continue
+            }
             if (index < 0 || !next.available()) {
                 list.toList().subList(i, list.size).forEach {
                     it.index = (it.index - 1).coerceAtLeast(it.priority)
