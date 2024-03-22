@@ -43,9 +43,9 @@ private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text(
 private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text().content((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
     get() = if (VERSION.version <= 18) {
-        CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
-    } else {
         LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
+    } else {
+        CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
     }
 
 fun String.toTextColor() = if (startsWith('#') && length == 7) {
