@@ -10,7 +10,6 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
@@ -26,7 +25,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.WorldBorder
 import org.bukkit.boss.BarColor
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer
@@ -51,7 +49,7 @@ class NMSImpl: NMS {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
-        private val getConnection: (ServerGamePacketListenerImpl) -> Connection = if (Bukkit.getConsoleSender() is Audience) {
+        private val getConnection: (ServerGamePacketListenerImpl) -> Connection = if (BetterHud.getInstance().isPaper) {
             {
                 it.connection
             }

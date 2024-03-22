@@ -2,15 +2,15 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import java.io.File
 import java.text.DecimalFormat
 
 object ConfigManager: BetterHudManager {
 
-    var info = EMPTY_COMPONENT
-        private set
-    var warn = EMPTY_COMPONENT
-        private set
+    val info = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.GOLD))
+    val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
     var defaultHud = emptyList<String>()
         private set
     var defaultPopup = emptyList<String>()
@@ -44,12 +44,6 @@ object ConfigManager: BetterHudManager {
         if (!file.exists()) PLUGIN.saveResource("config.yml", false)
         runCatching {
             val yaml = file.toYaml()
-            yaml.getString("info")?.let {
-                info = it.deserializeToComponent()
-            }
-            yaml.getString("warn")?.let {
-                warn = it.deserializeToComponent()
-            }
             defaultHud = yaml.getStringList("default-hud")
             defaultPopup = yaml.getStringList("default-popup")
             yaml.getString("default-font-name")?.let {

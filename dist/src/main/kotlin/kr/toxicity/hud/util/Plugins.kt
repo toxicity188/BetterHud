@@ -9,10 +9,7 @@ val PLUGIN
 const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
 val DATA_FOLDER
     get() = PLUGIN.dataFolder.apply {
-        if (!exists()) {
-            mkdir()
-            PLUGIN.loadAssets("default", this)
-        }
+        if (!exists()) mkdir()
     }
 
 val VERSION = PLUGIN.nms.version

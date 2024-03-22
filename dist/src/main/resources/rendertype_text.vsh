@@ -11,7 +11,6 @@ uniform sampler2D Sampler2;
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
-uniform mat3 IViewRotMat;
 uniform int FogShape;
 uniform vec2 ScreenSize;
 
@@ -35,7 +34,7 @@ void main() {
     float scale = round((ProjMat[0][0] / 2.0) / (1.0 / ScreenSize.x));
     vec2 ui = ScreenSize / scale;
 
-    vertexDistance = fog_distance(ModelViewMat, IViewRotMat * pos, FogShape);
+    vertexDistance = fog_distance(ModelViewMat, pos, FogShape);
     texCoord0 = UV0;
 
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);

@@ -12,7 +12,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-6"
+    version = "beta-7"
 
     repositories {
         mavenCentral()
@@ -22,6 +22,7 @@ allprojects {
         maven("https://maven.enginehub.org/repo/")
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.skriptlang.org/releases")
+        maven("https://repo.alessiodp.com/releases/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://mvn.lumine.io/repository/maven/")
     }
@@ -31,7 +32,6 @@ allprojects {
 
         compileOnly("com.mojang:authlib:6.0.52")
         compileOnly("net.kyori:adventure-api:$adventure")
-        compileOnly("net.kyori:adventure-text-minimessage:$adventure")
         compileOnly("net.kyori:adventure-platform-bukkit:$platform")
     }
 
@@ -41,18 +41,6 @@ allprojects {
         }
         compileJava {
             options.encoding = Charsets.UTF_8.name()
-        }
-        processResources {
-            filteringCharset = Charsets.UTF_8.name()
-            val props = mapOf(
-                "version" to project.version,
-                "adventure" to adventure,
-                "platform" to platform
-            )
-            inputs.properties(props)
-            filesMatching("plugin.yml") {
-                expand(props)
-            }
         }
     }
 }
@@ -73,6 +61,8 @@ tasks {
         prefix("kotlin")
         prefix("net.objecthunter.exp4j")
         prefix("org.bstats")
+        prefix("net.byteflux")
+        relocate("net.kyori", "hud.net.kyori")
     }
 }
 

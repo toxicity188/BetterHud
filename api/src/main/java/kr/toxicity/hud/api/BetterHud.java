@@ -18,6 +18,9 @@ public abstract class BetterHud extends JavaPlugin {
     private static BetterHud instance;
 
     public static final String DEFAULT_NAMESPACE = "betterhud";
+    public static final String ADVENTURE_VERSION = "4.16.0";
+    public static final String PLATFORM_VERSION = "4.3.2";
+    public static final String EXAMINATION_VERSION = "1.3.0";
 
 
     @Override
@@ -35,6 +38,7 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract @NotNull HudScheduler getScheduler();
     public abstract @NotNull BedrockAdapter getBedrockAdapter();
     public abstract boolean isFolia();
+    public abstract boolean isPaper();
     public abstract boolean isMergeBossBar();
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     public abstract int getWidth(char target);

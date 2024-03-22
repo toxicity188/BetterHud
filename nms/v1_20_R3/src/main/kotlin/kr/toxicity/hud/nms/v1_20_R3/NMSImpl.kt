@@ -9,7 +9,6 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
@@ -51,7 +50,7 @@ class NMSImpl: NMS {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
-        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (Bukkit.getConsoleSender() is Audience) {
+        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (BetterHud.getInstance().isPaper) {
             {
                it.connection
             }

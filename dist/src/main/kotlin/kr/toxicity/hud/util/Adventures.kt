@@ -7,28 +7,14 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 val SPACE_KEY = Key.key("$NAME_SPACE:space")
 val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
-
-val MINI_MESSAGE = MiniMessage.builder()
-    .tags(TagResolver.standard())
-    .postProcessor {
-        var style = it.style()
-        if (style.color() == null) style = style.color(NamedTextColor.WHITE)
-        it.style(style.decorations(TextDecoration.entries.associateWith { deco ->
-            if (style.hasDecoration(deco)) TextDecoration.State.TRUE else TextDecoration.State.FALSE
-        }))
-    }
-    .build()
 
 val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
     TextDecoration.State.FALSE
 }
 
-fun String.deserializeToComponent() = MINI_MESSAGE.deserialize(this)
 fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).decorations(DEFAULT_TEXT_DECORATION)
 
 val EMPTY_COMPONENT: Component = Component.empty()

@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("net.objecthunter:exp4j:0.4.8")
     implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("net.byteflux:libby-bukkit:1.3.0")
 
     implementation(project(":api"))
     implementation(project(":scheduler:standard"))
@@ -30,4 +31,15 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.SkriptLang:Skript:2.8.3")
+}
+
+tasks.processResources {
+    filteringCharset = Charsets.UTF_8.name()
+    val props = mapOf(
+        "version" to project.version
+    )
+    inputs.properties(props)
+    filesMatching("plugin.yml") {
+        expand(props)
+    }
 }

@@ -12,12 +12,14 @@ import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.manager.*
-import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
 import kr.toxicity.hud.skript.SkriptManager
 import kr.toxicity.hud.util.*
+import net.byteflux.libby.BukkitLibraryManager
+import net.byteflux.libby.Library
+import net.byteflux.libby.relocation.Relocation
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -35,6 +37,73 @@ import java.net.http.HttpResponse
 import java.util.jar.JarFile
 
 class BetterHudImpl: BetterHud() {
+
+    private val isFolia = runCatching {
+        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
+        true
+    }.getOrDefault(false)
+    private val isPaper = isFolia || runCatching {
+        Class.forName("com.destroystokyo.paper.profile.PlayerProfile")
+        true
+    }.getOrDefault(false)
+    init {
+        if (!dataFolder.exists()) loadAssets("default", dataFolder.apply {
+            mkdir()
+        })
+        BukkitLibraryManager(this, ".libraries").run {
+            addMavenCentral()
+            listOf(
+                "adventure-api",
+                "adventure-key",
+                "adventure-text-logger-slf4j",
+                "adventure-text-serializer-ansi",
+                "adventure-text-serializer-gson",
+                "adventure-text-serializer-plain",
+                "adventure-text-serializer-legacy",
+                "adventure-nbt",
+                "adventure-text-serializer-json",
+                "adventure-text-serializer-gson-legacy-impl",
+                "adventure-text-serializer-json-legacy-impl",
+            ).forEach {
+                loadLibrary(Library.builder()
+                    .groupId("net{}kyori")
+                    .artifactId(it)
+                    .version(ADVENTURE_VERSION)
+                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
+                    .build())
+            }
+            listOf(
+                "examination-api",
+                "examination-string"
+            ).forEach {
+                loadLibrary(Library.builder()
+                    .groupId("net{}kyori")
+                    .artifactId(it)
+                    .version(EXAMINATION_VERSION)
+                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
+                    .build())
+            }
+            listOf(
+                "adventure-platform-bukkit",
+                "adventure-platform-api",
+                "adventure-platform-facet",
+            ).forEach {
+                loadLibrary(Library.builder()
+                    .groupId("net{}kyori")
+                    .artifactId(it)
+                    .version(PLATFORM_VERSION)
+                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
+                    .build())
+            loadLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("option")
+                .version("1.0.0")
+                .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
+                .build())
+            }
+        }
+    }
+
     private val managers = listOf(
         ConfigManager,
         CommandManager,
@@ -62,12 +131,8 @@ class BetterHudImpl: BetterHud() {
     private lateinit var audience: BukkitAudiences
     private lateinit var bedrockAdapter: BedrockAdapter
 
-    private val isFolia = runCatching {
-        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
-        true
-    }.getOrDefault(false)
-
     private val scheduler = if (isFolia) FoliaScheduler() else StandardScheduler()
+
 
     override fun onEnable() {
         runCatching {
@@ -126,11 +191,11 @@ class BetterHudImpl: BetterHud() {
         managers.forEach {
             it.start()
         }
-        task {
+        Bukkit.getOnlinePlayers().forEach {
+            PlayerManager.register(it)
+        }
+        asyncTask {
             reload()
-            Bukkit.getOnlinePlayers().forEach {
-                PlayerManager.register(it)
-            }
             info("Plugin enabled.")
         }
     }
@@ -207,6 +272,7 @@ class BetterHudImpl: BetterHud() {
     }
 
     override fun getScheduler(): HudScheduler = scheduler
+    override fun isPaper(): Boolean = isPaper
     override fun isFolia(): Boolean = isFolia
     override fun isMergeBossBar(): Boolean = ConfigManager.mergeBossBar
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
