@@ -29,6 +29,9 @@ object ConfigManager: BetterHudManager {
     var separateResourcePackNameSpace = false
         private set
 
+    var mergeBossBar = true
+        private set
+
     override fun start() {
 
     }
@@ -65,6 +68,7 @@ object ConfigManager: BetterHudManager {
             yaml.getString("build-folder-location")?.let {
                 buildFolderLocation = it
             }
+            mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
         }.onFailure { e ->
             warn("Unable to load config.yml")
             warn("Reason: ${e.message}")

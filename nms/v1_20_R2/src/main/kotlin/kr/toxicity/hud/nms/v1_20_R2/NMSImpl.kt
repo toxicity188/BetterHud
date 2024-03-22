@@ -326,7 +326,7 @@ class NMSImpl: NMS {
         }
 
         override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-            if (msg is ClientboundBossEventPacket) {
+            if (BetterHud.getInstance().isMergeBossBar && msg is ClientboundBossEventPacket) {
                 val buf = FriendlyByteBuf(Unpooled.buffer(1 shl 4)).apply {
                     msg.write(this)
                 }

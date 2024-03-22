@@ -35,6 +35,7 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract @NotNull HudScheduler getScheduler();
     public abstract @NotNull BedrockAdapter getBedrockAdapter();
     public abstract boolean isFolia();
+    public abstract boolean isMergeBossBar();
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     public abstract int getWidth(char target);
     public abstract @NotNull HudPlayer getHudPlayer(@NotNull Player player);

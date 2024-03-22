@@ -1,6 +1,7 @@
 package kr.toxicity.hud.nms.v1_20_R1
 
 import com.mojang.authlib.GameProfile
+import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
@@ -324,8 +325,8 @@ class NMSImpl: NMS {
         }
 
         override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-            if (msg is ClientboundBossEventPacket) {
-                val buf = FriendlyByteBuf(Unpooled.buffer(1 shl 4)).apply {
+            if (BetterHud.getInstance().isMergeBossBar && msg is ClientboundBossEventPacket) {
+                val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
                     msg.write(this)
                 }
                 writeBossBar(buf, ctx, msg, promise)
@@ -334,7 +335,11 @@ class NMSImpl: NMS {
             }
         }
     }
-
+    private class HudByteBuf(val source: ByteBuf): FriendlyByteBuf(source) {
+        override fun unwrap(): ByteBuf {
+            return source
+        }
+    }
     private class HudBossBar(uuid: UUID, component: Component, color: BarColor): BossEvent(uuid, fromAdventure(component), getColor(color), BossBarOverlay.PROGRESS) {
         override fun getProgress(): Float {
             return 0F

@@ -208,6 +208,7 @@ class BetterHudImpl: BetterHud() {
 
     override fun getScheduler(): HudScheduler = scheduler
     override fun isFolia(): Boolean = isFolia
+    override fun isMergeBossBar(): Boolean = ConfigManager.mergeBossBar
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
     override fun getPopupManager(): PopupManager = PopupManagerImpl
