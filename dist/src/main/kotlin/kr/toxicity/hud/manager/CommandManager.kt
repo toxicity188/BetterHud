@@ -229,7 +229,7 @@ object CommandManager: BetterHudManager {
         }) {
             addCommand("on") {
                 description = "Turns on your hud.".toComponent()
-                usage = "off".toComponent()
+                usage = "on".toComponent()
                 permission = listOf("$NAME_SPACE.turn.on")
                 executer = { sender, _ ->
                     PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {

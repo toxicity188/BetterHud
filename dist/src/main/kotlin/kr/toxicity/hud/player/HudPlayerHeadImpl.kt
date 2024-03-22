@@ -2,7 +2,7 @@ package kr.toxicity.hud.player
 
 import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayerHead
-import kr.toxicity.hud.util.gameProfile
+import kr.toxicity.hud.util.textures
 import kr.toxicity.hud.util.toImage
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -23,7 +23,7 @@ class HudPlayerHeadImpl(player: Player): HudPlayerHead {
     private val colorList = runCatching {
         HttpClient.newHttpClient().send(
             HttpRequest.newBuilder()
-                .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(player.gameProfile.properties.get("textures").first().value)))
+                .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(player.textures)))
                     .asJsonObject
                     .getAsJsonObject("textures")
                     .getAsJsonObject("SKIN")

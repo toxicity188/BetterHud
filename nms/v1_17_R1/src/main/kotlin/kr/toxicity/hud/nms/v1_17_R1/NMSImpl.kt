@@ -1,6 +1,5 @@
 package kr.toxicity.hud.nms.v1_17_R1
 
-import com.mojang.authlib.GameProfile
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
@@ -96,8 +95,8 @@ class NMSImpl: NMS {
         return NMSVersion.V1_17_R1
     }
 
-    override fun getGameProfile(player: Player): GameProfile {
-        return (player as CraftPlayer).handle.gameProfile
+    override fun getTextureValue(player: Player): String {
+        return (player as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
     override fun getFoliaAdaptedPlayer(player: Player): Player {

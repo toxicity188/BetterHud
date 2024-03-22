@@ -24,8 +24,8 @@ val Player.armor
         return attribute
     }
 
-val Player.gameProfile
-    get() = PLUGIN.nms.getGameProfile(this)
+val Player.textures
+    get() = PLUGIN.nms.getTextureValue(this)
 
 val Player.emptySpace
     get(): Int {
