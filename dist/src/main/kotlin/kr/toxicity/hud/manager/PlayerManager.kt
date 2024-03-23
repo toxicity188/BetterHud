@@ -1,9 +1,13 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.event.HudPlayerJoinEvent
+import kr.toxicity.hud.api.event.HudPlayerQuitEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.asyncTask
+import kr.toxicity.hud.util.call
+import kr.toxicity.hud.util.task
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -26,8 +30,10 @@ object PlayerManager: BetterHudManager {
             }
             @EventHandler
             fun quit(e: PlayerQuitEvent) {
-                hudPlayer.remove(e.player.uniqueId)?.let {
+                val player = e.player
+                hudPlayer.remove(player.uniqueId)?.let {
                     it.cancel()
+                    HudPlayerQuitEvent(player, it).call()
                     asyncTask {
                         it.save()
                     }
@@ -40,7 +46,11 @@ object PlayerManager: BetterHudManager {
         val adaptedPlayer = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(player) else player
         asyncTask {
             hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
-                DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
+                val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
+                task {
+                    HudPlayerJoinEvent(adaptedPlayer, hud).call()
+                }
+                hud
             }
         }
     }

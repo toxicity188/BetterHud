@@ -162,7 +162,7 @@ class PopupImpl(
             player.popupKeyMap.remove(key)
             Unit
         }
-        get.addIterator(PopupIteratorImpl(
+        val iterator = PopupIteratorImpl(
             move.locations.lastIndex,
             key,
             sortType,
@@ -173,7 +173,9 @@ class PopupImpl(
             valueGetter,
             cond,
             remove0
-        ))
+        ).apply {
+            get.addIterator(this)
+        }
         return object : PopupUpdater {
             override fun update(): Boolean {
                 if (!ifRemove) return false
@@ -182,6 +184,10 @@ class PopupImpl(
             }
             override fun remove() {
                 remove0()
+            }
+            override fun getIndex(): Int = iterator.index
+            override fun setIndex(index: Int) {
+                iterator.index = index
             }
         }
     }
