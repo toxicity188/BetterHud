@@ -29,7 +29,7 @@ class PopupImpl(
     private val unique = section.getBoolean("unique")
     private val dispose = section.getBoolean("dispose")
     private val queue = duration > 0 && section.getBoolean("queue")
-    private val alwaysCheckCondition = section.getBoolean("always-check-condition", true)
+    private val alwaysCheckCondition = queue && section.getBoolean("always-check-condition", true)
     private val default = ConfigManager.defaultPopup.contains(internalName) || section.getBoolean("default")
     private val keyMapping = section.getBoolean("key-mapping")
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.getString("index")?.let {
@@ -93,12 +93,9 @@ class PopupImpl(
 
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? = show(reason, player, UUID.randomUUID())
     private fun show(reason: UpdateEvent, player: HudPlayer, key: Any): PopupUpdater? {
-        val playerMap = player.popupGroupIteratorMap
-        val get = playerMap.getOrPut(group) {
+        val get = player.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl(dispose)
         }
-        if (unique && get.contains(internalName)) return null
-        if (!queue && get.index >= move.locations.size) return null
         val buildCondition = conditions.build(reason)
         if (!buildCondition(player)) return null
         var updater = {
@@ -132,9 +129,8 @@ class PopupImpl(
             }
             mapper2
         }
-        var ifRemove = true
         var cond = {
-            ifRemove && buildCondition(player)
+            buildCondition(player)
         }
         if (duration > 0) {
             val old = cond
@@ -158,11 +154,11 @@ class PopupImpl(
             }
         }
         val remove0 = {
-            ifRemove = false
             player.popupKeyMap.remove(key)
             Unit
         }
         val iterator = PopupIteratorImpl(
+            unique,
             move.locations.lastIndex,
             key,
             sortType,
@@ -173,17 +169,16 @@ class PopupImpl(
             valueGetter,
             cond,
             remove0
-        ).apply {
-            get.addIterator(this)
-        }
+        )
+        get.addIterator(iterator)
         return object : PopupUpdater {
             override fun update(): Boolean {
-                if (!ifRemove) return false
+                if (iterator.markedAsRemoval()) return false
                 updater()
                 return true
             }
             override fun remove() {
-                remove0()
+                iterator.remove()
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {

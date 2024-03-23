@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.List;
 
 public interface PopupIterator extends Comparable<PopupIterator> {
+    boolean isUnique();
+    boolean markedAsRemoval();
     int getIndex();
     int getMaxIndex();
     void setIndex(int index);

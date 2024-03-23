@@ -13,7 +13,11 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class HudPlayerImpl(
     private val player: Player,
@@ -113,7 +117,12 @@ class HudPlayerImpl(
             }
             val popupGroupIterator = popupGroup.values.iterator()
             while (popupGroupIterator.hasNext()) {
-                val comp = popupGroupIterator.next().next()
+                val next = popupGroupIterator.next()
+                if (next.index == 0) {
+                    popupGroupIterator.remove()
+                    continue
+                }
+                val comp = next.next()
                 if (comp.isEmpty()) {
                     popupGroupIterator.remove()
                 } else compList.addAll(comp)

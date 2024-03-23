@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.popup.PopupSortType
 import java.util.UUID
 
 class PopupIteratorImpl(
+    private val unique: Boolean,
     private val maxIndex: Int,
     private val key: Any,
     private val sortType: PopupSortType,
@@ -19,11 +20,14 @@ class PopupIteratorImpl(
 ): PopupIterator {
     private var tick = 0
     private var i = 0
+    private var removal = false
     override fun getMaxIndex(): Int = maxIndex
 
     override fun getSortType(): PopupSortType {
         return sortType
     }
+
+    override fun isUnique(): Boolean = unique
 
     override fun canSave(): Boolean = save
     override fun alwaysCheckCondition(): Boolean = alwaysCheckCondition
@@ -38,7 +42,9 @@ class PopupIteratorImpl(
         return mapper(i, tick++)
     }
 
+    override fun markedAsRemoval(): Boolean = removal
     override fun remove() {
+        removal = true
         removeTask()
     }
 

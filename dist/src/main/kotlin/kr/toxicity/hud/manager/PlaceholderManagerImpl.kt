@@ -24,7 +24,7 @@ import java.util.function.Function
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
-    private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))?")
+    private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")
 
@@ -266,6 +266,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         val pattern = equation.replaceAll("").split(':')
 
         val matcher = castPattern.matcher(pattern[0])
+        val group = if (matcher.find()) matcher.group("type") else null
         val first = matcher.replaceAll("")
 
         val args = if (pattern.size > 1) pattern[pattern.lastIndex].split(',') else emptyList()
@@ -285,23 +286,17 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         } ?: throw RuntimeException("this placeholder not found: $first")
         if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
-        val type = if (matcher.find()) matcher.group("type")?.let {
-            types[it]
-        } else null
+        val type = types[group]
 
         return object : PlaceholderBuilder<Any> {
             override val clazz: Class<out Any>
-                get() = type?.let {
-                    type.clazz
-                } ?: get.first.clazz
+                get() = type?.clazz ?: get.first.clazz
 
             override fun build(reason: UpdateEvent): Placeholder<Any> {
                 val second = get.second(args, reason)
                 return object : Placeholder<Any> {
                     override val clazz: Class<out Any>
-                        get() = type?.let {
-                            type.clazz
-                        } ?: get.first.clazz
+                        get() = type?.clazz ?: get.first.clazz
 
                     override fun invoke(p1: HudPlayer): Any {
                         var value: Any = second.apply(p1)
@@ -315,7 +310,8 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     }
 
                     override fun stringValue(player: HudPlayer): String {
-                        return get.first.stringValue(invoke(player))
+                        val value = invoke(player)
+                        return type?.stringValue(value) ?: get.first.stringValue(value)
                     }
                 }
             }

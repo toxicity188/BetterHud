@@ -12,13 +12,18 @@ import java.util.TreeSet
 class PopupIteratorGroupImpl(
     private val dispose: Boolean,
 ): PopupIteratorGroup {
-    private val list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
+    private var list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
 
     override fun addIterator(iterator: PopupIterator) {
+        if (iterator.isUnique && contains(iterator.name())) return
         val p = iterator.priority
-        val map = list.map {
-            it.index
-        }.toSet()
+        val map = HashSet<Int>()
+        val loop = list.iterator()
+        while (loop.hasNext()) {
+            val next = loop.next()
+            if (next.markedAsRemoval()) next.remove()
+            else map.add(next.index)
+        }
         val i = when (iterator.sortType) {
             PopupSortType.FIRST -> if (p >= 0) p else 0
             PopupSortType.LAST -> if (p >= 0) p else run {
@@ -48,35 +53,32 @@ class PopupIteratorGroupImpl(
         list.clear()
     }
 
-    override fun next(): List<WidthComponent> {
-        val iterator = list.iterator()
-        val send = ArrayList<PopupIterator>()
-        var i = 0
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            val index = next.index
-            if (index > next.maxIndex) {
-                if (!next.canSave() || (next.alwaysCheckCondition() && !next.available())) {
-                    next.remove()
-                    iterator.remove()
-                }
-                continue
-            }
-            if (index < 0 || !next.available()) {
-                list.toList().subList(i, list.size).forEach {
-                    it.index = (it.index - 1).coerceAtLeast(it.priority)
-                }
-                next.remove()
-                iterator.remove()
-            } else {
-                i++
-                send.add(next)
+    private fun checkCondition(iterator: PopupIterator): Boolean {
+        if (iterator.markedAsRemoval()) {
+            return false
+        }
+        if (iterator.index > iterator.maxIndex) {
+            if (!iterator.canSave() || (iterator.alwaysCheckCondition() && !iterator.available())) {
+                return false
             }
         }
-        val result = send.map {
-            it.next()
-        }.sum()
-        if (dispose) list.clear()
+        if (iterator.index < 0 || !iterator.available()) return false
+        return true
+    }
+
+    override fun next(): List<WidthComponent> {
+        val copy = list
+        list = Collections.synchronizedSet(TreeSet(Comparator.naturalOrder()))
+        val send = ArrayList<PopupIterator>()
+        copy.forEach { next ->
+            if (checkCondition(next)) send.add(next)
+            else next.remove()
+        }
+        val result = ArrayList<WidthComponent>()
+        if (!dispose) send.forEach {
+            addIterator(it)
+            if (it.index <= it.maxIndex) result.addAll(it.next())
+        }
         return result
     }
 
