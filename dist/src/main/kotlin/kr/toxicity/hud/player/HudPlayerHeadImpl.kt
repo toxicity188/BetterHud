@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.util.textures
 import kr.toxicity.hud.util.toImage
+import kr.toxicity.hud.util.warn
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
@@ -42,6 +43,10 @@ class HudPlayerHeadImpl(player: Player): HudPlayerHead {
                 TextColor.color(if (layerColor ushr 24 != 0) layerColor else imageColor)
             }
         }
-    }.getOrNull() ?: allBlack
+    }.getOrElse { e ->
+        warn("Unable to get ${player.name}'s head.")
+        warn("Reason: ${e.message}")
+        allBlack
+    }
     override fun getColors(): List<TextColor> = colorList
 }

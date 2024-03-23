@@ -389,7 +389,19 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
     override fun getBooleanContainer(): PlaceholderContainer<Boolean> = boolean
     override fun getStringContainer(): PlaceholderContainer<String> = string
     override fun start() {
-
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            string.addPlaceholder("papi", object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    val format = "%${args[0]}%"
+                    return Function { player ->
+                        runCatching {
+                            PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
+                        }.getOrDefault("<error>")
+                    }
+                }
+            })
+        }
     }
 
     override fun reload(resource: GlobalResource) {

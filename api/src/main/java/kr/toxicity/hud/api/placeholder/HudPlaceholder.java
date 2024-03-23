@@ -13,7 +13,7 @@ public interface HudPlaceholder<T> {
     @NotNull Function<HudPlayer, T> invoke(@NotNull @Unmodifiable List<String> args, @NotNull UpdateEvent reason);
     int getRequiredArgsLength();
 
-    static <T> @NotNull HudPlaceholder<T> of(BiFunction<List<String>, UpdateEvent, Function<HudPlayer, T>> biFunction) {
+    static <T> @NotNull HudPlaceholder<T> of(@NotNull BiFunction<List<String>, UpdateEvent, Function<HudPlayer, T>> biFunction) {
         return new HudPlaceholder<>() {
             @Override
             public @NotNull Function<HudPlayer, T> invoke(@NotNull @Unmodifiable List<String> args, @NotNull UpdateEvent reason) {
