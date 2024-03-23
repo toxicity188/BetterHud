@@ -413,9 +413,12 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     val variable = configurationSection.getString("variable").ifNull("variable not set.")
                     val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
                     val update = configurationSection.getInt("update", 1).coerceAtLeast(1)
+                    val async = configurationSection.getBoolean("async", true)
                     updateTask.add(object : PlaceholderTask {
                         override val tick: Int
                             get() = update
+                        override val async: Boolean
+                            get() = async
 
                         override fun invoke(p1: HudPlayer) {
                             runCatching {
@@ -435,9 +438,16 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         val task = updateTask.filter {
             hudPlayer.tick % it.tick == 0L
         }
-        if (task.isNotEmpty()) task {
+        if (task.isNotEmpty()) {
+            val syncTask = ArrayList<PlaceholderTask>()
             task.forEach {
-                it(hudPlayer)
+                if (it.async) it(hudPlayer) else syncTask.add(it)
+            }
+            if (syncTask.isEmpty()) return
+            task {
+                syncTask.forEach {
+                    it(hudPlayer)
+                }
             }
         }
     }

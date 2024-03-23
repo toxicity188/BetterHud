@@ -60,6 +60,7 @@ class HudPlayerImpl(
 
     override fun cancelTick() {
         task?.cancel()
+        task = null
     }
 
     override fun startTick() {
@@ -124,7 +125,7 @@ class HudPlayerImpl(
             additionalComp?.let {
                 compList.add((-it.width / 2).toSpaceComponent() + it)
             }
-            var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+            var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT
             compList.forEach {
                 comp += it + (-it.width).toSpaceComponent()
             }

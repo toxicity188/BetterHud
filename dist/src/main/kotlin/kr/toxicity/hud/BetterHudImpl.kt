@@ -36,6 +36,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.jar.JarFile
 
+@Suppress("UNUSED")
 class BetterHudImpl: BetterHud() {
 
     private val isFolia = runCatching {

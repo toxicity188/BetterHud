@@ -19,6 +19,7 @@ object PlayerHeadManager: BetterHudManager {
 
     override fun reload(resource: GlobalResource) {
         val saveLocation = resource.textures.subFolder("head")
+        headMap.clear()
         DATA_FOLDER.subFolder("heads").forEachAllYaml { file, s, configurationSection ->
             runCatching {
                 val head = HudHead(s , configurationSection)
