@@ -30,7 +30,7 @@ class HudElement(hud: HudImpl, name: String, file: File, private val layout: Lay
         it.max
     } ?: 0
 
-    fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer(layout.align, max)
+    fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer(layout.offset, layout.align, max)
         .append(imageElement.map {
             it.getComponent(player)
         })

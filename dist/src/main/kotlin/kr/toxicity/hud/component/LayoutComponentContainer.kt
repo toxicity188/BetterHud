@@ -3,10 +3,12 @@ package kr.toxicity.hud.component
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.layout.LayoutAlign
+import kr.toxicity.hud.layout.LayoutOffset
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.toSpaceComponent
 
 class LayoutComponentContainer(
+    private val offset: LayoutOffset,
     private val align: LayoutAlign,
     private val max: Int
 ) {
@@ -32,6 +34,10 @@ class LayoutComponentContainer(
             }
             comp += (it.pixel + move).toSpaceComponent() + it.component + (-it.pixel - it.component.width - move).toSpaceComponent()
         }
-        return (-max / 2).toSpaceComponent() + comp
+        return (when (offset) {
+            LayoutOffset.LEFT -> 0
+            LayoutOffset.CENTER -> -max / 2
+            LayoutOffset.RIGHT -> -max
+        }).toSpaceComponent() + comp
     }
 }

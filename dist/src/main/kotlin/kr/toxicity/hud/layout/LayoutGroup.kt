@@ -21,6 +21,11 @@ class LayoutGroup(section: ConfigurationSection) {
             LayoutAlign.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutAlign.LEFT
+    val offset = section.getString("offset")?.let {
+        runCatching {
+            LayoutOffset.valueOf(it.uppercase())
+        }.getOrNull()
+    } ?: LayoutOffset.CENTER
 
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
         section.getConfigurationSection("images")?.forEachSubConfiguration { s, configurationSection ->
@@ -33,7 +38,7 @@ class LayoutGroup(section: ConfigurationSection) {
                     ImageLocation(configurationSection) + loc,
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
-                    configurationSection.getInt("layout"),
+                    configurationSection.getInt("layer"),
                     configurationSection.toConditions()
                 )
             )
@@ -59,9 +64,7 @@ class LayoutGroup(section: ConfigurationSection) {
                         TEquation(it)
                     } ?: TEquation.t,
                     configurationSection.getString("number-format")?.let {
-                        DecimalFormat(it).apply {
-                            maximumFractionDigits = 0
-                        }
+                        DecimalFormat(it)
                     } ?: ConfigManager.numberFormat,
                     configurationSection.toConditions()
                 )

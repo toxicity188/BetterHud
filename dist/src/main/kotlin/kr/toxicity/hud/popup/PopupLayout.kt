@@ -29,6 +29,7 @@ class PopupLayout(
     private val parent: PopupImpl,
     private val name: String,
     private val globalLocation: GuiLocation,
+    private val globalPixel: ImageLocation,
     file: File
 ) {
     private var imageChar = 0xCE000
@@ -79,7 +80,8 @@ class PopupLayout(
         }
     }
     private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: File) {
-        private val gui = pair.gui + parent.gui + globalLocation
+        private val elementGui = pair.gui + parent.gui + globalLocation
+        private val elementPixel = globalPixel + location
 
         fun getComponent(reason: UpdateEvent): (HudPlayer) -> WidthComponent {
             val imageProcessing = image.map {
@@ -92,7 +94,7 @@ class PopupLayout(
                 it.getHead(reason)
             }
             return { player ->
-                LayoutComponentContainer(layout.align, max)
+                LayoutComponentContainer(layout.offset, layout.align, max)
                     .append(imageProcessing.map {
                         it(player)
                     })
@@ -109,11 +111,11 @@ class PopupLayout(
         val image = layout.image.map { target ->
             val hudImage = target.image
             val imageShader = HudShader(
-                gui,
+                elementGui,
                 target.layer,
                 target.outline
             )
-            val pixel = location + pair.pixel + target.location
+            val pixel = elementPixel + pair.pixel + target.location
             val list = ArrayList<PixelComponent>()
 
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
@@ -163,9 +165,9 @@ class PopupLayout(
         } ?: 0
 
         val texts = layout.text.map { textLayout ->
-            val pixel = location + pair.pixel + textLayout.location
+            val pixel = elementPixel + pair.pixel + textLayout.location
             val textShader = HudShader(
-                gui,
+                elementGui,
                 textLayout.layer,
                 textLayout.outline
             )
@@ -214,9 +216,9 @@ class PopupLayout(
         }
 
         val heads = layout.head.map { headLayout ->
-            val pixel = location + pair.pixel + headLayout.location
+            val pixel = elementPixel + pair.pixel + headLayout.location
             val shader = HudShader(
-                gui,
+                elementGui,
                 headLayout.layer,
                 headLayout.outline
             )

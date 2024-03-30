@@ -20,7 +20,7 @@ class ImageRenderer(
     private val type = image.type
     private val components = components.map {
         val comp = it.component
-        PixelComponent(WidthComponent(Component.text().append(comp.component).color(color), comp.width), it.pixel)
+        PixelComponent(WidthComponent(Component.text().append(comp.component.build().color(color)), comp.width), it.pixel)
     }
 
     val listener: (UpdateEvent) -> HudListener = image.listener ?: HudListener.ZERO.let {

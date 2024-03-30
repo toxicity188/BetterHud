@@ -51,6 +51,13 @@ object ListenerManagerImpl: BetterHudManager, ListenerManager {
                 }
             }
         },
+        "absorption" to { _ ->
+            {
+                HudListener { p ->
+                    p.bukkitPlayer.absorptionAmount / p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                }
+            }
+        },
         "placeholder" to placeholder@ { c ->
             val v = PlaceholderManagerImpl.find(c.getString("value").ifNull("value value not set."))
             val m = PlaceholderManagerImpl.find(c.getString("max").ifNull("max value not set."))

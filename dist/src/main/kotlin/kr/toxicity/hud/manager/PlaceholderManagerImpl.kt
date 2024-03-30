@@ -28,9 +28,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")
 
-    private val doubleDecimal = DecimalFormat("#").apply {
-        maximumFractionDigits = 0
-    }
+    private val doubleDecimal = DecimalFormat("#.###")
 
     private val updateTask = ArrayList<PlaceholderTask>()
 
@@ -66,6 +64,11 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
             "max_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                }
+            },
+            "max_health_with_absorption" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value + p.bukkitPlayer.absorptionAmount
                 }
             },
             "health_percentage" to HudPlaceholder.of { _, _ ->
@@ -133,6 +136,11 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
             "air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.remainingAir
+                }
+            },
+            "absorption" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.absorptionAmount
                 }
             },
             "max_air" to HudPlaceholder.of { _, _ ->

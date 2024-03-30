@@ -54,9 +54,7 @@ object ConfigManager: BetterHudManager {
                 runCatching {
                     DecimalFormat(it)
                 }.getOrNull()
-            } ?: DecimalFormat("#,###.#")).apply {
-                maximumFractionDigits = 0
-            }
+            } ?: DecimalFormat("#,###.#"))
             disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
             separateResourcePackNameSpace = yaml.getBoolean("separate-resource-pack-namespace", false)
             yaml.getString("build-folder-location")?.let {

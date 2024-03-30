@@ -42,7 +42,13 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
                 val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
                     LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
                 }
-                val gui = GuiLocation(configurationSection)
+                var gui = GuiLocation(configurationSection)
+                configurationSection.getConfigurationSection("gui")?.let {
+                    gui += GuiLocation(it)
+                }
+                val pixel = configurationSection.getConfigurationSection("pixel")?.let {
+                    ImageLocation(it)
+                } ?: ImageLocation.zero
                 add(HudAnimation(
                     layout.animation.type,
                     layout.animation.location.map {
@@ -52,7 +58,7 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
                             subFile,
                             layout,
                             gui,
-                            ImageLocation(it.x, it.y)
+                            ImageLocation(it.x, it.y) + pixel
                         )
                     }
                 ))

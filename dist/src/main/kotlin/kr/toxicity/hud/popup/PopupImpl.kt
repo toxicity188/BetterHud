@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.EquationPairLocation
+import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
@@ -54,11 +55,18 @@ class PopupImpl(
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
+                var loc = GuiLocation(configurationSection)
+                configurationSection.getConfigurationSection("gui")?.let {
+                    loc += GuiLocation(it)
+                }
                 add(PopupLayout(
                     LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                     this@PopupImpl,
                     s,
-                    GuiLocation(configurationSection),
+                    loc,
+                    configurationSection.getConfigurationSection("pixel")?.let {
+                        ImageLocation(it)
+                    } ?: ImageLocation.zero,
                     target.subFolder(s),
                 ))
             }

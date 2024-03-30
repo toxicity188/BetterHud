@@ -40,7 +40,7 @@ class PopupIteratorGroupImpl(
                 it.index >= i
             }
             while (t < more.size && more[t].index >= biggest) {
-                biggest = more[t++].index++
+                biggest = ++more[t++].index
             }
         }
         list.add(iterator)
