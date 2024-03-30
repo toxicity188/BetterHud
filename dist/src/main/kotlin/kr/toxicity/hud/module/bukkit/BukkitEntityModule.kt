@@ -57,7 +57,7 @@ class BukkitEntityModule: BukkitModule {
             "health" to {
                 { event ->
                     event.unwrap ref@ { target: EntityEvent ->
-                        val entity = target.entity as? LivingEntity ?: return@ref HudListener.ZERO
+                        val entity = target.entity as? LivingEntity ?: return@ref HudListener.EMPTY
                         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value?.let { maxHealth ->
                             HudListener {
                                 entity.health / maxHealth

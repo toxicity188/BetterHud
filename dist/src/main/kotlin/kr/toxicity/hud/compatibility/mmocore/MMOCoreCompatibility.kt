@@ -54,7 +54,7 @@ class MMOCoreCompatibility: Compatibility {
                     HudListener { p ->
                         val mmo = api.getPlayerData(p.bukkitPlayer)
                         (mmo.getBoundSkill(slot)?.let {
-                            mmo.cooldownMap.getCooldown(it) / it.skill.getModifier("cooldown", mmo.getSkillLevel(it.skill))
+                            (mmo.cooldownMap.getCooldown(it) / it.skill.getModifier("cooldown", mmo.getSkillLevel(it.skill))).coerceAtLeast(0.0)
                         } ?: 0.0)
                     }
                 }
@@ -65,7 +65,7 @@ class MMOCoreCompatibility: Compatibility {
                 return@search { _: UpdateEvent ->
                     HudListener { p ->
                         val mmo = api.getPlayerData(p.bukkitPlayer)
-                        mmo.cooldownMap.getCooldown("skill_" + skill.handler.id) / skill.getModifier("cooldown", mmo.getSkillLevel(skill))
+                        (mmo.cooldownMap.getCooldown("skill_" + skill.handler.id) / skill.getModifier("cooldown", mmo.getSkillLevel(skill))).coerceAtLeast(0.0)
                     }
                 }
             }

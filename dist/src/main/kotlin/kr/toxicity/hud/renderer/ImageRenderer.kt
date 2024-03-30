@@ -23,7 +23,7 @@ class ImageRenderer(
         PixelComponent(WidthComponent(Component.text().append(comp.component.build().color(color)), comp.width), it.pixel)
     }
 
-    val listener: (UpdateEvent) -> HudListener = image.listener ?: HudListener.ZERO.let {
+    val listener: (UpdateEvent) -> HudListener = image.listener ?: HudListener.EMPTY.let {
         { _ ->
             it
         }
