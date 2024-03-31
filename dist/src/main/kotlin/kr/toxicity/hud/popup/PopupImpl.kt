@@ -179,6 +179,7 @@ class PopupImpl(
             }
             override fun remove() {
                 iterator.remove()
+                player.popupGroupIteratorMap.remove(group)
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {

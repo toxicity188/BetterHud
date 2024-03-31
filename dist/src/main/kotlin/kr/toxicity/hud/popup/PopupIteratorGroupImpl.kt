@@ -4,11 +4,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupSortType
-import kr.toxicity.hud.util.sum
-import java.util.Collections
-import java.util.Comparator
-import java.util.LinkedList
-import java.util.TreeSet
+import java.util.*
 
 class PopupIteratorGroupImpl(
     private val dispose: Boolean,
