@@ -21,4 +21,5 @@ public interface PopupIterator extends Comparable<PopupIterator> {
     @NotNull @Unmodifiable List<WidthComponent> next();
     @NotNull String name();
     int getPriority();
+    void setPriority(int priority);
 }

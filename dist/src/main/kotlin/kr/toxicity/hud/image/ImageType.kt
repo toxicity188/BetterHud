@@ -11,10 +11,10 @@ enum class ImageType {
     SINGLE {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
-                if (isNaN()) 0 else roundToInt()
+                if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
             return if (list.isNotEmpty()) {
-                if (get >= 0) list[(get * list.lastIndex)
+                if (get >= 0) list[get
                     .coerceAtLeast(0)
                     .coerceAtMost(list.lastIndex)] else list[0]
             } else EMPTY_PIXEL_COMPONENT
@@ -23,9 +23,9 @@ enum class ImageType {
     LISTENER {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
-                if (isNaN()) 0 else roundToInt()
+                if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
-            return if (get >= 0) list[(get * list.lastIndex)
+            return if (get >= 0) list[get
                 .coerceAtLeast(0)
                 .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
         }
@@ -33,9 +33,9 @@ enum class ImageType {
     SEQUENCE {
         override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
-                if (isNaN()) 0 else roundToInt()
+                if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
-            return if (get >= 0) list[(get * list.lastIndex)
+            return if (get >= 0) list[get
                 .coerceAtLeast(0)
                 .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
         }

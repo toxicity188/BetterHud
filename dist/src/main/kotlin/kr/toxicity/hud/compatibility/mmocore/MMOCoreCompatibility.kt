@@ -192,6 +192,32 @@ class MMOCoreCompatibility: Compatibility {
                     }
                 }
             },
+            "required_mana_skill" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(
+                    args: MutableList<String>,
+                    reason: UpdateEvent
+                ): Function<HudPlayer, Number> {
+                    val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
+                    return Function { p ->
+                        val mmo = api.getPlayerData(p.bukkitPlayer)
+                        skill.getModifier("mana", mmo.getSkillLevel(skill))
+                    }
+                }
+            },
+            "required_stamina_skill" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(
+                    args: MutableList<String>,
+                    reason: UpdateEvent
+                ): Function<HudPlayer, Number> {
+                    val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
+                    return Function { p ->
+                        val mmo = api.getPlayerData(p.bukkitPlayer)
+                        skill.getModifier("stamina", mmo.getSkillLevel(skill))
+                    }
+                }
+            },
             "skill_bound_index" to object : HudPlaceholder<Number> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(

@@ -14,7 +14,7 @@ class PopupIteratorImpl(
     private val save: Boolean,
     private val alwaysCheckCondition: Boolean,
     private val mapper: (Int,  Int) -> List<WidthComponent>,
-    val value: () -> Int,
+    private var value: Int,
     private val condition: () -> Boolean,
     private val removeTask: () -> Unit,
 ): PopupIterator {
@@ -48,7 +48,10 @@ class PopupIteratorImpl(
         removeTask()
     }
 
-    override fun getPriority(): Int = value()
+    override fun getPriority(): Int = value
+    override fun setPriority(priority: Int) {
+        value = priority
+    }
     override fun name(): String = name
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

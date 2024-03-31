@@ -11,8 +11,8 @@ val Player.armor
         var attribute = getAttribute(Attribute.GENERIC_ARMOR)?.value ?: 0.0
         val inventory = inventory
         fun add(itemStack: ItemStack?) {
-            itemStack?.itemMeta?.getAttributeModifiers(Attribute.GENERIC_ARMOR)?.sumOf {
-                it.amount
+            itemStack?.itemMeta?.attributeModifiers?.get(Attribute.GENERIC_ARMOR)?.sumOf { v ->
+                v.amount
             }?.let {
                 attribute += it
             }

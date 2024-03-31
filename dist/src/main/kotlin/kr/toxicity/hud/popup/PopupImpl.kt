@@ -152,15 +152,7 @@ class PopupImpl(
                 (++i < duration) && old()
             }
         }
-        var valueGetter: () -> Int = {
-            -1
-        }
-        index?.let {
-            val parse = it(reason)
-            valueGetter = {
-                parse(player)
-            }
-        }
+        val value = index?.invoke(reason)?.invoke(player) ?: -1
         val remove0 = {
             player.popupKeyMap.remove(key)
             Unit
@@ -174,7 +166,7 @@ class PopupImpl(
             queue,
             alwaysCheckCondition,
             mapper,
-            valueGetter,
+            value,
             cond,
             remove0
         )
@@ -190,7 +182,7 @@ class PopupImpl(
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {
-                iterator.index = index
+                iterator.priority = index
             }
         }
     }
