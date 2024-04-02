@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
@@ -11,9 +12,12 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import java.awt.AlphaComposite
 import java.awt.Font
+import java.awt.Image
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.InputStreamReader
+import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
 
@@ -27,12 +31,15 @@ object TextManager: BetterHudManager {
     private val textWidthMap = HashMap<Char, Int>()
     private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
 
+    private val defaultBitmapImageMap = HashMap<Char, BufferedImage>()
+
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
     fun setKey(shaderGroup: ShaderGroup, key: Key) {
         textKeyMap[shaderGroup] = key
     }
 
     override fun start() {
+        loadDefaultBitmap()
     }
     fun getWidth(char: Char) = textWidthMap[char] ?: 3
 
@@ -55,7 +62,7 @@ object TextManager: BetterHudManager {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
-                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.toConditions())
+                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.toConditions(), section.getBoolean("merge-default-bitmap"))
             }.onFailure { e ->
                 warn("Unable to load this text: $s in ${file.name}")
                 warn("Reason: ${e.message}")
@@ -82,7 +89,7 @@ object TextManager: BetterHudManager {
                 }
             }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
         }.deriveFont(configScale.toFloat())
-        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue)
+        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
         val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -101,11 +108,67 @@ object TextManager: BetterHudManager {
         }.save(resource.font.subFile("default.json"))
     }
 
-    private fun parseFont(s: String, saveName: String, fontFile: Font, scale: Int, imageSaveFolder: File, condition: ConditionBuilder): HudText {
+    private fun loadDefaultBitmap() {
+        defaultBitmapImageMap.clear()
+        PLUGIN.getResource("default.json")?.let {
+            runCatching {
+                InputStreamReader(it).buffered().use { reader ->
+                    JsonParser.parseReader(reader)
+                }.asJsonObject.getAsJsonArray("providers").forEachIndexed { debugIndex, element ->
+                    val obj = element.asJsonObject
+                    val imageName = (obj.getAsJsonPrimitive("file") ?: run {
+                        warn("Unable to find file name in this sector: $debugIndex")
+                        return
+                    }).asString.run {
+                        if (contains('/')) substringAfterLast('/') else this
+                    }
+                    val image = runCatching {
+                        PLUGIN.getResource(imageName)?.buffered()?.toImage() ?: run {
+                            warn("Unable to find this resource: $imageName")
+                            return
+                        }
+                    }.getOrElse { e ->
+                        warn("Unable to load this image: $imageName")
+                        warn("Reason: ${e.message}")
+                        return
+                    }
+                    val array = obj.getAsJsonArray("chars")
+                    val height = image.height / array.size()
+                    array.forEachIndexed { i1, charElement ->
+                        val str = charElement.asString
+                        val width = image.width / str.length
+                        str.forEachIndexed { i2, char ->
+                            defaultBitmapImageMap[char] = image.getSubimage(width * i2, height * i1, width, height)
+                        }
+                    }
+                }
+            }.onFailure { e ->
+                warn("Unable to parse default.json")
+                warn("Reason: ${e.message}")
+            }
+        }
+    }
+
+    private fun parseFont(s: String, saveName: String, fontFile: Font, scale: Int, imageSaveFolder: File, condition: ConditionBuilder, mergeDefaultBitmap: Boolean): HudText {
         val height = (scale.toDouble() * 1.4).toInt()
-        val pairMap = HashMap<Int, MutableList<Pair<Char, BufferedImage>>>()
+        val pairMap = HashMap<Int, MutableList<Pair<Char, Image>>>()
+        val charWidthMap = HashMap<Char, Int>()
+        if (mergeDefaultBitmap) defaultBitmapImageMap.forEach {
+            val newWidth = ((height.toDouble() / it.value.height) * it.value.width).roundToInt()
+            BufferedImage(newWidth, height, BufferedImage.TYPE_INT_ARGB).apply {
+                createGraphics().run {
+                    drawImage(it.value.getScaledInstance(newWidth, height, BufferedImage.SCALE_SMOOTH), 0, 0, null)
+                    dispose()
+                }
+            }.removeEmptyWidth()?.let { resizedImage ->
+                pairMap.getOrPut(resizedImage.image.width) {
+                    ArrayList()
+                }.add(it.key to resizedImage.image)
+                charWidthMap[it.key] = resizedImage.image.width
+            }
+        }
         (Char.MIN_VALUE..Char.MAX_VALUE).forEach { char ->
-            if (fontFile.canDisplay(char)) {
+            if (fontFile.canDisplay(char) && !charWidthMap.containsKey(char)) {
                 BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).apply {
                     createGraphics().run {
                         composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
@@ -119,6 +182,7 @@ object TextManager: BetterHudManager {
                     pairMap.getOrPut(it.image.width) {
                         ArrayList()
                     }.add(char to it.image)
+                    charWidthMap[char] = it.image.width
                 }
             }
         }
@@ -127,7 +191,7 @@ object TextManager: BetterHudManager {
         var i = 0
         pairMap.forEach {
             val width = it.key
-            fun save(list: List<Pair<Char, BufferedImage>>) {
+            fun save(list: List<Pair<Char, Image>>) {
                 val name = "${saveName}_${++i}.png"
                 val json = JsonArray()
                 BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
@@ -158,13 +222,7 @@ object TextManager: BetterHudManager {
                 }
             }
         }
-        return HudText(s, saveName, height, textList, HashMap<Char, Int>().apply {
-            pairMap.forEach { entry ->
-                entry.value.forEach { pair ->
-                    put(pair.first, entry.key)
-                }
-            }
-        }, condition)
+        return HudText(s, saveName, height, textList, charWidthMap, condition)
     }
 
     override fun end() {
