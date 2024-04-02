@@ -72,7 +72,7 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
             val name = it.getString("name").ifNull("unable to find the name value.")
             val password = it.getString("password").ifNull("unable to find the password value.")
 
-            val mysql = DriverManager.getConnection("jdbc:mysql://$host/$database?autoReconnect=true&useSSL=false", name, password).apply {
+            val mysql = DriverManager.getConnection("jdbc:mysql://$host/$database?autoReconnect=true&useSSL=false&cmaxReconnets=5&initialTimeout=1", name, password).apply {
                 createStatement().use { s ->
                     s.execute("CREATE TABLE IF NOT EXISTS enabled_hud(uuid CHAR(36) NOT NULL, type VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL);")
                 }

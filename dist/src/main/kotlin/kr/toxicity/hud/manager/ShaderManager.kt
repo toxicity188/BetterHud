@@ -91,24 +91,28 @@ object ShaderManager: BetterHudManager {
                     BarColor.valueOf(it.uppercase())
                 }.getOrNull()
             } ?: BarColor.RED
-            PLUGIN.getResource("background.png")?.buffered()?.use { input ->
-                resource.bossBar
-                    .subFolder("sprites")
-                    .subFolder("boss_bar")
-                    .subFile("${barColor.name.lowercase()}_background.png")
-                    .outputStream()
-                    .buffered()
-                    .use { output ->
-                        input.copyTo(output)
-                    }
+            fun copy(suffix: String) {
+                PLUGIN.getResource("background.png")?.buffered()?.use { input ->
+                    resource.bossBar
+                        .subFolder("sprites")
+                        .subFolder("boss_bar")
+                        .subFile("${barColor.name.lowercase()}_$suffix.png")
+                        .outputStream()
+                        .buffered()
+                        .use { output ->
+                            input.copyTo(output)
+                        }
+                }
             }
+            copy("background")
+            copy("progress")
             PLUGIN.getResource("bars.png")?.buffered()?.use { target ->
                 val oldImage = target.toImage()
                 val yAxis = 10 * barColor.ordinal
                 BufferedImage(oldImage.width, oldImage.height, BufferedImage.TYPE_INT_ARGB).apply {
                     createGraphics().run {
                         if (barColor.ordinal > 0) drawImage(oldImage.getSubimage(0, 0, oldImage.width, yAxis), 0, 0, null)
-                        drawImage(oldImage.getSubimage(0, yAxis + 5, oldImage.width, oldImage.height - yAxis - 5), 0, yAxis + 5, null)
+                        drawImage(oldImage.getSubimage(0, yAxis + 10, oldImage.width, oldImage.height - yAxis - 10), 0, yAxis + 10, null)
                         dispose()
                     }
                 }.save(File(resource.bossBar, "bars.png"))
