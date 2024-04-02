@@ -66,12 +66,10 @@ void main() {
             pos.y += yGui;
             pos.z += layer;
 
-        } else if (color == vec3(0)) {
-            vertexColor = vec4(0);
         }
     } else {
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
-//HideExp        if (ui.x >= 1 && ui.y >= 0.7 && ((more(color, exp / 256.0) && less(color , exp / 254.0)) || color == vec3(0))) {
+//HideExp        if (int(pos.z) == 0 && ProjMat[3].x == -1 && ((more(color, exp / 256.0) && less(color , exp / 254.0)) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
 //RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
