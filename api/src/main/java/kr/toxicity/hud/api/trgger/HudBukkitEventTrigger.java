@@ -14,6 +14,7 @@ public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
 
     static <E extends Event> HudBukkitEventTrigger<E> of(@NotNull Class<E> clazz, @NotNull Function<E, UUID> mapper) {
         Objects.requireNonNull(clazz);
+        Objects.requireNonNull(mapper);
         return new HudBukkitEventTrigger<>() {
             @Override
             public @NotNull Class<E> getEventClass() {
@@ -40,12 +41,12 @@ public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
             }
 
             @Override
-            public @NotNull UUID getValue(E e) {
+            public @NotNull UUID getValue(@NotNull E e) {
                 return e.getPlayer().getUniqueId();
             }
 
             @Override
-            public @NotNull UUID getKey(E e) {
+            public @NotNull UUID getKey(@NotNull E e) {
                 return UUID.randomUUID();
             }
         };

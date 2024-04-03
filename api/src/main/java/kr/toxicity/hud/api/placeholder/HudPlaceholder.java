@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -14,6 +15,7 @@ public interface HudPlaceholder<T> {
     int getRequiredArgsLength();
 
     static <T> @NotNull HudPlaceholder<T> of(@NotNull BiFunction<List<String>, UpdateEvent, Function<HudPlayer, T>> biFunction) {
+        Objects.requireNonNull(biFunction);
         return new HudPlaceholder<>() {
             @Override
             public @NotNull Function<HudPlayer, T> invoke(@NotNull @Unmodifiable List<String> args, @NotNull UpdateEvent reason) {
