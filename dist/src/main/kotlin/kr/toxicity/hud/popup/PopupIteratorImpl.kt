@@ -21,7 +21,9 @@ class PopupIteratorImpl(
     private var tick = 0
     private var i = 0
     private var removal = false
+    private val id = UUID.randomUUID()
     override fun getMaxIndex(): Int = maxIndex
+    override fun getUUID(): UUID = id
 
     override fun getSortType(): PopupSortType {
         return sortType
@@ -59,11 +61,11 @@ class PopupIteratorImpl(
 
         other as PopupIteratorImpl
 
-        return i == other.i
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        return i
+        return id.hashCode()
     }
 
     override fun compareTo(other: PopupIterator): Int {

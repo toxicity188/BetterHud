@@ -108,20 +108,17 @@ class PopupImpl(
         if (!buildCondition(player)) return null
         var updater = {
         }
+        val valueMap = layouts.map {
+            it.getComponent(reason)
+        }
         val mapper: (Int, Int) -> List<WidthComponent> = if (update) {
-            layouts.map {
-                it.getComponent(reason)
-            }.let { map ->
-                { t, index ->
-                    map.map {
-                        it(player, t, index)
-                    }
+            { t, index ->
+                valueMap.map {
+                    it(player, t, index)
                 }
             }
         } else {
-            fun getValue() = layouts.map {
-                it.getComponent(reason)
-            }.map { func ->
+            fun getValue() = valueMap.map { func ->
                 { a: Int, b: Int ->
                     func(player, a, b)
                 }

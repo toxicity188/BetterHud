@@ -9,7 +9,7 @@ import java.util.*
 class PopupIteratorGroupImpl(
     private val dispose: Boolean,
 ): PopupIteratorGroup {
-    private var list = Collections.synchronizedSet(TreeSet<PopupIterator>())
+    private var list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
 
     override fun addIterator(iterator: PopupIterator) {
         if (iterator.isUnique && contains(iterator.name())) return
@@ -21,14 +21,14 @@ class PopupIteratorGroupImpl(
             if (next.markedAsRemoval()) next.remove()
             else map.add(next.index)
         }
-        val i = when (iterator.sortType) {
+        val i = if (iterator.index < 0) when (iterator.sortType) {
             PopupSortType.FIRST -> if (p >= 0) p else 0
             PopupSortType.LAST -> if (p >= 0) p else run {
                 var i = 0
                 while (map.contains(i)) i++
                 i
             }
-        }
+        } else iterator.index
         iterator.index = i
         if (map.contains(i)) {
             var t = 0
@@ -71,16 +71,18 @@ class PopupIteratorGroupImpl(
 
     override fun next(): List<WidthComponent> {
         val copy = list
-        list = Collections.synchronizedSet(TreeSet())
+        list = Collections.synchronizedSet(TreeSet(Comparator.naturalOrder()))
         val send = ArrayList<PopupIterator>()
+        val result = ArrayList<WidthComponent>()
         copy.forEach { next ->
-            if (checkCondition(next)) send.add(next)
+            if (checkCondition(next)) {
+                result.addAll(next.next())
+                send.add(next)
+            }
             else next.remove()
         }
-        val result = ArrayList<WidthComponent>()
         if (!dispose) send.forEach {
             addIterator(it)
-            if (it.index <= it.maxIndex) result.addAll(it.next())
         }
         return result
     }
