@@ -1,6 +1,7 @@
 bar-color: yellow
 
 disable-level-text: false
+disable-item-name: false
 
 hotbar:
   disable: false

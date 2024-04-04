@@ -72,6 +72,9 @@ void main() {
 //HideExp        if (int(pos.z) == 0 && ProjMat[3].x == -1 && ((more(color, exp / 256.0) && less(color , exp / 254.0)) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
+//HideItemName        if (int(pos.z) == 0 && pos.y >= ui.y - 60 && pos.y <= ui.y - 35 && ProjMat[3].x == -1 && pos.x >= 0.5 * ui.x - 100 && pos.x <= 0.5 * ui.x + 100) {
+//HideItemName            vertexColor = vec4(0);
+//HideItemName        }
 //RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
 //RemapHotBar        if (int(pos.z) == 200 && ProjMat[3].x == -1 && scr.y - pos.y <= 20) {
 //RemapHotBar            float hotbarX = 0;

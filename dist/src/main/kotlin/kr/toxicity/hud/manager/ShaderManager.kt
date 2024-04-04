@@ -119,6 +119,7 @@ object ShaderManager: BetterHudManager {
             }
 
             if (yaml.getBoolean("disable-level-text")) replaceList.add("HideExp")
+            if (yaml.getBoolean("disable-item-name")) replaceList.add("HideItemName")
 
             yaml.getConfigurationSection("hotbar")?.let {
                 if (it.getBoolean("disable")) {
