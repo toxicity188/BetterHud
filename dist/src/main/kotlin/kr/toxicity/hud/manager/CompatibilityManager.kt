@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.mmocore.MMOCoreCompatibility
+import kr.toxicity.hud.compatibility.mythiclib.MythicLibCompatibility
 import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
 import kr.toxicity.hud.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
@@ -26,6 +27,9 @@ object CompatibilityManager: BetterHudManager {
         },
         "Vault" to {
             VaultCompatibility()
+        },
+        "MythicLib" to {
+            MythicLibCompatibility()
         }
     )
 
@@ -51,6 +55,9 @@ object CompatibilityManager: BetterHudManager {
                     }
                     obj.booleans.forEach { entry ->
                         PLUGIN.placeholderManager.booleanContainer.addPlaceholder("${namespace}_${entry.key}", entry.value)
+                    }
+                    obj.triggers.forEach { entry ->
+                        PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
                 }.onFailure { e ->
                     warn("Unable to load ${it.key} support.")

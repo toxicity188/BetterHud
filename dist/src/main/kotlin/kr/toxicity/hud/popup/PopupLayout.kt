@@ -57,7 +57,7 @@ class PopupLayout(
                 if (index > map.lastIndex) {
                     EMPTY_WIDTH_COMPONENT
                 } else {
-                    val get = map[index](player)
+                    val get = map[index](player, frame)
                     get[when (layout.animation.type) {
                         LayoutAnimationType.LOOP -> frame % get.size
                         LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
@@ -71,13 +71,13 @@ class PopupLayout(
         val elements = layout.animation.location.map { location ->
             PopupElement(pair, array, location, textFolder)
         }
-        fun getComponent(reason: UpdateEvent): (HudPlayer) -> List<WidthComponent> {
+        fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> List<WidthComponent> {
             val map = elements.map {
                 it.getComponent(reason)
             }
-            return { p ->
+            return { p, f ->
                 map.map {
-                    it(p)
+                    it(p, f)
                 }
             }
         }
@@ -86,7 +86,7 @@ class PopupLayout(
         private val elementGui = pair.gui + parent.gui + globalLocation
         private val elementPixel = globalPixel + location
 
-        fun getComponent(reason: UpdateEvent): (HudPlayer) -> WidthComponent {
+        fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> WidthComponent {
             val imageProcessing = image.map {
                 it.getComponent(reason)
             }
@@ -96,10 +96,10 @@ class PopupLayout(
             val headProcessing = heads.map {
                 it.getHead(reason)
             }
-            return { player ->
+            return { player, frame ->
                 LayoutComponentContainer(layout.offset, layout.align, max)
                     .append(imageProcessing.map {
-                        it(player)
+                        it(player, frame)
                     })
                     .append(textProcessing.map {
                         it(player)

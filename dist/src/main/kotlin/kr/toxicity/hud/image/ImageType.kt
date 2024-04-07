@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
 
 enum class ImageType {
     SINGLE {
-        override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Int, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
@@ -21,26 +21,26 @@ enum class ImageType {
         }
     },
     LISTENER {
-        override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Int, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
             return if (get >= 0) list[get
                 .coerceAtLeast(0)
-                .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
+                .coerceAtMost(list.lastIndex)] else list[frame % list.size]
         }
     },
     SEQUENCE {
-        override fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Int, list: List<PixelComponent>, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * list.lastIndex).roundToInt()
             }
             return if (get >= 0) list[get
                 .coerceAtLeast(0)
-                .coerceAtMost(list.lastIndex)] else list[(player.tick % list.size).toInt()]
+                .coerceAtMost(list.lastIndex)] else list[frame % list.size]
         }
     }
     ;
 
-    abstract fun getComponent(listener: HudListener, list: List<PixelComponent>, player: HudPlayer): PixelComponent
+    abstract fun getComponent(listener: HudListener, frame: Int, list: List<PixelComponent>, player: HudPlayer): PixelComponent
 }

@@ -2,6 +2,7 @@ package kr.toxicity.hud.compatibility.vault
 
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
+import kr.toxicity.hud.api.trgger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.Compatibility
 import net.milkbowl.vault.economy.Economy
@@ -15,6 +16,8 @@ class VaultCompatibility: Compatibility {
         Bukkit.getServicesManager().getRegistration(Economy::class.java)?.provider
     }.getOrNull()
 
+    override val triggers: Map<String, (ConfigurationSection) -> HudTrigger<*>>
+        get() = mapOf()
     override val listeners: Map<String, (ConfigurationSection) -> (UpdateEvent) -> HudListener>
         get() = emptyMap()
     override val numbers: Map<String, HudPlaceholder<Number>>

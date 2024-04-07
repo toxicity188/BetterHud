@@ -28,11 +28,11 @@ class ImageRenderer(
             it
         }
     }
-    fun getComponent(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
+    fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> PixelComponent {
         val cond = conditions.build(reason)
         val listen = listener(reason)
-        return { player ->
-            if (cond(player)) type.getComponent(listen, components, player) else EMPTY_PIXEL_COMPONENT
+        return { player, frame ->
+            if (cond(player)) type.getComponent(listen, frame, components, player) else EMPTY_PIXEL_COMPONENT
         }
     }
 

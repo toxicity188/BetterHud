@@ -8,12 +8,17 @@ import io.lumine.mythic.core.skills.AbstractSkill
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.trgger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.Compatibility
+import kr.toxicity.hud.util.unwrap
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.event.entity.EntityEvent
 import java.util.function.Function
 
 class MythicMobsCompatibility: Compatibility {
+    override val triggers: Map<String, (ConfigurationSection) -> HudTrigger<*>>
+        get() = mapOf()
     override val listeners: Map<String, (ConfigurationSection) -> (UpdateEvent) -> HudListener>
         get() = mapOf(
 
@@ -58,5 +63,12 @@ class MythicMobsCompatibility: Compatibility {
                     }
                 }
             },
+            "is_mythicmob" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function {
+                        MythicBukkit.inst().mobManager.isMythicMob(e.entity)
+                    }
+                }
+            }
         )
 }
