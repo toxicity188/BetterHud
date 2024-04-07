@@ -250,6 +250,22 @@ class MMOCoreCompatibility: Compatibility {
                     }
                 }
             },
+            "casting_slot" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(
+                    args: MutableList<String>,
+                    reason: UpdateEvent
+                ): Function<HudPlayer, Number> {
+                    val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
+                    return Function { p ->
+                        var slot = api.getPlayerData(p.bukkitPlayer).boundSkills.indexOfFirst {
+                            it.skill.handler.id == skill.handler.id
+                        }
+                        if (p.bukkitPlayer.inventory.heldItemSlot <= slot) slot++
+                        slot + 1
+                    }
+                }
+            },
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
