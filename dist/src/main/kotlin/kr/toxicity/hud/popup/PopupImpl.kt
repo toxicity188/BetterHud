@@ -99,6 +99,7 @@ class PopupImpl(
         }
     }
 
+    override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? = show(reason, player, UUID.randomUUID())
     private fun show(reason: UpdateEvent, player: HudPlayer, key: Any): PopupUpdater? {
         val get = player.popupGroupIteratorMap.computeIfAbsent(group) {
@@ -156,7 +157,7 @@ class PopupImpl(
         }
         val iterator = PopupIteratorImpl(
             unique,
-            move.locations.lastIndex,
+            lastIndex,
             key,
             sortType,
             internalName,
