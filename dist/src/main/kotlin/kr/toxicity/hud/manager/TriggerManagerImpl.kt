@@ -46,7 +46,7 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
         val clazz = section.getString("class").ifNull("class value not set.")
         when (val get = map[clazz].ifNull("unable to find this trigger: $clazz")(section)) {
             is HudBukkitEventTrigger<out Event> -> {
-                Bukkit.getPluginManager().registerEvent(get.eventClass, listener, EventPriority.NORMAL, { _, e ->
+                Bukkit.getPluginManager().registerEvent(get.eventClass, listener, EventPriority.MONITOR, { _, e ->
                     if (get.eventClass.isAssignableFrom(e.javaClass)) {
                         val cast = get.eventClass.cast(e)
                         val t = (get as HudBukkitEventTrigger<Event>)
@@ -55,7 +55,7 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
                             task(wrapper, uuid)
                         }
                     }
-                }, PLUGIN)
+                }, PLUGIN, true)
             }
         }
     }
