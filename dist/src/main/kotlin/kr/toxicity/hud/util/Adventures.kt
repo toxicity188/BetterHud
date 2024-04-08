@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import kotlin.math.abs
 
 val SPACE_KEY = Key.key("$NAME_SPACE:space")
 val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
@@ -48,8 +49,20 @@ fun Int.parseChar(): String {
 }
 
 fun Int.toSpaceComponent() = toSpaceComponent(this)
-fun Int.toSpaceComponent(width: Int) = if (VERSION.version <= 18) {
-    WidthComponent(Component.text().content((this + 0xFFC00).parseChar()).font(LEGACY_SPACE_KEY), width)
-} else {
-    WidthComponent(Component.text().content((this + 0xD0000).parseChar()).font(SPACE_KEY), width)
+fun Int.toSpaceComponent(width: Int): WidthComponent {
+    val builder = Component.text()
+    return if (VERSION.version <= 18) {
+        val abs = abs(this)
+        if (abs > 256) {
+            val i = (if (this > 0) 1 else -1)
+            WidthComponent(
+                builder.font(LEGACY_SPACE_KEY)
+                    .append(Component.text(((abs / 256 + 255) * i + 0xFFC00).parseChar()))
+                    .append(Component.text(((abs % 256) * i + 0xFFC00).parseChar())),
+                width
+            )
+        } else WidthComponent(builder.font(LEGACY_SPACE_KEY).content((this + 0xFFC00).parseChar()), width)
+    } else {
+        WidthComponent(builder.font(SPACE_KEY).content((this + 0xD0000).parseChar()), width)
+    }
 }
