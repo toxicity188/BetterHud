@@ -54,12 +54,22 @@ fun Int.toSpaceComponent(width: Int) = if (VERSION.version <= 18) {
     if (abs > 256) {
         val i = if (this > 0) 1 else -1
         WidthComponent(
-            Component.text().font(LEGACY_SPACE_KEY)
-                .append(Component.text(((abs / 256 + 255) * i + 0xFFC00).parseChar()))
-                .append(Component.text(((abs % 256) * i + 0xFFC00).parseChar())),
+            Component.text()
+                .font(LEGACY_SPACE_KEY)
+                .content("${((abs / 256 + 255) * i + 0xFFC00).parseChar()}${((abs % 256) * i + 0xFFC00).parseChar()}"),
             width
         )
-    } else WidthComponent(Component.text().font(LEGACY_SPACE_KEY).content((this + 0xFFC00).parseChar()), width)
+    } else WidthComponent(
+        Component.text()
+            .font(LEGACY_SPACE_KEY)
+            .content((this + 0xFFC00).parseChar()),
+        width
+    )
 } else {
-    WidthComponent(Component.text().font(SPACE_KEY).content((this + 0xD0000).parseChar()), width)
+    WidthComponent(
+        Component.text()
+            .font(SPACE_KEY)
+            .content((this + 0xD0000).parseChar()),
+        width
+    )
 }
