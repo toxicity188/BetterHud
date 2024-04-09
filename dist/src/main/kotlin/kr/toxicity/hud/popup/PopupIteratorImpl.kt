@@ -19,7 +19,7 @@ class PopupIteratorImpl(
     private val removeTask: () -> Unit,
 ): PopupIterator {
     private var tick = 0
-    private var i = 0
+    private var i = -1
     private var removal = false
     private val id = UUID.randomUUID()
     override fun getMaxIndex(): Int = maxIndex
