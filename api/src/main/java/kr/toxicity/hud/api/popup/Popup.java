@@ -13,6 +13,13 @@ public interface Popup {
     int getMaxStack();
     boolean isDefault();
     @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer player);
+    default boolean hide(@NotNull HudPlayer player) {
+        var group = player.getPopupGroupIteratorMap().remove(getGroupName());
+        if (group != null) {
+            group.clear();
+            return true;
+        } else return false;
+    }
     default int getLastIndex() {
         return getMaxStack() - 1;
     }

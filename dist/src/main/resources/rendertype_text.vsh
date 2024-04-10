@@ -27,6 +27,16 @@ bool less(vec3 i1, vec3 i2) {
     return (i1.x <= i2.x && i1.y <= i2.y && i1.z <= i2.z);
 }
 
+float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
+    if (shape == 0) {
+        return length((modelViewMat * vec4(pos, 1.0)).xyz);
+    } else {
+        float distXZ = length((modelViewMat * vec4(pos.x, 0.0, pos.z, 1.0)).xyz);
+        float distY = length((modelViewMat * vec4(0.0, pos.y, 0.0, 1.0)).xyz);
+        return max(distXZ, distY);
+    }
+}
+
 void main() {
 
     vec3 pos = Position;
@@ -34,7 +44,7 @@ void main() {
     float scale = round((ProjMat[0][0] / 2.0) / (1.0 / ScreenSize.x));
     vec2 ui = ScreenSize / scale;
 
-    vertexDistance = fog_distance(ModelViewMat, pos, FogShape);
+    vertexDistance = getDistance(ModelViewMat, pos, FogShape);
     texCoord0 = UV0;
 
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
