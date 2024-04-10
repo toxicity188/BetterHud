@@ -3,13 +3,15 @@ package kr.toxicity.hud.manager
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
+import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.key.Key
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.Image
@@ -29,12 +31,12 @@ object TextManager: BetterHudManager {
     private val textMap = HashMap<String, HudText>()
 
     private val textWidthMap = HashMap<Char, Int>()
-    private val textKeyMap = mutableMapOf<ShaderGroup, Key>()
+    private val textKeyMap = mutableMapOf<ShaderGroup, HudTextData>()
 
     private val defaultBitmapImageMap = HashMap<Char, BufferedImage>()
 
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
-    fun setKey(shaderGroup: ShaderGroup, key: Key) {
+    fun setKey(shaderGroup: ShaderGroup, key: HudTextData) {
         textKeyMap[shaderGroup] = key
     }
 
@@ -49,6 +51,7 @@ object TextManager: BetterHudManager {
         textMap.clear()
         textWidthMap.clear()
         textKeyMap.clear()
+        val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
         val globalSaveFolder = resource.textures.subFolder("text")
         DATA_FOLDER.subFolder("texts").forEachAllYaml { file, s, section ->
@@ -62,7 +65,21 @@ object TextManager: BetterHudManager {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
-                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, section.toConditions(), section.getBoolean("merge-default-bitmap"))
+                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
+                    section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
+                        put(key, LocatedImage(
+                            File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
+                                .ifNotExist("this image doesn't exist: $key")
+                                .toImage()
+                                .removeEmptyWidth()
+                                .ifNull("invalid image: $key"),
+                            ImageLocation(configurationSection),
+                            configurationSection.getDouble("scale", 1.0).apply {
+                                if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
+                            }
+                        ))
+                    }
+                }, section.toConditions(), section.getBoolean("merge-default-bitmap"))
             }.onFailure { e ->
                 warn("Unable to load this text: $s in ${file.name}")
                 warn("Reason: ${e.message}")
@@ -89,7 +106,7 @@ object TextManager: BetterHudManager {
                 }
             }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
         }.deriveFont(configScale.toFloat())
-        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
         val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -149,7 +166,16 @@ object TextManager: BetterHudManager {
         }
     }
 
-    private fun parseFont(s: String, saveName: String, fontFile: Font, scale: Int, imageSaveFolder: File, condition: ConditionBuilder, mergeDefaultBitmap: Boolean): HudText {
+    private fun parseFont(
+        s: String,
+        saveName: String,
+        fontFile: Font,
+        scale: Int,
+        imageSaveFolder: File,
+        images: Map<String, LocatedImage>,
+        condition: ConditionBuilder,
+        mergeDefaultBitmap: Boolean
+    ): HudText {
         val height = (scale.toDouble() * 1.4).toInt()
         val pairMap = HashMap<Int, MutableList<Pair<Char, Image>>>()
         val charWidthMap = HashMap<Char, Int>()
@@ -189,6 +215,9 @@ object TextManager: BetterHudManager {
         val textList = ArrayList<HudTextArray>()
         val saveFolder = imageSaveFolder.subFolder(saveName)
         var i = 0
+        images.forEach {
+            it.value.image.image.save(File(saveFolder, "image_${it.key}.png"))
+        }
         pairMap.forEach {
             val width = it.key
             fun save(list: List<Pair<Char, Image>>) {
@@ -222,7 +251,7 @@ object TextManager: BetterHudManager {
                 }
             }
         }
-        return HudText(s, saveName, height, textList, charWidthMap, condition)
+        return HudText(s, saveName, height, textList, images, charWidthMap, condition)
     }
 
     override fun end() {

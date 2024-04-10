@@ -9,7 +9,9 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.LocationGroup
+import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
@@ -19,10 +21,12 @@ import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
+import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.io.File
+import kotlin.math.roundToInt
 
 class PopupLayout(
     private val layout: LayoutGroup,
@@ -186,21 +190,74 @@ class PopupLayout(
                         })
                     })
                 }
+                val bit = HudImpl.createBit(pixel.y, textShader)
                 textLayout.text.array.forEach {
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE:text/${textLayout.text.fontName}/${it.file}")
-                        addProperty("ascent", HudImpl.createBit(pixel.y, textShader))
+                        addProperty("ascent", bit)
                         addProperty("height", scale)
                         add("chars", it.chars)
                     })
                 }
+                var textIndex = 0xC0000
+                val imageMap = HashMap<String, WidthComponent>()
+                val key = Key.key("$NAME_SPACE:popup/${parent.internalName}/$name/text/text_${index}")
+                textLayout.text.images.forEach {
+                    val result = (textIndex++).parseChar()
+                    val imageScale = it.value.scale * textLayout.scale
+                    val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
+                    val div = height.toDouble() / it.value.image.image.height
+                    array.add(JsonObject().apply {
+                        addProperty("type", "bitmap")
+                        addProperty("file", "$NAME_SPACE:text/${textLayout.text.fontName}/image_${it.key}.png")
+                        addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, textShader))
+                        addProperty("height", height)
+                        add("chars", JsonArray().apply {
+                            add(result)
+                        })
+                    })
+                    imageMap[it.key] = it.value.location.x.toSpaceComponent() + WidthComponent(Component.text()
+                        .font(key)
+                        .content(result)
+                        .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (it.value.image.image.width.toDouble() * div).roundToInt())
+                }
+                val result = HudTextData(
+                    key,
+                    imageMap,
+                    textLayout.background?.let {
+                        val y = HudImpl.createBit(pixel.y + it.location.y, HudShader(
+                            elementGui,
+                            textLayout.layer - 1,
+                            false
+                        ))
+                        fun getString(image: LoadedImage, file: String): WidthComponent {
+                            val result = (textIndex++).parseChar()
+                            val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
+                            val div = height.toDouble() / image.image.height
+                            array.add(JsonObject().apply {
+                                addProperty("type", "bitmap")
+                                addProperty("file", "$NAME_SPACE:background/${it.name}/$file.png")
+                                addProperty("ascent", y)
+                                addProperty("height", height)
+                                add("chars", JsonArray().apply {
+                                    add(result)
+                                })
+                            })
+                            return it.location.x.toSpaceComponent() + WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                        }
+                        BackgroundLayout(
+                            getString(it.left, "left"),
+                            getString(it.right, "right"),
+                            getString(it.body, "body")
+                        )
+                    }
+                )
                 JsonObject().apply {
                     add("providers", array)
                 }.save(File(textFolder, "text_${index}.json"))
-                val key = Key.key("$NAME_SPACE:popup/${parent.internalName}/$name/text/text_${index}")
-                TextManager.setKey(group, key)
-                key
+                TextManager.setKey(group, result)
+                result
             }
             TextRenderer(
                 textLayout.text.charWidth,

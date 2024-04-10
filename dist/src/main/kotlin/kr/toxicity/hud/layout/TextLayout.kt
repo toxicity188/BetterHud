@@ -1,5 +1,6 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.placeholder.ConditionBuilder
@@ -20,5 +21,7 @@ class TextLayout(
     val deserializeText: Boolean,
     val numberEquation: TEquation,
     val numberFormat: DecimalFormat,
+    val background: HudBackground?,
+    val backgroundScale: Double,
     val conditions: ConditionBuilder
 )

@@ -117,6 +117,7 @@ class BetterHudImpl: BetterHud() {
         PlaceholderManagerImpl,
         TriggerManagerImpl,
 
+        BackgroundManager,
         ImageManager,
         TextManager,
         PlayerHeadManager,
@@ -238,6 +239,7 @@ class BetterHudImpl: BetterHud() {
         managers.forEach {
             it.end()
         }
+        DatabaseManagerImpl.currentDatabase.close()
         info("Plugin disabled.")
     }
 

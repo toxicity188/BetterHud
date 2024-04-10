@@ -8,8 +8,8 @@ import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 class TextRenderer(
     private val widthMap: Map<Char, Int>,
     private val defaultColor: TextColor,
-    private val key: Key,
+    private val data: HudTextData,
     pattern: String,
     private val align: LayoutAlign,
     private val scale: Double,
@@ -85,9 +85,6 @@ class TextRenderer(
             }
             addDecoration(listOf("bold", "b"), TextDecoration.BOLD)
             addDecoration(listOf("italic", "em", "i"), TextDecoration.ITALIC)
-            addDecoration(listOf("underlined", "u"), TextDecoration.UNDERLINED)
-            addDecoration(listOf("strikethrough", "st"), TextDecoration.STRIKETHROUGH)
-            addDecoration(listOf("obfuscated", "obf"), TextDecoration.OBFUSCATED)
         }
     }
 
@@ -113,7 +110,11 @@ class TextRenderer(
         for ((i, componentFormat) in format.withIndex()) {
             val t = i + 1
             if (t > strings.lastIndex) break
-            getFormat(componentFormat.name)?.let {
+            if (componentFormat.name == "image" && componentFormat.args.isNotEmpty()) {
+                data.images[componentFormat.args[0]]?.let {
+                    strings[t].images.add(it)
+                }
+            } else getFormat(componentFormat.name)?.let {
                 strings.subList(t, strings.size).forEach { str ->
                     it(componentFormat.args, str)
                 }
@@ -135,13 +136,15 @@ class TextRenderer(
         var decoration = EnumMap(TextDecoration.entries.associateWith {
             TextDecoration.State.FALSE
         })
+        val images = ArrayList<WidthComponent>()
 
         fun build() = ComponentStyle(
             PlaceholderManagerImpl.parse(pattern),
+            images,
             Style.style()
                 .color(color)
                 .decorations(decoration)
-                .font(key)
+                .font(data.word)
                 .build(),
             run {
                 var i = 1
@@ -153,10 +156,11 @@ class TextRenderer(
 
         fun buildRaw() = RawComponentStyle(
             pattern,
+            images,
             Style.style()
                 .decorations(decoration)
                 .color(color)
-                .font(key)
+                .font(data.word)
                 .build(),
             run {
                 var i = 1
@@ -168,22 +172,26 @@ class TextRenderer(
     }
     private class ComponentStyle(
         val pattern: (UpdateEvent) -> (HudPlayer) -> String,
+        val images: List<WidthComponent>,
         val style: Style,
         val multiply: Int
     ) {
         fun map(updateEvent: UpdateEvent) = MappedComponentStyle(
             pattern(updateEvent),
+            images,
             style,
             multiply
         )
     }
     private class MappedComponentStyle(
         val value: (HudPlayer) -> String,
+        val images: List<WidthComponent>,
         val style: Style,
         val multiply: Int
     )
     private class RawComponentStyle(
         val value: String,
+        val images: List<WidthComponent>,
         val style: Style,
         val multiply: Int
     )
@@ -199,7 +207,10 @@ class TextRenderer(
             if (!cond(player)) return@build EMPTY_PIXEL_COMPONENT
             var comp = EMPTY_WIDTH_COMPONENT
 
-            fun applyString(targetString: String, style: Style, multiply: Int) {
+            fun applyString(targetString: String, style: Style, multiply: Int, images: List<WidthComponent>) {
+                images.forEach {
+                    comp += it
+                }
                 var original = targetString
                 if (original == "") return
                 val matcher = decimalPattern.matcher(original)
@@ -233,9 +244,20 @@ class TextRenderer(
                     parseStyle(target) {
                         it.buildRaw()
                     }.forEach {
-                        applyString(it.value, it.style, it.multiply)
+                        applyString(it.value, it.style, it.multiply, it.images)
                     }
-                } else applyString(target, mappedComponentStyle.style, mappedComponentStyle.multiply)
+                } else applyString(target, mappedComponentStyle.style, mappedComponentStyle.multiply, mappedComponentStyle.images)
+            }
+            data.background?.let {
+                val builder = Component.text().append(it.left.component)
+                var length = 0
+                while (length < comp.width) {
+                    builder.append(it.body.component)
+                    length += it.body.width
+                }
+                val total = it.left.width + length + it.right.width
+                val minus = -total + (length - comp.width) / 2 + it.left.width
+                comp = WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + comp
             }
             comp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x

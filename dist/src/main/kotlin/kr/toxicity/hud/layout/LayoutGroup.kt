@@ -3,10 +3,7 @@ package kr.toxicity.hud.layout
 import kr.toxicity.hud.equation.AnimationLocation
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.manager.ConfigManager
-import kr.toxicity.hud.manager.ImageManager
-import kr.toxicity.hud.manager.PlayerHeadManager
-import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.configuration.ConfigurationSection
@@ -46,6 +43,7 @@ class LayoutGroup(section: ConfigurationSection) {
     }
     val text: List<TextLayout> = ArrayList<TextLayout>().apply {
         section.getConfigurationSection("texts")?.forEachSubConfiguration { s, configurationSection ->
+            val scale = configurationSection.getDouble("scale", 1.0)
             add(
                 TextLayout(
                     configurationSection.getString("pattern").ifNull("pattern value not set: $s"),
@@ -53,7 +51,7 @@ class LayoutGroup(section: ConfigurationSection) {
                         TextManager.getText(n).ifNull("this text doesn't exist: $n")
                     },
                     ImageLocation(configurationSection) + loc,
-                    configurationSection.getDouble("scale", 1.0),
+                    scale,
                     configurationSection.getInt("space", 2).coerceAtLeast(0),
                     configurationSection.getString("align").toLayoutAlign(),
                     configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
@@ -66,6 +64,10 @@ class LayoutGroup(section: ConfigurationSection) {
                     configurationSection.getString("number-format")?.let {
                         DecimalFormat(it)
                     } ?: ConfigManager.numberFormat,
+                    configurationSection.getString("background")?.let {
+                        BackgroundManager.getBackground(it)
+                    },
+                    configurationSection.getDouble("background-scale", scale),
                     configurationSection.toConditions()
                 )
             )

@@ -162,6 +162,5 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
     }
 
     override fun end() {
-        current.close()
     }
 }
