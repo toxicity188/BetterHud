@@ -2,7 +2,6 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.NamedLoadedImage
-import java.awt.AlphaComposite
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.File
