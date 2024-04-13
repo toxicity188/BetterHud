@@ -15,7 +15,6 @@ import kr.toxicity.hud.util.*
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.Image
-import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
@@ -24,9 +23,6 @@ import kotlin.math.roundToInt
 object TextManager: BetterHudManager {
 
     private const val CHAR_LENGTH = 16
-
-    private val antialiasing = RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
-    private val fractionalMetrics = RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON)
 
     private val textMap = HashMap<String, HudText>()
 
@@ -154,8 +150,9 @@ object TextManager: BetterHudManager {
                     array.forEachIndexed { i1, charElement ->
                         val str = charElement.asString
                         val width = image.width / str.length
-                        str.forEachIndexed { i2, char ->
-                            defaultBitmapImageMap[char] = image.getSubimage(width * i2, height * i1, width, height)
+                        var i2 = 0
+                        str.codePoints().forEach { char ->
+                            defaultBitmapImageMap[char.toChar()] = image.getSubimage(width * (i2++), height * i1, width, height)
                         }
                     }
                 }
@@ -186,30 +183,20 @@ object TextManager: BetterHudManager {
                     drawImage(it.value.getScaledInstance(newWidth, height, BufferedImage.SCALE_SMOOTH), 0, 0, null)
                     dispose()
                 }
-            }.removeEmptyWidth()?.let { resizedImage ->
-                pairMap.getOrPut(resizedImage.image.width) {
+            }.fontSubImage()?.let { resizedImage ->
+                pairMap.getOrPut(resizedImage.width) {
                     ArrayList()
-                }.add(it.key to resizedImage.image)
-                charWidthMap[it.key] = resizedImage.image.width
+                }.add(it.key to resizedImage)
+                charWidthMap[it.key] = resizedImage.width
             }
         }
         (Char.MIN_VALUE..Char.MAX_VALUE).forEach { char ->
             if (fontFile.canDisplay(char) && !charWidthMap.containsKey(char)) {
-                BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).apply {
-                    createGraphics().run {
-                        composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                        font = fontFile
-                        renderingHints.add(antialiasing)
-                        renderingHints.add(fractionalMetrics)
-                        drawString(char.toString(), 0, scale)
-                        dispose()
-                    }
-                }.removeEmptyWidth()?.let {
-                    pairMap.getOrPut(it.image.width) {
-                        ArrayList()
-                    }.add(char to it.image)
-                    charWidthMap[char] = it.image.width
-                }
+                val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEach
+                pairMap.getOrPut(image.width) {
+                    ArrayList()
+                }.add(char to image)
+                charWidthMap[char] = image.width
             }
         }
         val textList = ArrayList<HudTextArray>()
@@ -226,8 +213,6 @@ object TextManager: BetterHudManager {
                 BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                     createGraphics().run {
                         composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                        renderingHints.add(antialiasing)
-                        renderingHints.add(fractionalMetrics)
                         list.forEachIndexed { index, pair ->
                             drawImage(pair.second, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
                         }

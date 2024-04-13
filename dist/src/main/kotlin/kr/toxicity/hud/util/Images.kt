@@ -2,6 +2,8 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.NamedLoadedImage
+import java.awt.Font
+import java.awt.font.FontRenderContext
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.File
@@ -44,6 +46,47 @@ fun BufferedImage.removeEmptyWidth(): LoadedImage? {
         0
     )
 }
+
+private val FRC = FontRenderContext(null, true, true)
+
+fun BufferedImage.processFont(char: Char, font: Font): BufferedImage? {
+    createGraphics().run {
+        drawGlyphVector(font.createGlyphVector(FRC, char.toString()), 0F, font.size.toFloat())
+        dispose()
+    }
+
+    return fontSubImage()
+}
+
+fun BufferedImage.fontSubImage(sampling: Int = 96): BufferedImage? {
+    var widthA = 0
+    var widthB = width
+
+    createGraphics().run {
+        for (i1 in 0..<width) {
+            for (i2 in 0..<height) {
+                val rgb = getRGB(i1, i2)
+                val alpha = (rgb and -0x1000000) ushr 24
+                if (alpha > sampling) {
+                    setRGB(i1, i2, (255 shl 24) + 0xFFFFFF)
+                } else {
+                    setRGB(i1, i2, 0)
+                    continue
+                }
+                if (widthA < i1) widthA = i1
+                if (widthB > i1) widthB = i1
+            }
+        }
+        dispose()
+    }
+
+    val finalWidth = widthA - widthB + 1
+
+    if (finalWidth <= 0) return null
+
+    return getSubimage(widthB, 0, finalWidth, height)
+}
+
 fun BufferedImage.removeEmptySide(): LoadedImage? {
     var heightA = 0
     var heightB = height

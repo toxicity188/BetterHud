@@ -30,7 +30,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    compileOnly("com.github.SkriptLang:Skript:2.8.3")
+    compileOnly("com.github.SkriptLang:Skript:2.8.4")
 }
 
 tasks.processResources {
