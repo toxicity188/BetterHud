@@ -97,9 +97,10 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
                                 add(result)
                             })
                         })
-                        return it.location.x.toSpaceComponent() + WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                        return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
                     }
                     BackgroundLayout(
+                        it.location.x,
                         getString(it.left, "left"),
                         getString(it.right, "right"),
                         getString(it.body, "body")

@@ -256,8 +256,8 @@ class TextRenderer(
                     length += it.body.width
                 }
                 val total = it.left.width + length + it.right.width
-                val minus = -total + (length - comp.width) / 2 + it.left.width
-                comp = WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + comp
+                val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
+                comp = it.x.toSpaceComponent() + WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + comp
             }
             comp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
