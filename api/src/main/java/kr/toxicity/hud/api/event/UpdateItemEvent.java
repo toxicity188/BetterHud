@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Player's inventory change event.
+ */
 public class UpdateItemEvent extends PlayerEvent implements BetterHudEvent {
     @Getter
     private final @NotNull ItemStack itemStack;

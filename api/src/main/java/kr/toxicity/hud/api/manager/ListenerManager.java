@@ -7,6 +7,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
+/**
+ * Represents listener manager.
+ */
 public interface ListenerManager {
+    /**
+     * Adds listener builder.
+     * @param name listener name
+     * @param listenerFunction builder
+     */
     void addListener(@NotNull String name, @NotNull Function<ConfigurationSection, Function<UpdateEvent, HudListener>> listenerFunction);
 }

@@ -3,6 +3,9 @@ package kr.toxicity.hud.api.nms;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Represents server's version.
+ */
 @RequiredArgsConstructor
 @Getter
 public enum NMSVersion {
@@ -16,7 +19,16 @@ public enum NMSVersion {
     V1_20_R2(20,2, 18),
     V1_20_R3(20,3, 22)
     ;
+    /**
+     * Main version.
+     */
     private final int version;
+    /**
+     * Sub version.
+     */
     private final int subVersion;
+    /**
+     * That client version's resource pack mcmeta version.
+     */
     private final int metaVersion;
 }

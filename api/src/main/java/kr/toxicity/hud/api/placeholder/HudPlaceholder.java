@@ -10,10 +10,31 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * Represents placeholder
+ * @param <T> reture value's type
+ */
 public interface HudPlaceholder<T> {
+    /**
+     * Creates new function from given args.
+     * @param args args
+     * @param reason event
+     * @throws RuntimeException if given args or reason is invalid.
+     * @return function
+     */
     @NotNull Function<HudPlayer, T> invoke(@NotNull @Unmodifiable List<String> args, @NotNull UpdateEvent reason);
+    /**
+     * Gets a length of required args.
+     * @return
+     */
     int getRequiredArgsLength();
 
+    /**
+     * Creates new placeholder by function.
+     * @param biFunction builder
+     * @return an instance of placeholder.
+     * @param <T> return value's type.
+     */
     static <T> @NotNull HudPlaceholder<T> of(@NotNull BiFunction<List<String>, UpdateEvent, Function<HudPlayer, T>> biFunction) {
         Objects.requireNonNull(biFunction);
         return new HudPlaceholder<>() {

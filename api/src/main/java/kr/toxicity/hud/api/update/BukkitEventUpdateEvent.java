@@ -5,6 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Represents wrapped event of bukkit
+ * @param event original event
+ * @param key event's key
+ */
 public record BukkitEventUpdateEvent(@NotNull Event event, @NotNull Object key) implements UpdateEvent {
     @Override
     public @NotNull UpdateReason getType() {

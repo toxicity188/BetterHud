@@ -7,5 +7,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.List;
 
 public interface HudPlayerHead {
+    /**
+     * Gets loaded player's head colors.
+     * @return head colors
+     */
     @NotNull @Unmodifiable List<TextColor> getColors();
 }

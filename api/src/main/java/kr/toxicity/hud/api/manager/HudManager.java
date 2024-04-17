@@ -7,8 +7,26 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Set;
 
+/**
+ * Represents hud manager.
+ */
 public interface HudManager {
+    /**
+     * Gets hud by given name.
+     * @param name id.
+     * @return hud or null
+     */
     @Nullable Hud getHud(@NotNull String name);
+
+    /**
+     * Gets all hud's name.
+     * @return all name of hud
+     */
     @NotNull @Unmodifiable Set<String> getAllNames();
+
+    /**
+     * Gets all default hud.
+     * @return default hud
+     */
     @NotNull @Unmodifiable Set<Hud> getDefaultHuds();
 }

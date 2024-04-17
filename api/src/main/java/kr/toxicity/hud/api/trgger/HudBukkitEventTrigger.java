@@ -9,9 +9,24 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
+/**
+ * Represents the wrapped bukkit event.
+ * @param <T> event type
+ */
 public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
+    /**
+     * Returns the type.
+     * @return event type
+     */
     @NotNull Class<T> getEventClass();
 
+    /**
+     * Creates new wrapped trigger.
+     * @param clazz event class
+     * @param mapper mapper
+     * @return trigger
+     * @param <E> event type
+     */
     static <E extends Event> HudBukkitEventTrigger<E> of(@NotNull Class<E> clazz, @NotNull Function<E, UUID> mapper) {
         Objects.requireNonNull(clazz);
         Objects.requireNonNull(mapper);
@@ -32,6 +47,12 @@ public interface HudBukkitEventTrigger<T extends Event> extends HudTrigger<T> {
             }
         };
     }
+    /**
+     * Creates new wrapped trigger.
+     * @param clazz event class
+     * @return trigger
+     * @param <E> event type
+     */
     static <E extends PlayerEvent> HudBukkitEventTrigger<E> of(@NotNull Class<E> clazz) {
         Objects.requireNonNull(clazz);
         return new HudBukkitEventTrigger<>() {

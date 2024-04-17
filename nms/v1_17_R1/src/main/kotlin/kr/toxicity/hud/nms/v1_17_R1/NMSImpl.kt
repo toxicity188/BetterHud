@@ -14,6 +14,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.network.Connection
@@ -236,7 +237,7 @@ class NMSImpl: NMS {
                     val comp = toAdventure(targetBuf.readComponent())
                     val key = Key.key("$INJECT_NAME:default")
                     fun applyFont(component: Component): Component {
-                        return component.font(key).children(component.children().map {
+                        return component.style(component.style().font(key)).children(component.children().map {
                             applyFont(it)
                         })
                     }

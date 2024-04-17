@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Custom popup event.
+ */
 @Getter
 public class CustomPopupEvent extends PlayerEvent implements BetterHudEvent {
     private final String name;

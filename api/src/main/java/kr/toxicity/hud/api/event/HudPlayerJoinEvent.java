@@ -7,6 +7,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Player's user data load event.
+ */
 @Getter
 public class HudPlayerJoinEvent extends PlayerEvent implements BetterHudEvent {
     private final @NotNull HudPlayer hudPlayer;

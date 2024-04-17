@@ -6,7 +6,7 @@ object PackGenerator {
     private val tasks = ArrayList<() -> Unit>()
 
     fun generate(callback: () -> Unit) {
-        tasks.forEachAsync({ i, t ->
+        tasks.forEachAsync({ _, t ->
             t()
         }) {
             callback()

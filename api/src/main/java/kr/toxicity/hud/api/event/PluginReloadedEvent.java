@@ -7,6 +7,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Plugin reloaded event.
+ */
 @RequiredArgsConstructor
 @Getter
 public class PluginReloadedEvent extends Event implements BetterHudEvent {

@@ -7,8 +7,26 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Set;
 
+/**
+ * Represents popup manager.
+ */
 public interface PopupManager {
+    /**
+     * Gets popup by given name.
+     * @param name id
+     * @return popup or null
+     */
     @Nullable Popup getPopup(@NotNull String name);
+
+    /**
+     * Gets all name of popup.
+     * @return names
+     */
     @NotNull @Unmodifiable Set<String> getAllNames();
+
+    /**
+     * Gets all default popup.
+     * @return default popups
+     */
     @NotNull @Unmodifiable Set<Popup> getDefaultPopups();
 }
