@@ -1,7 +1,11 @@
 package kr.toxicity.hud.resource
 
 import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ShaderManager
 import kr.toxicity.hud.util.*
+import org.bukkit.Bukkit
+import org.bukkit.boss.BarColor
+import org.bukkit.boss.BarStyle
 
 class GlobalResource {
     private val accept = DATA_FOLDER.parentFile.subFolder(ConfigManager.buildFolderLocation).let {

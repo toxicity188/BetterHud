@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.image.*
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
@@ -18,11 +19,11 @@ object ImageManager: BetterHudManager {
 
 
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
 
         imageMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYaml { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ _, file, s, configurationSection ->
             runCatching {
                 imageMap[s] = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
                     ImageType.SINGLE -> {
@@ -60,7 +61,7 @@ object ImageManager: BetterHudManager {
                             s,
                             configurationSection.getStringList("files").ifEmpty {
                                 warn("files is empty.")
-                                return@forEachAllYaml
+                                return@forEachAllYamlAsync
                             }.mapIndexed { index, string ->
                                 File(assets, string)
                                     .toImage()
@@ -77,17 +78,23 @@ object ImageManager: BetterHudManager {
                 warn("Unable to load this image: $s in ${file.name}")
                 warn("Reason: ${e.message}")
             }
-        }
-        val saveLocation = resource.textures.subFolder("image")
-        imageMap.values.forEach { value ->
-            val list = value.image
-            if (list.isNotEmpty()) {
-                val imageSaveLocation = if (list.size == 1) saveLocation else saveLocation.subFolder(value.name)
-                list.forEach {
-                    val file = File(imageSaveLocation, it.name)
-                    if (!file.exists()) it.image.image.save(file)
+        }) {
+            val saveLocation = resource.textures.subFolder("image")
+            imageMap.values.forEach { value ->
+                val list = value.image
+                if (list.isNotEmpty()) {
+                    val imageSaveLocation = if (list.size == 1) saveLocation else saveLocation.subFolder(value.name)
+                    list.forEach {
+                        val file = File(imageSaveLocation, it.name)
+                        if (!file.exists()) {
+                            PackGenerator.addTask {
+                                it.image.image.save(file)
+                            }
+                        }
+                    }
                 }
             }
+            callback()
         }
     }
 

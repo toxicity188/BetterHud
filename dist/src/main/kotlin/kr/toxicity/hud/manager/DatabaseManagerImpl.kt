@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
 import java.sql.DriverManager
+import java.util.concurrent.CompletableFuture
 
 object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
     private val defaultConnector = HudDatabaseConnector {
@@ -144,21 +145,23 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
 
     override fun getCurrentDatabase(): HudDatabase = current
 
-    override fun reload(resource: GlobalResource) {
-        runCatching {
-            current.close()
-            val db = File(DATA_FOLDER, "database.yml").apply {
-                if (!exists()) PLUGIN.saveResource("database.yml", false)
-            }.toYaml()
-            val type = db.getString("type").ifNull("type value not set.")
-            val info = db.getConfigurationSection("info").ifNull("info configuration not set.")
-            current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
-        }.onFailure { e ->
-            current = defaultConnector.connect(MemoryConfiguration())
-            warn("Unable to connect the database.")
-            warn("Reason: ${e.message}")
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+        CompletableFuture.runAsync {
+            runCatching {
+                current.close()
+                val db = File(DATA_FOLDER, "database.yml").apply {
+                    if (!exists()) PLUGIN.saveResource("database.yml", false)
+                }.toYaml()
+                val type = db.getString("type").ifNull("type value not set.")
+                val info = db.getConfigurationSection("info").ifNull("info configuration not set.")
+                current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
+            }.onFailure { e ->
+                current = defaultConnector.connect(MemoryConfiguration())
+                warn("Unable to connect the database.")
+                warn("Reason: ${e.message}")
+            }
+            callback()
         }
-
     }
 
     override fun end() {

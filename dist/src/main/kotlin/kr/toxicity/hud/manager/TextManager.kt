@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocatedImage
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
@@ -43,14 +44,14 @@ object TextManager: BetterHudManager {
 
     fun getText(name: String) = textMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         textMap.clear()
         textWidthMap.clear()
         textKeyMap.clear()
         val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
         val globalSaveFolder = resource.textures.subFolder("text")
-        DATA_FOLDER.subFolder("texts").forEachAllYaml { file, s, section ->
+        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ _, file, s, section ->
             runCatching {
                 val fontDir = section.getString("file")
                 val scale = section.getInt("scale")
@@ -80,45 +81,49 @@ object TextManager: BetterHudManager {
                 warn("Unable to load this text: $s in ${file.name}")
                 warn("Reason: ${e.message}")
             }
-        }
-        val defaultArray = JsonArray().apply {
-            add(JsonObject().apply {
-                addProperty("type", "space")
-                add("advances", JsonObject().apply {
-                    addProperty(" ", 4)
+        }) {
+            val defaultArray = JsonArray().apply {
+                add(JsonObject().apply {
+                    addProperty("type", "space")
+                    add("advances", JsonObject().apply {
+                        addProperty(" ", 4)
+                    })
                 })
-            })
+            }
+            val fontConfig = File(DATA_FOLDER, "font.yml").apply {
+                if (!exists()) PLUGIN.saveResource("font.yml", false)
+            }.toYaml()
+            val configScale = fontConfig.getInt("scale", 16)
+            val configHeight = fontConfig.getInt("height", 9)
+            val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
+            val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
+                (if (exists()) runCatching {
+                    inputStream().buffered().use {
+                        Font.createFont(Font.TRUETYPE_FONT, it)
+                    }
+                }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
+            }.deriveFont(configScale.toFloat())
+            val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+            val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
+            parseDefault.charWidth.forEach {
+                textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
+            }
+            parseDefault.array.forEach {
+                defaultArray.add(JsonObject().apply {
+                    addProperty("type", "bitmap")
+                    addProperty("file", "$NAME_SPACE:font/default/${it.file}")
+                    addProperty("ascent", configAscent)
+                    addProperty("height", configHeight)
+                    add("chars", it.chars)
+                })
+            }
+            PackGenerator.addTask {
+                JsonObject().apply {
+                    add("providers", defaultArray)
+                }.save(resource.font.subFile("default.json"))
+            }
+            callback()
         }
-        val fontConfig = File(DATA_FOLDER, "font.yml").apply {
-            if (!exists()) PLUGIN.saveResource("font.yml", false)
-        }.toYaml()
-        val configScale = fontConfig.getInt("scale", 16)
-        val configHeight = fontConfig.getInt("height", 9)
-        val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
-        val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
-            (if (exists()) runCatching {
-                inputStream().buffered().use {
-                    Font.createFont(Font.TRUETYPE_FONT, it)
-                }
-            }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
-        }.deriveFont(configScale.toFloat())
-        val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
-        val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
-        parseDefault.charWidth.forEach {
-            textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
-        }
-        parseDefault.array.forEach {
-            defaultArray.add(JsonObject().apply {
-                addProperty("type", "bitmap")
-                addProperty("file", "$NAME_SPACE:font/default/${it.file}")
-                addProperty("ascent", configAscent)
-                addProperty("height", configHeight)
-                add("chars", it.chars)
-            })
-        }
-        JsonObject().apply {
-            add("providers", defaultArray)
-        }.save(resource.font.subFile("default.json"))
     }
 
     private fun loadDefaultBitmap() {
@@ -210,20 +215,22 @@ object TextManager: BetterHudManager {
             fun save(list: List<Pair<Char, Image>>) {
                 val name = "${saveName}_${++i}.png"
                 val json = JsonArray()
-                BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
-                    createGraphics().run {
-                        composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                        list.forEachIndexed { index, pair ->
-                            drawImage(pair.second, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
+                list.split(CHAR_LENGTH).forEach { subList ->
+                    json.add(subList.map { pair ->
+                        pair.first
+                    }.joinToString(""))
+                }
+                PackGenerator.addTask {
+                    BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
+                        createGraphics().run {
+                            composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
+                            list.forEachIndexed { index, pair ->
+                                drawImage(pair.second, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
+                            }
+                            dispose()
                         }
-                        list.split(CHAR_LENGTH).forEach { subList ->
-                            json.add(subList.map { pair ->
-                                pair.first
-                            }.joinToString(""))
-                        }
-                        dispose()
-                    }
-                }.save(File(saveFolder, name))
+                    }.save(File(saveFolder, name))
+                }
                 textList.add(HudTextArray(name, json))
             }
             it.value.split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->

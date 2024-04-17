@@ -15,6 +15,7 @@ import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
@@ -46,9 +47,11 @@ class PopupLayout(
         val map = map { location ->
             PopupLayoutGroup(location, json, textFolder)
         }
-        JsonObject().apply {
-            add("providers", json)
-        }.save(File(file, "image.json"))
+        PackGenerator.addTask {
+            JsonObject().apply {
+                add("providers", json)
+            }.save(File(file, "image.json"))
+        }
         map
     }
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
@@ -254,9 +257,11 @@ class PopupLayout(
                         )
                     }
                 )
-                JsonObject().apply {
-                    add("providers", array)
-                }.save(File(textFolder, "text_${index}.json"))
+                PackGenerator.addTask {
+                    JsonObject().apply {
+                        add("providers", array)
+                    }.save(File(textFolder, "text_${index}.json"))
+                }
                 TextManager.setKey(group, result)
                 result
             }

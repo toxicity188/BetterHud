@@ -43,7 +43,8 @@ object SkriptManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+        callback()
     }
 
     override fun end() {

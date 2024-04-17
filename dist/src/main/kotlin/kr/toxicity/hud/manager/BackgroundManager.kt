@@ -16,11 +16,11 @@ object BackgroundManager: BetterHudManager {
 
     fun getBackground(name: String) = backgroundMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
         val outputParent = resource.textures.subFolder("background")
         backgroundMap.clear()
-        folder.forEach {
+        folder.forEachAsync({ _, it ->
             if (it.extension == "yml") {
                 runCatching {
                     val yaml = it.toYaml()
@@ -46,7 +46,7 @@ object BackgroundManager: BetterHudManager {
                     warn("Reason: ${e.message}")
                 }
             }
-        }
+        }, callback)
     }
 
     override fun end() {

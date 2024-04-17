@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class BetterHud extends JavaPlugin {
     private static BetterHud instance;
@@ -33,7 +34,7 @@ public abstract class BetterHud extends JavaPlugin {
     }
 
     public abstract @NotNull NMS getNMS();
-    public abstract @NotNull ReloadResult reload();
+    public abstract void reload(@NotNull Consumer<ReloadResult> consumer);
     public abstract @NotNull BukkitAudiences getAudiences();
     public abstract @NotNull HudScheduler getScheduler();
     public abstract @NotNull BedrockAdapter getBedrockAdapter();

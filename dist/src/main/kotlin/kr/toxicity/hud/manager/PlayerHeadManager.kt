@@ -17,10 +17,10 @@ object PlayerHeadManager: BetterHudManager {
 
     fun getHead(name: String) = headMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         val saveLocation = resource.textures.subFolder("head")
         headMap.clear()
-        DATA_FOLDER.subFolder("heads").forEachAllYaml { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ _, file, s, configurationSection ->
             runCatching {
                 val head = HudHead(s , configurationSection)
                 val pixel = head.pixel
@@ -37,7 +37,7 @@ object PlayerHeadManager: BetterHudManager {
                 warn("Unable to load this head: $s in ${file.name}")
                 warn("Reason: ${e.message}")
             }
-        }
+        }, callback)
     }
 
     override fun end() {

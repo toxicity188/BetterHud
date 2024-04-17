@@ -57,7 +57,8 @@ object PlayerManager: BetterHudManager {
 
     fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")
     fun getHudPlayer(uuid: UUID) = hudPlayer[uuid]
-    override fun reload(resource: GlobalResource) {
+
+    override fun preReload() {
         hudPlayer.values.forEach {
             it.popupGroupIteratorMap.forEach { value ->
                 value.value.clear()
@@ -67,6 +68,10 @@ object PlayerManager: BetterHudManager {
             it.resetElements()
             it.startTick()
         }
+    }
+
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+        callback()
     }
 
     override fun end() {

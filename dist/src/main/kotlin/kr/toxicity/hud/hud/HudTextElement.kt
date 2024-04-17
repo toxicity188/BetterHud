@@ -11,6 +11,7 @@ import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
@@ -107,9 +108,11 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
                     )
                 }
             )
-            JsonObject().apply {
-                add("providers", array)
-            }.save(File(file, "text_${index + 1}_${index2 + 1}.json"))
+            PackGenerator.addTask {
+                JsonObject().apply {
+                    add("providers", array)
+                }.save(File(file, "text_${index + 1}_${index2 + 1}.json"))
+            }
             TextManager.setKey(group, result)
             result
         }

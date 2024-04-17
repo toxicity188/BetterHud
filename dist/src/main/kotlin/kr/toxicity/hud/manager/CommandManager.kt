@@ -19,8 +19,7 @@ object CommandManager: BetterHudManager {
             permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
                 s.info("Try to start reloading. please wait...")
-                asyncTask {
-                    val result = PLUGIN.reload()
+                PLUGIN.reload { result ->
                     when (result.state) {
                         ReloadState.STILL_ON_RELOAD -> {
                             s.warn("The plugin is still on reload!")
@@ -294,7 +293,8 @@ object CommandManager: BetterHudManager {
         PLUGIN.getCommand(NAME_SPACE)?.setExecutor(command.createTabExecutor())
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+        callback()
     }
 
     override fun end() {

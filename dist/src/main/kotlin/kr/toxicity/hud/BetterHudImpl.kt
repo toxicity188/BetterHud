@@ -12,6 +12,7 @@ import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
@@ -34,6 +35,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.function.Consumer
 import java.util.jar.JarFile
 
 @Suppress("UNUSED")
@@ -196,40 +198,58 @@ class BetterHudImpl: BetterHud() {
         Bukkit.getOnlinePlayers().forEach {
             PlayerManager.register(it)
         }
-        asyncTask {
-            reload()
+        reload {
             info("Plugin enabled.")
         }
     }
 
     private var onReload = false
 
-    override fun reload(): ReloadResult {
-        if (onReload) return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
+    override fun reload(consumer: Consumer<ReloadResult>) {
+        if (onReload) {
+            consumer.accept(ReloadResult(ReloadState.STILL_ON_RELOAD, 0))
+            return
+        }
         onReload = true
         val time = System.currentTimeMillis()
-        return runCatching {
-            managers.forEach {
-                it.preReload()
+        asyncTask {
+            runCatching {
+                managers.forEach {
+                    it.preReload()
+                }
+                val resource = GlobalResource()
+                val index = TaskIndex(managers.size)
+
+                fun managerReload() {
+                    synchronized(index) {
+                        if (index.current < managers.size) {
+                            val manager = managers[index.current++]
+                            info("Loading ${manager.javaClass.simpleName}...")
+                            manager.reload(resource) {
+                                managerReload()
+                            }
+                        } else {
+                            PackGenerator.generate {
+                                managers.forEach {
+                                    it.postReload()
+                                }
+                                onReload = false
+                                val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                                task {
+                                    PluginReloadedEvent(result).call()
+                                }
+                                consumer.accept(result)
+                            }
+                        }
+                    }
+                }
+                managerReload()
+            }.onFailure { e ->
+                warn("Unable to reload.")
+                warn("Reason: ${e.message}")
+                onReload = false
+                consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
             }
-            val resource = GlobalResource()
-            managers.forEach {
-                it.reload(resource)
-            }
-            managers.forEach {
-                it.postReload()
-            }
-            onReload = false
-            val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-            task {
-                PluginReloadedEvent(result).call()
-            }
-            result
-        }.getOrElse { e ->
-            warn("Unable to reload.")
-            warn("Reason: ${e.message}")
-            onReload = false
-            ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
         }
     }
 

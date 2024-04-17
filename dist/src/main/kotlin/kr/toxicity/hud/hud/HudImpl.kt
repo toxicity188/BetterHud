@@ -11,6 +11,7 @@ import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
@@ -68,9 +69,11 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
         }
     }
     init {
-        JsonObject().apply {
-            add("providers", jsonArray)
-        }.save(file.subFolder(internalName).subFile("image.json"))
+        PackGenerator.addTask {
+            JsonObject().apply {
+                add("providers", jsonArray)
+            }.save(file.subFolder(internalName).subFile("image.json"))
+        }
     }
 
 

@@ -60,8 +60,9 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         HandlerList.unregisterAll(listener)
+        callback()
     }
     override fun end() {
     }

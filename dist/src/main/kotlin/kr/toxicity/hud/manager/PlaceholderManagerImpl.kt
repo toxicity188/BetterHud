@@ -408,10 +408,9 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         updateTask.clear()
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-
             DATA_FOLDER.subFolder("placeholders").forEachAllYaml { file, s, configurationSection ->
                 runCatching {
                     val variable = configurationSection.getString("variable").ifNull("variable not set.")
@@ -436,6 +435,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                 }
             }
         }
+        callback()
     }
 
     fun update(hudPlayer: HudPlayer) {

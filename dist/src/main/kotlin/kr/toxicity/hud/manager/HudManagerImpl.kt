@@ -4,10 +4,7 @@ import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.manager.HudManager
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.DATA_FOLDER
-import kr.toxicity.hud.util.forEachAllYaml
-import kr.toxicity.hud.util.subFolder
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.*
 import java.util.Collections
 
 object HudManagerImpl: BetterHudManager, HudManager {
@@ -20,17 +17,17 @@ object HudManagerImpl: BetterHudManager, HudManager {
 
     override fun getHud(name: String): Hud? = hudMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(resource: GlobalResource, callback: () -> Unit) {
         hudMap.clear()
         val hudFolder = resource.font.subFolder("hud")
-        DATA_FOLDER.subFolder("huds").forEachAllYaml { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("huds").forEachAllYamlAsync({ _, file, s, configurationSection ->
             runCatching {
                 hudMap[s] = HudImpl(s, hudFolder, configurationSection)
             }.onFailure { e ->
                 warn("Unable to load this hud: $s in ${file.name}")
                 warn("Reason: ${e.message}")
             }
-        }
+        }, callback)
     }
 
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)
