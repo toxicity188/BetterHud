@@ -32,7 +32,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-15"
+    version = "beta-15-HOTFIX"
 
     repositories {
         mavenCentral()
