@@ -161,6 +161,8 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                 warn("Reason: ${e.message}")
             }
             callback()
+        }.handle { _, e ->
+            e.printStackTrace()
         }
     }
 

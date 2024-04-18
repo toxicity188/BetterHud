@@ -189,8 +189,9 @@ object ShaderManager: BetterHudManager {
                 warn("Reason: ${e.message}")
             }
             callback()
+        }.handle { _, e ->
+            e.printStackTrace()
         }
-
     }
 
     override fun end() {

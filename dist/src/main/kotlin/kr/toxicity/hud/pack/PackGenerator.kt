@@ -19,7 +19,7 @@ object PackGenerator {
                 val pathLength = build.path.length + 1
                 val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
                 fun getAllLocation(file: File) {
-                    locationMap[file.path.substring(pathLength, file.path.length)] = file
+                    locationMap[file.path.substring(pathLength)] = file
                     file.listFiles()?.forEach {
                         getAllLocation(it)
                     }
@@ -29,7 +29,9 @@ object PackGenerator {
                 }
                 PLUGIN.loadAssets("pack") { a, i ->
                     val replace = a.replace('/','\\')
-                    (locationMap.remove(replace) ?: File(build, replace)).outputStream().buffered().use { os ->
+                    (locationMap.remove(replace) ?: File(build, replace).apply {
+                        parentFile.mkdirs()
+                    }).outputStream().buffered().use { os ->
                         i.copyTo(os)
                     }
                 }
@@ -110,8 +112,10 @@ object PackGenerator {
 
     fun addTask(dir: Iterable<String>, byteArray: () -> ByteArray) {
         val str = dir.joinToString("/")
-        tasks.computeIfAbsent(str) {
-            PackFile(str, byteArray)
+        synchronized(tasks) {
+            tasks.computeIfAbsent(str) {
+                PackFile(str, byteArray)
+            }
         }
     }
 

@@ -230,7 +230,9 @@ class BetterHudImpl: BetterHud() {
 
                     fun managerReload() {
                         if (index.current < managers.size) {
-                            val manager = managers[index.current++]
+                            val manager = synchronized(index) {
+                                managers[index.current++]
+                            }
                             info("Loading ${manager.javaClass.simpleName}...")
                             synchronized(manager) {
                                 manager.reload(resource) {
@@ -256,6 +258,8 @@ class BetterHudImpl: BetterHud() {
                     onReload = false
                     consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
                 }
+            }.handle { _, e ->
+                e.printStackTrace()
             }
         }
     }
