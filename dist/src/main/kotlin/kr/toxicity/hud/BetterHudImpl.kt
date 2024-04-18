@@ -213,44 +213,46 @@ class BetterHudImpl: BetterHud() {
             consumer.accept(ReloadResult(ReloadState.STILL_ON_RELOAD, 0))
             return
         }
-        onReload = true
-        val time = System.currentTimeMillis()
-        asyncTask {
-            PluginReloadStartEvent().call()
-            runCatching {
-                managers.forEach {
-                    it.preReload()
-                }
-                val resource = GlobalResource()
-                val index = TaskIndex(managers.size)
+        synchronized(this) {
+            onReload = true
+            val time = System.currentTimeMillis()
+            asyncTask {
+                PluginReloadStartEvent().call()
+                runCatching {
+                    managers.forEach {
+                        it.preReload()
+                    }
+                    val resource = GlobalResource()
+                    val index = TaskIndex(managers.size)
 
-                fun managerReload() {
-                    if (index.current < managers.size) {
-                        val manager = managers[index.current++]
-                        info("Loading ${manager.javaClass.simpleName}...")
-                        synchronized(manager) {
-                            manager.reload(resource) {
-                                managerReload()
+                    fun managerReload() {
+                        if (index.current < managers.size) {
+                            val manager = managers[index.current++]
+                            info("Loading ${manager.javaClass.simpleName}...")
+                            synchronized(manager) {
+                                manager.reload(resource) {
+                                    managerReload()
+                                }
                             }
-                        }
-                    } else {
-                        PackGenerator.generate {
-                            managers.forEach {
-                                it.postReload()
+                        } else {
+                            PackGenerator.generate {
+                                managers.forEach {
+                                    it.postReload()
+                                }
+                                onReload = false
+                                val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                                PluginReloadedEvent(result).call()
+                                consumer.accept(result)
                             }
-                            onReload = false
-                            val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-                            PluginReloadedEvent(result).call()
-                            consumer.accept(result)
                         }
                     }
+                    managerReload()
+                }.onFailure { e ->
+                    warn("Unable to reload.")
+                    warn("Reason: ${e.message}")
+                    onReload = false
+                    consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
                 }
-                managerReload()
-            }.onFailure { e ->
-                warn("Unable to reload.")
-                warn("Reason: ${e.message}")
-                onReload = false
-                consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
             }
         }
     }

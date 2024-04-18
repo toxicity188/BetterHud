@@ -20,7 +20,7 @@ fun RenderedImage.save(outputStream: OutputStream) {
 }
 
 fun RenderedImage.toByteArray(): ByteArray {
-    return ByteArrayOutputStream().use {
+    return ByteArrayOutputStream(2048).use {
         ImageIO.write(this, "png", it)
         it
     }.toByteArray()
