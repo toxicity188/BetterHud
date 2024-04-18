@@ -43,13 +43,15 @@ object BackgroundManager: BetterHudManager {
                                 image.toByteArray()
                             }
                         }
-                    backgroundMap[name] = HudBackground(
-                        name,
-                        getImage("left"),
-                        getImage("right"),
-                        getImage("body"),
-                        ImageLocation(yaml)
-                    )
+                    backgroundMap.putSync(name) {
+                        HudBackground(
+                            name,
+                            getImage("left"),
+                            getImage("right"),
+                            getImage("body"),
+                            ImageLocation(yaml)
+                        )
+                    }
                 }.onFailure { e ->
                     warn("Unable to load this yml: ${it.name}")
                     warn("Reason: ${e.message}")

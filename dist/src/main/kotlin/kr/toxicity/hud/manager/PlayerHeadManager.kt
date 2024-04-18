@@ -38,7 +38,9 @@ object PlayerHeadManager: BetterHudManager {
                         }
                     }.toByteArray()
                 }
-                headMap[head.name] = head
+                headMap.putSync(head.name) {
+                    head
+                }
             }.onFailure { e ->
                 warn("Unable to load this head: $s in ${file.name}")
                 warn("Reason: ${e.message}")

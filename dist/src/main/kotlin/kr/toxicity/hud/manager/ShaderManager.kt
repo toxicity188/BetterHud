@@ -211,6 +211,7 @@ object ShaderManager: BetterHudManager {
             callback()
         }.handle { _, e ->
             e.printStackTrace()
+            callback()
         }
     }
 

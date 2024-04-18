@@ -91,7 +91,9 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
                     e.printStackTrace()
                 }
                 synchronized(index) {
-                    if (++index.current == index.max) callback()
+                    if (++index.current == index.max) {
+                        callback()
+                    }
                 }
             }
         }

@@ -26,7 +26,7 @@ object ImageManager: BetterHudManager {
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
-                imageMap[s] = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
+                val image = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
                     ImageType.SINGLE -> {
                         HudImage(
                             s,
@@ -74,6 +74,9 @@ object ImageManager: BetterHudManager {
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
                         )
                     }
+                }
+                imageMap.putSync(s) {
+                    image
                 }
             }.onFailure { e ->
                 warn("Unable to load this image: $s in ${file.name}")

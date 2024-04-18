@@ -64,21 +64,23 @@ object TextManager: BetterHudManager {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
-                textMap[s] = parseFont(s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
-                    section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
-                        put(key, LocatedImage(
-                            File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
-                                .ifNotExist("this image doesn't exist: $key")
-                                .toImage()
-                                .removeEmptyWidth()
-                                .ifNull("invalid image: $key"),
-                            ImageLocation(configurationSection),
-                            configurationSection.getDouble("scale", 1.0).apply {
-                                if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
-                            }
-                        ))
-                    }
-                }, section.toConditions(), section.getBoolean("merge-default-bitmap"))
+                textMap.putSync(s) {
+                    parseFont(s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
+                        section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
+                            put(key, LocatedImage(
+                                File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
+                                    .ifNotExist("this image doesn't exist: $key")
+                                    .toImage()
+                                    .removeEmptyWidth()
+                                    .ifNull("invalid image: $key"),
+                                ImageLocation(configurationSection),
+                                configurationSection.getDouble("scale", 1.0).apply {
+                                    if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
+                                }
+                            ))
+                        }
+                    }, section.toConditions(), section.getBoolean("merge-default-bitmap"))
+                }
             }.onFailure { e ->
                 warn("Unable to load this text: $s in ${file.name}")
                 warn("Reason: ${e.message}")
