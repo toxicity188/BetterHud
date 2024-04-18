@@ -21,7 +21,7 @@ object PackGenerator {
                     override fun close() {
                     }
                     override fun invoke(p1: PackFile) {
-                        File(build, p1.path).apply {
+                        File(build, p1.path.replace('/','\\')).apply {
                             parentFile.mkdirs()
                         }.outputStream().buffered().use { stream ->
                             stream.write(p1.array())

@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Plugin reloaded event.
+ * Plugin reload start event.
  */
 @Getter
 public class PluginReloadStartEvent extends Event implements BetterHudEvent {
