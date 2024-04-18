@@ -10,12 +10,14 @@ import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.subFolder
 import java.io.File
 
-class HudElement(hud: HudImpl, name: String, file: File, private val layout: LayoutGroup, gui: GuiLocation, pixel: ImageLocation) {
+class HudElement(hud: HudImpl, name: String, file: List<String>, private val layout: LayoutGroup, gui: GuiLocation, pixel: ImageLocation) {
     private val imageElement = layout.image.map {image ->
         HudImageElement(hud, image, gui, pixel)
     }
     private val textElement = run {
-        val subFile = file.subFolder("text")
+        val subFile = ArrayList(file).apply {
+            add("text")
+        }
         layout.text.mapIndexed { index, textLayout ->
             HudTextElement(hud, name, subFile, textLayout, index, gui, pixel)
         }

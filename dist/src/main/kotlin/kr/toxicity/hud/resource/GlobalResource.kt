@@ -1,32 +1,32 @@
 package kr.toxicity.hud.resource
 
-import kr.toxicity.hud.manager.ConfigManager
-import kr.toxicity.hud.manager.ShaderManager
 import kr.toxicity.hud.util.*
-import org.bukkit.Bukkit
-import org.bukkit.boss.BarColor
-import org.bukkit.boss.BarStyle
 
 class GlobalResource {
-    private val accept = DATA_FOLDER.parentFile.subFolder(ConfigManager.buildFolderLocation).let {
-        if (ConfigManager.separateResourcePackNameSpace) it else it.subFolder("assets").clearFolder()
+    private val assets = listOf("assets")
+
+    private val hud = ArrayList(assets).apply {
+        add(NAME_SPACE)
     }
 
-    private val hud = accept.subFolder(NAME_SPACE).clearFolder().apply {
-        PLUGIN.loadAssets(NAME_SPACE, this)
-    }
-    private val minecraft = accept.subFolder("minecraft").clearFolder().apply {
-        PLUGIN.loadAssets("minecraft", this)
+    private val minecraft = ArrayList(assets).apply {
+        add("minecraft")
     }
 
-    val bossBar = minecraft
-        .subFolder("textures")
-        .subFolder("gui")
+    val bossBar = ArrayList(minecraft).apply {
+        add("textures")
+        add("gui")
+    }
 
-    val core = minecraft
-        .subFolder("shaders")
-        .subFolder("core")
+    val core = ArrayList(minecraft).apply {
+        add("shaders")
+        add("core")
+    }
 
-    val font = hud.subFolder("font")
-    val textures = hud.subFolder("textures")
+    val font = ArrayList(hud).apply {
+        add("font")
+    }
+    val textures = ArrayList(hud).apply {
+        add("textures")
+    }
 }

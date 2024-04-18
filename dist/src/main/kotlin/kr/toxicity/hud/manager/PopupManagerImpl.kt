@@ -6,6 +6,7 @@ import kr.toxicity.hud.popup.PopupImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 object PopupManagerImpl: BetterHudManager, PopupManager {
@@ -16,8 +17,10 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         popupMap.clear()
-        val save = resource.font.subFolder("popup")
-        DATA_FOLDER.subFolder("popups").forEachAllYamlAsync({ _, file, s, configurationSection ->
+        val save = ArrayList(resource.font).apply {
+            add("popup")
+        }
+        DATA_FOLDER.subFolder("popups").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 popupMap[s] = PopupImpl(save, s, configurationSection)
             }.onFailure { e ->

@@ -17,9 +17,8 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection
-import java.io.File
 
-class HudImpl(private val internalName: String, file: File, section: ConfigurationSection) : Hud {
+class HudImpl(private val internalName: String, file: List<String>, section: ConfigurationSection) : Hud {
     companion object {
         const val DEFAULT_BIT = 13
         const val MAX_BIT = 23 - DEFAULT_BIT
@@ -37,7 +36,9 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
     var textIndex = 0
 
     private val elements = run {
-        val subFile = file.subFolder(internalName)
+        val subFile = ArrayList(file).apply {
+            add(internalName)
+        }
         ArrayList<HudAnimation>().apply {
             section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
@@ -69,10 +70,15 @@ class HudImpl(private val internalName: String, file: File, section: Configurati
         }
     }
     init {
-        PackGenerator.addTask {
+        PackGenerator.addTask(
+            ArrayList(file).apply {
+                add(internalName)
+                add("image.json")
+            }
+        ) {
             JsonObject().apply {
                 add("providers", jsonArray)
-            }.save(file.subFolder(internalName).subFile("image.json"))
+            }.toByteArray()
         }
     }
 

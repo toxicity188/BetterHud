@@ -1,5 +1,6 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
@@ -26,10 +27,10 @@ object ConfigManager: BetterHudManager {
         private set
     var buildFolderLocation = "BetterHud\\build"
         private set
-    var separateResourcePackNameSpace = false
-        private set
 
     var mergeBossBar = true
+        private set
+    var packType = PackType.FOLDER
         private set
 
     override fun start() {
@@ -50,6 +51,11 @@ object ConfigManager: BetterHudManager {
             yaml.getString("default-font-name")?.let {
                 defaultFontName = it
             }
+            yaml.getString("pack-type")?.let {
+                runCatching {
+                    packType = PackType.valueOf(it.uppercase())
+                }
+            }
             tickSpeed = yaml.getLong("tick-speed", 1)
             numberFormat = (yaml.getString("number-format")?.let {
                 runCatching {
@@ -57,7 +63,6 @@ object ConfigManager: BetterHudManager {
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#"))
             disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
-            separateResourcePackNameSpace = yaml.getBoolean("separate-resource-pack-namespace", false)
             yaml.getString("build-folder-location")?.let {
                 buildFolderLocation = it
             }

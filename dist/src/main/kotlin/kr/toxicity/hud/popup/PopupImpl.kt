@@ -12,11 +12,11 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.ConfigurationSection
-import java.io.File
-import java.util.UUID
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PopupImpl(
-    file: File,
+    file: List<String>,
     val internalName: String,
     section: ConfigurationSection
 ): Popup {
@@ -51,7 +51,9 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
-        val target = file.subFolder(internalName)
+        val target = ArrayList(file).apply {
+            add(internalName)
+        }
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
@@ -67,7 +69,9 @@ class PopupImpl(
                     configurationSection.getConfigurationSection("pixel")?.let {
                         ImageLocation(it)
                     } ?: ImageLocation.zero,
-                    target.subFolder(s),
+                    ArrayList(target).apply {
+                        add(s)
+                    },
                 ))
             }
         }

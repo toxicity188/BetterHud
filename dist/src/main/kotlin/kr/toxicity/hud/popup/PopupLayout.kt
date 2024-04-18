@@ -26,7 +26,6 @@ import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import java.io.File
 import kotlin.math.roundToInt
 
 class PopupLayout(
@@ -35,7 +34,7 @@ class PopupLayout(
     private val name: String,
     private val globalLocation: GuiLocation,
     private val globalPixel: ImageLocation,
-    file: File
+    file: List<String>
 ) {
     private var imageChar = 0xCE000
     private var textIndex = 0
@@ -43,14 +42,18 @@ class PopupLayout(
     private val imageKey = Key.key("$NAME_SPACE:popup/${parent.internalName}/$name/image")
     private val groups = parent.move.locations.run {
         val json = JsonArray()
-        val textFolder = file.subFolder("text")
+        val textFolder = ArrayList(file).apply {
+            add("text")
+        }
         val map = map { location ->
             PopupLayoutGroup(location, json, textFolder)
         }
-        PackGenerator.addTask {
+        PackGenerator.addTask(ArrayList(file).apply {
+            add("image.json")
+        }) {
             JsonObject().apply {
                 add("providers", json)
-            }.save(File(file, "image.json"))
+            }.toByteArray()
         }
         map
     }
@@ -74,7 +77,7 @@ class PopupLayout(
         }
     }
 
-    private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray, textFolder: File) {
+    private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray, textFolder: List<String>) {
         val elements = layout.animation.location.map { location ->
             PopupElement(pair, array, location, textFolder)
         }
@@ -89,7 +92,7 @@ class PopupLayout(
             }
         }
     }
-    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: File) {
+    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: List<String>) {
         private val elementGui = pair.gui + parent.gui + globalLocation
         private val elementPixel = globalPixel + location
 
@@ -257,10 +260,12 @@ class PopupLayout(
                         )
                     }
                 )
-                PackGenerator.addTask {
+                PackGenerator.addTask(ArrayList(textFolder).apply {
+                    add("text_${index}.json")
+                }) {
                     JsonObject().apply {
                         add("providers", array)
-                    }.save(File(textFolder, "text_${index}.json"))
+                    }.toByteArray()
                 }
                 TextManager.setKey(group, result)
                 result

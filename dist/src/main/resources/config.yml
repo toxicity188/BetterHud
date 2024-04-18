@@ -6,7 +6,8 @@ default-font-name: "font.ttf"
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"
-separate-resource-pack-namespace: false
+
+pack-type: folder #folder, zip
 
 default-hud:
   - test_hud

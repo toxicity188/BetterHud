@@ -17,3 +17,8 @@ fun JsonElement.save(file: File) {
         GSON.toJson(this, it)
     }
 }
+fun JsonElement.toByteArray(): ByteArray {
+    val sb = StringBuilder()
+    GSON.toJson(this, sb)
+    return sb.toString().toByteArray(Charsets.UTF_8)
+}

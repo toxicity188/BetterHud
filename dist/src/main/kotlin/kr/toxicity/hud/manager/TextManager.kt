@@ -50,8 +50,10 @@ object TextManager: BetterHudManager {
         textKeyMap.clear()
         val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
-        val globalSaveFolder = resource.textures.subFolder("text")
-        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ _, file, s, section ->
+        val globalSaveFolder = ArrayList(resource.textures).apply {
+            add("text")
+        }
+        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ file, s, section ->
             runCatching {
                 val fontDir = section.getString("file")
                 val scale = section.getInt("scale")
@@ -103,7 +105,9 @@ object TextManager: BetterHudManager {
                     }
                 }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
             }.deriveFont(configScale.toFloat())
-            val parseDefault = parseFont("default", "default", defaultFont, configScale, resource.textures.subFolder("font"), emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+            val parseDefault = parseFont("default", "default", defaultFont, configScale, ArrayList(resource.textures).apply {
+                add("font")
+            }, emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
             val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
             parseDefault.charWidth.forEach {
                 textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -117,10 +121,12 @@ object TextManager: BetterHudManager {
                     add("chars", it.chars)
                 })
             }
-            PackGenerator.addTask {
+            PackGenerator.addTask(ArrayList(resource.font).apply {
+                add("default.json")
+            }) {
                 JsonObject().apply {
                     add("providers", defaultArray)
-                }.save(resource.font.subFile("default.json"))
+                }.toByteArray()
             }
             callback()
         }
@@ -173,7 +179,7 @@ object TextManager: BetterHudManager {
         saveName: String,
         fontFile: Font,
         scale: Int,
-        imageSaveFolder: File,
+        imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
         condition: ConditionBuilder,
         mergeDefaultBitmap: Boolean
@@ -205,10 +211,16 @@ object TextManager: BetterHudManager {
             }
         }
         val textList = ArrayList<HudTextArray>()
-        val saveFolder = imageSaveFolder.subFolder(saveName)
+        val saveFolder = ArrayList(imageSaveFolder).apply {
+            add(saveName)
+        }
         var i = 0
         images.forEach {
-            it.value.image.image.save(File(saveFolder, "image_${it.key}.png"))
+            PackGenerator.addTask(ArrayList(saveFolder).apply {
+                add("image_${it.key}.png")
+            }) {
+                it.value.image.image.toByteArray()
+            }
         }
         pairMap.forEach {
             val width = it.key
@@ -220,7 +232,9 @@ object TextManager: BetterHudManager {
                         pair.first
                     }.joinToString(""))
                 }
-                PackGenerator.addTask {
+                PackGenerator.addTask(ArrayList(saveFolder).apply {
+                    add(name)
+                }) {
                     BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {
                             composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
@@ -229,7 +243,7 @@ object TextManager: BetterHudManager {
                             }
                             dispose()
                         }
-                    }.save(File(saveFolder, name))
+                    }.toByteArray()
                 }
                 textList.add(HudTextArray(name, json))
             }

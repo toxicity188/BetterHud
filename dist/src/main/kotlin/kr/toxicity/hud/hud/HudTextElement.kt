@@ -20,10 +20,9 @@ import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import java.io.File
 import kotlin.math.roundToInt
 
-class HudTextElement(parent: HudImpl, name: String, file: File, private val text: TextLayout, index: Int, gui: GuiLocation, pixel: ImageLocation) {
+class HudTextElement(parent: HudImpl, name: String, file: List<String>, private val text: TextLayout, index: Int, gui: GuiLocation, pixel: ImageLocation) {
 
     private val renderer = run {
         val shader = HudShader(
@@ -108,10 +107,12 @@ class HudTextElement(parent: HudImpl, name: String, file: File, private val text
                     )
                 }
             )
-            PackGenerator.addTask {
+            PackGenerator.addTask(ArrayList(file).apply {
+                add("text_${index + 1}_${index2 + 1}.json")
+            }) {
                 JsonObject().apply {
                     add("providers", array)
-                }.save(File(file, "text_${index + 1}_${index2 + 1}.json"))
+                }.toByteArray()
             }
             TextManager.setKey(group, result)
             result

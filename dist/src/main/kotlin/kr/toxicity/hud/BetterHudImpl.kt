@@ -2,6 +2,7 @@ package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.bedrock.BedrockAdapter
+import kr.toxicity.hud.api.event.PluginReloadStartEvent
 import kr.toxicity.hud.api.event.PluginReloadedEvent
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.nms.NMS
@@ -31,10 +32,12 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
+import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 import java.util.jar.JarFile
 
@@ -213,6 +216,7 @@ class BetterHudImpl: BetterHud() {
         onReload = true
         val time = System.currentTimeMillis()
         asyncTask {
+            PluginReloadStartEvent().call()
             runCatching {
                 managers.forEach {
                     it.preReload()
@@ -221,25 +225,23 @@ class BetterHudImpl: BetterHud() {
                 val index = TaskIndex(managers.size)
 
                 fun managerReload() {
-                    synchronized(index) {
-                        if (index.current < managers.size) {
-                            val manager = managers[index.current++]
-                            info("Loading ${manager.javaClass.simpleName}...")
+                    if (index.current < managers.size) {
+                        val manager = managers[index.current++]
+                        info("Loading ${manager.javaClass.simpleName}...")
+                        synchronized(manager) {
                             manager.reload(resource) {
                                 managerReload()
                             }
-                        } else {
-                            PackGenerator.generate {
-                                managers.forEach {
-                                    it.postReload()
-                                }
-                                onReload = false
-                                val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-                                task {
-                                    PluginReloadedEvent(result).call()
-                                }
-                                consumer.accept(result)
+                        }
+                    } else {
+                        PackGenerator.generate {
+                            managers.forEach {
+                                it.postReload()
                             }
+                            onReload = false
+                            val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                            PluginReloadedEvent(result).call()
+                            consumer.accept(result)
                         }
                     }
                 }
@@ -269,7 +271,26 @@ class BetterHudImpl: BetterHud() {
     override fun getAudiences(): BukkitAudiences = audience
     override fun getHudPlayer(player: Player): HudPlayer = PlayerManager.getHudPlayer(player)
 
+
     override fun loadAssets(prefix: String, dir: File) {
+        loadAssets(prefix, {
+            File(dir, it).run {
+                if (!exists()) mkdir()
+            }
+        }) { s, i ->
+            File(dir, s).outputStream().buffered().use {
+                i.copyTo(it)
+            }
+        }
+    }
+
+    override fun loadAssets(prefix: String, consumer: BiConsumer<String, InputStream>) {
+        loadAssets(prefix, {}) { s, i ->
+            consumer.accept(s, i)
+        }
+    }
+
+    private fun loadAssets(prefix: String, dir: (String) -> Unit, consumer: (String, InputStream) -> Unit) {
         JarFile(file).use {
             it.entries().asSequence().sortedBy { dir ->
                 dir.name.length
@@ -277,18 +298,10 @@ class BetterHudImpl: BetterHud() {
                 if (!entry.name.startsWith(prefix)) return@forEach
                 if (entry.name.length <= prefix.length + 1) return@forEach
                 val name = entry.name.substring(prefix.length + 1)
-                val file = File(dir, name)
                 if (entry.isDirectory) {
-                    if (!file.exists()) file.mkdir()
-                } else {
-                    getResource(entry.name)?.buffered()?.use { stream ->
-                        if (!file.exists()) {
-                            file.createNewFile()
-                            file.outputStream().buffered().use { fos ->
-                                stream.copyTo(fos)
-                            }
-                        }
-                    }
+                    dir(name)
+                } else getResource(entry.name)?.buffered()?.use { stream ->
+                    consumer(name, stream)
                 }
             }
         }

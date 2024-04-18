@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.hud.HudImpl
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
@@ -8,6 +9,7 @@ import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
@@ -95,15 +97,14 @@ object ShaderManager: BetterHudManager {
                 } ?: BarColor.RED
                 fun copy(suffix: String) {
                     PLUGIN.getResource("background.png")?.buffered()?.use { input ->
-                        resource.bossBar
-                            .subFolder("sprites")
-                            .subFolder("boss_bar")
-                            .subFile("${barColor.name.lowercase()}_$suffix.png")
-                            .outputStream()
-                            .buffered()
-                            .use { output ->
-                                input.copyTo(output)
-                            }
+                        val byte = input.readAllBytes()
+                        PackGenerator.addTask(ArrayList(resource.bossBar).apply {
+                            add("sprites")
+                            add("boss_bar")
+                            add("${barColor.name.lowercase()}_$suffix.png")
+                        }) {
+                            byte
+                        }
                     }
                 }
                 copy("background")
@@ -111,13 +112,17 @@ object ShaderManager: BetterHudManager {
                 PLUGIN.getResource("bars.png")?.buffered()?.use { target ->
                     val oldImage = target.toImage()
                     val yAxis = 10 * barColor.ordinal
-                    BufferedImage(oldImage.width, oldImage.height, BufferedImage.TYPE_INT_ARGB).apply {
-                        createGraphics().run {
-                            if (barColor.ordinal > 0) drawImage(oldImage.getSubimage(0, 0, oldImage.width, yAxis), 0, 0, null)
-                            drawImage(oldImage.getSubimage(0, yAxis + 10, oldImage.width, oldImage.height - yAxis - 10), 0, yAxis + 10, null)
-                            dispose()
-                        }
-                    }.save(File(resource.bossBar, "bars.png"))
+                    PackGenerator.addTask(ArrayList(resource.bossBar).apply {
+                        add("bars.png")
+                    }) {
+                        BufferedImage(oldImage.width, oldImage.height, BufferedImage.TYPE_INT_ARGB).apply {
+                            createGraphics().run {
+                                if (barColor.ordinal > 0) drawImage(oldImage.getSubimage(0, 0, oldImage.width, yAxis), 0, 0, null)
+                                drawImage(oldImage.getSubimage(0, yAxis + 10, oldImage.width, oldImage.height - yAxis - 10), 0, yAxis + 10, null)
+                                dispose()
+                            }
+                        }.toByteArray()
+                    }
                 }
 
                 if (yaml.getBoolean("disable-level-text")) replaceList.add("HideExp")
@@ -150,7 +155,7 @@ object ShaderManager: BetterHudManager {
 
                 shaders.forEach { shader ->
                     shader.second.use { reader ->
-                        File(resource.core, shader.first).bufferedWriter(Charsets.UTF_8).use { writer ->
+                        val byte = ByteArrayOutputStream().use { writer ->
                             reader.readLines().forEach write@ { string ->
                                 var s = string
                                 val deactivateMatcher = deactivatePattern.matcher(s)
@@ -162,13 +167,19 @@ object ShaderManager: BetterHudManager {
                                     tagBuilders[tagMatcher.group("name")]?.let {
                                         val space = "".padStart(s.count { it == ' ' }, ' ')
                                         it().forEach { methodString ->
-                                            writer.write(space + methodString + "\n")
+                                            writer.write((space + methodString + "\n").toByteArray())
                                         }
                                         return@write
                                     }
                                 }
-                                writer.write(s + "\n")
+                                writer.write((s + "\n").toByteArray())
                             }
+                            writer
+                        }.toByteArray()
+                        PackGenerator.addTask(ArrayList(resource.core).apply {
+                            add(shader.first)
+                        }) {
+                            byte
                         }
                     }
                 }

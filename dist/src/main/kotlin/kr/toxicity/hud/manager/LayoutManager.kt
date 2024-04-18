@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object LayoutManager: BetterHudManager {
 
@@ -16,15 +17,14 @@ object LayoutManager: BetterHudManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         layoutMap.clear()
-        DATA_FOLDER.subFolder("layouts").forEachAllYaml { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("layouts").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 layoutMap[s] = LayoutGroup(configurationSection)
             }.onFailure { e ->
                 warn("Unable to load this layout: $s in ${file.name}")
                 warn("Reason: ${e.message}")
             }
-        }
-        callback()
+        }, callback)
     }
 
     override fun end() {

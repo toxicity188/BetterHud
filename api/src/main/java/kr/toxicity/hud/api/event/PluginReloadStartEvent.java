@@ -1,8 +1,6 @@
 package kr.toxicity.hud.api.event;
 
-import kr.toxicity.hud.api.plugin.ReloadResult;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -11,11 +9,9 @@ import org.jetbrains.annotations.NotNull;
  * Plugin reloaded event.
  */
 @Getter
-public class PluginReloadedEvent extends Event implements BetterHudEvent {
-    private final ReloadResult result;
-    public PluginReloadedEvent(@NotNull ReloadResult result) {
+public class PluginReloadStartEvent extends Event implements BetterHudEvent {
+    public PluginReloadStartEvent() {
         super(true);
-        this.result = result;
     }
     @NotNull
     @Override

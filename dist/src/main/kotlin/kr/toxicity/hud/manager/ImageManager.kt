@@ -6,6 +6,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object ImageManager: BetterHudManager {
 
@@ -23,7 +24,7 @@ object ImageManager: BetterHudManager {
 
         imageMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ _, file, s, configurationSection ->
+        DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 imageMap[s] = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
                     ImageType.SINGLE -> {
@@ -79,17 +80,21 @@ object ImageManager: BetterHudManager {
                 warn("Reason: ${e.message}")
             }
         }) {
-            val saveLocation = resource.textures.subFolder("image")
+            val saveLocation = ArrayList(resource.textures).apply {
+                add("image")
+            }
             imageMap.values.forEach { value ->
                 val list = value.image
                 if (list.isNotEmpty()) {
-                    val imageSaveLocation = if (list.size == 1) saveLocation else saveLocation.subFolder(value.name)
+                    val imageSaveLocation = if (list.size == 1) saveLocation else ArrayList(saveLocation).apply {
+                        add(value.name)
+                    }
                     list.forEach {
-                        val file = File(imageSaveLocation, it.name)
-                        if (!file.exists()) {
-                            PackGenerator.addTask {
-                                it.image.image.save(file)
-                            }
+                        val file = ArrayList(imageSaveLocation).apply {
+                            add(it.name)
+                        }
+                        PackGenerator.addTask(file) {
+                            it.image.image.toByteArray()
                         }
                     }
                 }

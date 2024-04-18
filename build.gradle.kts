@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "1.9.23"
     id("com.github.johnrengelman.shadow") version("8.1.1")
-    id("io.papermc.paperweight.userdev") version("1.5.6") apply(false)
+    id("io.papermc.paperweight.userdev") version("1.5.12") apply(false)
     id("org.jetbrains.dokka") version "1.9.20"
 }
 
@@ -32,7 +32,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-14"
+    version = "beta-15"
 
     repositories {
         mavenCentral()

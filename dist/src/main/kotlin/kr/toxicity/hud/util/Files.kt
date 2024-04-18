@@ -33,7 +33,7 @@ fun File.forEachAllFolder(block: (File) -> Unit) {
     }
 }
 
-fun File.forEachAllFolderAsync(block: (Int, File) -> Unit, callback: () -> Unit) {
+fun File.forEachAllFolderAsync(block: (File) -> Unit, callback: () -> Unit) {
     fun getAll(file: File): List<File> {
         return if (file.isDirectory) {
             file.listFiles()?.map { subFile ->
@@ -46,20 +46,8 @@ fun File.forEachAllFolderAsync(block: (Int, File) -> Unit, callback: () -> Unit)
     getAll(this).forEachAsync(block, callback)
 }
 
-fun File.forEachAsync(block: (Int, File) -> Unit, callback: () -> Unit) {
-    val list = listFiles() ?: return
-    val task = TaskIndex(list.size)
-    list.forEach {
-        CompletableFuture.runAsync {
-            block(task.current, it)
-        }.thenAccept {
-            synchronized(task) {
-                if (++task.current == task.max) {
-                    callback()
-                }
-            }
-        }
-    }
+fun File.forEachAsync(block: (File) -> Unit, callback: () -> Unit) {
+    listFiles()?.toList()?.forEachAsync(block, callback) ?: return callback()
 }
 
 fun File.forEachAllYaml(block: (File, String, ConfigurationSection) -> Unit) {
@@ -76,12 +64,12 @@ fun File.forEachAllYaml(block: (File, String, ConfigurationSection) -> Unit) {
         }
     }
 }
-fun File.forEachAllYamlAsync(block: (Int, File, String, ConfigurationSection) -> Unit, callback: () -> Unit) {
-    forEachAllFolderAsync({ i, it ->
+fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit, callback: () -> Unit) {
+    forEachAllFolderAsync({
         if (it.extension == "yml") {
             runCatching {
                 it.toYaml().forEachSubConfiguration { s, configurationSection ->
-                    block(i, it, s, configurationSection)
+                    block(it, s, configurationSection)
                 }
             }.onFailure { e ->
                 warn("Unable to load this yml file: ${it.name}")

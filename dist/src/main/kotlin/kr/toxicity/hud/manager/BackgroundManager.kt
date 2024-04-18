@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import java.io.File
@@ -18,21 +19,29 @@ object BackgroundManager: BetterHudManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
-        val outputParent = resource.textures.subFolder("background")
+        val outputParent = ArrayList(resource.textures).apply {
+            add("background")
+        }
         backgroundMap.clear()
-        folder.forEachAsync({ _, it ->
+        folder.forEachAsync({
             if (it.extension == "yml") {
                 runCatching {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)
-                    val output = outputParent.subFolder(name)
+                    val output = ArrayList(outputParent).apply {
+                        add(name)
+                    }
                     fun getImage(imageName: String) = File(backgroundFolder, "$imageName.png")
                         .ifNotExist("this image doesn't exist: $imageName.png in $name")
                         .toImage()
                         .removeEmptyWidth()
                         .ifNull("this image is empty: $imageName.png in $name").apply {
-                            image.save(output.subFile("$imageName.png"))
+                            PackGenerator.addTask(ArrayList(output).apply {
+                                add("$imageName.png")
+                            }) {
+                                image.toByteArray()
+                            }
                         }
                     backgroundMap[name] = HudBackground(
                         name,

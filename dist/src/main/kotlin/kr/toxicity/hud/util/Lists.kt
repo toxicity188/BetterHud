@@ -21,30 +21,20 @@ fun <T> List<List<T>>.sum(): List<T> {
     return result
 }
 
-fun <T> List<T>.forEachAsync(block: (Int, T) -> Unit, callback: () -> Unit) {
-    val current = TaskIndex(size)
-    if (isNotEmpty()) forEach {
-        CompletableFuture.runAsync {
-            block(current.current, it)
-        }.thenAccept {
-            synchronized(current) {
-                if (++current.current == current.max) {
-                    callback()
+fun <T> Collection<T>.forEachAsync(block: (T) -> Unit, callback: () -> Unit) {
+    if (isNotEmpty()) {
+        val current = TaskIndex(size)
+        forEach {
+            CompletableFuture.runAsync {
+                runCatching {
+                    block(it)
+                }.onFailure { e ->
+                    e.printStackTrace()
                 }
-            }
-        }
-    } else callback()
-}
-
-fun <T> Set<T>.forEachAsync(block: (Int, T) -> Unit, callback: () -> Unit) {
-    val current = TaskIndex(size)
-    if (isNotEmpty()) forEach {
-        CompletableFuture.runAsync {
-            block(current.current, it)
-        }.thenAccept {
-            synchronized(current) {
-                if (++current.current == current.max) {
-                    callback()
+                synchronized(current) {
+                    if (++current.current == current.max) {
+                        callback()
+                    }
                 }
             }
         }

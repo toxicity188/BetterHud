@@ -12,7 +12,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -94,6 +96,12 @@ public abstract class BetterHud extends JavaPlugin {
      * @param dir target directory
      */
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
+    /**
+     * Loads player's resource to some directory
+     * @param prefix resource folder
+     * @param consumer for each callback
+     */
+    public abstract void loadAssets(@NotNull String prefix, @NotNull BiConsumer<String, InputStream> consumer);
 
     /**
      * Gets a width of default font's char
