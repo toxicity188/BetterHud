@@ -22,7 +22,6 @@ object Conditions {
                     }
                 }
             }.onFailure { e ->
-                e.printStackTrace()
                 warn("Unable to load this condition: $s")
                 warn("Reason: ${e.message}")
             }
