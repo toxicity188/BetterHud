@@ -13,10 +13,14 @@ object LayoutManager: BetterHudManager {
 
     }
 
-    fun getLayout(name: String) = layoutMap[name]
+    fun getLayout(name: String) = synchronized(layoutMap) {
+        layoutMap[name]
+    }
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        layoutMap.clear()
+        synchronized(layoutMap) {
+            layoutMap.clear()
+        }
         DATA_FOLDER.subFolder("layouts").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 layoutMap.putSync(s) {

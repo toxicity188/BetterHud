@@ -234,10 +234,8 @@ class BetterHudImpl: BetterHud() {
                                 managers[index.current++]
                             }
                             info("Loading ${manager.javaClass.simpleName}...")
-                            synchronized(manager) {
-                                manager.reload(resource) {
-                                    managerReload()
-                                }
+                            manager.reload(resource) {
+                                managerReload()
                             }
                         } else {
                             PackGenerator.generate {

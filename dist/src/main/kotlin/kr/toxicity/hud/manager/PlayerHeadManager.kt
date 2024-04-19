@@ -15,13 +15,17 @@ object PlayerHeadManager: BetterHudManager {
 
     }
 
-    fun getHead(name: String) = headMap[name]
+    fun getHead(name: String) = synchronized(headMap) {
+        headMap[name]
+    }
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         val saveLocation = ArrayList(resource.textures).apply {
             add("head")
         }
-        headMap.clear()
+        synchronized(headMap) {
+            headMap.clear()
+        }
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 val head = HudHead(s , configurationSection)
@@ -30,7 +34,7 @@ object PlayerHeadManager: BetterHudManager {
                     add("pixel_$pixel.png")
                 }
                 PackGenerator.addTask(targetFile) {
-                    BufferedImage(pixel, pixel ,BufferedImage.TYPE_INT_ARGB).apply {
+                    BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {
                             color = Color.WHITE
                             fillRect(0, 0, pixel, pixel)

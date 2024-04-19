@@ -65,12 +65,14 @@ object PlayerManager: BetterHudManager {
             }
             it.popupGroupIteratorMap.clear()
             it.popupKeyMap.clear()
-            it.resetElements()
-            it.startTick()
         }
     }
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
+        hudPlayer.values.forEach {
+            it.resetElements()
+            it.startTick()
+        }
         callback()
     }
 

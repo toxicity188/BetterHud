@@ -42,12 +42,16 @@ object TextManager: BetterHudManager {
     }
     fun getWidth(char: Char) = textWidthMap[char] ?: 3
 
-    fun getText(name: String) = textMap[name]
+    fun getText(name: String) = synchronized(textMap) {
+        textMap[name]
+    }
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        textMap.clear()
-        textWidthMap.clear()
-        textKeyMap.clear()
+        synchronized(this) {
+            textMap.clear()
+            textWidthMap.clear()
+            textKeyMap.clear()
+        }
         val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
         val globalSaveFolder = ArrayList(resource.textures).apply {

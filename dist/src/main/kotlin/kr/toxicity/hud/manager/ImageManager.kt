@@ -16,13 +16,17 @@ object ImageManager: BetterHudManager {
     override fun start() {
     }
 
-    fun getImage(name: String) = imageMap[name]
+    fun getImage(name: String) = synchronized(imageMap) {
+        imageMap[name]
+    }
 
 
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
 
-        imageMap.clear()
+        synchronized(imageMap) {
+            imageMap.clear()
+        }
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
