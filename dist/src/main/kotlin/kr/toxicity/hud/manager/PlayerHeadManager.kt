@@ -1,18 +1,35 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.player.HudHead
+import kr.toxicity.hud.player.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import java.awt.Color
 import java.awt.image.BufferedImage
 
 object PlayerHeadManager: BetterHudManager {
 
+    private val skinProviders = ArrayList<PlayerSkinProvider>()
+    private val defaultProviders = GameProfileProvider()
     private val headMap = HashMap<String, HudHead>()
 
     override fun start() {
+        if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
+            skinProviders.add(SkinRestorerProvider())
+        }
+        if (!Bukkit.getServer().onlineMode) {
+            skinProviders.add(HttpSkinProvider())
+        }
+    }
 
+    fun provideSkin(player: Player): String {
+        for (skinProvider in skinProviders) {
+            val value = skinProvider.provide(player)
+            if (value != null) return value
+        }
+        return defaultProviders.provide(player)
     }
 
     fun getHead(name: String) = synchronized(headMap) {

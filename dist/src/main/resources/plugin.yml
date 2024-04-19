@@ -16,6 +16,7 @@ softdepend:
   - floodgate
   - Geyser-Spigot
   - Skript
+  - SkinsRestorer
 commands:
   betterhud:
     aliases:

@@ -7,6 +7,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.SkriptLang:Skript:2.8.4")
+    compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.10")
 }
 
 tasks.processResources {

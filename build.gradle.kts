@@ -46,6 +46,7 @@ allprojects {
         maven("https://repo.alessiodp.com/releases/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://mvn.lumine.io/repository/maven/")
+        maven("https://repo.codemc.org/repository/maven-public/")
     }
 
     dependencies {
