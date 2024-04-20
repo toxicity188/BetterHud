@@ -3,45 +3,109 @@ package kr.toxicity.hud.pack
 import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.util.*
-import org.bukkit.Bukkit
 import java.io.File
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.security.DigestOutputStream
 import java.security.MessageDigest
-import java.util.Comparator
-import java.util.TreeMap
+import java.text.DecimalFormat
+import java.util.*
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
+    @Volatile
+    private var beforeByte = 0L
+    private val decimal = DecimalFormat("#,###.###")
+
+    private fun mbFormat(long: Long): String {
+        return "${decimal.format(BigDecimal("${long}.0") / BigDecimal("1048576.0"))}MB"
+    }
 
     private class ZipBuilder(
         val zip: ZipOutputStream
     ) {
-        var byte = 0
+        var byte = 0L
+    }
+    private class FileTreeBuilder(
+        private val build: File
+    ) {
+        val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
+        var byte = 0L
+
+        fun save(packFile: PackFile) {
+            val replace = packFile.path.replace('/', File.separatorChar)
+            val arr = packFile.array()
+            synchronized(this) {
+                byte += arr.size
+            }
+            (synchronized(locationMap) {
+                locationMap.remove(replace)
+            } ?: File(build, replace).apply {
+                parentFile.mkdirs()
+            }).outputStream().buffered().use { stream ->
+                stream.write(arr)
+            }
+        }
+        fun close() {
+            synchronized(this) {
+                val iterator = locationMap.values.iterator()
+                synchronized(iterator) {
+                    while (iterator.hasNext()) {
+                        val next = iterator.next()
+                        if (next.listFiles()?.isNotEmpty() == true) continue
+                        next.delete()
+                    }
+                }
+                info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(byte)}" else mbFormat(byte)}")
+                if (beforeByte != byte) {
+                    beforeByte = byte
+                }
+            }
+        }
     }
 
     fun generate(callback: () -> Unit) {
         runCatching {
+            ConfigManager.mergeOtherFolders.forEach {
+                val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
+                val mergeLength = mergeTarget.path.length + 1
+                fun addFile(target: File) {
+                    if (target.isDirectory) target.forEach { t ->
+                        addFile(t)
+                    } else {
+                        addTask(target.path.substring(mergeLength).replace(File.separatorChar, '/').split('/')) {
+                            target.inputStream().buffered().use { stream ->
+                                stream.readAllBytes()
+                            }
+                        }
+                    }
+                }
+                mergeTarget.forEach { target ->
+                    addFile(target)
+                }
+            }
             val saveTask: Generator = when (ConfigManager.packType) {
                 PackType.FOLDER -> {
                     val build = DATA_FOLDER.parentFile.subFolder(ConfigManager.buildFolderLocation)
                     val pathLength = build.path.length + 1
-                    val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
-                    fun getAllLocation(file: File) {
-                        locationMap[file.path.substring(pathLength)] = file
-                        file.listFiles()?.forEach {
-                            getAllLocation(it)
+                    val builder = FileTreeBuilder(build)
+                    fun getAllLocation(file: File, length: Int) {
+                        builder.locationMap.put(file.path.substring(length), file)?.let {
+                            warn("Duplicated file skipped: ${file.path} and ${it.path}")
+                        }
+                        file.forEach {
+                            getAllLocation(it, length)
                         }
                     }
                     build.listFiles()?.forEach {
-                        getAllLocation(it)
+                        getAllLocation(it, pathLength)
                     }
                     PLUGIN.loadAssets("pack") { a, i ->
-                        val replace = a.replace('/','\\')
-                        (locationMap.remove(replace) ?: File(build, replace).apply {
+                        val replace = a.replace('/', File.separatorChar)
+                        (builder.locationMap.remove(replace) ?: File(build, replace).apply {
                             parentFile.mkdirs()
                         }).outputStream().buffered().use { os ->
                             i.copyTo(os)
@@ -49,26 +113,10 @@ object PackGenerator {
                     }
                     object : Generator {
                         override fun close() {
-                            synchronized(locationMap) {
-                                val iterator = locationMap.values.iterator()
-                                synchronized(iterator) {
-                                    while (iterator.hasNext()) {
-                                        val next = iterator.next()
-                                        if (next.listFiles()?.isNotEmpty() == true) continue
-                                        next.delete()
-                                    }
-                                }
-                            }
+                            builder.close()
                         }
                         override fun invoke(p1: PackFile) {
-                            val replace = p1.path.replace('/','\\')
-                            (synchronized(locationMap) {
-                                locationMap.remove(replace)
-                            } ?: File(build, replace).apply {
-                                parentFile.mkdirs()
-                            }).outputStream().buffered().use { stream ->
-                                stream.write(p1.array())
-                            }
+                            builder.save(p1)
                         }
                     }
                 }
@@ -88,7 +136,7 @@ object PackGenerator {
                         setComment("BetterHud resource pack.")
                         setLevel(Deflater.BEST_COMPRESSION)
                         PLUGIN.loadAssets("pack") { s, i ->
-                            putNextEntry(ZipEntry(s.replace('\\','/')))
+                            putNextEntry(ZipEntry(s.replace(File.separatorChar,'/')))
                             write(i.readAllBytes())
                             closeEntry()
                         }
@@ -120,11 +168,15 @@ object PackGenerator {
                         override fun close() {
                             synchronized(zip) {
                                 zip.zip.close()
-                                if (host && message != null) {
-                                    PackUploader.upload(message, file.inputStream().buffered().use {
-                                        it.readAllBytes()
-                                    })
-                                } else PackUploader.stop()
+                                info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(zip.byte)}" else mbFormat(zip.byte)}")
+                                if (beforeByte != zip.byte) {
+                                    beforeByte = zip.byte
+                                    if (host && message != null) {
+                                        PackUploader.upload(message, file.inputStream().buffered().use {
+                                            it.readAllBytes()
+                                        })
+                                    } else PackUploader.stop()
+                                }
                             }
                         }
 

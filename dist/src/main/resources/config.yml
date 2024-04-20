@@ -11,6 +11,7 @@ pack-type: folder #folder, zip
 enable-protection: false
 enable-self-host: false
 self-host-port: 8163
+merge-other-folders: []
 
 default-hud:
   - test_hud

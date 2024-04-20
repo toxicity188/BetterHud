@@ -25,7 +25,7 @@ object ConfigManager: BetterHudManager {
         private set
     var disableToBedrockPlayer = true
         private set
-    var buildFolderLocation = "BetterHud\\build"
+    var buildFolderLocation = "BetterHud/build"
         private set
     var enableProtection = true
         private set
@@ -37,6 +37,8 @@ object ConfigManager: BetterHudManager {
     var enableSelfHost = false
         private set
     var selfHostPort = 8163
+        private set
+    var mergeOtherFolders = emptyList<String>()
         private set
 
     override fun start() {
@@ -75,6 +77,7 @@ object ConfigManager: BetterHudManager {
             enableProtection = yaml.getBoolean("enable-protection")
             mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
             enableSelfHost = yaml.getBoolean("enable-self-host")
+            mergeOtherFolders = yaml.getStringList("merge-other-folders")
             selfHostPort = yaml.getInt("self-host-port", 8163)
         }.onFailure { e ->
             warn("Unable to load config.yml")
