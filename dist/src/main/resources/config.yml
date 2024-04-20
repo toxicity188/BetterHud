@@ -8,6 +8,9 @@ disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"
 
 pack-type: folder #folder, zip
+enable-protection: false
+enable-self-host: false
+self-host-port: 8163
 
 default-hud:
   - test_hud

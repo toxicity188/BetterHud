@@ -10,16 +10,24 @@ import java.net.http.HttpResponse
 
 class HttpSkinProvider: PlayerSkinProvider {
     override fun provide(player: Player): String? {
-        return InputStreamReader(HttpClient.newHttpClient().send(HttpRequest.newBuilder()
-            .uri(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/${player.uniqueId.toString().replace("_","").lowercase()}"))
-            .GET()
-            .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
+        return runCatching {
+            val uuid = InputStreamReader(HttpClient.newHttpClient().send(HttpRequest.newBuilder()
+                .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/${player.name}?at=${System.currentTimeMillis() / 1000}"))
+                .GET()
+                .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                 JsonParser.parseReader(it)
-        }.asJsonObject
-            .getAsJsonArray("properties")
-            .get(0)
-            .asJsonObject
-            .getAsJsonPrimitive("value")
-            .asString
+            }.asJsonObject.getAsJsonPrimitive("id").asString
+            InputStreamReader(HttpClient.newHttpClient().send(HttpRequest.newBuilder()
+                .uri(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/$uuid"))
+                .GET()
+                .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
+                JsonParser.parseReader(it)
+            }.asJsonObject
+                .getAsJsonArray("properties")
+                .get(0)
+                .asJsonObject
+                .getAsJsonPrimitive("value")
+                .asString
+        }.getOrNull()
     }
 }

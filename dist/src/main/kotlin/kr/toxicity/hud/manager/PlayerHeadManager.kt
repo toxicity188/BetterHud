@@ -12,12 +12,12 @@ import java.awt.image.BufferedImage
 object PlayerHeadManager: BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
-    private val defaultProviders = GameProfileProvider()
+    private val defaultProviders = GameProfileSkinProvider()
     private val headMap = HashMap<String, HudHead>()
 
     override fun start() {
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
-            skinProviders.add(SkinRestorerProvider())
+            skinProviders.add(SkinsRestorerSkinProvider())
         }
         if (!Bukkit.getServer().onlineMode) {
             skinProviders.add(HttpSkinProvider())

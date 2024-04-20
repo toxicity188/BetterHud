@@ -3,11 +3,9 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.event.HudPlayerJoinEvent
 import kr.toxicity.hud.api.event.HudPlayerQuitEvent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.asyncTask
-import kr.toxicity.hud.util.call
-import kr.toxicity.hud.util.task
+import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -48,6 +46,9 @@ object PlayerManager: BetterHudManager {
             hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
                 val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
                 task {
+                    taskLater(20) {
+                        PackUploader.apply(player)
+                    }
                     HudPlayerJoinEvent(adaptedPlayer, hud).call()
                 }
                 hud

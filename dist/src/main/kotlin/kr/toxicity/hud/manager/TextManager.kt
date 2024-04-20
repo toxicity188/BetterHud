@@ -140,7 +140,7 @@ object TextManager: BetterHudManager {
 
     private fun loadDefaultBitmap() {
         defaultBitmapImageMap.clear()
-        PLUGIN.getResource("default.json")?.let {
+        PLUGIN.getResource("minecraft_default.json")?.let {
             runCatching {
                 InputStreamReader(it).buffered().use { reader ->
                     JsonParser.parseReader(reader)
@@ -174,7 +174,7 @@ object TextManager: BetterHudManager {
                     }
                 }
             }.onFailure { e ->
-                warn("Unable to parse default.json")
+                warn("Unable to parse minecraft_default.json")
                 warn("Reason: ${e.message}")
             }
         }

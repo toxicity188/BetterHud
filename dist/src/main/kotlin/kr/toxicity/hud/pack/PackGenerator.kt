@@ -1,8 +1,13 @@
 package kr.toxicity.hud.pack
 
+import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManager
 import kr.toxicity.hud.util.*
+import org.bukkit.Bukkit
 import java.io.File
+import java.math.BigInteger
+import java.security.DigestOutputStream
+import java.security.MessageDigest
 import java.util.Comparator
 import java.util.TreeMap
 import java.util.zip.Deflater
@@ -11,6 +16,12 @@ import java.util.zip.ZipOutputStream
 
 object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
+
+    private class ZipBuilder(
+        val zip: ZipOutputStream
+    ) {
+        var byte = 0
+    }
 
     fun generate(callback: () -> Unit) {
         runCatching {
@@ -62,9 +73,18 @@ object PackGenerator {
                     }
                 }
                 PackType.ZIP -> {
-                    val zip = ZipOutputStream(File(DATA_FOLDER.parentFile, "${ConfigManager.buildFolderLocation}.zip").apply {
+                    val protection = ConfigManager.enableProtection
+                    val host = ConfigManager.enableSelfHost
+                    val message = runCatching {
+                        MessageDigest.getInstance("SHA-1")
+                    }.getOrNull()
+                    val file = File(DATA_FOLDER.parentFile, "${ConfigManager.buildFolderLocation}.zip")
+                    val stream = file.apply {
                         if (!exists()) delete()
-                    }.outputStream().buffered()).apply {
+                    }.outputStream().buffered()
+                    val zip = ZipBuilder(ZipOutputStream(message?.let {
+                        DigestOutputStream(stream, it)
+                    } ?: stream).apply {
                         setComment("BetterHud resource pack.")
                         setLevel(Deflater.BEST_COMPRESSION)
                         PLUGIN.loadAssets("pack") { s, i ->
@@ -72,22 +92,46 @@ object PackGenerator {
                             write(i.readAllBytes())
                             closeEntry()
                         }
+                    })
+                    fun addEntry(entry: ZipEntry, byte: ByteArray) {
+                        synchronized(zip) {
+                            zip.byte += byte.size
+                            zip.zip.putNextEntry(entry)
+                            zip.zip.write(byte)
+                            zip.zip.closeEntry()
+                            if (protection) {
+                                entry.crc = byte.size.toLong()
+                                entry.size = BigInteger(byte).mod(BigInteger.valueOf(Long.MAX_VALUE)).toLong()
+                            }
+                        }
+                    }
+                    if (host) {
+                        PLUGIN.getResource("icon.png")?.buffered()?.use {
+                            addEntry(ZipEntry("pack.png"), it.readAllBytes())
+                        }
+                        addEntry(ZipEntry("pack.mcmeta"), JsonObject().apply {
+                            add("pack", JsonObject().apply {
+                                addProperty("pack_format", PLUGIN.nms.version.metaVersion)
+                                addProperty("description", "BetterHud's self host pack.")
+                            })
+                        }.toByteArray())
                     }
                     object : Generator {
                         override fun close() {
                             synchronized(zip) {
-                                zip.close()
+                                zip.zip.close()
+                                if (host && message != null) {
+                                    PackUploader.upload(message, file.inputStream().buffered().use {
+                                        it.readAllBytes()
+                                    })
+                                } else PackUploader.stop()
                             }
                         }
 
                         override fun invoke(p1: PackFile) {
                             val entry = ZipEntry(p1.path)
                             val byte = p1.array()
-                            synchronized(zip) {
-                                zip.putNextEntry(entry)
-                                zip.write(byte)
-                                zip.closeEntry()
-                            }
+                            addEntry(entry, byte)
                         }
                     }
                 }

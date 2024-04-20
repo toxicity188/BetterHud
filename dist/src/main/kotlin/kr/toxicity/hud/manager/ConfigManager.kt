@@ -27,10 +27,16 @@ object ConfigManager: BetterHudManager {
         private set
     var buildFolderLocation = "BetterHud\\build"
         private set
+    var enableProtection = true
+        private set
 
     var mergeBossBar = true
         private set
     var packType = PackType.FOLDER
+        private set
+    var enableSelfHost = false
+        private set
+    var selfHostPort = 8163
         private set
 
     override fun start() {
@@ -66,7 +72,10 @@ object ConfigManager: BetterHudManager {
             yaml.getString("build-folder-location")?.let {
                 buildFolderLocation = it
             }
+            enableProtection = yaml.getBoolean("enable-protection")
             mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
+            enableSelfHost = yaml.getBoolean("enable-self-host")
+            selfHostPort = yaml.getInt("self-host-port", 8163)
         }.onFailure { e ->
             warn("Unable to load config.yml")
             warn("Reason: ${e.message}")

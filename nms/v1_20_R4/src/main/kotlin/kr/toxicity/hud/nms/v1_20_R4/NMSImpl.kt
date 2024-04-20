@@ -93,7 +93,7 @@ class NMSImpl: NMS {
     }
 
     override fun getVersion(): NMSVersion {
-        return NMSVersion.V1_20_R3
+        return NMSVersion.V1_20_R4
     }
 
     override fun getTextureValue(player: Player): String {

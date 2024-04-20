@@ -183,6 +183,7 @@ class BetterHudImpl: BetterHud() {
             "v1_20_R1" -> kr.toxicity.hud.nms.v1_20_R1.NMSImpl()
             "v1_20_R2" -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
             "v1_20_R3" -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
+            //"v1_20_R4" -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
             else -> {
                 warn("Unsupported bukkit version: $version")
                 pluginManager.disablePlugin(this)

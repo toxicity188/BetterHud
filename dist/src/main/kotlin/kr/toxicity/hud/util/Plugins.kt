@@ -18,5 +18,6 @@ fun info(message: String) = PLUGIN.logger.info(message)
 fun warn(message: String) = PLUGIN.logger.warning(message)
 
 fun task(block: () -> Unit) = PLUGIN.scheduler.task(PLUGIN, block)
+fun taskLater(delay: Long, block: () -> Unit) = PLUGIN.scheduler.taskLater(PLUGIN, delay, block)
 fun asyncTask(block: () -> Unit) = PLUGIN.scheduler.asyncTask(PLUGIN, block)
 fun asyncTaskTimer(delay: Long, period: Long, block: () -> Unit) = PLUGIN.scheduler.asyncTaskTimer(PLUGIN, delay, period, block)

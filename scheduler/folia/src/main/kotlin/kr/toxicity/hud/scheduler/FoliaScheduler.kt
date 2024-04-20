@@ -21,6 +21,20 @@ class FoliaScheduler: HudScheduler {
         }
     }
 
+    override fun taskLater(plugin: Plugin, delay: Long, runnable: Runnable): HudTask {
+        val task = Bukkit.getGlobalRegionScheduler().runDelayed(plugin, {
+            runnable.run()
+        }, delay)
+        return object : HudTask {
+            override fun isCancelled(): Boolean {
+                return task.isCancelled
+            }
+            override fun cancel() {
+                task.cancel()
+            }
+        }
+    }
+
     override fun asyncTask(plugin: Plugin, runnable: Runnable): HudTask {
         val task = Bukkit.getAsyncScheduler().runNow(plugin) {
             runnable.run()

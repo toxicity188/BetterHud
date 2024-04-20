@@ -15,6 +15,14 @@ public interface HudScheduler {
      */
     @NotNull HudTask task(@NotNull Plugin plugin, @NotNull Runnable runnable);
     /**
+     * Executes sync task.
+     * @param plugin target plugin.
+     * @param delay delay
+     * @param runnable task
+     * @return scheduled task.
+     */
+    @NotNull HudTask taskLater(@NotNull Plugin plugin, long delay, @NotNull Runnable runnable);
+    /**
      * Executes async task.
      * @param plugin target plugin.
      * @param runnable task
