@@ -16,6 +16,7 @@ import java.util.zip.ZipOutputStream
 
 object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
+
     @Volatile
     private var beforeByte = 0L
     private val decimal = DecimalFormat("#,###.###")

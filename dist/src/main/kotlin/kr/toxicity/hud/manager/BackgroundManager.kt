@@ -43,8 +43,9 @@ object BackgroundManager: BetterHudManager {
                                 image.toByteArray()
                             }
                         }
-                    backgroundMap.putSync(name) {
+                    backgroundMap.putSync("background", name) {
                         HudBackground(
+                            it.path,
                             name,
                             getImage("left"),
                             getImage("right"),

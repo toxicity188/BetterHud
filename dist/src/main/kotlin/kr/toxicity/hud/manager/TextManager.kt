@@ -68,8 +68,8 @@ object TextManager: BetterHudManager {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
-                textMap.putSync(s) {
-                    parseFont(s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
+                textMap.putSync("text", s) {
+                    parseFont(file.path, s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
                         section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
                             put(key, LocatedImage(
                                 File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
@@ -111,7 +111,7 @@ object TextManager: BetterHudManager {
                     }
                 }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
             }.deriveFont(configScale.toFloat())
-            val parseDefault = parseFont("default", "default", defaultFont, configScale, ArrayList(resource.textures).apply {
+            val parseDefault = parseFont("", "default", "default", defaultFont, configScale, ArrayList(resource.textures).apply {
                 add("font")
             }, emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
             val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
@@ -181,6 +181,7 @@ object TextManager: BetterHudManager {
     }
 
     private fun parseFont(
+        path: String,
         s: String,
         saveName: String,
         fontFile: Font,
@@ -263,7 +264,7 @@ object TextManager: BetterHudManager {
                 }
             }
         }
-        return HudText(s, saveName, height, textList, images, charWidthMap, condition)
+        return HudText(path, s, saveName, height, textList, images, charWidthMap, condition)
     }
 
     override fun end() {

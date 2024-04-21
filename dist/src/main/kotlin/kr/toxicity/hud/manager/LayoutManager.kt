@@ -23,8 +23,8 @@ object LayoutManager: BetterHudManager {
         }
         DATA_FOLDER.subFolder("layouts").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
-                layoutMap.putSync(s) {
-                    LayoutGroup(configurationSection)
+                layoutMap.putSync("layout", s) {
+                    LayoutGroup(file.path, configurationSection)
                 }
             }.onFailure { e ->
                 warn("Unable to load this layout: $s in ${file.name}")

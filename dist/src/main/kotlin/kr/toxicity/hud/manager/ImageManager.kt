@@ -33,6 +33,7 @@ object ImageManager: BetterHudManager {
                 val image = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
                     ImageType.SINGLE -> {
                         HudImage(
+                            file.path,
                             s,
                             listOf(NamedLoadedImage(
                                 "$s.png",
@@ -52,6 +53,7 @@ object ImageManager: BetterHudManager {
                             }.getOrNull()
                         } ?: SplitType.LEFT)
                         HudImage(
+                            file.path,
                             s,
                             splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set."))
                                 .toImage()
@@ -63,6 +65,7 @@ object ImageManager: BetterHudManager {
                     }
                     ImageType.SEQUENCE -> {
                         HudImage(
+                            file.path,
                             s,
                             configurationSection.getStringList("files").ifEmpty {
                                 warn("files is empty.")
@@ -79,7 +82,7 @@ object ImageManager: BetterHudManager {
                         )
                     }
                 }
-                imageMap.putSync(s) {
+                imageMap.putSync("image", s) {
                     image
                 }
             }.onFailure { e ->

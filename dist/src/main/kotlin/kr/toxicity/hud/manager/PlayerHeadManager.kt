@@ -45,21 +45,21 @@ object PlayerHeadManager: BetterHudManager {
         }
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
-                val head = HudHead(s , configurationSection)
-                val pixel = head.pixel
-                val targetFile = ArrayList(saveLocation).apply {
-                    add("pixel_$pixel.png")
-                }
-                PackGenerator.addTask(targetFile) {
-                    BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {
-                        createGraphics().run {
-                            color = Color.WHITE
-                            fillRect(0, 0, pixel, pixel)
-                            dispose()
-                        }
-                    }.toByteArray()
-                }
-                headMap.putSync(head.name) {
+                headMap.putSync("head", s) {
+                    val head = HudHead(file.path, s, configurationSection)
+                    val pixel = head.pixel
+                    val targetFile = ArrayList(saveLocation).apply {
+                        add("pixel_$pixel.png")
+                    }
+                    PackGenerator.addTask(targetFile) {
+                        BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {
+                            createGraphics().run {
+                                color = Color.WHITE
+                                fillRect(0, 0, pixel, pixel)
+                                dispose()
+                            }
+                        }.toByteArray()
+                    }
                     head
                 }
             }.onFailure { e ->

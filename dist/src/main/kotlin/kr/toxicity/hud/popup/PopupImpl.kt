@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.EquationPairLocation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.*
@@ -16,10 +17,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class PopupImpl(
+    override val path: String,
     file: List<String>,
     val internalName: String,
     section: ConfigurationSection
-): Popup {
+): Popup, HudConfiguration {
     val gui = GuiLocation(section)
     val move = section.getConfigurationSection("move")?.let {
         EquationPairLocation(it)

@@ -22,8 +22,8 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
         }
         DATA_FOLDER.subFolder("popups").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
-                popupMap.putSync(s) {
-                    PopupImpl(save, s, configurationSection)
+                popupMap.putSync("popup", s) {
+                    PopupImpl(file.path, save, s, configurationSection)
                 }
             }.onFailure { e ->
                 warn("Unable to load this popup: $s in ${file.name}")

@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.manager.ConfigManager
@@ -18,7 +19,12 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection
 
-class HudImpl(private val internalName: String, file: List<String>, section: ConfigurationSection) : Hud {
+class HudImpl(
+    override val path: String,
+    private val internalName: String,
+    file: List<String>,
+    section: ConfigurationSection
+): Hud, HudConfiguration {
     companion object {
         const val DEFAULT_BIT = 13
         const val MAX_BIT = 23 - DEFAULT_BIT

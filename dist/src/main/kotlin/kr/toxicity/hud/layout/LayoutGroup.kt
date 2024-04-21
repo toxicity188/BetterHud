@@ -1,5 +1,6 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.AnimationLocation
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
@@ -9,7 +10,10 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.configuration.ConfigurationSection
 import java.text.DecimalFormat
 
-class LayoutGroup(section: ConfigurationSection) {
+class LayoutGroup(
+    override val path: String,
+    section: ConfigurationSection
+): HudConfiguration {
 
     private val loc = ImageLocation(section)
 

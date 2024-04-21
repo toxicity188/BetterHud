@@ -24,8 +24,8 @@ object HudManagerImpl: BetterHudManager, HudManager {
         }
         DATA_FOLDER.subFolder("huds").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
-                hudMap.putSync(s) {
-                    HudImpl(s, hudFolder, configurationSection)
+                hudMap.putSync("hud", s) {
+                    HudImpl(file.path, s, hudFolder, configurationSection)
                 }
             }.onFailure { e ->
                 warn("Unable to load this hud: $s in ${file.name}")
