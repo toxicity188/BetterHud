@@ -193,22 +193,28 @@ object PackGenerator {
                 runCatching {
                     saveTask(t)
                 }.onFailure { e ->
-                    warn("Unable to save this file: ${t.path}")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to save this file: ${t.path}",
+                        "Reason: ${e.message}"
+                    )
                 }
             }) {
                 runCatching {
                     saveTask.close()
                 }.onFailure { e ->
-                    warn("Unable to finalized resource pack build.")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to finalized resource pack build.",
+                        "Reason: ${e.message}"
+                    )
                 }
                 callback()
                 tasks.clear()
             }
         }.onFailure { e ->
-            warn("Unable to make a resource pack.")
-            warn("Reason: ${e.message}")
+            warn(
+                "Unable to make a resource pack.",
+                "Reason: ${e.message}"
+            )
             callback()
             tasks.clear()
         }

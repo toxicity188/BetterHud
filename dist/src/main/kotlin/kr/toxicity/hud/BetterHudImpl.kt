@@ -252,8 +252,10 @@ class BetterHudImpl: BetterHud() {
                     }
                     managerReload()
                 }.onFailure { e ->
-                    warn("Unable to reload.")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to reload.",
+                        "Reason: ${e.message}"
+                    )
                     onReload = false
                     consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
                 }

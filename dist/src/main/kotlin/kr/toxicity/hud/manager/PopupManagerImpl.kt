@@ -26,8 +26,10 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
                     PopupImpl(file.path, save, s, configurationSection)
                 }
             }.onFailure { e ->
-                warn("Unable to load this popup: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this popup: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }, callback)
     }

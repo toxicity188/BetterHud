@@ -27,8 +27,10 @@ object LayoutManager: BetterHudManager {
                     LayoutGroup(file.path, configurationSection)
                 }
             }.onFailure { e ->
-                warn("Unable to load this layout: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this layout: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }, callback)
     }

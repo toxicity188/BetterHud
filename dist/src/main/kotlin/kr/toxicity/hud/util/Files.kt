@@ -41,8 +41,10 @@ fun File.forEachAllYaml(block: (File, String, ConfigurationSection) -> Unit) {
                     block(it, s, configurationSection)
                 }
             }.onFailure { e ->
-                warn("Unable to load this yml file: ${it.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this yml file: ${it.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }
     }
@@ -70,8 +72,10 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
             }
             if (list.isNotEmpty()) it to list else null
         }.getOrElse { e ->
-            warn("Unable to load this yml file: ${it.name}")
-            warn("Reason: ${e.message}")
+            warn(
+                "Unable to load this yml file: ${it.name}",
+                "Reason: ${e.message}"
+            )
             null
         }
     }

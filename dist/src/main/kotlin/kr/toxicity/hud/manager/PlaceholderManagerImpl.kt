@@ -431,8 +431,10 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                         }
                     })
                 }.onFailure { e ->
-                    warn("Unable to read this placeholder task: $s in ${file.name}")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to read this placeholder task: $s in ${file.name}",
+                        "Reason: ${e.message}"
+                    )
                 }
             }
         }

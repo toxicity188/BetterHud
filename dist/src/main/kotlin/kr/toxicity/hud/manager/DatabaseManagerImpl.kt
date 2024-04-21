@@ -158,8 +158,10 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                     current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
                 }.onFailure { e ->
                     current = defaultConnector.connect(MemoryConfiguration())
-                    warn("Unable to connect the database.")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to connect the database.",
+                        "Reason: ${e.message}"
+                    )
                 }
                 callback()
             }

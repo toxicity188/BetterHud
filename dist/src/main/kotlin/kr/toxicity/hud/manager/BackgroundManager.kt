@@ -54,8 +54,10 @@ object BackgroundManager: BetterHudManager {
                         )
                     }
                 }.onFailure { e ->
-                    warn("Unable to load this yml: ${it.name}")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to load this yml: ${it.name}",
+                        "Reason: ${e.message}"
+                    )
                 }
             }
         }, callback)

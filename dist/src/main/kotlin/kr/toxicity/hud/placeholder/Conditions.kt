@@ -22,8 +22,10 @@ object Conditions {
                     }
                 }
             }.onFailure { e ->
-                warn("Unable to load this condition: $s")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this condition: $s",
+                    "Reason: ${e.message}"
+                )
             }
         }
         return value

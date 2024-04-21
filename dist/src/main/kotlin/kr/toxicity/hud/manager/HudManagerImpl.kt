@@ -28,8 +28,10 @@ object HudManagerImpl: BetterHudManager, HudManager {
                     HudImpl(file.path, s, hudFolder, configurationSection)
                 }
             }.onFailure { e ->
-                warn("Unable to load this hud: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this hud: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }, callback)
     }

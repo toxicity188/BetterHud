@@ -80,8 +80,10 @@ object ConfigManager: BetterHudManager {
             mergeOtherFolders = yaml.getStringList("merge-other-folders")
             selfHostPort = yaml.getInt("self-host-port", 8163)
         }.onFailure { e ->
-            warn("Unable to load config.yml")
-            warn("Reason: ${e.message}")
+            warn(
+                "Unable to load config.yml",
+                "Reason: ${e.message}"
+            )
         }
     }
     override fun end() {

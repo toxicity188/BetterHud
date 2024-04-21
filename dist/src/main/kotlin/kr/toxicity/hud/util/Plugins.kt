@@ -14,8 +14,22 @@ val DATA_FOLDER
 
 val VERSION = PLUGIN.nms.version
 
-fun info(message: String) = PLUGIN.logger.info(message)
-fun warn(message: String) = PLUGIN.logger.warning(message)
+fun info(vararg message: String) {
+    val logger = PLUGIN.logger
+    synchronized(logger) {
+        message.forEach {
+            logger.info(it)
+        }
+    }
+}
+fun warn(vararg message: String) {
+    val logger = PLUGIN.logger
+    synchronized(logger) {
+        message.forEach {
+            logger.warning(it)
+        }
+    }
+}
 
 fun task(block: () -> Unit) = PLUGIN.scheduler.task(PLUGIN, block)
 fun taskLater(delay: Long, block: () -> Unit) = PLUGIN.scheduler.taskLater(PLUGIN, delay, block)

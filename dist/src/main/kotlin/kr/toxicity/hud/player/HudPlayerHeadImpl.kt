@@ -3,7 +3,6 @@ package kr.toxicity.hud.player
 import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.manager.PlayerHeadManager
-import kr.toxicity.hud.util.textures
 import kr.toxicity.hud.util.toImage
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.text.format.NamedTextColor
@@ -45,8 +44,10 @@ class HudPlayerHeadImpl(player: Player): HudPlayerHead {
             }
         }
     }.getOrElse { e ->
-        warn("Unable to get ${player.name}'s head.")
-        warn("Reason: ${e.message}")
+        warn(
+            "Unable to get ${player.name}'s head.",
+            "Reason: ${e.message}"
+        )
         allBlack
     }
     override fun getColors(): List<TextColor> = colorList

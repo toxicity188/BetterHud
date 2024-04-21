@@ -63,8 +63,10 @@ object PlayerHeadManager: BetterHudManager {
                     head
                 }
             }.onFailure { e ->
-                warn("Unable to load this head: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this head: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }, callback)
     }

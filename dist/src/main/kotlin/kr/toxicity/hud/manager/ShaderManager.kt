@@ -204,8 +204,10 @@ object ShaderManager: BetterHudManager {
                     }
                     hudShaders.clear()
                 }.onFailure { e ->
-                    warn("Unable to load shader.yml")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to load shader.yml",
+                        "Reason: ${e.message}"
+                    )
                 }
             }
             callback()

@@ -86,8 +86,10 @@ object TextManager: BetterHudManager {
                     }, section.toConditions(), section.getBoolean("merge-default-bitmap"))
                 }
             }.onFailure { e ->
-                warn("Unable to load this text: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this text: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }) {
             val defaultArray = JsonArray().apply {
@@ -158,8 +160,10 @@ object TextManager: BetterHudManager {
                             return
                         }
                     }.getOrElse { e ->
-                        warn("Unable to load this image: $imageName")
-                        warn("Reason: ${e.message}")
+                        warn(
+                            "Unable to load this image: $imageName",
+                            "Reason: ${e.message}"
+                        )
                         return
                     }
                     val array = obj.getAsJsonArray("chars")
@@ -174,8 +178,10 @@ object TextManager: BetterHudManager {
                     }
                 }
             }.onFailure { e ->
-                warn("Unable to parse minecraft_default.json")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to parse minecraft_default.json",
+                    "Reason: ${e.message}"
+                )
             }
         }
     }

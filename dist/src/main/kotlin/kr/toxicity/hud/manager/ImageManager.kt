@@ -86,8 +86,10 @@ object ImageManager: BetterHudManager {
                     image
                 }
             }.onFailure { e ->
-                warn("Unable to load this image: $s in ${file.name}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this image: $s in ${file.name}",
+                    "Reason: ${e.message}"
+                )
             }
         }) {
             val saveLocation = ArrayList(resource.textures).apply {

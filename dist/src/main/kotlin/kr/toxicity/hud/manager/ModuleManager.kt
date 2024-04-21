@@ -32,8 +32,10 @@ object ModuleManager: BetterHudManager {
                     PlaceholderManagerImpl.booleanContainer.addPlaceholder("${module.key}_${boolean.key}", boolean.value)
                 }
             }.onFailure { e ->
-                warn("Unable to load this module: ${module.key}")
-                warn("Reason: ${e.message}")
+                warn(
+                    "Unable to load this module: ${module.key}",
+                    "Reason: ${e.message}"
+                )
             }
         }
     }

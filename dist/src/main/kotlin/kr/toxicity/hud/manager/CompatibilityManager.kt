@@ -64,8 +64,10 @@ object CompatibilityManager: BetterHudManager {
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
                 }.onFailure { e ->
-                    warn("Unable to load ${it.key} support.")
-                    warn("Reason: ${e.message}")
+                    warn(
+                        "Unable to load ${it.key} support.",
+                        "Reason: ${e.message}"
+                    )
                 }
             }
         }
