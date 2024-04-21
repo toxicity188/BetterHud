@@ -141,7 +141,7 @@ val sourceJar by tasks.creating(Jar::class.java) {
 val dokkaJar by tasks.creating(Jar::class.java) {
     dependsOn(tasks.dokkaHtmlMultiModule)
     archiveClassifier = "dokka"
-    from(layout.buildDirectory.dir("dokka\\htmlMultiModule").orNull?.asFile)
+    from(layout.buildDirectory.dir("dokka${File.separatorChar}htmlMultiModule").orNull?.asFile)
 }
 
 tasks {
