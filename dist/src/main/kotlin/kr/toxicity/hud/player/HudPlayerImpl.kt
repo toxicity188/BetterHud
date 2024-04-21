@@ -104,6 +104,7 @@ class HudPlayerImpl(
                     it.show(UpdateEvent.EMPTY, this)
                     false
                 }.onFailure { e ->
+                    e.printStackTrace()
                     warn("Unable to update popup. reason: ${e.message}")
                 }.getOrDefault(true)
             }
@@ -112,6 +113,7 @@ class HudPlayerImpl(
                     compList.addAll(it.getComponents(this))
                     false
                 }.onFailure { e ->
+                    e.printStackTrace()
                     warn("Unable to update hud. reason: ${e.message}")
                 }.getOrDefault(true)
             }

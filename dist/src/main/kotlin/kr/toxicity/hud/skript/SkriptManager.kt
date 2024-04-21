@@ -3,6 +3,7 @@ package kr.toxicity.hud.skript
 import ch.njol.skript.Skript
 import ch.njol.skript.classes.ClassInfo
 import ch.njol.skript.classes.Parser
+import ch.njol.skript.lang.ExpressionType
 import ch.njol.skript.lang.ParseContext
 import ch.njol.skript.registrations.Classes
 import kr.toxicity.hud.api.hud.Hud
@@ -14,7 +15,9 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.skript.effect.EffCallPopupEvent
 import kr.toxicity.hud.skript.effect.EffShowPopup
 import kr.toxicity.hud.skript.effect.EffUpdateHud
+import kr.toxicity.hud.skript.expression.ExprHudPlayer
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 
 object SkriptManager: BetterHudManager {
     override fun start() {
@@ -40,6 +43,7 @@ object SkriptManager: BetterHudManager {
             Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
             Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
             Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
+            Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
         }
     }
 

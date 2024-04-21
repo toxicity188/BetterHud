@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class HudPlayerJoinEvent extends PlayerEvent implements BetterHudEvent {
     private final @NotNull HudPlayer hudPlayer;
-    public HudPlayerJoinEvent(@NotNull Player who, @NotNull HudPlayer hudPlayer) {
-        super(who);
+    public HudPlayerJoinEvent(@NotNull HudPlayer hudPlayer) {
+        super(hudPlayer.getBukkitPlayer());
         this.hudPlayer = hudPlayer;
     }
     @NotNull

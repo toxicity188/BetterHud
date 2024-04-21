@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.mmocore.MMOCoreCompatibility
 import kr.toxicity.hud.compatibility.mythiclib.MythicLibCompatibility
 import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
+import kr.toxicity.hud.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
@@ -30,6 +31,9 @@ object CompatibilityManager: BetterHudManager {
         },
         "MythicLib" to {
             MythicLibCompatibility()
+        },
+        "Skript" to {
+            SkriptCompatibility()
         }
     )
 

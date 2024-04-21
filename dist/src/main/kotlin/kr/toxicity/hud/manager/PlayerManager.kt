@@ -31,7 +31,7 @@ object PlayerManager: BetterHudManager {
                 val player = e.player
                 hudPlayer.remove(player.uniqueId)?.let {
                     it.cancel()
-                    HudPlayerQuitEvent(player, it).call()
+                    HudPlayerQuitEvent(it).call()
                     asyncTask {
                         it.save()
                     }
@@ -49,7 +49,7 @@ object PlayerManager: BetterHudManager {
                     taskLater(20) {
                         PackUploader.apply(player)
                     }
-                    HudPlayerJoinEvent(adaptedPlayer, hud).call()
+                    HudPlayerJoinEvent(hud).call()
                 }
                 hud
             }

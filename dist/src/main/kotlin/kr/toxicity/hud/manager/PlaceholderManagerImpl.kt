@@ -271,13 +271,14 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
             }
         }
 
-        val pattern = equation.replaceAll("").split(':')
+        val pattern = equation.replaceAll("")
+        val head = pattern.substringBefore(':')
 
-        val matcher = castPattern.matcher(pattern[0])
+        val matcher = castPattern.matcher(head)
         val group = if (matcher.find()) matcher.group("type") else null
         val first = matcher.replaceAll("")
 
-        val args = if (pattern.size > 1) pattern[pattern.lastIndex].split(',') else emptyList()
+        val args = if (pattern.length > head.length + 1) pattern.substring(head.length + 1).split(',') else emptyList()
         val get = types.values.firstNotNullOfOrNull {
             it.map[first]?.let { mapper ->
                 it to mapper
