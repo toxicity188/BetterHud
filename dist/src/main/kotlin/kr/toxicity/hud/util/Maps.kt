@@ -35,5 +35,6 @@ fun <V: HudConfiguration> MutableMap<String, V>.putSync(name: String, k: String,
         }
     }.onFailure {
         remove()
+        throw it
     }
 }
