@@ -36,6 +36,8 @@ fun <T> Collection<T>.forEachAsync(block: (T) -> Unit, callback: () -> Unit) {
                         callback()
                     }
                 }
+            }.handle { _, e ->
+                e.printStackTrace()
             }
         }
     } else callback()

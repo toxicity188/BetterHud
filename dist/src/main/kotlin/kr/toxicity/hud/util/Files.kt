@@ -86,6 +86,10 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
     val index = TaskIndex(list.sumOf {
         it.second.size
     })
+    if (index.max == 0) {
+        callback()
+        return
+    }
     list.forEach {
         it.second.forEach { pair ->
             CompletableFuture.runAsync {
@@ -99,6 +103,8 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
                         callback()
                     }
                 }
+            }.handle { _, e ->
+                e.printStackTrace()
             }
         }
     }

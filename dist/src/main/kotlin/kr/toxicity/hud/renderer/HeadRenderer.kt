@@ -25,17 +25,19 @@ class HeadRenderer(
     fun getHead(event: UpdateEvent): (HudPlayer) -> PixelComponent {
         val cond = conditions.build(event)
         return { player ->
-            if (cond(player)) componentMap.computeIfAbsent(player.bukkitPlayer.uniqueId) {
-                var comp = EMPTY_WIDTH_COMPONENT
-                player.head.colors.forEachIndexed { index, textColor ->
-                    comp += WidthComponent(components[index / 8].color(textColor), pixel)
-                    comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
+            if (cond(player)) synchronized(componentMap) {
+                componentMap.computeIfAbsent(player.bukkitPlayer.uniqueId) {
+                    var comp = EMPTY_WIDTH_COMPONENT
+                    player.head.colors.forEachIndexed { index, textColor ->
+                        comp += WidthComponent(components[index / 8].color(textColor), pixel)
+                        comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
+                    }
+                    comp.toPixelComponent(when (align) {
+                        LayoutAlign.LEFT -> x
+                        LayoutAlign.CENTER -> x - comp.width / 2
+                        LayoutAlign.RIGHT -> x - comp.width
+                    })
                 }
-                comp.toPixelComponent(when (align) {
-                    LayoutAlign.LEFT -> x
-                    LayoutAlign.CENTER -> x - comp.width / 2
-                    LayoutAlign.RIGHT -> x - comp.width
-                })
             } else EMPTY_PIXEL_COMPONENT
         }
     }

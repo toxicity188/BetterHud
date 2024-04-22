@@ -49,3 +49,4 @@ permissions:
       hud.popup.add: true
       hud.popup.remove: true
       hud.popup.show: true
+      hud.popup.hide: true

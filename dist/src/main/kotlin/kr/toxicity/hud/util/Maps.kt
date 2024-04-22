@@ -18,7 +18,10 @@ fun <V: HudConfiguration> MutableMap<String, V>.putSync(name: String, k: String,
         cache.remove(k)
         if (cache.isEmpty()) CACHE_MAP.remove(name)
     }
-    if (!cache.add(k)) return warn()
+    if (!cache.add(k)) {
+        if (cache.isEmpty()) CACHE_MAP.remove(name)
+        return warn()
+    }
     runCatching {
         synchronized(this) {
             get(k)
