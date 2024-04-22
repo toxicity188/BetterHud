@@ -83,29 +83,14 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
         callback()
         return
     }
-    val index = TaskIndex(list.sumOf {
-        it.second.size
-    })
-    if (index.max == 0) {
-        callback()
-        return
-    }
-    list.forEach {
-        it.second.forEach { pair ->
-            CompletableFuture.runAsync {
-                runCatching {
-                    block(it.first, pair.first, pair.second)
-                }.onFailure { e ->
-                    e.printStackTrace()
-                }
-                synchronized(index) {
-                    if (++index.current == index.max) {
-                        callback()
-                    }
-                }
-            }.handle { _, e ->
-                e.printStackTrace()
+    list.map {
+        {
+            it.second.forEachAsync { pair ->
+                block(it.first, pair.first, pair.second)
             }
         }
+    }.forEachAsync {
+        it()
     }
+    callback()
 }

@@ -1,6 +1,8 @@
 package kr.toxicity.hud.util
 
-import java.util.concurrent.CompletableFuture
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.sqrt
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()
@@ -22,23 +24,57 @@ fun <T> List<List<T>>.sum(): List<T> {
 }
 
 fun <T> Collection<T>.forEachAsync(block: (T) -> Unit, callback: () -> Unit) {
+    toList().forEachAsync(block)
+    callback()
+}
+
+fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
     if (isNotEmpty()) {
-        val current = TaskIndex(size)
-        forEach {
-            CompletableFuture.runAsync {
-                runCatching {
+        val available = Runtime.getRuntime().availableProcessors()
+        val queue = if (available > size) {
+            LinkedList(map {
+                {
                     block(it)
-                }.onFailure { e ->
-                    e.printStackTrace()
                 }
-                synchronized(current) {
-                    if (++current.current == current.max) {
-                        callback()
+            })
+        } else {
+            val queue = LinkedList<() -> Unit>()
+            var i = 0
+            val add = sqrt(size.toDouble() / available).toInt()
+            while (i < size) {
+                val get = subList(i, (i + add).coerceAtMost(size))
+                queue.add {
+                    get.forEach { t ->
+                        block(t)
                     }
                 }
-            }.handle { _, e ->
-                e.printStackTrace()
+                i += add
             }
+            queue
         }
-    } else callback()
+        object : Thread() {
+            private val index = TaskIndex(queue.size)
+            override fun run() {
+                while (!isInterrupted) {
+                    queue.poll()?.let {
+                        Thread {
+                            runCatching {
+                                it()
+                            }.onFailure { e ->
+                                e.printStackTrace()
+                            }
+                            synchronized(index) {
+                                if (++index.current == index.max) {
+                                    interrupt()
+                                }
+                            }
+                        }.start()
+                    }
+                }
+            }
+        }.run {
+            start()
+            join()
+        }
+    }
 }

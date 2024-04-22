@@ -11,6 +11,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityEvent
@@ -24,7 +25,7 @@ class BukkitEntityModule: BukkitModule {
             "attack" to {
                 createBukkitTrigger(EntityDamageByEntityEvent::class.java, {
                     val attacker = it.damager
-                    if (attacker is Player) attacker.uniqueId else null
+                    if (attacker is Player) attacker.uniqueId else if (attacker is Projectile) (attacker.shooter as? Player)?.uniqueId else null
                 }, {
                     it.entity.uniqueId
                 })

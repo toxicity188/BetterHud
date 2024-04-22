@@ -59,11 +59,11 @@ private val FRC = FontRenderContext(null, true, true)
 
 fun BufferedImage.processFont(char: Char, font: Font): BufferedImage? {
     createGraphics().run {
-        drawGlyphVector(font.createGlyphVector(FRC, char.toString()), 0F, font.size.toFloat())
+        fill(font.createGlyphVector(FRC, char.toString()).getOutline(0F, font.size.toFloat()))
         dispose()
     }
 
-    return fontSubImage()
+    return removeEmptyWidth()?.image
 }
 
 fun BufferedImage.fontSubImage(sampling: Int = 96): BufferedImage? {

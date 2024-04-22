@@ -200,7 +200,7 @@ object TextManager: BetterHudManager {
         val height = (scale.toDouble() * 1.4).toInt()
         val pairMap = HashMap<Int, MutableList<Pair<Char, Image>>>()
         val charWidthMap = HashMap<Char, Int>()
-        if (mergeDefaultBitmap) defaultBitmapImageMap.forEach {
+        if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync {
             val newWidth = ((height.toDouble() / it.value.height) * it.value.width).roundToInt()
             BufferedImage(newWidth, height, BufferedImage.TYPE_INT_ARGB).apply {
                 createGraphics().run {
@@ -214,14 +214,14 @@ object TextManager: BetterHudManager {
                 charWidthMap[it.key] = resizedImage.width
             }
         }
-        (Char.MIN_VALUE..Char.MAX_VALUE).forEach { char ->
-            if (fontFile.canDisplay(char) && !charWidthMap.containsKey(char)) {
-                val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEach
-                pairMap.getOrPut(image.width) {
-                    ArrayList()
-                }.add(char to image)
-                charWidthMap[char] = image.width
-            }
+        (Char.MIN_VALUE..Char.MAX_VALUE).filter { char ->
+            fontFile.canDisplay(char) && !charWidthMap.containsKey(char)
+        }.forEachAsync { char ->
+            val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEachAsync
+            pairMap.getOrPut(image.width) {
+                ArrayList()
+            }.add(char to image)
+            charWidthMap[char] = image.width
         }
         val textList = ArrayList<HudTextArray>()
         val saveFolder = ArrayList(imageSaveFolder).apply {
