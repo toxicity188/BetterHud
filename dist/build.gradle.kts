@@ -2,12 +2,13 @@ dependencies {
     compileOnly("io.lumine:Mythic-Dist:5.6.2")
     compileOnly("io.lumine:MythicLib-dist:1.6.2-SNAPSHOT")
     compileOnly("net.Indyuce:MMOCore-API:1.12.1-SNAPSHOT")
+    compileOnly("net.Indyuce:MMOItems-API:6.10-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.5")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.SkriptLang:Skript:2.8.4")
-    compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.10")
+    compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.11")
 }
 
 tasks.processResources {

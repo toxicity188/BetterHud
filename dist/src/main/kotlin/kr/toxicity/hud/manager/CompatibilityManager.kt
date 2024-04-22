@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.mmocore.MMOCoreCompatibility
+import kr.toxicity.hud.compatibility.mmoitems.MMOItemsCompatibility
 import kr.toxicity.hud.compatibility.mythiclib.MythicLibCompatibility
 import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
 import kr.toxicity.hud.compatibility.skript.SkriptCompatibility
@@ -34,6 +35,9 @@ object CompatibilityManager: BetterHudManager {
         },
         "Skript" to {
             SkriptCompatibility()
+        },
+        "MMOItems" to {
+            MMOItemsCompatibility()
         }
     )
 

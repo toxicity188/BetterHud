@@ -1,5 +1,7 @@
 package kr.toxicity.hud.compatibility.mmocore
 
+import io.lumine.mythic.lib.player.modifier.ModifierSource
+import io.lumine.mythic.lib.player.modifier.ModifierType
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
@@ -140,6 +142,19 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     return Function { p ->
                         api.getPlayerData(p.bukkitPlayer).stats.getStat(args[0])
+                    }
+                }
+            },
+            "temp_stat" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(
+                    args: MutableList<String>,
+                    reason: UpdateEvent
+                ): Function<HudPlayer, Number> {
+                    return Function { p ->
+                        api.getPlayerData(p.bukkitPlayer).stats.map.getInstance(args[0]).getFilteredTotal {
+                            it.source == ModifierSource.OTHER
+                        }
                     }
                 }
             },
