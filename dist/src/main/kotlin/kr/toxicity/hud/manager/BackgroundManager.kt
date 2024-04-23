@@ -38,7 +38,7 @@ object BackgroundManager: BetterHudManager {
                         .removeEmptyWidth()
                         .ifNull("this image is empty: $imageName.png in $name").apply {
                             PackGenerator.addTask(ArrayList(output).apply {
-                                add("$imageName.png")
+                                add("background_${name}_$imageName.png".encodeFile())
                             }) {
                                 image.toByteArray()
                             }

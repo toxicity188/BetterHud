@@ -7,6 +7,8 @@ val PLUGIN
     get() = BetterHud.getInstance()
 
 const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
+val NAME_SPACE_ENCODED = NAME_SPACE.encodeKey()
+
 val DATA_FOLDER
     get() = PLUGIN.dataFolder.apply {
         if (!exists()) mkdir()

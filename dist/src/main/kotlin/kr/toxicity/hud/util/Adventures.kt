@@ -9,8 +9,9 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import kotlin.math.abs
 
-val SPACE_KEY = Key.key("$NAME_SPACE:space")
-val LEGACY_SPACE_KEY = Key.key("$NAME_SPACE:legacy_space")
+val SPACE_KEY = Key.key("${NAME_SPACE.encodeKey()}:space")
+val LEGACY_SPACE_KEY = Key.key("${NAME_SPACE.encodeKey()}:legacy_space")
+val DEFAULT_KEY = Key.key("${NAME_SPACE.encodeKey()}:default")
 
 val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
     TextDecoration.State.FALSE

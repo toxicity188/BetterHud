@@ -47,14 +47,15 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
             text.text.array.forEach {
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:text/${text.text.fontName}/${it.file}")
                     addProperty("ascent", HudImpl.createBit(yAxis, shader))
                     addProperty("height", scale)
                     add("chars", it.chars)
                 })
             }
             var textIndex = 0xC0000
-            val key = Key.key("$NAME_SPACE:hud/$name/text/text_${index + 1}_${index2 + 1}")
+            val textEncoded = "hud_${parent.name}_text_${index + 1}_${index2 + 1}".encodeKey()
+            val key = Key.key("$NAME_SPACE_ENCODED:hud/$name/text/$textEncoded")
             val imageMap = HashMap<String, WidthComponent>()
             text.text.images.forEach {
                 val result = (textIndex++).parseChar()
@@ -63,7 +64,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                 val div = height.toDouble() / it.value.image.image.height
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE:text/${text.text.fontName}/image_${it.key}.png")
+                    addProperty("file", "$NAME_SPACE_ENCODED:text/${text.text.fontName}/${"glyph_${it.key}".encodeKey()}.png")
                     addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, shader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
@@ -90,7 +91,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                         val div = height.toDouble() / image.image.height
                         array.add(JsonObject().apply {
                             addProperty("type", "bitmap")
-                            addProperty("file", "$NAME_SPACE:background/${it.name}/$file.png")
+                            addProperty("file", "$NAME_SPACE_ENCODED:background/${it.name}/$file.png")
                             addProperty("ascent", y)
                             addProperty("height", height)
                             add("chars", JsonArray().apply {
@@ -101,14 +102,14 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                     }
                     BackgroundLayout(
                         it.location.x,
-                        getString(it.left, "left"),
-                        getString(it.right, "right"),
-                        getString(it.body, "body")
+                        getString(it.left, "background_${it.name}_left".encodeKey()),
+                        getString(it.right, "background_${it.name}_right".encodeKey()),
+                        getString(it.body, "background_${it.name}_body".encodeKey())
                     )
                 }
             )
             PackGenerator.addTask(ArrayList(file).apply {
-                add("text_${index + 1}_${index2 + 1}.json")
+                add("$textEncoded.json")
             }) {
                 JsonObject().apply {
                     add("providers", array)

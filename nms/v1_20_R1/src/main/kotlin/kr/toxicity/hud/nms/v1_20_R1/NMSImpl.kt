@@ -237,7 +237,7 @@ class NMSImpl: NMS {
                 runCatching {
                     val hud = BetterHud.getInstance().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponent())
-                    val key = Key.key("$INJECT_NAME:default")
+                    val key = BetterHud.getInstance().defaultKey
                     fun applyFont(component: Component): Component {
                         return component.font(key).children(component.children().map {
                             applyFont(it)

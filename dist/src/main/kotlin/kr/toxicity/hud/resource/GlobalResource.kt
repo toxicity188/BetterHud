@@ -6,7 +6,7 @@ class GlobalResource {
     private val assets = listOf("assets")
 
     private val hud = ArrayList(assets).apply {
-        add(NAME_SPACE)
+        add(NAME_SPACE_ENCODED)
     }
 
     private val minecraft = ArrayList(assets).apply {

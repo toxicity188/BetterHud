@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
 import kr.toxicity.hud.api.scheduler.HudScheduler;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -153,4 +154,16 @@ public abstract class BetterHud extends JavaPlugin {
      * @return whether to this plugin is on reload
      */
     public abstract boolean isOnReload();
+
+    /**
+     * Returns encoded namespace.
+     * @return namespace.
+     */
+    public abstract @NotNull String getEncodedNamespace();
+
+    /**
+     * Returns default font key.
+     * @return font key
+     */
+    public abstract @NotNull Key getDefaultKey();
 }

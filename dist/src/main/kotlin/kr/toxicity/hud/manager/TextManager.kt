@@ -123,7 +123,7 @@ object TextManager: BetterHudManager {
             parseDefault.array.forEach {
                 defaultArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE:font/default/${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:font/default/${it.file}")
                     addProperty("ascent", configAscent)
                     addProperty("height", configHeight)
                     add("chars", it.chars)
@@ -230,7 +230,7 @@ object TextManager: BetterHudManager {
         var i = 0
         images.forEach {
             PackGenerator.addTask(ArrayList(saveFolder).apply {
-                add("image_${it.key}.png")
+                add("${"glyph_${it.key}".encodeKey()}.png")
             }) {
                 it.value.image.image.toByteArray()
             }
@@ -238,7 +238,7 @@ object TextManager: BetterHudManager {
         pairMap.forEach {
             val width = it.key
             fun save(list: List<Pair<Char, Image>>) {
-                val name = "${saveName}_${++i}.png"
+                val name = "text_${saveName}_${++i}.png".encodeFile()
                 val json = JsonArray()
                 list.split(CHAR_LENGTH).forEach { subList ->
                     json.add(subList.map { pair ->

@@ -40,8 +40,8 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             val finalWidth = WidthComponent(Component.text().content(c).font(parent.imageKey), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
             parent.jsonArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
-                if (isSingle) addProperty("file", "$NAME_SPACE:image/${pair.name}")
-                else addProperty("file", "$NAME_SPACE:image/${hud.name}/${pair.name}")
+                if (isSingle) addProperty("file", "$NAME_SPACE_ENCODED:image/${pair.name}")
+                else addProperty("file", "$NAME_SPACE_ENCODED:image/${hud.name}/${pair.name}")
                 addProperty("ascent", HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader))
                 addProperty("height", height)
                 add("chars", JsonArray().apply {

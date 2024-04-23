@@ -105,7 +105,7 @@ object PackGenerator {
                         getAllLocation(it, pathLength)
                     }
                     PLUGIN.loadAssets("pack") { a, i ->
-                        val replace = a.replace('/', File.separatorChar)
+                        val replace = a.replace(NAME_SPACE, NAME_SPACE_ENCODED).replace('/', File.separatorChar)
                         (builder.locationMap.remove(replace) ?: File(build, replace).apply {
                             parentFile.mkdirs()
                         }).outputStream().buffered().use { os ->
@@ -137,7 +137,7 @@ object PackGenerator {
                         setComment("BetterHud resource pack.")
                         setLevel(Deflater.BEST_COMPRESSION)
                         PLUGIN.loadAssets("pack") { s, i ->
-                            putNextEntry(ZipEntry(s.replace(File.separatorChar,'/')))
+                            putNextEntry(ZipEntry(s.replace(NAME_SPACE, NAME_SPACE_ENCODED).replace(File.separatorChar,'/')))
                             write(i.readAllBytes())
                             closeEntry()
                         }

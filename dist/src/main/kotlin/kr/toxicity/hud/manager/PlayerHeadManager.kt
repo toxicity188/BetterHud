@@ -49,7 +49,7 @@ object PlayerHeadManager: BetterHudManager {
                     val head = HudHead(file.path, s, configurationSection)
                     val pixel = head.pixel
                     val targetFile = ArrayList(saveLocation).apply {
-                        add("pixel_$pixel.png")
+                        add("pixel_$pixel.png".encodeFile())
                     }
                     PackGenerator.addTask(targetFile) {
                         BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {

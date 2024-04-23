@@ -9,7 +9,8 @@ import kr.toxicity.hud.layout.HeadLayout
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.util.NAME_SPACE
+import kr.toxicity.hud.util.NAME_SPACE_ENCODED
+import kr.toxicity.hud.util.encodeKey
 import kr.toxicity.hud.util.parseChar
 import net.kyori.adventure.text.Component
 
@@ -26,7 +27,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 val char = (++parent.imageChar).parseChar()
                 parent.jsonArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE:head/pixel_${head.head.pixel}.png")
+                    addProperty("file", "$NAME_SPACE_ENCODED:head/${"pixel_${head.head.pixel}".encodeKey()}.png")
                     addProperty("ascent", HudImpl.createBit(final.y + i * head.head.pixel, shader))
                     addProperty("height", head.head.pixel)
                     add("chars", JsonArray().apply {

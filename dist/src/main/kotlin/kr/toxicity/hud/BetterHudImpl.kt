@@ -22,6 +22,7 @@ import kr.toxicity.hud.util.*
 import net.byteflux.libby.BukkitLibraryManager
 import net.byteflux.libby.Library
 import net.byteflux.libby.relocation.Relocation
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -203,10 +204,8 @@ class BetterHudImpl: BetterHud() {
         Bukkit.getOnlinePlayers().forEach {
             PlayerManager.register(it)
         }
-        task {
-            reload {
-                info("Plugin enabled.")
-            }
+        reload {
+            info("Plugin enabled.")
         }
     }
 
@@ -317,6 +316,7 @@ class BetterHudImpl: BetterHud() {
         }
     }
 
+    override fun getEncodedNamespace(): String = NAME_SPACE_ENCODED
     override fun getScheduler(): HudScheduler = scheduler
     override fun isPaper(): Boolean = isPaper
     override fun isFolia(): Boolean = isFolia
@@ -328,4 +328,5 @@ class BetterHudImpl: BetterHud() {
     override fun getHudManager(): HudManager = HudManagerImpl
     override fun getDatabaseManager(): DatabaseManager = DatabaseManagerImpl
     override fun isOnReload(): Boolean = onReload
+    override fun getDefaultKey(): Key = DEFAULT_KEY
 }

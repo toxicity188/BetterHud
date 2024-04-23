@@ -36,7 +36,9 @@ class HudImpl(
     }
 
     var imageChar = 0xCE000
-    val imageKey = Key.key("$NAME_SPACE:hud/$internalName/image")
+
+    private val imageEncoded = "hud_${internalName}_image".encodeKey()
+    val imageKey = Key.key("$NAME_SPACE_ENCODED:hud/$internalName/$imageEncoded")
     val jsonArray = JsonArray()
     private val default = ConfigManager.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
@@ -79,7 +81,7 @@ class HudImpl(
         PackGenerator.addTask(
             ArrayList(file).apply {
                 add(internalName)
-                add("image.json")
+                add("$imageEncoded.json")
             }
         ) {
             JsonObject().apply {
