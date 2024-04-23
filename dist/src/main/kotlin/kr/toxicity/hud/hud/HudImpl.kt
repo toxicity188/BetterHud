@@ -38,15 +38,12 @@ class HudImpl(
     var imageChar = 0xCE000
 
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
-    val imageKey = Key.key("$NAME_SPACE_ENCODED:hud/$internalName/$imageEncoded")
+    val imageKey = Key.key("$NAME_SPACE_ENCODED:$imageEncoded")
     val jsonArray = JsonArray()
     private val default = ConfigManager.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
 
     private val elements = run {
-        val subFile = ArrayList(file).apply {
-            add(internalName)
-        }
         ArrayList<HudAnimation>().apply {
             section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
@@ -65,7 +62,7 @@ class HudImpl(
                         HudElement(
                             this@HudImpl,
                             internalName,
-                            subFile,
+                            file,
                             layout,
                             gui,
                             ImageLocation(it.x, it.y) + pixel
@@ -80,7 +77,6 @@ class HudImpl(
     init {
         PackGenerator.addTask(
             ArrayList(file).apply {
-                add(internalName)
                 add("$imageEncoded.json")
             }
         ) {

@@ -31,23 +31,19 @@ import kotlin.math.roundToInt
 class PopupLayout(
     private val layout: LayoutGroup,
     private val parent: PopupImpl,
-    private val name: String,
     private val globalLocation: GuiLocation,
     private val globalPixel: ImageLocation,
-    file: List<String>
+    private val file: List<String>
 ) {
     private var imageChar = 0xCE000
     private var textIndex = 0
 
     private val imageEncoded = "popup_${parent.name}_image".encodeKey()
-    private val imageKey = Key.key("$NAME_SPACE_ENCODED:popup/${parent.internalName}/$name/$imageEncoded")
+    private val imageKey = Key.key("$NAME_SPACE_ENCODED:$imageEncoded")
     private val groups = parent.move.locations.run {
         val json = JsonArray()
-        val textFolder = ArrayList(file).apply {
-            add("text")
-        }
         val map = map { location ->
-            PopupLayoutGroup(location, json, textFolder)
+            PopupLayoutGroup(location, json)
         }
         PackGenerator.addTask(ArrayList(file).apply {
             add("$imageEncoded.json")
@@ -78,9 +74,9 @@ class PopupLayout(
         }
     }
 
-    private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray, textFolder: List<String>) {
+    private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray) {
         val elements = layout.animation.location.map { location ->
-            PopupElement(pair, array, location, textFolder)
+            PopupElement(pair, array, location)
         }
         fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> List<WidthComponent> {
             val map = elements.map {
@@ -93,7 +89,7 @@ class PopupLayout(
             }
         }
     }
-    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation, textFolder: List<String>) {
+    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation) {
         private val elementGui = pair.gui + parent.gui + globalLocation
         private val elementPixel = globalPixel + location
 
@@ -140,7 +136,7 @@ class PopupLayout(
 
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:image/${hudImage.name}/${it.name}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.name}")
                     addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
@@ -155,7 +151,7 @@ class PopupLayout(
                 val char = (++imageChar).parseChar()
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:image/${it.name}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.name}")
                     addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
                     addProperty("height", Math.round(it.image.image.height * target.scale).toInt())
                     add("chars", JsonArray().apply {
@@ -201,7 +197,7 @@ class PopupLayout(
                 textLayout.text.array.forEach {
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:text/${textLayout.text.fontName}/${it.file}")
+                        addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                         addProperty("ascent", bit)
                         addProperty("height", scale)
                         add("chars", it.chars)
@@ -210,7 +206,7 @@ class PopupLayout(
                 var textIndex = 0xC0000
                 val imageMap = HashMap<String, WidthComponent>()
                 val textEncoded = "popup_${parent.name}_text_${index}".encodeKey()
-                val key = Key.key("$NAME_SPACE_ENCODED:popup/${parent.internalName}/$name/text/$textEncoded")
+                val key = Key.key("$NAME_SPACE_ENCODED:$textEncoded")
                 textLayout.text.images.forEach {
                     val result = (textIndex++).parseChar()
                     val imageScale = it.value.scale * textLayout.scale
@@ -218,7 +214,7 @@ class PopupLayout(
                     val div = height.toDouble() / it.value.image.image.height
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:text/${textLayout.text.fontName}/${"glyph_${it.key}".encodeKey()}.png")
+                        addProperty("file", "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png")
                         addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, textShader))
                         addProperty("height", height)
                         add("chars", JsonArray().apply {
@@ -245,7 +241,7 @@ class PopupLayout(
                             val div = height.toDouble() / image.image.height
                             array.add(JsonObject().apply {
                                 addProperty("type", "bitmap")
-                                addProperty("file", "$NAME_SPACE_ENCODED:background/${it.name}/$file.png")
+                                addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
                                 addProperty("ascent", y)
                                 addProperty("height", height)
                                 add("chars", JsonArray().apply {
@@ -262,7 +258,7 @@ class PopupLayout(
                         )
                     }
                 )
-                PackGenerator.addTask(ArrayList(textFolder).apply {
+                PackGenerator.addTask(ArrayList(file).apply {
                     add("$textEncoded.json")
                 }) {
                     JsonObject().apply {
@@ -300,7 +296,7 @@ class PopupLayout(
                     val char = (++imageChar).parseChar()
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:head/${"pixel_${headLayout.head.pixel}".encodeKey()}.png")
+                        addProperty("file", "$NAME_SPACE_ENCODED:${"pixel_${headLayout.head.pixel}".encodeKey()}.png")
                         addProperty("ascent", HudImpl.createBit(pixel.y + i * headLayout.head.pixel, shader))
                         addProperty("height", headLayout.head.pixel)
                         add("chars", JsonArray().apply {

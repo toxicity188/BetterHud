@@ -19,13 +19,10 @@ object HudManagerImpl: BetterHudManager, HudManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         hudMap.clear()
-        val hudFolder = ArrayList(resource.font).apply {
-            add("hud")
-        }
         DATA_FOLDER.subFolder("huds").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 hudMap.putSync("hud", s) {
-                    HudImpl(file.path, s, hudFolder, configurationSection)
+                    HudImpl(file.path, s, resource.font, configurationSection)
                 }
             }.onFailure { e ->
                 warn(

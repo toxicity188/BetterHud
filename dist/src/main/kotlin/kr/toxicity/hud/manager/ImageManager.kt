@@ -1,12 +1,14 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.image.*
+import kr.toxicity.hud.image.HudImage
+import kr.toxicity.hud.image.ImageType
+import kr.toxicity.hud.image.NamedLoadedImage
+import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 
 object ImageManager: BetterHudManager {
 
@@ -23,7 +25,6 @@ object ImageManager: BetterHudManager {
 
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
-
         synchronized(imageMap) {
             imageMap.clear()
         }
@@ -92,17 +93,11 @@ object ImageManager: BetterHudManager {
                 )
             }
         }) {
-            val saveLocation = ArrayList(resource.textures).apply {
-                add("image")
-            }
             imageMap.values.forEach { value ->
                 val list = value.image
                 if (list.isNotEmpty()) {
-                    val imageSaveLocation = if (list.size == 1) saveLocation else ArrayList(saveLocation).apply {
-                        add(value.name)
-                    }
                     list.forEach {
-                        val file = ArrayList(imageSaveLocation).apply {
+                        val file = ArrayList(resource.textures).apply {
                             add(it.name)
                         }
                         PackGenerator.addTask(file) {

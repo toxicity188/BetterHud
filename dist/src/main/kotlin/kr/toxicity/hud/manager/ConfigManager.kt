@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -9,6 +10,8 @@ import java.io.File
 import java.text.DecimalFormat
 
 object ConfigManager: BetterHudManager {
+    var key = KeyResource(NAME_SPACE)
+        private set
 
     val info = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.GOLD))
     val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
@@ -73,6 +76,9 @@ object ConfigManager: BetterHudManager {
             disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
             yaml.getString("build-folder-location")?.let {
                 buildFolderLocation = it
+            }
+            yaml.getString("namespace")?.let {
+                key = KeyResource(it.lowercase())
             }
             enableProtection = yaml.getBoolean("enable-protection")
             mergeBossBar = yaml.getBoolean("merge-boss-bar", true)

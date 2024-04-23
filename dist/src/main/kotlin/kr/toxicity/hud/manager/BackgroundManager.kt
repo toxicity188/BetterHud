@@ -19,9 +19,6 @@ object BackgroundManager: BetterHudManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
-        val outputParent = ArrayList(resource.textures).apply {
-            add("background")
-        }
         backgroundMap.clear()
         folder.forEachAsync({
             if (it.extension == "yml") {
@@ -29,15 +26,12 @@ object BackgroundManager: BetterHudManager {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)
-                    val output = ArrayList(outputParent).apply {
-                        add(name)
-                    }
                     fun getImage(imageName: String) = File(backgroundFolder, "$imageName.png")
                         .ifNotExist("this image doesn't exist: $imageName.png in $name")
                         .toImage()
                         .removeEmptyWidth()
                         .ifNull("this image is empty: $imageName.png in $name").apply {
-                            PackGenerator.addTask(ArrayList(output).apply {
+                            PackGenerator.addTask(ArrayList(resource.textures).apply {
                                 add("background_${name}_$imageName.png".encodeFile())
                             }) {
                                 image.toByteArray()

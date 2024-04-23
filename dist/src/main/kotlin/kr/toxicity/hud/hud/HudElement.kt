@@ -14,13 +14,8 @@ class HudElement(hud: HudImpl, name: String, file: List<String>, private val lay
     private val imageElement = layout.image.map {image ->
         HudImageElement(hud, image, gui, pixel)
     }
-    private val textElement = run {
-        val subFile = ArrayList(file).apply {
-            add("text")
-        }
-        layout.text.mapIndexed { index, textLayout ->
-            HudTextElement(hud, name, subFile, textLayout, index, gui, pixel)
-        }
+    private val textElement = layout.text.mapIndexed { index, textLayout ->
+        HudTextElement(hud, name, file, textLayout, index, gui, pixel)
     }
     private val headElement = layout.head.map {image ->
         HudHeadElement(hud, image, gui, pixel)

@@ -54,9 +54,6 @@ object TextManager: BetterHudManager {
         }
         val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
-        val globalSaveFolder = ArrayList(resource.textures).apply {
-            add("text")
-        }
         DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ file, s, section ->
             runCatching {
                 val fontDir = section.getString("file")
@@ -69,7 +66,7 @@ object TextManager: BetterHudManager {
                 } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
                 val saveName = "${fontTarget?.nameWithoutExtension ?: s}_$scale"
                 textMap.putSync("text", s) {
-                    parseFont(file.path, s, saveName, fontFile, scale, globalSaveFolder, HashMap<String, LocatedImage>().apply {
+                    parseFont(file.path, s, saveName, fontFile, scale, resource.textures, HashMap<String, LocatedImage>().apply {
                         section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
                             put(key, LocatedImage(
                                 File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
@@ -113,9 +110,7 @@ object TextManager: BetterHudManager {
                     }
                 }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
             }.deriveFont(configScale.toFloat())
-            val parseDefault = parseFont("", "default", "default", defaultFont, configScale, ArrayList(resource.textures).apply {
-                add("font")
-            }, emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+            val parseDefault = parseFont("", "default", "default", defaultFont, configScale, resource.textures, emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
             val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
             parseDefault.charWidth.forEach {
                 textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -123,14 +118,14 @@ object TextManager: BetterHudManager {
             parseDefault.array.forEach {
                 defaultArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:font/default/${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                     addProperty("ascent", configAscent)
                     addProperty("height", configHeight)
                     add("chars", it.chars)
                 })
             }
             PackGenerator.addTask(ArrayList(resource.font).apply {
-                add("default.json")
+                add("${DEFAULT_KEY.value()}.json")
             }) {
                 JsonObject().apply {
                     add("providers", defaultArray)
@@ -224,12 +219,9 @@ object TextManager: BetterHudManager {
             charWidthMap[char] = image.width
         }
         val textList = ArrayList<HudTextArray>()
-        val saveFolder = ArrayList(imageSaveFolder).apply {
-            add(saveName)
-        }
         var i = 0
         images.forEach {
-            PackGenerator.addTask(ArrayList(saveFolder).apply {
+            PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                 add("${"glyph_${it.key}".encodeKey()}.png")
             }) {
                 it.value.image.image.toByteArray()
@@ -245,7 +237,7 @@ object TextManager: BetterHudManager {
                         pair.first
                     }.joinToString(""))
                 }
-                PackGenerator.addTask(ArrayList(saveFolder).apply {
+                PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                     add(name)
                 }) {
                     BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {

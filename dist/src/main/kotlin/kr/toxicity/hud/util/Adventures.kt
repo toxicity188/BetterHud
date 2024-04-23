@@ -2,6 +2,7 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.manager.ConfigManager
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -9,9 +10,12 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import kotlin.math.abs
 
-val SPACE_KEY = Key.key("${NAME_SPACE.encodeKey()}:space")
-val LEGACY_SPACE_KEY = Key.key("${NAME_SPACE.encodeKey()}:legacy_space")
-val DEFAULT_KEY = Key.key("${NAME_SPACE.encodeKey()}:default")
+val SPACE_KEY
+    get() = ConfigManager.key.spaceKey
+val LEGACY_SPACE_KEY
+    get() = ConfigManager.key.legacySpaceKey
+val DEFAULT_KEY
+    get() = ConfigManager.key.defaultKey
 
 val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
     TextDecoration.State.FALSE

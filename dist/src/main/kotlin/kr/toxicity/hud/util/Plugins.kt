@@ -1,13 +1,15 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.BetterHud
+import kr.toxicity.hud.manager.ConfigManager
 import org.bukkit.Bukkit
 
 val PLUGIN
     get() = BetterHud.getInstance()
 
 const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
-val NAME_SPACE_ENCODED = NAME_SPACE.encodeKey()
+val NAME_SPACE_ENCODED
+    get() = ConfigManager.key.encodedNamespace
 
 val DATA_FOLDER
     get() = PLUGIN.dataFolder.apply {

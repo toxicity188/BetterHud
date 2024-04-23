@@ -17,13 +17,10 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         popupMap.clear()
-        val save = ArrayList(resource.font).apply {
-            add("popup")
-        }
         DATA_FOLDER.subFolder("popups").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 popupMap.putSync("popup", s) {
-                    PopupImpl(file.path, save, s, configurationSection)
+                    PopupImpl(file.path, resource.font, s, configurationSection)
                 }
             }.onFailure { e ->
                 warn(

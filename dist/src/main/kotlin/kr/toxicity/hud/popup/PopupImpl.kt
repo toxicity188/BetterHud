@@ -53,9 +53,6 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
-        val target = ArrayList(file).apply {
-            add(internalName)
-        }
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { s, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
@@ -66,14 +63,11 @@ class PopupImpl(
                 add(PopupLayout(
                     LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                     this@PopupImpl,
-                    s,
                     loc,
                     configurationSection.getConfigurationSection("pixel")?.let {
                         ImageLocation(it)
                     } ?: ImageLocation.zero,
-                    ArrayList(target).apply {
-                        add(s)
-                    },
+                    file,
                 ))
             }
         }

@@ -37,9 +37,6 @@ object PlayerHeadManager: BetterHudManager {
     }
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        val saveLocation = ArrayList(resource.textures).apply {
-            add("head")
-        }
         synchronized(headMap) {
             headMap.clear()
         }
@@ -48,7 +45,7 @@ object PlayerHeadManager: BetterHudManager {
                 headMap.putSync("head", s) {
                     val head = HudHead(file.path, s, configurationSection)
                     val pixel = head.pixel
-                    val targetFile = ArrayList(saveLocation).apply {
+                    val targetFile = ArrayList(resource.textures).apply {
                         add("pixel_$pixel.png".encodeFile())
                     }
                     PackGenerator.addTask(targetFile) {
