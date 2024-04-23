@@ -10,6 +10,8 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import kotlin.math.abs
 
+fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, "$value/$value")
+
 val SPACE_KEY
     get() = ConfigManager.key.spaceKey
 val LEGACY_SPACE_KEY

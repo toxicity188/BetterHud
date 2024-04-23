@@ -7,15 +7,19 @@ import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
-import kr.toxicity.hud.util.subFolder
-import java.io.File
 
-class HudElement(hud: HudImpl, name: String, file: List<String>, private val layout: LayoutGroup, gui: GuiLocation, pixel: ImageLocation) {
+class HudElement(
+    hud: HudImpl,
+    file: List<String>,
+    private val layout: LayoutGroup,
+    gui: GuiLocation,
+    pixel: ImageLocation
+) {
     private val imageElement = layout.image.map {image ->
         HudImageElement(hud, image, gui, pixel)
     }
     private val textElement = layout.text.mapIndexed { index, textLayout ->
-        HudTextElement(hud, name, file, textLayout, index, gui, pixel)
+        HudTextElement(hud, file, textLayout, index, gui, pixel)
     }
     private val headElement = layout.head.map {image ->
         HudHeadElement(hud, image, gui, pixel)

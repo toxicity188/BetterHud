@@ -40,6 +40,7 @@ class GlobalResource {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(textures).apply {
                 add(KeyResource.splitter)
+                add("${KeyResource.splitter}.png")
             }) {
                 read
             }
@@ -48,18 +49,20 @@ class GlobalResource {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(font).apply {
                 add(KeyResource.spaces)
+                add("${KeyResource.spaces}.ttf")
             }) {
                 read
             }
         }
         PackGenerator.addTask(ArrayList(font).apply {
+            add(KeyResource.space)
             add("${KeyResource.space}.json")
         }) {
             JsonObject().apply {
                 add("providers", JsonArray().apply {
                     add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", key.splitterKey.asString())
+                        addProperty("file", "${key.splitterKey.asString()}.png")
                         addProperty("ascent", -9999)
                         addProperty("height", - 2)
                         add("chars", JsonArray().apply {
@@ -79,13 +82,14 @@ class GlobalResource {
             }.toByteArray()
         }
         PackGenerator.addTask(ArrayList(font).apply {
+            add(KeyResource.legacySpace)
             add("${KeyResource.legacySpace}.json")
         }) {
             JsonObject().apply {
                 add("providers", JsonArray().apply {
                     add(JsonObject().apply {
                         addProperty("type", "ttf")
-                        addProperty("file", key.spacesTtfKey.asString())
+                        addProperty("file", "${key.spacesTtfKey.asString()}.ttf")
                         addProperty("size", 2.5)
                         addProperty("oversample", 1.0)
                         add("shift", JsonArray().apply {

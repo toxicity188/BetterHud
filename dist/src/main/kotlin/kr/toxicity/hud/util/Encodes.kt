@@ -41,8 +41,8 @@ fun String.decodeKey(): String {
     val reversed = reversed()
     for (i in (0..<length / 2)) {
         sb.append(
-            ((Character.digit(reversed.get(t++), 16).decode() shl 4) or
-                    Character.digit(reversed.get(t++), 16).decode()).toChar()
+            ((Character.digit(reversed[t++], 16).decode() shl 4) or
+                    Character.digit(reversed[t++], 16).decode()).toChar()
         )
     }
     return sb.toString()

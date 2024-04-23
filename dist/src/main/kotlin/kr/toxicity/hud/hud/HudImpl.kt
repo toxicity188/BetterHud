@@ -16,7 +16,6 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection
 
 class HudImpl(
@@ -38,7 +37,7 @@ class HudImpl(
     var imageChar = 0xCE000
 
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
-    val imageKey = Key.key("$NAME_SPACE_ENCODED:$imageEncoded")
+    val imageKey = createAdventureKey(imageEncoded)
     val jsonArray = JsonArray()
     private val default = ConfigManager.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
@@ -61,7 +60,6 @@ class HudImpl(
                     layout.animation.location.map {
                         HudElement(
                             this@HudImpl,
-                            internalName,
                             file,
                             layout,
                             gui,
@@ -77,6 +75,7 @@ class HudImpl(
     init {
         PackGenerator.addTask(
             ArrayList(file).apply {
+                add(imageEncoded)
                 add("$imageEncoded.json")
             }
         ) {

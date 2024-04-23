@@ -8,6 +8,7 @@ import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
@@ -118,14 +119,15 @@ object TextManager: BetterHudManager {
             parseDefault.array.forEach {
                 defaultArray.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.')}/${it.file}")
                     addProperty("ascent", configAscent)
                     addProperty("height", configHeight)
                     add("chars", it.chars)
                 })
             }
             PackGenerator.addTask(ArrayList(resource.font).apply {
-                add("${DEFAULT_KEY.value()}.json")
+                add(KeyResource.default)
+                add("${KeyResource.default}.json")
             }) {
                 JsonObject().apply {
                     add("providers", defaultArray)
@@ -222,7 +224,9 @@ object TextManager: BetterHudManager {
         var i = 0
         images.forEach {
             PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                add("${"glyph_${it.key}".encodeKey()}.png")
+                val encode = "glyph_${it.key}".encodeKey()
+                add(encode)
+                add("$encode.png")
             }) {
                 it.value.image.image.toByteArray()
             }
@@ -230,7 +234,8 @@ object TextManager: BetterHudManager {
         pairMap.forEach {
             val width = it.key
             fun save(list: List<Pair<Char, Image>>) {
-                val name = "text_${saveName}_${++i}.png".encodeFile()
+                val encode = "text_${saveName}_${++i}".encodeKey()
+                val name = "$encode.png"
                 val json = JsonArray()
                 list.split(CHAR_LENGTH).forEach { subList ->
                     json.add(subList.map { pair ->
@@ -238,6 +243,7 @@ object TextManager: BetterHudManager {
                     }.joinToString(""))
                 }
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
+                    add(encode)
                     add(name)
                 }) {
                     BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {

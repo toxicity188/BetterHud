@@ -18,11 +18,17 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
-class HudTextElement(parent: HudImpl, name: String, file: List<String>, private val text: TextLayout, index: Int, gui: GuiLocation, pixel: ImageLocation) {
+class HudTextElement(
+    parent: HudImpl,
+    file: List<String>,
+    private val text: TextLayout,
+    index: Int,
+    gui: GuiLocation,
+    pixel: ImageLocation
+) {
 
     private val renderer = run {
         val shader = HudShader(
@@ -47,7 +53,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
             text.text.array.forEach {
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.')}/${it.file}")
                     addProperty("ascent", HudImpl.createBit(yAxis, shader))
                     addProperty("height", scale)
                     add("chars", it.chars)
@@ -55,7 +61,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
             }
             var textIndex = 0xC0000
             val textEncoded = "hud_${parent.name}_text_${index + 1}_${index2 + 1}".encodeKey()
-            val key = Key.key("$NAME_SPACE_ENCODED:$textEncoded")
+            val key = createAdventureKey(textEncoded)
             val imageMap = HashMap<String, WidthComponent>()
             text.text.images.forEach {
                 val result = (textIndex++).parseChar()
@@ -64,7 +70,8 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                 val div = height.toDouble() / it.value.image.image.height
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png")
+                    val encode = "glyph_${it.key}".encodeKey()
+                    addProperty("file", "$NAME_SPACE_ENCODED:$encode/$encode.png")
                     addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, shader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
@@ -91,7 +98,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                         val div = height.toDouble() / image.image.height
                         array.add(JsonObject().apply {
                             addProperty("type", "bitmap")
-                            addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
+                            addProperty("file", "$NAME_SPACE_ENCODED:$file/$file.png")
                             addProperty("ascent", y)
                             addProperty("height", height)
                             add("chars", JsonArray().apply {
@@ -109,6 +116,7 @@ class HudTextElement(parent: HudImpl, name: String, file: List<String>, private 
                 }
             )
             PackGenerator.addTask(ArrayList(file).apply {
+                add(textEncoded)
                 add("$textEncoded.json")
             }) {
                 JsonObject().apply {
