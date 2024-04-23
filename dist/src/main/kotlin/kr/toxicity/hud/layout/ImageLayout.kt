@@ -12,5 +12,6 @@ class ImageLayout(
     val scale: Double,
     val outline: Boolean,
     val layer: Int,
+    val follow: String?,
     val conditions: ConditionBuilder
 )

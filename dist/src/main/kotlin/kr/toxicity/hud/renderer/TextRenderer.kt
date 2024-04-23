@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
+import kr.toxicity.hud.manager.PlayerManager
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
@@ -15,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Bukkit
 import java.text.DecimalFormat
 import java.util.EnumMap
 import java.util.LinkedList
@@ -35,6 +37,8 @@ class TextRenderer(
 
     private val numberEquation: TEquation,
     private val numberPattern: DecimalFormat,
+
+    follow: String?,
 
     private val condition: ConditionBuilder
 ) {
@@ -196,6 +200,12 @@ class TextRenderer(
         val multiply: Int
     )
 
+    private val followPlayer = follow?.let {
+        PlaceholderManagerImpl.find(it).apply {
+            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
+        }
+    }
+
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
         val patternMap = patternMapper.map {
@@ -203,8 +213,16 @@ class TextRenderer(
         }
         val cond = condition.build(reason)
 
+        val followTarget = followPlayer?.build(reason)
+
         return build@ { player ->
-            if (!cond(player)) return@build EMPTY_PIXEL_COMPONENT
+            var targetPlayer = player
+            followTarget?.let {
+                targetPlayer = Bukkit.getPlayer(it.value(player).toString())?.let { p ->
+                    PlayerManager.getHudPlayer(p.uniqueId)
+                } ?: return@build EMPTY_PIXEL_COMPONENT
+            }
+            if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var comp = EMPTY_WIDTH_COMPONENT
 
             fun applyString(targetString: String, style: Style, multiply: Int, images: List<WidthComponent>) {
@@ -239,7 +257,7 @@ class TextRenderer(
                 }
             }
             for (mappedComponentStyle in patternMap) {
-                val target = mappedComponentStyle.value(player)
+                val target = mappedComponentStyle.value(targetPlayer)
                 if (deserializeText) {
                     parseStyle(target) {
                         it.buildRaw()

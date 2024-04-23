@@ -23,5 +23,6 @@ class TextLayout(
     val numberFormat: DecimalFormat,
     val background: HudBackground?,
     val backgroundScale: Double,
+    val follow: String?,
     val conditions: ConditionBuilder
 )

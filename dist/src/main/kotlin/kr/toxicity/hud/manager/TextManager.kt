@@ -225,8 +225,10 @@ object TextManager: BetterHudManager {
         images.forEach {
             PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                 val encode = "glyph_${it.key}".encodeKey()
-                add(encode)
-                add("$encode.png")
+                synchronized(this) {
+                    add(encode)
+                    add("$encode.png")
+                }
             }) {
                 it.value.image.image.toByteArray()
             }
@@ -243,8 +245,10 @@ object TextManager: BetterHudManager {
                     }.joinToString(""))
                 }
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                    add(encode)
-                    add(name)
+                    synchronized(this) {
+                        add(encode)
+                        add(name)
+                    }
                 }) {
                     BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {

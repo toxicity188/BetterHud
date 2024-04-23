@@ -52,6 +52,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             hud,
             image.color,
             list,
+            image.follow,
             image.conditions.and(image.image.conditions)
         )
         renderer.max() to renderer.getComponent(UpdateEvent.EMPTY)

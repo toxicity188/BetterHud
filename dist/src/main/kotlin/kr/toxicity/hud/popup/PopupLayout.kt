@@ -166,6 +166,7 @@ class PopupLayout(
                 hudImage,
                 target.color,
                 list,
+                target.follow,
                 hudImage.conditions.and(target.conditions)
             )
         }
@@ -282,6 +283,7 @@ class PopupLayout(
                 textLayout.space,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
+                textLayout.follow,
                 textLayout.conditions.and(textLayout.text.conditions)
             )
         }

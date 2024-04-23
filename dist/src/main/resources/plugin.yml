@@ -18,6 +18,7 @@ softdepend:
   - Geyser-Spigot
   - Skript
   - SkinsRestorer
+  - Parties
 commands:
   betterhud:
     aliases:

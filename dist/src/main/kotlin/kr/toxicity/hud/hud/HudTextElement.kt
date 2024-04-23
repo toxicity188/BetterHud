@@ -138,6 +138,7 @@ class HudTextElement(
             text.space,
             text.numberEquation,
             text.numberFormat,
+            text.follow,
             text.conditions.and(text.text.conditions)
         )
     }.getText(UpdateEvent.EMPTY)

@@ -5,12 +5,12 @@ import kr.toxicity.hud.compatibility.mmocore.MMOCoreCompatibility
 import kr.toxicity.hud.compatibility.mmoitems.MMOItemsCompatibility
 import kr.toxicity.hud.compatibility.mythiclib.MythicLibCompatibility
 import kr.toxicity.hud.compatibility.mythicmobs.MythicMobsCompatibility
+import kr.toxicity.hud.compatibility.parties.PartiesCompatibility
 import kr.toxicity.hud.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.task
 import kr.toxicity.hud.util.warn
 import org.bukkit.Bukkit
 import java.util.function.Function
@@ -38,6 +38,9 @@ object CompatibilityManager: BetterHudManager {
         },
         "MMOItems" to {
             MMOItemsCompatibility()
+        },
+        "Parties" to {
+            PartiesCompatibility()
         }
     )
 

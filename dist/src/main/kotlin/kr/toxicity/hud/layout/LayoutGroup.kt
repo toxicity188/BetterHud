@@ -40,6 +40,7 @@ class LayoutGroup(
                     configurationSection.getDouble("scale", 1.0),
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
+                    configurationSection.getString("follow"),
                     configurationSection.toConditions()
                 )
             )
@@ -72,6 +73,7 @@ class LayoutGroup(
                         BackgroundManager.getBackground(it)
                     },
                     configurationSection.getDouble("background-scale", scale),
+                    configurationSection.getString("follow"),
                     configurationSection.toConditions()
                 )
             )

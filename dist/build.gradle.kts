@@ -9,6 +9,7 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.SkriptLang:Skript:2.8.4")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.11")
+    compileOnly("com.alessiodp.parties:parties-bukkit:3.2.15")
 }
 
 tasks.processResources {
