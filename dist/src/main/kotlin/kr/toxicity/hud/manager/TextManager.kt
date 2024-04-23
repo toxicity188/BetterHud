@@ -20,6 +20,7 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
+import java.util.Collections
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -206,7 +207,7 @@ object TextManager: BetterHudManager {
                 }
             }.fontSubImage()?.let { resizedImage ->
                 pairMap.getOrPut(resizedImage.width) {
-                    ArrayList()
+                    Collections.synchronizedList(ArrayList())
                 }.add(it.key to resizedImage)
                 charWidthMap[it.key] = resizedImage.width
             }
@@ -216,7 +217,7 @@ object TextManager: BetterHudManager {
         }.forEachAsync { char ->
             val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEachAsync
             pairMap.getOrPut(image.width) {
-                ArrayList()
+                Collections.synchronizedList(ArrayList())
             }.add(char to image)
             charWidthMap[char] = image.width
         }
