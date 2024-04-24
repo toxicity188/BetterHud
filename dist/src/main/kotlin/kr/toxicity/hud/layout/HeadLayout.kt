@@ -10,5 +10,6 @@ class HeadLayout(
     val outline: Boolean,
     val layer: Int,
     val align: LayoutAlign,
+    val follow: String?,
     val conditions: ConditionBuilder
 )

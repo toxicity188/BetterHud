@@ -90,6 +90,7 @@ class LayoutGroup(
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
                     configurationSection.getString("align").toLayoutAlign(),
+                    configurationSection.getString("follow"),
                     configurationSection.toConditions()
                 )
             )

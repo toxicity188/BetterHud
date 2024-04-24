@@ -40,6 +40,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             head.head.pixel,
             final.x,
             head.align,
+            head.follow,
             head.conditions.and(head.head.conditions)
         ).getHead(UpdateEvent.EMPTY)
     }
