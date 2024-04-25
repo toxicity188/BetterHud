@@ -1,6 +1,7 @@
 package kr.toxicity.hud.api.popup;
 
 import kr.toxicity.hud.api.BetterHud;
+import kr.toxicity.hud.api.configuration.HudObject;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.update.UpdateEvent;
 import org.bukkit.entity.Player;
@@ -10,12 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Represents popup.
  */
-public interface Popup {
-    /**
-     * Gets an internal name of popup.
-     * @return id
-     */
-    @NotNull String getName();
+public interface Popup extends HudObject {
 
     /**
      * Gets a group name of popup.
@@ -28,12 +24,6 @@ public interface Popup {
      * @return max stack size
      */
     int getMaxStack();
-
-    /**
-     * Returns whether this popup is default.
-     * @return whether to default
-     */
-    boolean isDefault();
 
     /**
      * Shows popup to some player.

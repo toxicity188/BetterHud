@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "1.9.23"
     id("com.github.johnrengelman.shadow") version("8.1.1")
-    id("io.papermc.paperweight.userdev") version("1.5.12") apply(false)
+    id("io.papermc.paperweight.userdev") version("1.5.15") apply(false)
     id("org.jetbrains.dokka") version "1.9.20"
 }
 
@@ -55,6 +55,8 @@ allprojects {
         implementation("net.objecthunter:exp4j:0.4.8")
         implementation("org.bstats:bstats-bukkit:3.0.2")
         implementation("net.byteflux:libby-bukkit:1.3.0")
+
+        implementation(rootProject.fileTree("shaded"))
     }
 
     tasks {

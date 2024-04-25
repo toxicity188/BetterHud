@@ -19,6 +19,7 @@ softdepend:
   - Skript
   - SkinsRestorer
   - Parties
+  - GPS
 commands:
   betterhud:
     aliases:
@@ -38,6 +39,12 @@ permissions:
     children:
       hud.hud.add: true
       hud.hud.remove: true
+  hud.compass:
+    description: Access to compass command.
+    default: op
+    children:
+      hud.compass.add: true
+      hud.compass.remove: true
   hud.turn:
     description: Access to turn command.
     default: op

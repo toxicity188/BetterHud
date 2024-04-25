@@ -1,4 +1,4 @@
-package kr.toxicity.hud.player
+package kr.toxicity.hud.player.head
 
 import net.skinsrestorer.api.SkinsRestorerProvider
 import org.bukkit.entity.Player

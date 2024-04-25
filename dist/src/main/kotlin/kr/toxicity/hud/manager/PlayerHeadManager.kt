@@ -1,7 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.player.*
+import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit

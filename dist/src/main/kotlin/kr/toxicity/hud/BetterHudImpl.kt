@@ -131,6 +131,7 @@ class BetterHudImpl: BetterHud() {
         LayoutManager,
         HudManagerImpl,
         PopupManagerImpl,
+        CompassManagerImpl,
 
         ShaderManager,
         PlayerManager

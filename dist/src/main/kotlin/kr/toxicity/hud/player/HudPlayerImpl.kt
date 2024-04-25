@@ -1,38 +1,27 @@
 package kr.toxicity.hud.player
 
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.api.hud.Hud
+import kr.toxicity.hud.api.configuration.HudObject
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.HudPlayerHead
-import kr.toxicity.hud.api.popup.Popup
+import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.scheduler.HudTask
-import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.player.head.HudPlayerHeadImpl
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class HudPlayerImpl(
     private val player: Player,
-    huds: MutableSet<Hud>,
-    popups: MutableSet<Popup>
+    private val objectSet: MutableSet<HudObject>
 ): HudPlayer {
+    private val locationSet = HashSet<PointedLocation>()
 
     private val h = HudPlayerHeadImpl(player)
-
-    private val huds = huds.apply {
-        addAll(HudManagerImpl.defaultHuds)
-    }
-    private val popups = popups.apply {
-        addAll(PopupManagerImpl.defaultPopups)
-    }
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -46,8 +35,14 @@ class HudPlayerImpl(
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
+    private val locationProvide = asyncTaskTimer(20, 20) {
+        PlayerManager.provideLocation(this)
+    }
     init {
         PLUGIN.nms.inject(player, ShaderManager.barColor)
+        objectSet.addAll(HudManagerImpl.defaultHuds)
+        objectSet.addAll(PopupManagerImpl.defaultPopups)
+        objectSet.addAll(CompassManagerImpl.defaultCompasses)
         startTick()
     }
 
@@ -56,11 +51,14 @@ class HudPlayerImpl(
     override fun setAdditionalComponent(component: WidthComponent?) {
         additionalComp = component
     }
+    override fun getHudObjects(): MutableSet<HudObject> = objectSet
 
     override fun getBarColor(): BarColor? = color
     override fun setBarColor(color: BarColor?) {
         this.color = color
     }
+
+    override fun getPointedLocation(): MutableSet<PointedLocation> = locationSet
 
     override fun cancelTick() {
         task?.cancel()
@@ -74,9 +72,6 @@ class HudPlayerImpl(
             update()
         }
     }
-
-    override fun getHuds(): MutableSet<Hud> = huds
-    override fun getPopups(): MutableSet<Popup> = popups
 
     override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
     override fun getPopupKeyMap(): MutableMap<Any, PopupUpdater> = popupKey
@@ -99,22 +94,13 @@ class HudPlayerImpl(
         val compList = ArrayList<WidthComponent>()
 
         if (enabled && !PLUGIN.isOnReload) {
-            popups.removeIf {
+            objectSet.removeIf {
                 runCatching {
-                    it.show(UpdateEvent.EMPTY, this)
+                    compList.addAll(it.getComponentsByType(this))
                     false
                 }.onFailure { e ->
                     e.printStackTrace()
-                    warn("Unable to update popup. reason: ${e.message}")
-                }.getOrDefault(true)
-            }
-            huds.removeIf {
-                runCatching {
-                    compList.addAll(it.getComponents(this))
-                    false
-                }.onFailure { e ->
-                    e.printStackTrace()
-                    warn("Unable to update hud. reason: ${e.message}")
+                    warn("Unable to update ${it.type.name}. reason: ${e.message}")
                 }.getOrDefault(true)
             }
             val popupGroupIterator = popupGroup.values.iterator()
@@ -152,23 +138,33 @@ class HudPlayerImpl(
         }.map {
             it.name
         }
-        popups.clear()
-        popups.addAll(PopupManagerImpl.defaultPopups)
-        popupNames.forEach {
-            PopupManagerImpl.getPopup(it)?.let { popup ->
-                if (!popup.isDefault) popups.add(popup)
-            }
-        }
-        val hudNames = popups.filter {
+        val hudNames = huds.filter {
             !it.isDefault
         }.map {
             it.name
         }
-        huds.clear()
-        huds.addAll(HudManagerImpl.defaultHuds)
+        val compassNames = compasses.filter {
+            !it.isDefault
+        }.map {
+            it.name
+        }
+        objectSet.clear()
+        objectSet.addAll(PopupManagerImpl.defaultPopups)
+        objectSet.addAll(HudManagerImpl.defaultHuds)
+        objectSet.addAll(CompassManagerImpl.defaultCompasses)
+        popupNames.forEach {
+            PopupManagerImpl.getPopup(it)?.let { popup ->
+                if (!popup.isDefault) objectSet.add(popup)
+            }
+        }
         hudNames.forEach {
             HudManagerImpl.getHud(it)?.let { hud ->
-                if (!hud.isDefault) huds.add(hud)
+                if (!hud.isDefault) objectSet.add(hud)
+            }
+        }
+        compassNames.forEach {
+            CompassManagerImpl.getCompass(it)?.let { hud ->
+                if (!hud.isDefault) objectSet.add(hud)
             }
         }
     }
@@ -180,5 +176,6 @@ class HudPlayerImpl(
         PLUGIN.nms.removeBossBar(player)
         cancelTick()
         autoSave.cancel()
+        locationProvide.cancel()
     }
 }

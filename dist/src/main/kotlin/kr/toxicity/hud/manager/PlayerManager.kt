@@ -4,6 +4,8 @@ import kr.toxicity.hud.api.event.HudPlayerJoinEvent
 import kr.toxicity.hud.api.event.HudPlayerQuitEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.pack.PackUploader
+import kr.toxicity.hud.player.location.GPSLocationProvider
+import kr.toxicity.hud.player.location.PointedLocationProvider
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit
@@ -15,13 +17,18 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 
 object PlayerManager: BetterHudManager {
 
     private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
 
+    private val locationProviders = ArrayList<PointedLocationProvider>()
+
     override fun start() {
-        Bukkit.getPluginManager().registerEvents(object : Listener {
+        val manager = Bukkit.getPluginManager()
+        if (manager.isPluginEnabled("GPS")) locationProviders.add(GPSLocationProvider())
+        manager.registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
             fun join(e: PlayerJoinEvent) {
                 register(e.player)
@@ -52,6 +59,18 @@ object PlayerManager: BetterHudManager {
                     HudPlayerJoinEvent(hud).call()
                 }
                 hud
+            }
+        }
+    }
+
+    fun provideLocation(player: HudPlayer) {
+        val set = player.pointedLocation
+        synchronized(set) {
+            set.clear()
+            locationProviders.forEach {
+                it.provide(player)?.let { loc ->
+                    set.add(loc)
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ object PackGenerator {
                     if (target.isDirectory) target.forEach { t ->
                         addFile(t)
                     } else {
-                        addTask(target.path.substring(mergeLength).replace(File.separatorChar, '/').split('/')) {
+                        addTask(target.path.substring(mergeLength).split(File.separatorChar)) {
                             target.inputStream().buffered().use { stream ->
                                 stream.readAllBytes()
                             }
@@ -101,7 +101,7 @@ object PackGenerator {
                             getAllLocation(it, length)
                         }
                     }
-                    build.listFiles()?.forEach {
+                    build.forEach {
                         getAllLocation(it, pathLength)
                     }
                     PLUGIN.loadAssets("pack") { a, i ->

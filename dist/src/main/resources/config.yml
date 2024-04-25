@@ -19,3 +19,5 @@ default-hud:
   - test_hud
 
 default-popup: []
+
+default-compass: []

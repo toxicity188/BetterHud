@@ -1,17 +1,23 @@
 package kr.toxicity.hud.api.player;
 
+import kr.toxicity.hud.api.compass.Compass;
 import kr.toxicity.hud.api.component.WidthComponent;
+import kr.toxicity.hud.api.configuration.HudObject;
+import kr.toxicity.hud.api.configuration.HudObjectType;
 import kr.toxicity.hud.api.hud.Hud;
 import kr.toxicity.hud.api.popup.Popup;
 import kr.toxicity.hud.api.popup.PopupIteratorGroup;
 import kr.toxicity.hud.api.popup.PopupUpdater;
+import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents player data.
@@ -111,16 +117,39 @@ public interface HudPlayer {
     @Nullable BarColor getBarColor();
 
     /**
+     * Gets a current player's hud objects.
+     * @return hud objects
+     */
+    @NotNull Set<HudObject> getHudObjects();
+
+    /**
      * Gets a current player's popup.
      * @return popups
      */
-    @NotNull Set<Popup> getPopups();
+    default @NotNull Set<Popup> getPopups() {
+        return getHudObjects().stream().map(o -> o instanceof Popup popup ? popup : null).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
 
     /**
      * Gets a current player's hud.
      * @return hud
      */
-    @NotNull Set<Hud> getHuds();
+    default @NotNull Set<Hud> getHuds() {
+        return getHudObjects().stream().map(o -> o instanceof Hud hud ? hud : null).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+    /**
+     * Gets a current player's compass.
+     * @return compass
+     */
+    default @NotNull Set<Compass> getCompasses() {
+        return getHudObjects().stream().map(o -> o instanceof Compass compass ? compass : null).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets a pointed location.
+     * @return location set
+     */
+    @NotNull Set<PointedLocation> getPointedLocation();
 
     /**
      * Resets all hud and popup.

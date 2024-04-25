@@ -3,6 +3,8 @@ package kr.toxicity.hud.hud
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudObject
+import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
@@ -85,6 +87,10 @@ class HudImpl(
         }
     }
 
+
+    override fun getType(): HudObjectType<*> {
+        return HudObjectType.HUD
+    }
 
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
 

@@ -1,4 +1,4 @@
-package kr.toxicity.hud.player
+package kr.toxicity.hud.player.head
 
 import com.google.gson.JsonParser
 import org.bukkit.entity.Player

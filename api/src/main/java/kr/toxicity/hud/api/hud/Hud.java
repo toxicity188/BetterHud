@@ -1,6 +1,8 @@
 package kr.toxicity.hud.api.hud;
 
 import kr.toxicity.hud.api.component.WidthComponent;
+import kr.toxicity.hud.api.configuration.HudObject;
+import kr.toxicity.hud.api.configuration.HudObjectType;
 import kr.toxicity.hud.api.player.HudPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,18 +11,7 @@ import java.util.List;
 /**
  * Represents hud.
  */
-public interface Hud {
-    /**
-     * Returns hud's internal name.
-     * @return id
-     */
-    @NotNull String getName();
-
-    /**
-     * Returns this hud is default hud or not.
-     * @return whether to default
-     */
-    boolean isDefault();
+public interface Hud extends HudObject {
 
     /**
      * Returns the output of hud.

@@ -20,7 +20,6 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
-import java.util.Collections
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -198,6 +197,16 @@ object TextManager: BetterHudManager {
         val height = (scale.toDouble() * 1.4).toInt()
         val pairMap = HashMap<Int, MutableList<Pair<Char, Image>>>()
         val charWidthMap = HashMap<Char, Int>()
+        fun addImage(image: BufferedImage, char: Char) {
+            synchronized(pairMap) {
+                pairMap.computeIfAbsent(image.width) {
+                    ArrayList()
+                }.add(char to image)
+            }
+            synchronized(charWidthMap) {
+                charWidthMap[char] = image.width
+            }
+        }
         if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync {
             val newWidth = ((height.toDouble() / it.value.height) * it.value.width).roundToInt()
             BufferedImage(newWidth, height, BufferedImage.TYPE_INT_ARGB).apply {
@@ -206,30 +215,24 @@ object TextManager: BetterHudManager {
                     dispose()
                 }
             }.fontSubImage()?.let { resizedImage ->
-                pairMap.getOrPut(resizedImage.width) {
-                    Collections.synchronizedList(ArrayList())
-                }.add(it.key to resizedImage)
-                charWidthMap[it.key] = resizedImage.width
+                addImage(resizedImage, it.key)
             }
         }
         (Char.MIN_VALUE..Char.MAX_VALUE).filter { char ->
             fontFile.canDisplay(char) && !charWidthMap.containsKey(char)
         }.forEachAsync { char ->
-            val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEachAsync
-            pairMap.getOrPut(image.width) {
-                Collections.synchronizedList(ArrayList())
-            }.add(char to image)
-            charWidthMap[char] = image.width
+            if (fontFile.canDisplay(char) && !charWidthMap.containsKey(char)) {
+                val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEachAsync
+                addImage(image, char)
+            }
         }
         val textList = ArrayList<HudTextArray>()
         var i = 0
         images.forEach {
             PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                 val encode = "glyph_${it.key}".encodeKey()
-                synchronized(this) {
-                    add(encode)
-                    add("$encode.png")
-                }
+                add(encode)
+                add("$encode.png")
             }) {
                 it.value.image.image.toByteArray()
             }
@@ -246,10 +249,8 @@ object TextManager: BetterHudManager {
                     }.joinToString(""))
                 }
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                    synchronized(this) {
-                        add(encode)
-                        add(name)
-                    }
+                    add(encode)
+                    add(name)
                 }) {
                     BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {

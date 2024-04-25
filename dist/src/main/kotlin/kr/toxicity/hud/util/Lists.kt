@@ -2,7 +2,6 @@ package kr.toxicity.hud.util
 
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.sqrt
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()
@@ -40,7 +39,7 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
         } else {
             val queue = LinkedList<() -> Unit>()
             var i = 0
-            val add = sqrt(size.toDouble() / available).toInt()
+            val add = (size.toDouble() / available).toInt()
             while (i < size) {
                 val get = subList(i, (i + add).coerceAtMost(size))
                 queue.add {

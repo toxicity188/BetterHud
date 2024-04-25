@@ -1,4 +1,4 @@
-package kr.toxicity.hud.player
+package kr.toxicity.hud.player.head
 
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.util.toConditions

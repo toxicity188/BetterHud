@@ -1,6 +1,7 @@
 package kr.toxicity.hud.popup
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupSortType
@@ -54,7 +55,7 @@ class PopupImpl(
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
         ArrayList<PopupLayout>().apply {
-            it.forEachSubConfiguration { s, configurationSection ->
+            it.forEachSubConfiguration { _, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
                 var loc = GuiLocation(configurationSection)
                 configurationSection.getConfigurationSection("gui")?.let {
@@ -98,6 +99,8 @@ class PopupImpl(
             TriggerManagerImpl.addTask(configurationSection, task)
         }
     }
+
+    override fun getType(): HudObjectType<*> = HudObjectType.POPUP
 
     override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? = show(reason, player, UUID.randomUUID())

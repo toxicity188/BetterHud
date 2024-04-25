@@ -1,5 +1,6 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
@@ -72,8 +73,6 @@ object ShaderManager: BetterHudManager {
             synchronized(this) {
                 constants.clear()
                 index = 0
-                val file = File(DATA_FOLDER, "shader.yml")
-                if (!file.exists()) PLUGIN.saveResource("shader.yml", false)
                 runCatching {
                     fun getReader(name: String): Pair<String, BufferedReader> {
                         return (name to run {
@@ -93,7 +92,7 @@ object ShaderManager: BetterHudManager {
                     constants += shaderConstants
                     val replaceList = mutableSetOf<String>()
 
-                    val yaml = file.toYaml()
+                    val yaml = PluginConfiguration.SHADER.create()
                     barColor = yaml.getString("bar-color")?.let {
                         runCatching {
                             BarColor.valueOf(it.uppercase())

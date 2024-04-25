@@ -11,6 +11,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import javax.imageio.ImageIO
+import kotlin.math.roundToInt
 
 fun RenderedImage.save(file: File) {
     ImageIO.write(this, "png", file)
@@ -122,4 +123,15 @@ fun BufferedImage.removeEmptySide(): LoadedImage? {
         widthB,
         heightB
     )
+}
+
+fun BufferedImage.withOpacity(opacity: Double): BufferedImage {
+    return BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).also {
+        for (i1 in 0..<width) {
+            for (i2 in 0..<height) {
+                val rgba = getRGB(i1, i2)
+                it.setRGB(i1, i2, ((opacity * ((rgba shr 24) and 0xFF)).roundToInt() shl 24) or (rgba and 0xFFFFFF))
+            }
+        }
+    }
 }

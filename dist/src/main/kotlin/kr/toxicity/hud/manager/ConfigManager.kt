@@ -1,5 +1,6 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
@@ -18,6 +19,8 @@ object ConfigManager: BetterHudManager {
     var defaultHud = emptyList<String>()
         private set
     var defaultPopup = emptyList<String>()
+        private set
+    var defaultCompass = emptyList<String>()
         private set
 
     var numberFormat = DecimalFormat("#,###.#")
@@ -53,12 +56,11 @@ object ConfigManager: BetterHudManager {
     }
 
     override fun preReload() {
-        val file = File(DATA_FOLDER, "config.yml")
-        if (!file.exists()) PLUGIN.saveResource("config.yml", false)
         runCatching {
-            val yaml = file.toYaml()
+            val yaml = PluginConfiguration.CONFIG.create()
             defaultHud = yaml.getStringList("default-hud")
             defaultPopup = yaml.getStringList("default-popup")
+            defaultCompass = yaml.getStringList("default-compass")
             yaml.getString("default-font-name")?.let {
                 defaultFontName = it
             }
