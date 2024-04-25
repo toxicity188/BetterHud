@@ -38,7 +38,7 @@ object ImageManager: BetterHudManager {
                             s,
                             listOf(NamedLoadedImage(
                                 "$s.png",
-                                File(assets, configurationSection.getString("file").ifNull("file value not set."))
+                                File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
                                     .toImage()
                                     .removeEmptySide()
                                     .ifNull("Invalid image."),
@@ -56,7 +56,7 @@ object ImageManager: BetterHudManager {
                         HudImage(
                             file.path,
                             s,
-                            splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set."))
+                            splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
                                 .toImage()
                                 .removeEmptySide()
                                 .ifNull("Invalid image.").image, configurationSection.getInt("split", 25).coerceAtLeast(1)),
@@ -72,7 +72,7 @@ object ImageManager: BetterHudManager {
                                 warn("files is empty.")
                                 return@forEachAllYamlAsync
                             }.mapIndexed { index, string ->
-                                File(assets, string)
+                                File(assets, string.replace('/', File.separatorChar))
                                     .toImage()
                                     .removeEmptyWidth()
                                     .ifNull("Invalid image: $string")

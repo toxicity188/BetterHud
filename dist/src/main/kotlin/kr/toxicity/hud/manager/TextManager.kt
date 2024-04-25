@@ -20,6 +20,8 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
+import java.util.TreeMap
+import java.util.TreeSet
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -183,6 +185,29 @@ object TextManager: BetterHudManager {
         }
     }
 
+    private class CharImage(
+        val char: Char,
+        val image: Image
+    ): Comparable<CharImage> {
+        override fun compareTo(other: CharImage): Int {
+            return char.compareTo(other.char)
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CharImage
+
+            return char == other.char
+        }
+
+        override fun hashCode(): Int {
+            return char.hashCode()
+        }
+
+    }
+
     private fun parseFont(
         path: String,
         s: String,
@@ -195,13 +220,13 @@ object TextManager: BetterHudManager {
         mergeDefaultBitmap: Boolean
     ): HudText {
         val height = (scale.toDouble() * 1.4).toInt()
-        val pairMap = HashMap<Int, MutableList<Pair<Char, Image>>>()
+        val pairMap = TreeMap<Int, MutableSet<CharImage>>()
         val charWidthMap = HashMap<Char, Int>()
         fun addImage(image: BufferedImage, char: Char) {
             synchronized(pairMap) {
                 pairMap.computeIfAbsent(image.width) {
-                    ArrayList()
-                }.add(char to image)
+                    TreeSet()
+                }.add(CharImage(char, image))
             }
             synchronized(charWidthMap) {
                 charWidthMap[char] = image.width
@@ -239,13 +264,13 @@ object TextManager: BetterHudManager {
         }
         pairMap.forEach {
             val width = it.key
-            fun save(list: List<Pair<Char, Image>>) {
+            fun save(list: List<CharImage>) {
                 val encode = "text_${saveName}_${++i}".encodeKey()
                 val name = "$encode.png"
                 val json = JsonArray()
                 list.split(CHAR_LENGTH).forEach { subList ->
                     json.add(subList.map { pair ->
-                        pair.first
+                        pair.char
                     }.joinToString(""))
                 }
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
@@ -256,7 +281,7 @@ object TextManager: BetterHudManager {
                         createGraphics().run {
                             composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
                             list.forEachIndexed { index, pair ->
-                                drawImage(pair.second, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
+                                drawImage(pair.image, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
                             }
                             dispose()
                         }
@@ -264,7 +289,7 @@ object TextManager: BetterHudManager {
                 }
                 textList.add(HudTextArray(name, json))
             }
-            it.value.split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
+            it.value.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
                 if (target.size % CHAR_LENGTH == 0 || target.size < CHAR_LENGTH) {
                     save(target)
                 } else {

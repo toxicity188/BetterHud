@@ -22,18 +22,20 @@ object PackGenerator {
     private val decimal = DecimalFormat("#,###.###")
 
     private fun mbFormat(long: Long): String {
-        return "${decimal.format(BigDecimal("${long}.0") / BigDecimal("1048576.0"))}MB"
+        return "${decimal.format(BigDecimal("${long}.000") / BigDecimal("1048576.000"))}MB"
     }
 
     private class ZipBuilder(
         val zip: ZipOutputStream
     ) {
+        @Volatile
         var byte = 0L
     }
     private class FileTreeBuilder(
         private val build: File
     ) {
         val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
+        @Volatile
         var byte = 0L
 
         fun save(packFile: PackFile) {

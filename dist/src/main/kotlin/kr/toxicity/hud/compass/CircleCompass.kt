@@ -159,7 +159,7 @@ class CircleCompass(
         section: ConfigurationSection
     ) {
         val map = run {
-            val fileName = section.getString("name").ifNull("name value not set.")
+            val fileName = section.getString("name").ifNull("name value not set.").replace('/', File.separatorChar)
             val scale = section.getDouble("scale", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0")
             }
