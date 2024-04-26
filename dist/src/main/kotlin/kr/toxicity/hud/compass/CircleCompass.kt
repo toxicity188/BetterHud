@@ -9,7 +9,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.GuiLocation
@@ -65,7 +65,7 @@ class CircleCompass(
     private val pixel = ImageLocation(section.getConfigurationSection("pixel").ifNull("pixel value not set."))
     private val images = CompassImage(assets, section.getConfigurationSection("file").ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
-    private val isDefault = ConfigManager.defaultCompass.contains(internalName) || section.getBoolean("default")
+    private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getBoolean("default")
 
     private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, y: Int): WidthComponent {
         val char = (center++).parseChar()
@@ -241,7 +241,7 @@ class CircleCompass(
                 0, length * 4 -> images.s
                 else -> images.chain
             }?.map?.get(CompassData(if (i > lengthDiv) length - i else i))?.let {
-                val glyphWidth = ((it.width + space) * mod).roundToInt()
+                val glyphWidth = ((it.width + space) * (mod - 0.5)).roundToInt()
                 (glyphWidth + space).toSpaceComponent() + it + (-glyphWidth + space).toSpaceComponent()
             } ?: (space * 2).toSpaceComponent()
         }

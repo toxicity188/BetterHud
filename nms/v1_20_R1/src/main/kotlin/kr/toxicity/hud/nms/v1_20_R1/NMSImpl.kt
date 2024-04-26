@@ -10,7 +10,6 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.nms.NMSVersion
 import net.kyori.adventure.bossbar.BossBar
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -37,6 +36,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permission
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class NMSImpl: NMS {
     companion object {
@@ -171,16 +171,27 @@ class NMSImpl: NMS {
         }
     }
 
+    private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID) {
+        var buf: FriendlyByteBuf? = null
+    }
     private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BarColor, component: Component): ChannelDuplexHandler() {
+        private val line = BetterHud.getInstance().configManager.bossbarLine - 1
+        private val dummyBars = (0..<line).map {
+            HudBossBar(UUID.randomUUID(), component, color).apply {
+                listener.send(ClientboundBossEventPacket.createAddPacket(this))
+            }
+        }
+        private val dummyBarsUUID = dummyBars.map {
+            it.uuid
+        }
+        private val dummyBarHandleMap = Collections.synchronizedMap(LinkedHashMap<UUID, CachedHudBossbar>())
+        private val otherBarCache = ConcurrentLinkedQueue<Pair<UUID, HudByteBuf>>()
         private val uuid = UUID.randomUUID().apply {
             listener.send(ClientboundBossEventPacket.createAddPacket(HudBossBar(this, component, color)))
         }
-        private var saveUUID = uuid
 
         private var last: HudBossBar = HudBossBar(uuid, Component.empty(), BarColor.RED)
-        private val bufQueue = mutableMapOf<UUID, FriendlyByteBuf>()
-        private var onUse = false
-        private var toggle = false
+        private var onUse = uuid to HudByteBuf(Unpooled.buffer())
 
         init {
             val pipeLine = getConnection(listener).channel.pipeline()
@@ -196,44 +207,45 @@ class NMSImpl: NMS {
         }
 
         fun remove() {
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
             val channel = getConnection(listener).channel
             channel.eventLoop().submit {
                 channel.pipeline().remove(INJECT_NAME)
             }
+            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
+            dummyBarsUUID.forEach {
+                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
+            }
         }
 
         private fun writeBossBar(buf: FriendlyByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-
             val originalUUID = buf.readUUID()
-            if (originalUUID == uuid) {
-                super.write(ctx, msg, promise)
-                return
-            }
-            if (toggle) {
-                toggle = false
+            if (originalUUID == uuid || dummyBarsUUID.contains(originalUUID)) {
                 super.write(ctx, msg, promise)
                 return
             }
             val enum = buf.readEnum(operation)
 
-            fun getBuf() = FriendlyByteBuf(Unpooled.buffer(1 shl 4))
-                .writeUUID(uuid)
+            fun getBuf(targetUUID: UUID = uuid) = HudByteBuf(Unpooled.buffer(1 shl 4))
+                .writeUUID(targetUUID)
 
-            fun sendProgress(targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf().apply {
+            fun sendProgress(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf.apply {
                 writeEnum(operationEnum[2])
                 writeFloat(targetBuf.readFloat())
             }))
-            fun sendStyle(targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf()
-                .writeEnum(operationEnum[4])
-                .writeEnum(targetBuf.readEnum(BossEvent.BossBarColor::class.java))
-                .writeEnum(targetBuf.readEnum(BossEvent.BossBarOverlay::class.java)))
-            )
-            fun sendProperties(targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf().apply {
+            fun sendName(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf.apply {
+                writeEnum(operationEnum[3])
+                writeComponent(targetBuf.readComponent())
+            }))
+            fun sendStyle(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf.apply {
+                writeEnum(operationEnum[4])
+                writeEnum(targetBuf.readEnum(BossEvent.BossBarColor::class.java))
+                writeEnum(targetBuf.readEnum(BossEvent.BossBarOverlay::class.java))
+            }))
+            fun sendProperties(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf.apply {
                 writeEnum(operationEnum[5])
                 writeByte(targetBuf.readUnsignedByte().toInt())
             }))
-            fun sendName(targetBuf: FriendlyByteBuf = buf) {
+            fun changeName(targetBuf: FriendlyByteBuf = buf) {
                 runCatching {
                     val hud = BetterHud.getInstance().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponent())
@@ -257,65 +269,128 @@ class NMSImpl: NMS {
                     hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(comp))
                 }
             }
+            fun removeBossbar(changeCache: Boolean = false): Boolean {
+                if (onUse.first == uuid) return false
+                var result = false
+                if (changeCache) {
+                    val cacheSize = dummyBarHandleMap.size
+                    if (cacheSize < line) {
+                        val cache = CachedHudBossbar(dummyBars[cacheSize], onUse.first).apply {
+                            this.buf = HudByteBuf(Unpooled.copiedBuffer(onUse.second.unwrap()))
+                        }
+                        dummyBarHandleMap[onUse.first] = cache
+                        sendName(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
+                        sendProgress(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
+                        sendStyle(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
+                        sendProperties(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
+                        result = true
+                    }
+                }
+                otherBarCache.poll()?.let { target ->
+                    val targetBuf = HudByteBuf(Unpooled.copiedBuffer(target.second.unwrap()))
+                    listener.send(ClientboundBossEventPacket.createRemovePacket(target.first))
+                    changeName(targetBuf = targetBuf)
+                    sendProgress(targetBuf = targetBuf)
+                    sendStyle(targetBuf = targetBuf)
+                    sendProperties(targetBuf = targetBuf)
+                    onUse = target
+                } ?: run {
+                    onUse = uuid to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
+                    listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
+                    listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
+                    listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))
+                    listener.send(ClientboundBossEventPacket.createUpdatePropertiesPacket(last))
+                }
+                return result
+            }
 
             runCatching {
-                if (saveUUID != originalUUID) {
-                    when (val type = enum.ordinal) {
-                        0 -> {
-                            if (!onUse) {
-                                sendName()
-                                sendProgress()
-                                sendStyle()
-                                sendProperties()
-                                saveUUID = originalUUID
-                                onUse = true
-                            } else {
-                                bufQueue[originalUUID] = FriendlyByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
-                                super.write(ctx, msg, promise)
+                val cacheSize = dummyBarHandleMap.size
+                if (cacheSize < line && enum.ordinal == 0) {
+                    val hud = dummyBarHandleMap.computeIfAbsent(originalUUID) {
+                        CachedHudBossbar(dummyBars[cacheSize], originalUUID)
+                    }.apply {
+                        this.buf = HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    }
+                    sendName(getBuf = getBuf(hud.hud.uuid))
+                    sendProgress(getBuf = getBuf(hud.hud.uuid))
+                    sendStyle(getBuf = getBuf(hud.hud.uuid))
+                    sendProperties(getBuf = getBuf(hud.hud.uuid))
+                    return
+                } else {
+                    dummyBarHandleMap[originalUUID]?.let {
+                        when (enum.ordinal) {
+                            0 -> {
+                                sendName(getBuf = getBuf(it.hud.uuid))
+                                sendProgress(getBuf = getBuf(it.hud.uuid))
+                                sendStyle(getBuf = getBuf(it.hud.uuid))
+                                sendProperties(getBuf = getBuf(it.hud.uuid))
                             }
+                            1 -> {
+                                dummyBarHandleMap.remove(originalUUID)
+                                val swap = removeBossbar(changeCache = true)
+                                val list = dummyBarHandleMap.entries.toList()
+                                val last = if (list.isNotEmpty()) list.last().value else it
+                                list.forEachIndexed { index, target ->
+                                    val after = target.value
+                                    val targetBuf = after.buf ?: return@forEachIndexed
+                                    val newCache = CachedHudBossbar(dummyBars[index], after.cacheUUID).apply {
+                                        this.buf = HudByteBuf(Unpooled.copiedBuffer(targetBuf.unwrap()))
+                                    }
+                                    target.setValue(newCache)
+                                    sendName(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
+                                    sendProgress(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
+                                    sendStyle(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
+                                    sendProperties(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
+                                }
+                                if (!swap) {
+                                    listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last.hud))
+                                    listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last.hud))
+                                    listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last.hud))
+                                    listener.send(ClientboundBossEventPacket.createUpdatePropertiesPacket(last.hud))
+                                }
+                            }
+                            2 -> sendProgress(getBuf = getBuf(it.hud.uuid))
+                            3 -> sendName(getBuf = getBuf(it.hud.uuid))
+                            4 -> sendStyle(getBuf = getBuf(it.hud.uuid))
+                            5 -> sendProperties(getBuf = getBuf(it.hud.uuid))
+                            else -> {}
                         }
-                        else -> {
-                            if (type == 1) bufQueue.remove(originalUUID)
-                            super.write(ctx, msg, promise)
+                        return
+                    }
+                }
+                if (otherBarCache.isEmpty() && enum.ordinal == 0 && onUse.first == uuid) {
+                    onUse = originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    changeName()
+                    sendProgress()
+                    sendStyle()
+                    sendProperties()
+                    return
+                }
+                if (originalUUID == onUse.first) {
+                    when (enum.ordinal) {
+                        0 -> {
+                            changeName()
+                            sendProgress()
+                            sendStyle()
+                            sendProperties()
                         }
+                        1 -> removeBossbar()
+                        2 -> sendProgress()
+                        3 -> changeName()
+                        4 -> sendStyle()
+                        5 -> sendProperties()
+                        else -> {}
                     }
                 } else {
                     when (enum.ordinal) {
-                        1 -> {
-                            bufQueue.keys.firstOrNull()?.let { uuid ->
-                                bufQueue.remove(uuid)?.let {
-                                    toggle = true
-                                    listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-                                    saveUUID = uuid
-                                    sendName(it)
-                                    sendProgress(it)
-                                    sendStyle(it)
-                                    sendProperties(it)
-                                }
-                            } ?: run {
-                                saveUUID = uuid
-                                onUse = false
-                                BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
-                                listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
-                                listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
-                                listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))
-                                listener.send(ClientboundBossEventPacket.createUpdatePropertiesPacket(last))
-                            }
+                        0 -> otherBarCache.add(originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap())))
+                        1 -> otherBarCache.removeIf {
+                            it.first == originalUUID
                         }
-                        2 -> {
-                            sendProgress()
-                        }
-                        3 -> {
-                            sendName()
-                        }
-                        4 -> {
-                            sendStyle()
-                        }
-                        5 -> {
-                            sendProperties()
-                        }
-                        else -> {}
                     }
+                    super.write(ctx, msg, promise)
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -333,12 +408,13 @@ class NMSImpl: NMS {
             }
         }
     }
-    private class HudByteBuf(val source: ByteBuf): FriendlyByteBuf(source) {
+    private class HudByteBuf(private val source: ByteBuf): FriendlyByteBuf(source) {
         override fun unwrap(): ByteBuf {
-            return source
+            return Unpooled.copiedBuffer(source)
         }
     }
-    private class HudBossBar(uuid: UUID, component: Component, color: BarColor): BossEvent(uuid, fromAdventure(component), getColor(color), BossBarOverlay.PROGRESS) {
+
+    private class HudBossBar(val uuid: UUID, component: Component, color: BarColor): BossEvent(uuid, fromAdventure(component), getColor(color), BossBarOverlay.PROGRESS) {
         override fun getProgress(): Float {
             return 0F
         }

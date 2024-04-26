@@ -39,7 +39,6 @@ class HudPlayerImpl(
         PlayerManager.provideLocation(this)
     }
     init {
-        PLUGIN.nms.inject(player, ShaderManager.barColor)
         objectSet.addAll(HudManagerImpl.defaultHuds)
         objectSet.addAll(PopupManagerImpl.defaultPopups)
         objectSet.addAll(CompassManagerImpl.defaultCompasses)
@@ -61,13 +60,15 @@ class HudPlayerImpl(
     override fun getPointedLocation(): MutableSet<PointedLocation> = locationSet
 
     override fun cancelTick() {
+        PLUGIN.nms.removeBossBar(player)
         task?.cancel()
         task = null
     }
 
     override fun startTick() {
         cancelTick()
-        val speed = ConfigManager.tickSpeed
+        PLUGIN.nms.inject(player, ShaderManager.barColor)
+        val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
         }

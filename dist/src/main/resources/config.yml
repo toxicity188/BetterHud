@@ -5,6 +5,8 @@ namespace: "betterhud"
 
 default-font-name: "font.ttf"
 
+bossbar-line: 1
+
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"

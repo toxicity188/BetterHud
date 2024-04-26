@@ -1,7 +1,7 @@
 package kr.toxicity.hud.pack
 
 import com.google.gson.JsonObject
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
 import java.io.File
 import java.math.BigDecimal
@@ -72,7 +72,7 @@ object PackGenerator {
 
     fun generate(callback: () -> Unit) {
         runCatching {
-            ConfigManager.mergeOtherFolders.forEach {
+            ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
                 fun addFile(target: File) {
@@ -90,9 +90,9 @@ object PackGenerator {
                     addFile(target)
                 }
             }
-            val saveTask: Generator = when (ConfigManager.packType) {
+            val saveTask: Generator = when (ConfigManagerImpl.packType) {
                 PackType.FOLDER -> {
-                    val build = DATA_FOLDER.parentFile.subFolder(ConfigManager.buildFolderLocation)
+                    val build = DATA_FOLDER.parentFile.subFolder(ConfigManagerImpl.buildFolderLocation)
                     val pathLength = build.path.length + 1
                     val builder = FileTreeBuilder(build)
                     fun getAllLocation(file: File, length: Int) {
@@ -124,12 +124,12 @@ object PackGenerator {
                     }
                 }
                 PackType.ZIP -> {
-                    val protection = ConfigManager.enableProtection
-                    val host = ConfigManager.enableSelfHost
+                    val protection = ConfigManagerImpl.enableProtection
+                    val host = ConfigManagerImpl.enableSelfHost
                     val message = runCatching {
                         MessageDigest.getInstance("SHA-1")
                     }.getOrNull()
-                    val file = File(DATA_FOLDER.parentFile, "${ConfigManager.buildFolderLocation}.zip")
+                    val file = File(DATA_FOLDER.parentFile, "${ConfigManagerImpl.buildFolderLocation}.zip")
                     val stream = file.apply {
                         if (!exists()) delete()
                     }.outputStream().buffered()
@@ -172,7 +172,7 @@ object PackGenerator {
                             synchronized(zip) {
                                 zip.zip.close()
                                 info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(zip.byte)}" else mbFormat(zip.byte)}")
-                                if (beforeByte != zip.byte) {
+                                if (ConfigManagerImpl.needToUpdatePack || beforeByte != zip.byte) {
                                     beforeByte = zip.byte
                                     if (host && message != null) {
                                         PackUploader.upload(message, file.inputStream().buffered().use {

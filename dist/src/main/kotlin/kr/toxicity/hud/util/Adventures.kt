@@ -2,7 +2,7 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -13,11 +13,11 @@ import kotlin.math.abs
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, "$value/$value")
 
 val SPACE_KEY
-    get() = ConfigManager.key.spaceKey
+    get() = ConfigManagerImpl.key.spaceKey
 val LEGACY_SPACE_KEY
-    get() = ConfigManager.key.legacySpaceKey
+    get() = ConfigManagerImpl.key.legacySpaceKey
 val DEFAULT_KEY
-    get() = ConfigManager.key.defaultKey
+    get() = ConfigManagerImpl.key.defaultKey
 
 val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
     TextDecoration.State.FALSE

@@ -106,7 +106,7 @@ object TextManager: BetterHudManager {
             val configScale = fontConfig.getInt("scale", 16)
             val configHeight = fontConfig.getInt("height", 9)
             val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
-            val defaultFont = File(DATA_FOLDER, ConfigManager.defaultFontName).run {
+            val defaultFont = File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).run {
                 (if (exists()) runCatching {
                     inputStream().buffered().use {
                         Font.createFont(Font.TRUETYPE_FONT, it)

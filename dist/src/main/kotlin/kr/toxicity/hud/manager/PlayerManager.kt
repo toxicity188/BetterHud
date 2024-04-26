@@ -47,7 +47,7 @@ object PlayerManager: BetterHudManager {
         }, PLUGIN)
     }
     fun register(player: Player) {
-        if (ConfigManager.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
+        if (ConfigManagerImpl.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(player) else player
         asyncTask {
             hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
@@ -91,9 +91,14 @@ object PlayerManager: BetterHudManager {
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         hudPlayer.values.forEach {
             it.resetElements()
-            it.startTick()
         }
         callback()
+    }
+
+    override fun postReload() {
+        hudPlayer.values.forEach {
+            it.startTick()
+        }
     }
 
     override fun end() {

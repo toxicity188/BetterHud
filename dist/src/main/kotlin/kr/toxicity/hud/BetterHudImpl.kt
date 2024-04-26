@@ -113,7 +113,7 @@ class BetterHudImpl: BetterHud() {
     }
 
     private val managers = listOf(
-        ConfigManager,
+        ConfigManagerImpl,
         CommandManager,
         CompatibilityManager,
         SkriptManager,
@@ -321,13 +321,15 @@ class BetterHudImpl: BetterHud() {
     override fun getScheduler(): HudScheduler = scheduler
     override fun isPaper(): Boolean = isPaper
     override fun isFolia(): Boolean = isFolia
-    override fun isMergeBossBar(): Boolean = ConfigManager.mergeBossBar
+    override fun isMergeBossBar(): Boolean = ConfigManagerImpl.mergeBossBar
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl
     override fun getPopupManager(): PopupManager = PopupManagerImpl
     override fun getTriggerManager(): TriggerManager = TriggerManagerImpl
     override fun getHudManager(): HudManager = HudManagerImpl
     override fun getDatabaseManager(): DatabaseManager = DatabaseManagerImpl
+    override fun getCompassManager(): CompassManager = CompassManagerImpl
+    override fun getConfigManager(): ConfigManager = ConfigManagerImpl
     override fun isOnReload(): Boolean = onReload
     override fun getDefaultKey(): Key = DEFAULT_KEY
 }

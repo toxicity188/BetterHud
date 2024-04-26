@@ -2,7 +2,7 @@ package kr.toxicity.hud.resource
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.util.*
 
@@ -35,7 +35,7 @@ class GlobalResource {
     }
 
     init {
-        val key = ConfigManager.key
+        val key = ConfigManagerImpl.key
         PLUGIN.getResource("splitter.png")?.buffered()?.use {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(textures).apply {

@@ -134,6 +134,16 @@ public abstract class BetterHud extends JavaPlugin {
      */
     public abstract @NotNull PopupManager getPopupManager();
     /**
+     * Gets config manager.
+     * @return config manager
+     */
+    public abstract @NotNull ConfigManager getConfigManager();
+    /**
+     * Gets compass manager.
+     * @return compass manager
+     */
+    public abstract @NotNull CompassManager getCompassManager();
+    /**
      * Gets trigger manager.
      * @return trigger manager
      */

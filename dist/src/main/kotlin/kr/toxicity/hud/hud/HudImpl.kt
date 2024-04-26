@@ -3,7 +3,6 @@ package kr.toxicity.hud.hud
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.api.configuration.HudObject
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
@@ -11,7 +10,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManager
 import kr.toxicity.hud.pack.PackGenerator
@@ -41,7 +40,7 @@ class HudImpl(
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
     val imageKey = createAdventureKey(imageEncoded)
     val jsonArray = JsonArray()
-    private val default = ConfigManager.defaultHud.contains(internalName) || section.getBoolean("default")
+    private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
 
     private val elements = run {

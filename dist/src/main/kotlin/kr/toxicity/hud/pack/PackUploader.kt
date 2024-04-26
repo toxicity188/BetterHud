@@ -3,7 +3,7 @@ package kr.toxicity.hud.pack
 import com.google.gson.JsonPrimitive
 import com.sun.net.httpserver.HttpServer
 import kr.toxicity.hud.api.nms.NMSVersion
-import kr.toxicity.hud.manager.ConfigManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -54,7 +54,7 @@ object PackUploader {
                 .uri(URI.create("http://checkip.amazonaws.com/"))
                 .GET()
                 .build(), HttpResponse.BodyHandlers.ofString()).thenAccept {
-                    val host = ConfigManager.selfHostPort
+                    val host = ConfigManagerImpl.selfHostPort
                     val body = it.body()
                     val url = "http://${body.substring(0, body.length - 1)}:$host/$string.zip"
                     runCatching {

@@ -68,7 +68,7 @@ class LayoutGroup(
                     } ?: TEquation.t,
                     configurationSection.getString("number-format")?.let {
                         DecimalFormat(it)
-                    } ?: ConfigManager.numberFormat,
+                    } ?: ConfigManagerImpl.numberFormat,
                     configurationSection.getString("background")?.let {
                         BackgroundManager.getBackground(it)
                     },

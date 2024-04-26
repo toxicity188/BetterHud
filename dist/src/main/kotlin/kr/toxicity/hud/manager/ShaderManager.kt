@@ -60,7 +60,6 @@ object ShaderManager: BetterHudManager {
     private val shaderConstants = mapOf(
         "HEIGHT_BIT" to HudImpl.DEFAULT_BIT.toString(),
         "MAX_BIT" to HudImpl.MAX_BIT.toString(),
-        "DEFAULT_OFFSET" to "64",
         "ADD_OFFSET" to HudImpl.ADD_HEIGHT.toString()
     )
 
@@ -90,6 +89,7 @@ object ShaderManager: BetterHudManager {
                         getReader("rendertype_text.vsh")
                     )
                     constants += shaderConstants
+                    constants["DEFAULT_OFFSET"] = "${64 + 17 * (ConfigManagerImpl.bossbarLine - 1)}"
                     val replaceList = mutableSetOf<String>()
 
                     val yaml = PluginConfiguration.SHADER.create()
