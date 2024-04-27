@@ -176,8 +176,6 @@ class BetterHudImpl: BetterHud() {
         }
         val pluginManager = Bukkit.getPluginManager()
         nms = when (val version = Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
-            "v1_17_R1" -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
-            "v1_18_R1" -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
             "v1_18_R2" -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
             "v1_19_R1" -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
             "v1_19_R2" -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()

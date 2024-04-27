@@ -26,8 +26,10 @@ object PlayerHeadManager: BetterHudManager {
 
     fun provideSkin(player: Player): String {
         for (skinProvider in skinProviders) {
-            val value = skinProvider.provide(player)
-            if (value != null) return value
+            runCatching {
+                val value = skinProvider.provide(player)
+                if (value != null) return value
+            }
         }
         return defaultProviders.provide(player)
     }
