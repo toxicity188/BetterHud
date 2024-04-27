@@ -1,3 +1,4 @@
+metrics: true
 number-format: "#,###.#"
 tick-speed: 1
 

@@ -8,6 +8,7 @@ import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bstats.bukkit.Metrics
 import java.io.File
 import java.text.DecimalFormat
 
@@ -53,6 +54,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
 
     var needToUpdatePack = false
         private set
+
+    private var metrics: Metrics? = null
 
     override fun start() {
 
@@ -103,6 +106,12 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             mergeOtherFolders = yaml.getStringList("merge-other-folders")
             selfHostPort = yaml.getInt("self-host-port", 8163)
             forceUpdate = yaml.getBoolean("force-update")
+            if (yaml.getBoolean("metrics") && metrics == null) {
+                metrics = Metrics(PLUGIN, 21287)
+            } else {
+                metrics?.shutdown()
+                metrics = null
+            }
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

@@ -26,7 +26,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
-import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -146,7 +145,6 @@ class BetterHudImpl: BetterHud() {
 
     override fun onEnable() {
         runCatching {
-            Metrics(this, 21287)
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
