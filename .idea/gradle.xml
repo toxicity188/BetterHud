@@ -15,6 +15,13 @@
             <option value="$PROJECT_DIR$/bedrock/geyser" />
             <option value="$PROJECT_DIR$/dist" />
             <option value="$PROJECT_DIR$/nms" />
+            <option value="$PROJECT_DIR$/nms/v1_17_R1" />
+            <option value="$PROJECT_DIR$/nms/v1_18_R1" />
+            <option value="$PROJECT_DIR$/nms/v1_18_R2" />
+            <option value="$PROJECT_DIR$/nms/v1_19_R1" />
+            <option value="$PROJECT_DIR$/nms/v1_19_R2" />
+            <option value="$PROJECT_DIR$/nms/v1_19_R3" />
+            <option value="$PROJECT_DIR$/nms/v1_20_R1" />
             <option value="$PROJECT_DIR$/nms/v1_20_R2" />
             <option value="$PROJECT_DIR$/nms/v1_20_R3" />
             <option value="$PROJECT_DIR$/nms/v1_20_R4" />

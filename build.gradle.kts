@@ -11,6 +11,13 @@ val adventure = "4.16.0"
 val platform = "4.3.2"
 
 val nmsVersion = listOf(
+    "v1_17_R1",
+    "v1_18_R1",
+    "v1_18_R2",
+    "v1_19_R1",
+    "v1_19_R2",
+    "v1_19_R3",
+    "v1_20_R1",
     "v1_20_R2",
     "v1_20_R3",
     "v1_20_R4",
@@ -166,9 +173,10 @@ tasks {
     }
 }
 
-val targetJavaVersion = 21
+val targetJavaVersion = 17
 
 java {
+    toolchain.vendor = JvmVendorSpec.ADOPTIUM
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
 }
 
