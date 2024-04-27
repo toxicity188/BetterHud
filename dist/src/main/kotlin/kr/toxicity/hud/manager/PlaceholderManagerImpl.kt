@@ -417,7 +417,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                     val variable = configurationSection.getString("variable").ifNull("variable not set.")
                     val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
                     val update = configurationSection.getInt("update", 1).coerceAtLeast(1)
-                    val async = configurationSection.getBoolean("async", true)
+                    val async = configurationSection.getBoolean("async", false)
                     updateTask.add(object : PlaceholderTask {
                         override val tick: Int
                             get() = update
