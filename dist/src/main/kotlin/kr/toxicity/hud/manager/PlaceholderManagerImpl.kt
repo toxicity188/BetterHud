@@ -451,7 +451,7 @@ object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
                 if (it.async) it(hudPlayer) else syncTask.add(it)
             }
             if (syncTask.isEmpty()) return
-            task {
+            task(hudPlayer.bukkitPlayer.location) {
                 syncTask.forEach {
                     it(hudPlayer)
                 }

@@ -3,6 +3,7 @@ package kr.toxicity.hud.scheduler
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.plugin.Plugin
 
 class StandardScheduler: HudScheduler {
@@ -18,6 +19,7 @@ class StandardScheduler: HudScheduler {
         }
     }
 
+    override fun task(plugin: Plugin, location: Location, runnable: Runnable): HudTask = task(plugin, runnable)
 
     override fun taskLater(plugin: Plugin, delay: Long, runnable: Runnable): HudTask {
         val task = Bukkit.getScheduler().runTaskLater(plugin, runnable, delay)

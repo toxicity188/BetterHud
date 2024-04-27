@@ -1,5 +1,6 @@
 package kr.toxicity.hud.api.scheduler;
 
+import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,14 @@ public interface HudScheduler {
      * @return scheduled task.
      */
     @NotNull HudTask task(@NotNull Plugin plugin, @NotNull Runnable runnable);
+    /**
+     * Executes sync task.
+     * @param plugin target plugin
+     * @param location location
+     * @param runnable task
+     * @return scheduled task.
+     */
+    @NotNull HudTask task(@NotNull Plugin plugin, @NotNull Location location, @NotNull Runnable runnable);
     /**
      * Executes sync task.
      * @param plugin target plugin.
