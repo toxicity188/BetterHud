@@ -172,7 +172,7 @@ object PackGenerator {
                             synchronized(zip) {
                                 zip.zip.close()
                                 info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(zip.byte)}" else mbFormat(zip.byte)}")
-                                if (ConfigManagerImpl.needToUpdatePack || beforeByte != zip.byte) {
+                                if (ConfigManagerImpl.needToUpdatePack || ConfigManagerImpl.forceUpdate || beforeByte != zip.byte) {
                                     beforeByte = zip.byte
                                     if (host && message != null) {
                                         PackUploader.upload(message, file.inputStream().buffered().use {

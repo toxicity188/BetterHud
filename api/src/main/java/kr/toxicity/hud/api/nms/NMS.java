@@ -49,4 +49,11 @@ public interface NMS {
      * @return textures value
      */
     @NotNull String getTextureValue(@NotNull Player player);
+
+    /**
+     * Reloads player's boss bar.
+     * @param player target player
+     * @param color color
+     */
+    void reloadBossBar(@NotNull Player player, @NotNull BarColor color);
 }

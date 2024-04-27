@@ -93,6 +93,10 @@ class NMSImpl: NMS {
         bossBarMap.remove(player.uniqueId)?.remove()
     }
 
+    override fun reloadBossBar(player: Player, color: BarColor) {
+        bossBarMap[player.uniqueId]?.resetDummy(color)
+    }
+
     override fun getVersion(): NMSVersion {
         return NMSVersion.V1_19_R3
     }
@@ -172,19 +176,20 @@ class NMSImpl: NMS {
         }
     }
 
-    private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID) {
-        var buf: FriendlyByteBuf? = null
-    }
+    private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID, val buf: FriendlyByteBuf)
     private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BarColor, component: Component): ChannelDuplexHandler() {
-        private val line = BetterHud.getInstance().configManager.bossbarLine - 1
-        private val dummyBars = (0..<line).map {
-            HudBossBar(UUID.randomUUID(), component, color).apply {
-                listener.send(ClientboundBossEventPacket.createAddPacket(this))
+        private inner class PlayerDummyBossBar(color: BarColor) {
+            val line = BetterHud.getInstance().configManager.bossbarLine - 1
+            val dummyBars = (0..<line).map {
+                HudBossBar(UUID.randomUUID(), Component.empty(), color).apply {
+                    listener.send(ClientboundBossEventPacket.createAddPacket(this))
+                }
+            }
+            val dummyBarsUUID = dummyBars.map {
+                it.uuid
             }
         }
-        private val dummyBarsUUID = dummyBars.map {
-            it.uuid
-        }
+        private var dummy = PlayerDummyBossBar(color)
         private val dummyBarHandleMap = Collections.synchronizedMap(LinkedHashMap<UUID, CachedHudBossbar>())
         private val otherBarCache = ConcurrentLinkedQueue<Pair<UUID, HudByteBuf>>()
         private val uuid = UUID.randomUUID().apply {
@@ -206,6 +211,18 @@ class NMSImpl: NMS {
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
         }
+        
+        fun resetDummy(color: BarColor) {
+            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
+            dummy.dummyBarsUUID.forEach {
+                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
+            }
+            dummy = PlayerDummyBossBar(color)
+            dummy.dummyBars.forEach { 
+                listener.send(ClientboundBossEventPacket.createAddPacket(it))
+            }
+            listener.send(ClientboundBossEventPacket.createAddPacket(last))
+        }
 
         fun remove() {
             val channel = getConnection(listener).channel
@@ -213,14 +230,14 @@ class NMSImpl: NMS {
                 channel.pipeline().remove(INJECT_NAME)
             }
             listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummyBarsUUID.forEach {
+            dummy.dummyBarsUUID.forEach {
                 listener.send(ClientboundBossEventPacket.createRemovePacket(it))
             }
         }
 
         private fun writeBossBar(buf: FriendlyByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
             val originalUUID = buf.readUUID()
-            if (originalUUID == uuid || dummyBarsUUID.contains(originalUUID)) {
+            if (originalUUID == uuid || dummy.dummyBarsUUID.contains(originalUUID)) {
                 super.write(ctx, msg, promise)
                 return
             }
@@ -275,10 +292,8 @@ class NMSImpl: NMS {
                 var result = false
                 if (changeCache) {
                     val cacheSize = dummyBarHandleMap.size
-                    if (cacheSize < line) {
-                        val cache = CachedHudBossbar(dummyBars[cacheSize], onUse.first).apply {
-                            this.buf = HudByteBuf(Unpooled.copiedBuffer(onUse.second.unwrap()))
-                        }
+                    if (cacheSize < dummy.line) {
+                        val cache = CachedHudBossbar(dummy.dummyBars[cacheSize], onUse.first, HudByteBuf(Unpooled.copiedBuffer(onUse.second.unwrap())))
                         dummyBarHandleMap[onUse.first] = cache
                         sendName(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
                         sendProgress(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
@@ -296,7 +311,7 @@ class NMSImpl: NMS {
                     sendProperties(targetBuf = targetBuf)
                     onUse = target
                 } ?: run {
-                    onUse = uuid to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    onUse = uuid to HudByteBuf(buf.unwrap())
                     BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
                     listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
@@ -308,11 +323,9 @@ class NMSImpl: NMS {
 
             runCatching {
                 val cacheSize = dummyBarHandleMap.size
-                if (cacheSize < line && enum.ordinal == 0) {
+                if (cacheSize < dummy.line && enum.ordinal == 0) {
                     val hud = dummyBarHandleMap.computeIfAbsent(originalUUID) {
-                        CachedHudBossbar(dummyBars[cacheSize], originalUUID)
-                    }.apply {
-                        this.buf = HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                        CachedHudBossbar(dummy.dummyBars[cacheSize], originalUUID, HudByteBuf(buf.unwrap()))
                     }
                     sendName(getBuf = getBuf(hud.hud.uuid))
                     sendProgress(getBuf = getBuf(hud.hud.uuid))
@@ -335,10 +348,8 @@ class NMSImpl: NMS {
                                 val last = if (list.isNotEmpty()) list.last().value else it
                                 list.forEachIndexed { index, target ->
                                     val after = target.value
-                                    val targetBuf = after.buf ?: return@forEachIndexed
-                                    val newCache = CachedHudBossbar(dummyBars[index], after.cacheUUID).apply {
-                                        this.buf = HudByteBuf(Unpooled.copiedBuffer(targetBuf.unwrap()))
-                                    }
+                                    val targetBuf = after.buf
+                                    val newCache = CachedHudBossbar(dummy.dummyBars[index], after.cacheUUID, HudByteBuf(targetBuf.unwrap()))
                                     target.setValue(newCache)
                                     sendName(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
                                     sendProgress(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
@@ -362,7 +373,7 @@ class NMSImpl: NMS {
                     }
                 }
                 if (otherBarCache.isEmpty() && enum.ordinal == 0 && onUse.first == uuid) {
-                    onUse = originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    onUse = originalUUID to HudByteBuf(buf.unwrap())
                     changeName()
                     sendProgress()
                     sendStyle()
@@ -386,7 +397,12 @@ class NMSImpl: NMS {
                     }
                 } else {
                     when (enum.ordinal) {
-                        0 -> otherBarCache.add(originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap())))
+                        0 -> {
+                            otherBarCache.removeIf {
+                                it.first == originalUUID
+                            }
+                            otherBarCache.add(originalUUID to HudByteBuf(buf.unwrap()))
+                        }
                         1 -> otherBarCache.removeIf {
                             it.first == originalUUID
                         }
@@ -399,11 +415,13 @@ class NMSImpl: NMS {
         }
 
         override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-            if (BetterHud.getInstance().isMergeBossBar && msg is ClientboundBossEventPacket) {
-                val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
-                    msg.write(this)
-                }
-                writeBossBar(buf, ctx, msg, promise)
+            if (msg is ClientboundBossEventPacket) {
+                if (BetterHud.getInstance().isMergeBossBar) {
+                    val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
+                        msg.write(this)
+                    }
+                    writeBossBar(buf, ctx, msg, promise)
+                } else super.write(ctx, msg, promise)
             } else {
                 super.write(ctx, msg, promise)
             }

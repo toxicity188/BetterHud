@@ -32,26 +32,27 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
             }
 
             override fun load(player: Player): HudPlayer {
-                val yaml = getFile(player).toYaml()
-                val set = HashSet<HudObject>()
-                fun add(name: String, mapper: (String) -> HudObject?) {
-                    yaml.getStringList(name).mapNotNull(mapper).forEach {
-                        if (!it.isDefault) set.add(it)
+                val hudPlayer = HudPlayerImpl(
+                    player
+                )
+                asyncTask {
+                    val yaml = getFile(player).toYaml()
+                    fun add(name: String, mapper: (String) -> HudObject?) {
+                        yaml.getStringList(name).mapNotNull(mapper).forEach {
+                            if (!it.isDefault) hudPlayer.hudObjects.add(it)
+                        }
+                    }
+                    add("huds") {
+                        HudManagerImpl.getHud(it)
+                    }
+                    add("popups") {
+                        PopupManagerImpl.getPopup(it)
+                    }
+                    add("compasses") {
+                        CompassManagerImpl.getCompass(it)
                     }
                 }
-                add("huds") {
-                    HudManagerImpl.getHud(it)
-                }
-                add("popups") {
-                    PopupManagerImpl.getPopup(it)
-                }
-                add("compasses") {
-                    CompassManagerImpl.getCompass(it)
-                }
-                return HudPlayerImpl(
-                    player,
-                    set
-                )
+                return hudPlayer
             }
 
             override fun save(player: HudPlayer): Boolean {
@@ -98,25 +99,27 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                 }
 
                 override fun load(player: Player): HudPlayer {
-                    val uuid = player.uniqueId.toString()
-                    val set = HashSet<HudObject>()
-                    mysql.prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
-                        val result = s.executeQuery()
-                        while (result.next()) {
-                            when (result.getString("type")) {
-                                "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
-                                    if (!h.isDefault) set.add(h)
-                                }
-                                "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
-                                    if (!p.isDefault) set.add(p)
-                                }
-                                "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { p ->
-                                    if (!p.isDefault) set.add(p)
+                    val hudPlayer = HudPlayerImpl(player)
+                    asyncTask {
+                        val uuid = player.uniqueId.toString()
+                        mysql.prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
+                            val result = s.executeQuery()
+                            while (result.next()) {
+                                when (result.getString("type")) {
+                                    "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
+                                        if (!h.isDefault) hudPlayer.hudObjects.add(h)
+                                    }
+                                    "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
+                                        if (!p.isDefault) hudPlayer.hudObjects.add(p)
+                                    }
+                                    "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { p ->
+                                        if (!p.isDefault) hudPlayer.hudObjects.add(p)
+                                    }
                                 }
                             }
                         }
                     }
-                    return HudPlayerImpl(player, set)
+                    return hudPlayer
                 }
 
                 override fun save(player: HudPlayer): Boolean {

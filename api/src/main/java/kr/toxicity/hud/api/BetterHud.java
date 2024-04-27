@@ -92,13 +92,13 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract boolean isMergeBossBar();
 
     /**
-     * Loads player's resource to some directory
+     * Loads plugin's resource to some directory
      * @param prefix resource folder
      * @param dir target directory
      */
     public abstract void loadAssets(@NotNull String prefix, @NotNull File dir);
     /**
-     * Loads player's resource to some directory
+     * Loads plugin's resource to some directory
      * @param prefix resource folder
      * @param consumer for each callback
      */

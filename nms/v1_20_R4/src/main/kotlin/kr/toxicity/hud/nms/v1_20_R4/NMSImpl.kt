@@ -1,4 +1,4 @@
-package kr.toxicity.hud.nms.v1_20_R3
+package kr.toxicity.hud.nms.v1_20_R4
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
@@ -15,8 +15,12 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.minecraft.core.RegistryAccess
+import net.minecraft.nbt.NbtAccounter
+import net.minecraft.nbt.NbtOps
 import net.minecraft.network.Connection
-import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerCommonPacketListenerImpl
@@ -26,10 +30,10 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.WorldBorder
 import org.bukkit.boss.BarColor
-import org.bukkit.craftbukkit.v1_20_R4.CraftServer
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_20_R4.persistence.CraftPersistentDataContainer
-import org.bukkit.craftbukkit.v1_20_R4.util.CraftChatMessage
+import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer
+import org.bukkit.craftbukkit.util.CraftChatMessage
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.EntityEquipment
@@ -67,6 +71,8 @@ class NMSImpl: NMS {
             }
         }
 
+        fun createBossBar(byteBuf: RegistryFriendlyByteBuf): ClientboundBossEventPacket = ClientboundBossEventPacket.STREAM_CODEC.decode(byteBuf)
+
         private fun toAdventure(component: net.minecraft.network.chat.Component) = GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(component))
         private fun fromAdventure(component: Component) = CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(component))
         private fun getColor(color: BarColor) =  when (color) {
@@ -94,8 +100,12 @@ class NMSImpl: NMS {
         bossBarMap.remove(player.uniqueId)?.remove()
     }
 
+    override fun reloadBossBar(player: Player, color: BarColor) {
+        bossBarMap[player.uniqueId]?.resetDummy(color)
+    }
+
     override fun getVersion(): NMSVersion {
-        return NMSVersion.v1_20_R4
+        return NMSVersion.V1_20_R4
     }
 
     override fun getTextureValue(player: Player): String {
@@ -175,19 +185,20 @@ class NMSImpl: NMS {
     }
 
 
-    private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID) {
-        var buf: FriendlyByteBuf? = null
-    }
+    private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID, val buf: HudByteBuf)
     private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BarColor, component: Component): ChannelDuplexHandler() {
-        private val line = BetterHud.getInstance().configManager.bossbarLine - 1
-        private val dummyBars = (0..<line).map {
-            HudBossBar(UUID.randomUUID(), component, color).apply {
-                listener.send(ClientboundBossEventPacket.createAddPacket(this))
+        private inner class PlayerDummyBossBar(color: BarColor) {
+            val line = BetterHud.getInstance().configManager.bossbarLine - 1
+            val dummyBars = (0..<line).map {
+                HudBossBar(UUID.randomUUID(), Component.empty(), color).apply {
+                    listener.send(ClientboundBossEventPacket.createAddPacket(this))
+                }
+            }
+            val dummyBarsUUID = dummyBars.map {
+                it.uuid
             }
         }
-        private val dummyBarsUUID = dummyBars.map {
-            it.uuid
-        }
+        private var dummy = PlayerDummyBossBar(color)
         private val dummyBarHandleMap = Collections.synchronizedMap(LinkedHashMap<UUID, CachedHudBossbar>())
         private val otherBarCache = ConcurrentLinkedQueue<Pair<UUID, HudByteBuf>>()
         private val uuid = UUID.randomUUID().apply {
@@ -209,6 +220,18 @@ class NMSImpl: NMS {
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
         }
+        
+        fun resetDummy(color: BarColor) {
+            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
+            dummy.dummyBarsUUID.forEach {
+                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
+            }
+            dummy = PlayerDummyBossBar(color)
+            dummy.dummyBars.forEach { 
+                listener.send(ClientboundBossEventPacket.createAddPacket(it))
+            }
+            listener.send(ClientboundBossEventPacket.createAddPacket(last))
+        }
 
         fun remove() {
             val channel = getConnection(listener).channel
@@ -216,40 +239,41 @@ class NMSImpl: NMS {
                 channel.pipeline().remove(INJECT_NAME)
             }
             listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummyBarsUUID.forEach {
+            dummy.dummyBarsUUID.forEach {
                 listener.send(ClientboundBossEventPacket.createRemovePacket(it))
             }
         }
 
-        private fun writeBossBar(buf: FriendlyByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
+        private fun writeBossBar(buf: HudByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
             val originalUUID = buf.readUUID()
-            if (originalUUID == uuid || dummyBarsUUID.contains(originalUUID)) {
+            if (originalUUID == uuid || dummy.dummyBarsUUID.contains(originalUUID)) {
                 super.write(ctx, msg, promise)
                 return
             }
+            if (BetterHud.getInstance().isOnReload) return
             val enum = buf.readEnum(operation)
 
             fun getBuf(targetUUID: UUID = uuid) = HudByteBuf(Unpooled.buffer(1 shl 4))
                 .writeUUID(targetUUID)
 
-            fun sendProgress(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf
+            fun sendProgress(getBuf: HudByteBuf = getBuf(), targetBuf: HudByteBuf = buf) = listener.send(createBossBar(getBuf
                 .writeEnum(operationEnum[2])
                 .writeFloat(targetBuf.readFloat())
             ))
-            fun sendName(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf
+            fun sendName(getBuf: HudByteBuf = getBuf(), targetBuf: HudByteBuf = buf) = listener.send(createBossBar(getBuf
                 .writeEnum(operationEnum[3])
                 .writeComponent(targetBuf.readComponentTrusted())
             ))
-            fun sendStyle(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf
+            fun sendStyle(getBuf: HudByteBuf = getBuf(), targetBuf: HudByteBuf = buf) = listener.send(createBossBar(getBuf
                 .writeEnum(operationEnum[4])
                 .writeEnum(targetBuf.readEnum(BossEvent.BossBarColor::class.java))
                 .writeEnum(targetBuf.readEnum(BossEvent.BossBarOverlay::class.java)))
             )
-            fun sendProperties(getBuf: FriendlyByteBuf = getBuf(), targetBuf: FriendlyByteBuf = buf) = listener.send(ClientboundBossEventPacket(getBuf
+            fun sendProperties(getBuf: HudByteBuf = getBuf(), targetBuf: HudByteBuf = buf) = listener.send(createBossBar(getBuf
                 .writeEnum(operationEnum[5])
                 .writeByte(targetBuf.readUnsignedByte().toInt())
             ))
-            fun changeName(targetBuf: FriendlyByteBuf = buf) {
+            fun changeName(targetBuf: HudByteBuf = buf) {
                 runCatching {
                     val hud = BetterHud.getInstance().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponentTrusted())
@@ -278,10 +302,8 @@ class NMSImpl: NMS {
                 var result = false
                 if (changeCache) {
                     val cacheSize = dummyBarHandleMap.size
-                    if (cacheSize < line) {
-                        val cache = CachedHudBossbar(dummyBars[cacheSize], onUse.first).apply {
-                            this.buf = HudByteBuf(onUse.second.unwrap())
-                        }
+                    if (cacheSize < dummy.line) {
+                        val cache = CachedHudBossbar(dummy.dummyBars[cacheSize], onUse.first, HudByteBuf(onUse.second.unwrap()))
                         dummyBarHandleMap[onUse.first] = cache
                         sendName(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
                         sendProgress(getBuf = getBuf(cache.hud.uuid), targetBuf = onUse.second)
@@ -299,7 +321,7 @@ class NMSImpl: NMS {
                     sendProperties(targetBuf = targetBuf)
                     onUse = target
                 } ?: run {
-                    onUse = uuid to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    onUse = uuid to HudByteBuf(buf.unwrap())
                     BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
                     listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
@@ -311,11 +333,9 @@ class NMSImpl: NMS {
 
             runCatching {
                 val cacheSize = dummyBarHandleMap.size
-                if (cacheSize < line && enum.ordinal == 0) {
+                if (cacheSize < dummy.line && enum.ordinal == 0) {
                     val hud = dummyBarHandleMap.computeIfAbsent(originalUUID) {
-                        CachedHudBossbar(dummyBars[cacheSize], originalUUID)
-                    }.apply {
-                        this.buf = HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                        CachedHudBossbar(dummy.dummyBars[cacheSize], originalUUID, HudByteBuf(buf.unwrap()))
                     }
                     sendName(getBuf = getBuf(hud.hud.uuid))
                     sendProgress(getBuf = getBuf(hud.hud.uuid))
@@ -338,10 +358,8 @@ class NMSImpl: NMS {
                                 val last = if (list.isNotEmpty()) list.last().value else it
                                 list.forEachIndexed { index, target ->
                                     val after = target.value
-                                    val targetBuf = after.buf ?: return@forEachIndexed
-                                    val newCache = CachedHudBossbar(dummyBars[index], after.cacheUUID).apply {
-                                        this.buf = HudByteBuf(Unpooled.copiedBuffer(targetBuf.unwrap()))
-                                    }
+                                    val targetBuf = after.buf
+                                    val newCache = CachedHudBossbar(dummy.dummyBars[index], after.cacheUUID, HudByteBuf(targetBuf.unwrap()))
                                     target.setValue(newCache)
                                     sendName(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
                                     sendProgress(getBuf = getBuf(newCache.hud.uuid), targetBuf = targetBuf)
@@ -365,7 +383,7 @@ class NMSImpl: NMS {
                     }
                 }
                 if (otherBarCache.isEmpty() && enum.ordinal == 0 && onUse.first == uuid) {
-                    onUse = originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap()))
+                    onUse = originalUUID to HudByteBuf(buf.unwrap())
                     changeName()
                     sendProgress()
                     sendStyle()
@@ -389,7 +407,12 @@ class NMSImpl: NMS {
                     }
                 } else {
                     when (enum.ordinal) {
-                        0 -> otherBarCache.add(originalUUID to HudByteBuf(Unpooled.copiedBuffer(buf.unwrap())))
+                        0 -> {
+                            otherBarCache.removeIf {
+                                it.first == originalUUID
+                            }
+                            otherBarCache.add(originalUUID to HudByteBuf(buf.unwrap()))
+                        }
                         1 -> otherBarCache.removeIf {
                             it.first == originalUUID
                         }
@@ -402,19 +425,45 @@ class NMSImpl: NMS {
         }
 
         override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-            if (BetterHud.getInstance().isMergeBossBar && msg is ClientboundBossEventPacket) {
-                val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
-                    msg.write(this)
-                }
-                writeBossBar(buf, ctx, msg, promise)
+            if (msg is ClientboundBossEventPacket) {
+
+                if (BetterHud.getInstance().isMergeBossBar) {
+                    val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
+                        ClientboundBossEventPacket.STREAM_CODEC.encode(this, msg)
+                    }
+                    writeBossBar(buf, ctx, msg, promise)
+                } else super.write(ctx, msg, promise)
             } else {
                 super.write(ctx, msg, promise)
             }
         }
     }
-    private class HudByteBuf(private val source: ByteBuf): FriendlyByteBuf(source) {
+    private class HudByteBuf(private val source: ByteBuf): RegistryFriendlyByteBuf(source, RegistryAccess.EMPTY) {
         override fun unwrap(): ByteBuf {
             return Unpooled.copiedBuffer(source)
+        }
+        override fun writeEnum(instance: Enum<*>): HudByteBuf {
+            super.writeEnum(instance)
+            return this
+        }
+        override fun writeUUID(uuid: UUID): HudByteBuf {
+            super.writeUUID(uuid)
+            return this
+        }
+        override fun writeFloat(f: Float): HudByteBuf {
+            super.writeFloat(f)
+            return this
+        }
+        override fun writeByte(i: Int): HudByteBuf {
+            super.writeByte(i)
+            return this
+        }
+        fun readComponentTrusted(): net.minecraft.network.chat.Component {
+            return ComponentSerialization.CODEC.parse(NbtOps.INSTANCE, readNbt(NbtAccounter.unlimitedHeap())).orThrow
+        }
+        fun writeComponent(component: net.minecraft.network.chat.Component): HudByteBuf {
+            writeNbt(ComponentSerialization.CODEC.encodeStart(NbtOps.INSTANCE, component).orThrow)
+            return this
         }
     }
 

@@ -14,6 +14,7 @@ build-folder-location: "BetterHud/build"
 pack-type: folder #folder, zip
 enable-protection: false
 enable-self-host: false
+force-update: false
 self-host-port: 8163
 merge-other-folders: []
 

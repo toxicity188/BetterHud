@@ -1,8 +1,8 @@
 plugins {
     `java-library`
     kotlin("jvm") version "1.9.23"
-    id("com.github.johnrengelman.shadow") version("8.1.1")
-    id("io.papermc.paperweight.userdev") version("1.5.15") apply(false)
+    id("io.github.goooler.shadow") version("8.1.7")
+    id("io.papermc.paperweight.userdev") version("1.6.0") apply(false)
     id("org.jetbrains.dokka") version "1.9.20"
 }
 
@@ -20,7 +20,7 @@ val nmsVersion = listOf(
     "v1_20_R1",
     "v1_20_R2",
     "v1_20_R3",
-    //"v1_20_R4",
+    "v1_20_R4",
 )
 
 val api = project(":api")
@@ -47,6 +47,7 @@ allprojects {
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://mvn.lumine.io/repository/maven/")
         maven("https://repo.codemc.org/repository/maven-public/")
+        maven("https://maven.fabricmc.net/")
     }
 
     dependencies {
@@ -172,7 +173,7 @@ tasks {
     }
 }
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)

@@ -49,17 +49,15 @@ object PlayerManager: BetterHudManager {
     fun register(player: Player) {
         if (ConfigManagerImpl.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(player) else player
-        asyncTask {
-            hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
-                val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
-                task {
-                    taskLater(20) {
-                        PackUploader.apply(player)
-                    }
-                    HudPlayerJoinEvent(hud).call()
+        hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
+            val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
+            task {
+                taskLater(20) {
+                    PackUploader.apply(player)
                 }
-                hud
+                HudPlayerJoinEvent(hud).call()
             }
+            hud
         }
     }
 

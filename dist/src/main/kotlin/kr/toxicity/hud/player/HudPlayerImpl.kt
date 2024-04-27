@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 class HudPlayerImpl(
     private val player: Player,
-    private val objectSet: MutableSet<HudObject>
 ): HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
+    private val objectSet = HashSet<HudObject>()
 
     private val h = HudPlayerHeadImpl(player)
 
@@ -43,6 +43,7 @@ class HudPlayerImpl(
         objectSet.addAll(PopupManagerImpl.defaultPopups)
         objectSet.addAll(CompassManagerImpl.defaultCompasses)
         startTick()
+        PLUGIN.nms.inject(player, ShaderManager.barColor)
     }
 
     override fun getHudComponent(): WidthComponent = last
@@ -60,14 +61,13 @@ class HudPlayerImpl(
     override fun getPointedLocation(): MutableSet<PointedLocation> = locationSet
 
     override fun cancelTick() {
-        PLUGIN.nms.removeBossBar(player)
         task?.cancel()
         task = null
     }
 
     override fun startTick() {
         cancelTick()
-        PLUGIN.nms.inject(player, ShaderManager.barColor)
+        PLUGIN.nms.reloadBossBar(player, ShaderManager.barColor)
         val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()

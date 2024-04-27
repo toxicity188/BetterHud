@@ -37,6 +37,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var enableProtection = true
         private set
+    var forceUpdate = false
+        private set
 
     var mergeBossBar = true
         private set
@@ -100,6 +102,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             enableSelfHost = yaml.getBoolean("enable-self-host")
             mergeOtherFolders = yaml.getStringList("merge-other-folders")
             selfHostPort = yaml.getInt("self-host-port", 8163)
+            forceUpdate = yaml.getBoolean("force-update")
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",
