@@ -39,3 +39,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+## Minecraft ###
+/run
