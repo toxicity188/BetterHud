@@ -9,7 +9,6 @@ import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.manager.*
-import kr.toxicity.hud.player.head.HudPlayerHeadImpl
 import kr.toxicity.hud.util.*
 import org.bukkit.boss.BarColor
 import org.bukkit.entity.Player
@@ -20,8 +19,6 @@ class HudPlayerImpl(
 ): HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
     private val objectSet = HashSet<HudObject>()
-
-    private val h = HudPlayerHeadImpl(player)
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -80,7 +77,7 @@ class HudPlayerImpl(
     override fun getTick(): Long = tick
     override fun getBukkitPlayer(): Player = player
     override fun getVariableMap(): MutableMap<String, String> = variable
-    override fun getHead(): HudPlayerHead = h
+    override fun getHead(): HudPlayerHead = PlayerHeadManager.provideHead(player.name)
     override fun isHudEnabled(): Boolean = enabled
     override fun setHudEnabled(toEnable: Boolean) {
         enabled = toEnable
