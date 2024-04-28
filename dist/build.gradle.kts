@@ -10,6 +10,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.8.4")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.11")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.15")
+    compileOnly("net.jodah:expiringmap:0.5.11")
 }
 
 tasks.processResources {
