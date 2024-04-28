@@ -9,12 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
+import java.util.*
 
 class CommandModule(
     val name: String
 ) {
 
-    private val moduleMap = mutableMapOf<String, CommandPlayer>()
+    private val moduleMap = TreeMap<String, CommandPlayer>()
     init {
         addCommand("help") {
             aliases = listOf("h", "도움말")

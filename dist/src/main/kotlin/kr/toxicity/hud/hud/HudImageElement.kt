@@ -36,7 +36,10 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             val c = (++parent.imageChar).parseChar()
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
-            val finalWidth = WidthComponent(Component.text().content(c).font(parent.imageKey), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+            val finalWidth = WidthComponent(Component.text()
+                .content(c)
+                .font(parent.imageKey)
+                .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEW_LAYER
             parent.jsonArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
                 addProperty("file", "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.')}/${pair.name}")
