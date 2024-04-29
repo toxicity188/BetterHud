@@ -20,7 +20,7 @@ object PlayerHeadManager : BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
-    private val headLock = Collections.newSetFromMap(WeakHashMap<String, Boolean>())
+    private val headLock = WeakHashMap<String, HudPlayerHeadImpl>()
     private val headCache = ExpiringMap.builder()
         .expiration(5, TimeUnit.MINUTES)
         .expirationListener { k1: String, _: HudPlayerHead ->
@@ -29,7 +29,10 @@ object PlayerHeadManager : BetterHudManager {
         .build<String, HudPlayerHead>()
     private val headMap = HashMap<String, HudHead>()
 
-    private var steve = HudPlayerHeadImpl.allBlack
+    private val loadingHeadMap = HashMap<String, HudPlayerHeadImpl>()
+    private var loadingHead = {
+        HudPlayerHeadImpl.allBlack
+    }
 
     override fun start() {
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
@@ -39,9 +42,9 @@ object PlayerHeadManager : BetterHudManager {
         if (!Bukkit.getServer().onlineMode) {
             skinProviders.add(HttpSkinProvider())
         }
-        PLUGIN.getResource("steve.png")?.buffered()?.use {
-            val image = it.toImage()
-            steve = HudPlayerHeadImpl((0..63).map { i ->
+        PLUGIN.loadAssets("skin") { s, i ->
+            val image = i.toImage()
+            loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->
                 TextColor.color(image.getRGB(i % 8, i / 8))
             })
         }
@@ -59,15 +62,18 @@ object PlayerHeadManager : BetterHudManager {
 
     fun provideHead(playerName: String): HudPlayerHead {
         return synchronized(headLock) {
-            val get = headCache[playerName]
-            if (get == null && !headLock.contains(playerName)) {
-                headLock.add(playerName)
+            headCache[playerName] ?: run {
+                val lock = headLock.computeIfAbsent(playerName) {
+                    loadingHead()
+                }
                 CompletableFuture.runAsync {
                     headCache[playerName] = HudPlayerHeadImpl.of(playerName)
-                    headLock.remove(playerName)
+                    synchronized(headLock) {
+                        headLock.remove(playerName)
+                    }
                 }
+                lock
             }
-            get ?: steve
         }
     }
 
@@ -80,6 +86,18 @@ object PlayerHeadManager : BetterHudManager {
             headMap.clear()
         }
         headCache.clear()
+        loadingHead = when (val name = ConfigManagerImpl.loadingHead) {
+            "random" -> {
+                {
+                    if (loadingHeadMap.isNotEmpty()) loadingHeadMap.values.random() else HudPlayerHeadImpl.allBlack
+                }
+            }
+            else -> {
+                {
+                    loadingHeadMap[name] ?: HudPlayerHeadImpl.allBlack
+                }
+            }
+        }
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 headMap.putSync("head", s) {

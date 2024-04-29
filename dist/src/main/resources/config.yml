@@ -19,6 +19,8 @@ force-update: false
 self-host-port: 8163
 merge-other-folders: []
 
+loading-head: random #steve, alex, etc.
+
 default-hud:
   - test_hud
 

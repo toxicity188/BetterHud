@@ -54,6 +54,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
 
     var needToUpdatePack = false
         private set
+    var loadingHead = "random"
+        private set
 
     private var metrics: Metrics? = null
 
@@ -111,6 +113,9 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             } else {
                 metrics?.shutdown()
                 metrics = null
+            }
+            yaml.getString("loading-head")?.let {
+                loadingHead = it
             }
         }.onFailure { e ->
             warn(
