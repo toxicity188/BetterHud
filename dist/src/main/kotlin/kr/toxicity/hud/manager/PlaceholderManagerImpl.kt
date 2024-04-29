@@ -23,7 +23,7 @@ import java.text.DecimalFormat
 import java.util.function.Function
 import java.util.regex.Pattern
 
-object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
+object PlaceholderManagerImpl: PlaceholderManager, BetterHudManager {
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*/% ]|[a-zA-Z]|[0-9])+)))")
@@ -239,7 +239,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         private val defaultMap: Map<String, HudPlaceholder<T>>,
         val parser: (String) -> T?,
         val stringMapper: (R) -> String
-    ) : PlaceholderContainer<T> {
+    ): PlaceholderContainer<T> {
         val map = HashMap(defaultMap)
 
         fun init() {
@@ -296,7 +296,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
         val type = types[group]
-        print("target: $target, group: $group, first: $first, args: $args, get: $get, type: $type")
 
         return object : PlaceholderBuilder<Any> {
             override val clazz: Class<out Any>
@@ -345,7 +344,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                         }
                         sb.setLength(0)
                     }
-
                     ']' -> {
                         val result = sb.toString()
                         sb.setLength(0)
@@ -360,7 +358,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                             }
                         }
                     }
-
                     else -> {
                         sb.append(char)
                     }
@@ -405,17 +402,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     return Function { player ->
                         runCatching {
                             PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
-                        }.getOrDefault("<error>")
-                    }
-                }
-            })
-            string.addPlaceholder("skin-papi", object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val format = "%${args[0]}%"
-                    return Function { player ->
-                        runCatching {
-                            "skin:" + PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
                         }.getOrDefault("<error>")
                     }
                 }

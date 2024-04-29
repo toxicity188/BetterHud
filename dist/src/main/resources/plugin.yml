@@ -6,8 +6,6 @@ author: toxicity
 description: Make a hud in minecraft!
 folia-supported: true
 website: "https://www.spigotmc.org/resources/115559"
-libraries:
-  - net.jodah:expiringmap:0.5.11
 softdepend:
   - MythicLib
   - MythicMobs

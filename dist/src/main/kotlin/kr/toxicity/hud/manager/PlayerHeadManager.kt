@@ -1,51 +1,37 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.jodah.expiringmap.ExpiringMap
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
-object PlayerHeadManager : BetterHudManager {
+object PlayerHeadManager: BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
-    private val headCache = ExpiringMap.builder()
-        .expiration(5, TimeUnit.MINUTES)
-        .build<String, HudPlayerHead>()
     private val headMap = HashMap<String, HudHead>()
 
     override fun start() {
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
             skinProviders.add(SkinsRestorerSkinProvider())
         }
-        skinProviders.add(MineToolsProvider())
         if (!Bukkit.getServer().onlineMode) {
             skinProviders.add(HttpSkinProvider())
         }
     }
 
-    fun provideSkin(playerName: String): String {
+    fun provideSkin(player: Player): String {
         for (skinProvider in skinProviders) {
             runCatching {
-                val value = skinProvider.provide(playerName)
+                val value = skinProvider.provide(player)
                 if (value != null) return value
             }
         }
-        return defaultProviders.provide(playerName)
-    }
-
-    fun provideHead(playerName: String): HudPlayerHead {
-        return headCache.getOrPut(playerName) {
-            HudPlayerHeadImpl(playerName)
-        }
+        return defaultProviders.provide(player)
     }
 
     fun getHead(name: String) = synchronized(headMap) {
@@ -56,7 +42,6 @@ object PlayerHeadManager : BetterHudManager {
         synchronized(headMap) {
             headMap.clear()
         }
-        headCache.clear()
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 headMap.putSync("head", s) {
