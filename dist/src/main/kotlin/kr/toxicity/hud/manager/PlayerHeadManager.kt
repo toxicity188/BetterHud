@@ -5,29 +5,36 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.jodah.expiringmap.ExpiringMap
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.util.Collections
-import java.util.WeakHashMap
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
     private val headLock = WeakHashMap<String, HudPlayerHeadImpl>()
-    private val headCache = ExpiringMap.builder()
-        .expiration(5, TimeUnit.MINUTES)
-        .expirationListener { k1: String, _: HudPlayerHead ->
-            headLock.remove(k1)
-        }
-        .build<String, HudPlayerHead>()
+    private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
+
+    private class CachedHead(
+        val name: String,
+        private val head: HudPlayerHeadImpl
+    ) {
+        @Volatile
+        private var i = 60
+        fun update(): HudPlayerHeadImpl {
+            i = 60
+            return head
+        }
+        fun check(): Boolean {
+            return --i <= 0
+        }
+    }
 
     private val loadingHeadMap = HashMap<String, HudPlayerHeadImpl>()
     private var loadingHead = {
@@ -42,11 +49,23 @@ object PlayerHeadManager : BetterHudManager {
         if (!Bukkit.getServer().onlineMode) {
             skinProviders.add(HttpSkinProvider())
         }
-        PLUGIN.loadAssets("skin") { s, i ->
-            val image = i.toImage()
+        PLUGIN.loadAssets("skin") { s, stream ->
+            val image = stream.toImage()
             loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->
                 TextColor.color(image.getRGB(i % 8, i / 8))
             })
+        }
+        asyncTaskTimer(20, 20) {
+            val iterator = headCache.values.iterator()
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                if (next.check()) {
+                    iterator.remove()
+                    synchronized(headLock) {
+                        headLock.remove(next.name)
+                    }
+                }
+            }
         }
     }
 
@@ -62,10 +81,10 @@ object PlayerHeadManager : BetterHudManager {
 
     fun provideHead(playerName: String): HudPlayerHead {
         return synchronized(headLock) {
-            headCache[playerName] ?: run {
+            headCache[playerName]?.update() ?: run {
                 headLock.computeIfAbsent(playerName) {
                     CompletableFuture.runAsync {
-                        headCache[playerName] = HudPlayerHeadImpl.of(playerName)
+                        headCache[playerName] = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
                         synchronized(headLock) {
                             headLock.remove(playerName)
                         }

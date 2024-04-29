@@ -5,7 +5,6 @@ import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.util.toImage
 import kr.toxicity.hud.util.warn
-import net.jodah.expiringmap.ExpiringMap
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import java.net.URI
