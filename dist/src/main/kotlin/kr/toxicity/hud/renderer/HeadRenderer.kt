@@ -39,8 +39,10 @@ class HeadRenderer(
             var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
                 val value = it.value(player)
-                val pair: Pair<HudPlayer, HudPlayerHead> = getHead(value.toString()) ?: return@build EMPTY_PIXEL_COMPONENT
-                targetPlayer = pair.first
+                val pair = getHead(value.toString())
+                pair.first?.let { player ->
+                    targetPlayer = player
+                }
                 targetPlayerHead = pair.second
             }
             if (cond(targetPlayer)) synchronized(componentMap) {
@@ -62,12 +64,9 @@ class HeadRenderer(
         }
     }
 
-    private fun getHead(placeholderValue: String): Pair<HudPlayer, HudPlayerHead>? {
-        val stringValue = placeholderValue.replace("%", "")
-        Bukkit.getPlayer(stringValue)?.let { bukkitPlayer ->
-            return PlayerManager.getHudPlayer(bukkitPlayer) to PlayerHeadManager.provideHead(bukkitPlayer.name)
-        }
-        warn("Invalid placeholder value: $placeholderValue")
-        return null
+    private fun getHead(placeholderValue: String): Pair<HudPlayer?, HudPlayerHead> {
+        return Bukkit.getPlayer(placeholderValue)?.let { bukkitPlayer ->
+            PlayerManager.getHudPlayer(bukkitPlayer.uniqueId)
+        } to PlayerHeadManager.provideHead(placeholderValue)
     }
 }

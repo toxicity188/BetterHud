@@ -16,6 +16,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 
@@ -50,14 +51,16 @@ object PlayerManager: BetterHudManager {
         if (ConfigManagerImpl.disableToBedrockPlayer && PLUGIN.bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (PLUGIN.isFolia) PLUGIN.nms.getFoliaAdaptedPlayer(player) else player
         hudPlayer.computeIfAbsent(adaptedPlayer.uniqueId) {
-            val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
-            task {
-                taskLater(20) {
-                    PackUploader.apply(player)
+            CompletableFuture.supplyAsync {
+                val hud = DatabaseManagerImpl.currentDatabase.load(adaptedPlayer)
+                task {
+                    taskLater(20) {
+                        PackUploader.apply(player)
+                    }
+                    HudPlayerJoinEvent(hud).call()
                 }
-                HudPlayerJoinEvent(hud).call()
-            }
-            hud
+                hud
+            }.join()
         }
     }
 

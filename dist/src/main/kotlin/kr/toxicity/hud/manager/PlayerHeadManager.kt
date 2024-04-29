@@ -9,6 +9,7 @@ import net.jodah.expiringmap.ExpiringMap
 import org.bukkit.Bukkit
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
@@ -43,7 +44,9 @@ object PlayerHeadManager : BetterHudManager {
     fun provideHead(playerName: String): HudPlayerHead {
         return synchronized(headCache) {
             headCache.computeIfAbsent(playerName) {
-                HudPlayerHeadImpl(playerName)
+                CompletableFuture.supplyAsync {
+                    HudPlayerHeadImpl(playerName)
+                }.join()
             }
         }
     }
