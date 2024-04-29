@@ -6,6 +6,7 @@ import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.jodah.expiringmap.ExpiringMap
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -28,6 +29,8 @@ object PlayerHeadManager : BetterHudManager {
         .build<String, HudPlayerHead>()
     private val headMap = HashMap<String, HudHead>()
 
+    private var steve = HudPlayerHeadImpl.allBlack
+
     override fun start() {
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
             skinProviders.add(SkinsRestorerSkinProvider())
@@ -35,6 +38,12 @@ object PlayerHeadManager : BetterHudManager {
         skinProviders.add(MineToolsProvider())
         if (!Bukkit.getServer().onlineMode) {
             skinProviders.add(HttpSkinProvider())
+        }
+        PLUGIN.getResource("steve.png")?.buffered()?.use {
+            val image = it.toImage()
+            steve = HudPlayerHeadImpl((0..63).map { i ->
+                TextColor.color(image.getRGB(i % 8, i / 8))
+            })
         }
     }
 
@@ -55,9 +64,10 @@ object PlayerHeadManager : BetterHudManager {
                 headLock.add(playerName)
                 CompletableFuture.runAsync {
                     headCache[playerName] = HudPlayerHeadImpl.of(playerName)
+                    headLock.remove(playerName)
                 }
             }
-            get ?: HudPlayerHeadImpl.allBlack
+            get ?: steve
         }
     }
 
