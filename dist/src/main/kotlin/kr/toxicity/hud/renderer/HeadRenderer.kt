@@ -36,21 +36,17 @@ class HeadRenderer(
         val playerPlaceholder = followPlayer?.build(event)
         return build@{ player ->
             var targetPlayer = player
-            var targetPlayerHead: HudPlayerHead? = null
+            var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
                 val value = it.value(player)
-                val pair: Pair<HudPlayer, HudPlayerHead> = getHead(value, player) ?: return@build EMPTY_PIXEL_COMPONENT
+                val pair: Pair<HudPlayer, HudPlayerHead> = getHead(value.toString()) ?: return@build EMPTY_PIXEL_COMPONENT
                 targetPlayer = pair.first
                 targetPlayerHead = pair.second
-            }
-            if (targetPlayerHead == null) {
-                println("targetPlayerHead is null")
-                return@build EMPTY_PIXEL_COMPONENT
             }
             if (cond(targetPlayer)) synchronized(componentMap) {
                 componentMap.computeIfAbsent(targetPlayer.bukkitPlayer.uniqueId) {
                     var comp = EMPTY_WIDTH_COMPONENT
-                    targetPlayerHead!!.colors.forEachIndexed { index, textColor ->
+                    targetPlayerHead.colors.forEachIndexed { index, textColor ->
                         comp += WidthComponent(components[index / 8].color(textColor), pixel)
                         comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
                     }
@@ -66,23 +62,12 @@ class HeadRenderer(
         }
     }
 
-    private fun getHead(placeholderValue: Any, player: HudPlayer): Pair<HudPlayer, HudPlayerHead>? {
-        if (placeholderValue is String) {
-            val stringValue = placeholderValue.replace("%", "")
-            if (stringValue.startsWith("skin:")) {
-                val skin = stringValue.substring(5)
-                return Pair(player, PlayerHeadManager.provideHead(skin))
-            } else {
-                val bukkitPlayer = Bukkit.getPlayer(stringValue)
-                if (bukkitPlayer != null) {
-                    return Pair(
-                        PlayerManager.getHudPlayer(bukkitPlayer),
-                        PlayerHeadManager.provideHead(bukkitPlayer.name)
-                    )
-                }
-            }
+    private fun getHead(placeholderValue: String): Pair<HudPlayer, HudPlayerHead>? {
+        val stringValue = placeholderValue.replace("%", "")
+        Bukkit.getPlayer(stringValue)?.let { bukkitPlayer ->
+            return PlayerManager.getHudPlayer(bukkitPlayer) to PlayerHeadManager.provideHead(bukkitPlayer.name)
         }
-        println("Invalid placeholder value: $placeholderValue")
+        warn("Invalid placeholder value: $placeholderValue")
         return null
     }
 }

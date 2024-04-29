@@ -29,13 +29,12 @@ class HudPlayerHeadImpl(playerName: String) : HudPlayerHead {
         expiringMap[playerName] ?: HttpClient.newHttpClient().send(
             HttpRequest.newBuilder()
                 .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
-                            .asJsonObject
-                            .getAsJsonObject("textures")
-                            .getAsJsonObject("SKIN")
-                            .getAsJsonPrimitive("url")
-                            .asString
-                    )
-                )
+                    .asJsonObject
+                    .getAsJsonObject("textures")
+                    .getAsJsonObject("SKIN")
+                    .getAsJsonPrimitive("url")
+                    .asString
+                ))
                 .GET()
                 .build(),
             BodyHandlers.ofInputStream()

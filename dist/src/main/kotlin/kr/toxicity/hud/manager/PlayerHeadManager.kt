@@ -7,10 +7,8 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.jodah.expiringmap.ExpiringMap
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
@@ -43,8 +41,10 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return headCache.getOrPut(playerName) {
-            HudPlayerHeadImpl(playerName)
+        return synchronized(headCache) {
+            headCache.computeIfAbsent(playerName) {
+                HudPlayerHeadImpl(playerName)
+            }
         }
     }
 
@@ -56,7 +56,9 @@ object PlayerHeadManager : BetterHudManager {
         synchronized(headMap) {
             headMap.clear()
         }
-        headCache.clear()
+        synchronized(headCache) {
+            headCache.clear()
+        }
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 headMap.putSync("head", s) {

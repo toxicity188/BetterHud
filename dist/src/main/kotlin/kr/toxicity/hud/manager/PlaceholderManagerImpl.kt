@@ -409,17 +409,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
                 }
             })
-            string.addPlaceholder("skin-papi", object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val format = "%${args[0]}%"
-                    return Function { player ->
-                        runCatching {
-                            "skin:" + PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
-                        }.getOrDefault("<error>")
-                    }
-                }
-            })
         }
     }
 
