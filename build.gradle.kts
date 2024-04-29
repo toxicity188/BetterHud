@@ -172,7 +172,7 @@ tasks {
         prefix("net.objecthunter.exp4j")
         prefix("org.bstats")
         prefix("net.byteflux")
-        prefix("net.jodah:expiringmap")
+        prefix("net.jodah.expiringmap")
         relocate("net.kyori", "hud.net.kyori")
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
