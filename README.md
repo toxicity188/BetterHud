@@ -75,3 +75,15 @@ dependencies {
     compileOnly("com.github.toxicity188:BetterHud:VERSION")
 }
 ```
+
+### Contirbuting
+
+You should make a pull-request to the **"dev"** branch.
+
+- Fork BetterHud on GitHub
+- Clone your forked repository (git clone)
+- Create your feature branch (git checkout -b my-feature)
+- Commit your changes (git commit -am 'Add my feature')
+- Push to the branch (git push origin my-feature)
+- Create a new Pull Request to the **"dev"*** branch
+- Wait for your pull request to be reviewed and merged
