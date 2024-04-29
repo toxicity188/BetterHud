@@ -9,15 +9,22 @@ import net.jodah.expiringmap.ExpiringMap
 import org.bukkit.Bukkit
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.util.Collections
+import java.util.WeakHashMap
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
+    private val headLock = Collections.newSetFromMap(WeakHashMap<String, Boolean>())
     private val headCache = ExpiringMap.builder()
         .expiration(5, TimeUnit.MINUTES)
+        .expirationListener { k1: String, _: HudPlayerHead ->
+            headLock.remove(k1)
+        }
         .build<String, HudPlayerHead>()
     private val headMap = HashMap<String, HudHead>()
 
@@ -42,10 +49,15 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return headCache.computeIfAbsent(playerName) {
-            CompletableFuture.supplyAsync {
-                HudPlayerHeadImpl(playerName)
-            }.join()
+        return synchronized(headLock) {
+            val get = headCache[playerName]
+            if (get == null && !headLock.contains(playerName)) {
+                headLock.add(playerName)
+                CompletableFuture.runAsync {
+                    headCache[playerName] = HudPlayerHeadImpl.of(playerName)
+                }
+            }
+            get ?: HudPlayerHeadImpl.allBlack
         }
     }
 

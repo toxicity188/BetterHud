@@ -14,19 +14,10 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.util.*
 
-class HudPlayerHeadImpl(playerName: String) : HudPlayerHead {
+class HudPlayerHeadImpl(private val colorList: List<TextColor>) : HudPlayerHead {
 
-    companion object {
-        private val allBlack = (0..63).map {
-            NamedTextColor.BLACK
-        }
-        private val expiringMap = ExpiringMap.builder()
-            .expiration(5, java.util.concurrent.TimeUnit.MINUTES)
-            .build<String, List<TextColor>>()
-    }
-
-    private val colorList = runCatching {
-        expiringMap[playerName] ?: HttpClient.newHttpClient().send(
+    private constructor(playerName: String): this(
+        HttpClient.newHttpClient().send(
             HttpRequest.newBuilder()
                 .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
                     .asJsonObject
@@ -47,15 +38,23 @@ class HudPlayerHeadImpl(playerName: String) : HudPlayerHead {
                 val imageColor = image.getRGB(i % 8, i / 8)
                 TextColor.color(if (layerColor ushr 24 != 0) layerColor else imageColor)
             }
-            expiringMap[playerName] = colors
             colors
         }
-    }.getOrElse { e ->
-        warn(
-            "Unable to get ${playerName}'s head.",
-            "Reason: ${e.message}"
-        )
-        allBlack
+    )
+
+    companion object {
+        val allBlack = HudPlayerHeadImpl((0..63).map {
+            NamedTextColor.BLACK
+        })
+        fun of(playerName: String) = runCatching {
+            HudPlayerHeadImpl(playerName)
+        }.getOrElse { e ->
+            warn(
+                "Unable to get ${playerName}'s head.",
+                "Reason: ${e.message}"
+            )
+            allBlack
+        }
     }
 
     override fun getColors(): List<TextColor> = colorList
