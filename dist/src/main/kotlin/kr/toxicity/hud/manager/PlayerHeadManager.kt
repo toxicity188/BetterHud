@@ -42,12 +42,10 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return synchronized(headCache) {
-            headCache.computeIfAbsent(playerName) {
-                CompletableFuture.supplyAsync {
-                    HudPlayerHeadImpl(playerName)
-                }.join()
-            }
+        return headCache.computeIfAbsent(playerName) {
+            CompletableFuture.supplyAsync {
+                HudPlayerHeadImpl(playerName)
+            }.join()
         }
     }
 
@@ -59,9 +57,7 @@ object PlayerHeadManager : BetterHudManager {
         synchronized(headMap) {
             headMap.clear()
         }
-        synchronized(headCache) {
-            headCache.clear()
-        }
+        headCache.clear()
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 headMap.putSync("head", s) {
