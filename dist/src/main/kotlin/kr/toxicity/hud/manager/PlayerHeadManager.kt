@@ -63,16 +63,15 @@ object PlayerHeadManager : BetterHudManager {
     fun provideHead(playerName: String): HudPlayerHead {
         return synchronized(headLock) {
             headCache[playerName] ?: run {
-                val lock = headLock.computeIfAbsent(playerName) {
+                headLock.computeIfAbsent(playerName) {
+                    CompletableFuture.runAsync {
+                        headCache[playerName] = HudPlayerHeadImpl.of(playerName)
+                        synchronized(headLock) {
+                            headLock.remove(playerName)
+                        }
+                    }
                     loadingHead()
                 }
-                CompletableFuture.runAsync {
-                    headCache[playerName] = HudPlayerHeadImpl.of(playerName)
-                    synchronized(headLock) {
-                        headLock.remove(playerName)
-                    }
-                }
-                lock
             }
         }
     }
@@ -84,6 +83,9 @@ object PlayerHeadManager : BetterHudManager {
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         synchronized(headMap) {
             headMap.clear()
+        }
+        synchronized(headLock) {
+            headLock.clear()
         }
         headCache.clear()
         loadingHead = when (val name = ConfigManagerImpl.loadingHead) {
