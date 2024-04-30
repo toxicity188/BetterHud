@@ -11,7 +11,7 @@ val minecraft = "1.20.4" // TODO Bumps version.
 val adventure = "4.16.0"
 val platform = "4.3.2"
 
-val nmsVersion = listOf(
+val legacyNmsVersion = listOf(
     "v1_17_R1",
     "v1_18_R1",
     "v1_18_R2",
@@ -21,8 +21,15 @@ val nmsVersion = listOf(
     "v1_20_R1",
     "v1_20_R2",
     "v1_20_R3",
-    "v1_20_R4",
 )
+val currentNmsVersion = listOf(
+    "v1_20_R4"
+)
+
+val allNmsVersion = ArrayList<String>().apply {
+    addAll(legacyNmsVersion)
+    addAll(currentNmsVersion)
+}
 
 val api = project(":api")
 val dist = project(":dist")
@@ -34,7 +41,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-19"
+    version = "beta-21"
 
     repositories {
         mavenCentral()
@@ -106,7 +113,7 @@ dist.dependencies {
     bedrock.subprojects.forEach {
         compileOnly(it)
     }
-    nmsVersion.forEach {
+    allNmsVersion.forEach {
         compileOnly(project(":nms:$it"))
     }
 }
@@ -124,7 +131,7 @@ dependencies {
     bedrock.subprojects.forEach {
         implementation(it)
     }
-    nmsVersion.forEach {
+    allNmsVersion.forEach {
         implementation(project(":nms:$it", configuration = "reobf"))
     }
 }
@@ -157,7 +164,7 @@ tasks {
         version(minecraft)
     }
     shadowJar {
-        nmsVersion.forEach {
+        legacyNmsVersion.forEach {
             dependsOn(":nms:$it:reobfJar")
         }
         archiveClassifier = ""
