@@ -17,11 +17,8 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.text.TextComponent
 import org.bukkit.configuration.ConfigurationSection
 import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.collections.ArrayList
 
 class HudImpl(
     override val path: String,
@@ -46,9 +43,6 @@ class HudImpl(
     val jsonArray = WeakReference(JsonArray())
     private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
-
-    val imageNameComponent = WeakReference(WeakHashMap<BitmapKey, WidthComponent>())
-    val headNameComponent = WeakReference(WeakHashMap<BitmapKey, TextComponent.Builder>())
 
     private val elements = run {
         ArrayList<HudAnimation>().apply {

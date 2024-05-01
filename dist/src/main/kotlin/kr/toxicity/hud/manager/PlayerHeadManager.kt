@@ -4,7 +4,9 @@ import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import java.awt.Color
@@ -20,6 +22,14 @@ object PlayerHeadManager : BetterHudManager {
     private val headLock = WeakHashMap<String, HudPlayerHeadImpl>()
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
+
+    private val headNameComponent = WeakHashMap<ShaderGroup, TextComponent.Builder>()
+
+
+    fun getHead(group: ShaderGroup) = headNameComponent[group]
+    fun setHead(group: ShaderGroup, component: TextComponent.Builder) {
+        headNameComponent[group] = component
+    }
 
     private class CachedHead(
         val name: String,
@@ -102,6 +112,9 @@ object PlayerHeadManager : BetterHudManager {
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         synchronized(headMap) {
             headMap.clear()
+        }
+        synchronized(headNameComponent) {
+            headNameComponent.clear()
         }
         synchronized(headLock) {
             headLock.clear()

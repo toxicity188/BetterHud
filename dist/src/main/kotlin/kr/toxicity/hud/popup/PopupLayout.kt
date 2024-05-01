@@ -14,6 +14,8 @@ import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.layout.LayoutGroup
+import kr.toxicity.hud.manager.ImageManager
+import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.HeadRenderer
@@ -25,8 +27,6 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 class PopupLayout(
@@ -122,15 +122,14 @@ class PopupLayout(
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
             if (hudImage.image.size > 1) hudImage.image.forEach {
                 val fileName = "$NAME_SPACE_ENCODED:${it.name.substringBefore('.')}/${it.name}"
-                val map = parent.imageNameComponent.get()
 
                 val height = Math.round(it.image.image.height * target.scale).toInt()
                 val scale = height.toDouble() / it.image.image.height
                 val xOffset = Math.round(it.image.xOffset * scale).toInt()
                 val ascent = HudImpl.createBit(pixel.y, imageShader)
-                val bitmapKey = BitmapKey(fileName, ascent, height)
+                val shaderGroup = ShaderGroup(imageShader, fileName, ascent, height)
 
-                val component = map?.get(bitmapKey) ?: run {
+                val component = ImageManager.getImage(shaderGroup) ?: run {
                     val char = (++imageChar).parseChar()
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
@@ -143,7 +142,7 @@ class PopupLayout(
                     })
                     val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
                     val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                    map?.put(bitmapKey, comp)
+                    ImageManager.setImage(shaderGroup, comp)
                     comp
                 }
 
@@ -301,13 +300,12 @@ class PopupLayout(
                 (0..7).map { i ->
                     val encode = "pixel_${headLayout.head.pixel}".encodeKey()
                     val fileName = "$NAME_SPACE_ENCODED:$encode/$encode.png"
-                    val map = parent.headNameComponent.get()
                     val char = (++imageChar).parseChar()
                     val ascent = HudImpl.createBit(pixel.y + i * headLayout.head.pixel, shader)
                     val height = headLayout.head.pixel
-                    val bitmapKey = BitmapKey(fileName, ascent, height)
+                    val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
 
-                    map?.get(bitmapKey) ?: run {
+                    PlayerHeadManager.getHead(shaderGroup) ?: run {
                         array.add(JsonObject().apply {
                             addProperty("type", "bitmap")
                             addProperty("file", fileName)
@@ -318,7 +316,7 @@ class PopupLayout(
                             })
                         })
                         val comp = Component.text().content(char).font(parent.imageKey)
-                        map?.put(bitmapKey, comp)
+                        PlayerHeadManager.setHead(shaderGroup, comp)
                         comp
                     }
                 },

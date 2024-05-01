@@ -1,20 +1,30 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageType
 import kr.toxicity.hud.image.NamedLoadedImage
 import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
+import java.util.*
 import java.util.regex.Pattern
 
 object ImageManager: BetterHudManager {
 
     private val imageMap = HashMap<String, HudImage>()
     private val emptySetting = MemoryConfiguration()
+
+    private val imageNameComponent = WeakHashMap<ShaderGroup, WidthComponent>()
+
+    fun getImage(group: ShaderGroup) = imageNameComponent[group]
+    fun setImage(group: ShaderGroup, component: WidthComponent) {
+        imageNameComponent[group] = component
+    }
 
     override fun start() {
     }
@@ -28,22 +38,23 @@ object ImageManager: BetterHudManager {
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         synchronized(imageMap) {
             imageMap.clear()
+            imageNameComponent.clear()
         }
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ file, s, configurationSection ->
             runCatching {
                 val image = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
                     ImageType.SINGLE -> {
+                        val targetFile = File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
                         HudImage(
                             file.path,
                             s,
-                            listOf(NamedLoadedImage(
-                                "$s.png",
-                                File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
-                                    .toImage()
-                                    .removeEmptySide()
-                                    .ifNull("Invalid image."),
-                            )),
+                            listOf(targetFile
+                                .toImage()
+                                .removeEmptySide()
+                                .ifNull("Invalid image.")
+                                .toNamed(targetFile.name),
+                            ),
                             type,
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
                         )
@@ -54,13 +65,15 @@ object ImageManager: BetterHudManager {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
                         } ?: SplitType.LEFT)
+                        val getFile = File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
                         HudImage(
                             file.path,
                             s,
-                            splitType.split(s, File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
+                            splitType.split(getFile
                                 .toImage()
                                 .removeEmptySide()
-                                .ifNull("Invalid image.").image, configurationSection.getInt("split", 25).coerceAtLeast(1)),
+                                .ifNull("Invalid image.")
+                                .toNamed(getFile.name), configurationSection.getInt("split", 25).coerceAtLeast(1)),
                             type,
                             configurationSection.getConfigurationSection("setting").ifNull("setting configuration not found.")
                         )
@@ -73,7 +86,7 @@ object ImageManager: BetterHudManager {
                             configurationSection.getStringList("files").ifEmpty {
                                 warn("files is empty.")
                                 return@forEachAllYamlAsync
-                            }.mapIndexed { index, string ->
+                            }.map { string ->
                                 val matcher = multiFrameRegex.matcher(string)
                                 var fileName = string
                                 var frame = 1
@@ -81,11 +94,12 @@ object ImageManager: BetterHudManager {
                                     fileName = matcher.group("name")
                                     frame = matcher.group("frame").toInt()
                                 }
-                                val targetImage = File(assets, fileName.replace('/', File.separatorChar))
+                                val targetFile = File(assets, fileName.replace('/', File.separatorChar))
+                                val targetImage = targetFile
                                     .toImage()
                                     .removeEmptyWidth()
                                     .ifNull("Invalid image: $string")
-                                    .toNamed("${s}_${index + 1}.png")
+                                    .toNamed(targetFile.name)
                                 (0..<(frame * globalFrame).coerceAtLeast(1)).map {
                                     targetImage
                                 }

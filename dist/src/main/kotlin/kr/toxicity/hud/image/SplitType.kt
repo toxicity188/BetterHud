@@ -6,68 +6,72 @@ import java.awt.image.BufferedImage
 
 enum class SplitType {
     LEFT {
-        override fun split(name: String, target: BufferedImage, split: Int): List<NamedLoadedImage> {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
             return (1..split).map {
                 NamedLoadedImage(
-                    "${name}_$it.png",
+                    "${saveName}_$it.png",
                     LoadedImage(
-                        target.getSubimage(0, 0, (it.toDouble() / split * target.width).toInt().coerceAtLeast(1), target.height),
-                        0,
-                        0
+                        target.image.image.getSubimage(0, 0, (it.toDouble() / split * target.image.image.width).toInt().coerceAtLeast(1), target.image.image.height),
+                        target.image.xOffset,
+                        target.image.yOffset
                     )
                 )
             }
         }
     },
     RIGHT {
-        override fun split(name: String, target: BufferedImage, split: Int): List<NamedLoadedImage> {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
             return (1..split).map {
-                val getWidth = (it.toDouble() / split * target.width).toInt().coerceAtLeast(1)
-                val xOffset = target.width - getWidth
+                val getWidth = (it.toDouble() / split * target.image.image.width).toInt().coerceAtLeast(1)
+                val xOffset = target.image.image.width - getWidth
                 NamedLoadedImage(
-                    "${name}_$it.png",
+                    "${saveName}_$it.png",
                     LoadedImage(
-                        target.getSubimage(xOffset, 0, getWidth, target.height),
-                        xOffset,
-                        0
+                        target.image.image.getSubimage(xOffset, 0, getWidth, target.image.image.height),
+                        xOffset + target.image.xOffset,
+                        target.image.yOffset
                     )
                 )
             }
         }
     },
     UP {
-        override fun split(name: String, target: BufferedImage, split: Int): List<NamedLoadedImage> {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
             return (1..split).map {
-                val getHeight = (it.toDouble() / split * target.height).toInt().coerceAtLeast(1)
+                val getHeight = (it.toDouble() / split * target.image.image.height).toInt().coerceAtLeast(1)
                 NamedLoadedImage(
-                    "${name}_$it.png",
-                    BufferedImage(target.width, target.height, BufferedImage.TYPE_INT_ARGB).apply {
+                    "${saveName}_$it.png",
+                    BufferedImage(target.image.image.width, target.image.image.height, BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {
                             composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                            drawImage(target.getSubimage(0, target.height - getHeight, target.width, getHeight), 0, target.height - getHeight, null)
+                            drawImage(target.image.image.getSubimage(0, target.image.image.height - getHeight, target.image.image.width, getHeight), 0, target.image.image.height - getHeight, null)
                             dispose()
                         }
-                    }.removeEmptyWidth() ?: throw RuntimeException()
+                    }.removeEmptyWidth(target.image.xOffset, target.image.yOffset) ?: throw RuntimeException()
                 )
             }
         }
     },
     DOWN {
-        override fun split(name: String, target: BufferedImage, split: Int): List<NamedLoadedImage> {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
             return (1..split).map {
                 NamedLoadedImage(
-                    "${name}_$it.png",
-                    BufferedImage(target.width, target.height, BufferedImage.TYPE_INT_ARGB).apply {
+                    "${saveName}_$it.png",
+                    BufferedImage(target.image.image.width, target.image.image.height, BufferedImage.TYPE_INT_ARGB).apply {
                         createGraphics().run {
                             composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                            drawImage(target.getSubimage(0, 0, target.width, (it.toDouble() / split * target.height).toInt().coerceAtLeast(1)), 0, 0, null)
+                            drawImage(target.image.image.getSubimage(0, 0, target.image.image.width, (it.toDouble() / split * target.image.image.height).toInt().coerceAtLeast(1)), 0, 0, null)
                             dispose()
                         }
-                    }.removeEmptyWidth() ?: throw RuntimeException()
+                    }.removeEmptyWidth(target.image.xOffset, target.image.yOffset) ?: throw RuntimeException()
                 )
             }
         }
     },
     ;
-    abstract fun split(name: String, target: BufferedImage, split: Int): List<NamedLoadedImage>
+    abstract fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage>
 }

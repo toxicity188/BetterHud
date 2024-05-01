@@ -8,9 +8,11 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.ImageLayout
+import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 
@@ -32,14 +34,12 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         val finalPixel = image.location + pixel
         hud.image.forEach { pair ->
             val fileName = "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.')}/${pair.name}"
-            val map = parent.imageNameComponent.get()
-
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
             val ascent = HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader)
-            val bitmapKey = BitmapKey(fileName, ascent, height)
+            val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
 
-            val component = map?.get(bitmapKey) ?: run {
+            val component = ImageManager.getImage(shaderGroup) ?: run {
                 val c = (++parent.imageChar).parseChar()
                 val finalWidth = WidthComponent(Component.text()
                     .content(c)
@@ -54,7 +54,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                         add(c)
                     })
                 })
-                map?.put(bitmapKey, finalWidth)
+                ImageManager.setImage(shaderGroup, finalWidth)
                 finalWidth
             }
 

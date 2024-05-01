@@ -32,7 +32,7 @@ fun InputStream.toImage(): BufferedImage = ImageIO.read(this)
 
 fun LoadedImage.toNamed(name: String) = NamedLoadedImage(name, this)
 
-fun BufferedImage.removeEmptyWidth(): LoadedImage? {
+fun BufferedImage.removeEmptyWidth(x: Int = 0, y: Int = 0): LoadedImage? {
 
     var widthA = 0
     var widthB = width
@@ -51,8 +51,8 @@ fun BufferedImage.removeEmptyWidth(): LoadedImage? {
 
     return LoadedImage(
         getSubimage(widthB, 0, finalWidth, height),
-        widthB,
-        0
+        widthB + x,
+        y
     )
 }
 

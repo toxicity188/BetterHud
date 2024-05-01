@@ -3,7 +3,7 @@ package kr.toxicity.hud.popup
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupSortType
-import java.util.UUID
+import java.util.*
 
 class PopupIteratorImpl(
     private val unique: Boolean,

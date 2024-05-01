@@ -16,11 +16,9 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.text.TextComponent
 import org.bukkit.configuration.ConfigurationSection
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.ArrayList
 
 class PopupImpl(
     override val path: String,
@@ -55,8 +53,6 @@ class PopupImpl(
         }
     }
 
-    val imageNameComponent = WeakReference(WeakHashMap<BitmapKey, WidthComponent>())
-    val headNameComponent = WeakReference(WeakHashMap<BitmapKey, TextComponent.Builder>())
     private val imageEncoded = "popup_${name}_image".encodeKey()
     val array = WeakReference(JsonArray())
     val imageKey = createAdventureKey(imageEncoded)

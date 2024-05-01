@@ -7,7 +7,6 @@ import kr.toxicity.hud.placeholder.ConditionBuilder
 class HudText(
     override val path: String,
     val name: String,
-    val fontName: String,
     val height: Int,
     val array: List<HudTextArray>,
     val images: Map<String, LocatedImage>,
