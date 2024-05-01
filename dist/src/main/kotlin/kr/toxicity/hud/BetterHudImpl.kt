@@ -173,18 +173,16 @@ class BetterHudImpl: BetterHud() {
             }
         }
         val pluginManager = Bukkit.getPluginManager()
-        val bukkitVersion = MinecraftVersion(Bukkit.getBukkitVersion()
-            .substringBefore('-'))
-        if (bukkitVersion >= MinecraftVersion.version1_20_5) {
-            nms = when (bukkitVersion) {
+        if (MinecraftVersion.current >= MinecraftVersion.version1_20_5) {
+            nms = when (MinecraftVersion.current) {
                 MinecraftVersion.version1_20_5, MinecraftVersion.version1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
                 else -> {
-                    warn("Unsupported bukkit version: $bukkitVersion")
+                    warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                     pluginManager.disablePlugin(this)
                     return
                 }
             }
-        } else nms = when (val version = Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
+        } else nms = when (Bukkit.getServer().javaClass.`package`.name.split('.')[3]) {
             "v1_17_R1" -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             "v1_18_R1" -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
             "v1_18_R2" -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
@@ -195,7 +193,7 @@ class BetterHudImpl: BetterHud() {
             "v1_20_R2" -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
             "v1_20_R3" -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
             else -> {
-                warn("Unsupported bukkit version: $version")
+                warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                 pluginManager.disablePlugin(this)
                 return
             }
@@ -214,7 +212,10 @@ class BetterHudImpl: BetterHud() {
             PlayerManager.register(it)
         }
         reload {
-            info("Plugin enabled.")
+            info(
+                "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                "Plugin enabled."
+            )
         }
     }
 

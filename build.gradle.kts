@@ -7,9 +7,11 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.20"
 }
 
-val minecraft = "1.20.4" // TODO Bumps version.
+val minecraft = "1.20.6"
+val folia = "1.20.4" // TODO Bumps version.
 val adventure = "4.16.0"
 val platform = "4.3.2"
+val targetJavaVersion = 21
 
 val legacyNmsVersion = listOf(
     "v1_17_R1",
@@ -78,6 +80,19 @@ allprojects {
     }
 }
 
+subprojects {
+    val targetJavaVersion = 17
+
+    java {
+        toolchain.vendor = JvmVendorSpec.ADOPTIUM
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+
+    kotlin {
+        jvmToolchain(targetJavaVersion)
+    }
+}
+
 fun branch(project: Project) {
     if (project.subprojects.isNotEmpty()) {
         project.subprojects.forEach {
@@ -102,7 +117,7 @@ listOf(
 }
 
 scheduler.project("folia").dependencies {
-    compileOnly("dev.folia:folia-api:$minecraft-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
 }
 
 dist.dependencies {
@@ -184,13 +199,17 @@ tasks {
     }
 }
 
-val targetJavaVersion = 17
-
-java {
-    toolchain.vendor = JvmVendorSpec.ADOPTIUM
-    toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-}
-
-kotlin {
-    jvmToolchain(targetJavaVersion)
+ArrayList<Project>().apply {
+    add(project)
+    addAll(currentNmsVersion.map {
+        project("nms:$it")
+    })
+}.forEach {
+    it.java {
+        toolchain.vendor = JvmVendorSpec.ADOPTIUM
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    it.kotlin {
+        jvmToolchain(targetJavaVersion)
+    }
 }

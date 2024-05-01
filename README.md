@@ -62,6 +62,8 @@ No
 1.17-1.20.4
 
 ### Build
+Requires Java 17, 21 Eclipse Adoptium.
+
 ./gradlew build
 
 ### API

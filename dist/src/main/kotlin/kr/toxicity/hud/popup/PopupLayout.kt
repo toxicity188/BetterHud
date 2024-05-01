@@ -25,9 +25,12 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 class PopupLayout(
+    private val json: JsonArray,
     private val layout: LayoutGroup,
     private val parent: PopupImpl,
     private val globalLocation: GuiLocation,
@@ -37,22 +40,10 @@ class PopupLayout(
     private var imageChar = 0xCE000
     private var textIndex = 0
 
-    private val imageEncoded = "popup_${parent.name}_image".encodeKey()
-    private val imageKey = createAdventureKey(imageEncoded)
     private val groups = parent.move.locations.run {
-        val json = JsonArray()
-        val map = map { location ->
+        map { location ->
             PopupLayoutGroup(location, json)
         }
-        PackGenerator.addTask(ArrayList(file).apply {
-            add(imageEncoded)
-            add("$imageEncoded.json")
-        }) {
-            JsonObject().apply {
-                add("providers", json)
-            }.toByteArray()
-        }
-        map
     }
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
         val build = layout.conditions.build(reason)
@@ -130,23 +121,33 @@ class PopupLayout(
 
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
             if (hudImage.image.size > 1) hudImage.image.forEach {
-                val char = (++imageChar).parseChar()
+                val fileName = "$NAME_SPACE_ENCODED:${it.name.substringBefore('.')}/${it.name}"
+                val map = parent.imageNameComponent.get()
+
                 val height = Math.round(it.image.image.height * target.scale).toInt()
                 val scale = height.toDouble() / it.image.image.height
-
-                array.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${it.name.substringBefore('.')}/${it.name}")
-                    addProperty("ascent", HudImpl.createBit(pixel.y, imageShader))
-                    addProperty("height", height)
-                    add("chars", JsonArray().apply {
-                        add(char)
-                    })
-                })
                 val xOffset = Math.round(it.image.xOffset * scale).toInt()
-                val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
-                val comp = WidthComponent(Component.text().content(char).font(imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
-                list.add(comp.toPixelComponent(pixel.x + xOffset))
+                val ascent = HudImpl.createBit(pixel.y, imageShader)
+                val bitmapKey = BitmapKey(fileName, ascent, height)
+
+                val component = map?.get(bitmapKey) ?: run {
+                    val char = (++imageChar).parseChar()
+                    array.add(JsonObject().apply {
+                        addProperty("type", "bitmap")
+                        addProperty("file", fileName)
+                        addProperty("ascent", ascent)
+                        addProperty("height", height)
+                        add("chars", JsonArray().apply {
+                            add(char)
+                        })
+                    })
+                    val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
+                    val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                    map?.put(bitmapKey, comp)
+                    comp
+                }
+
+                list.add(component.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
                 val char = (++imageChar).parseChar()
                 array.add(JsonObject().apply {
@@ -158,7 +159,7 @@ class PopupLayout(
                         add(char)
                     })
                 })
-                val comp = WidthComponent(Component.text().content(char).font(imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x))
             }
 
@@ -298,18 +299,28 @@ class PopupLayout(
             )
             HeadRenderer(
                 (0..7).map { i ->
+                    val encode = "pixel_${headLayout.head.pixel}".encodeKey()
+                    val fileName = "$NAME_SPACE_ENCODED:$encode/$encode.png"
+                    val map = parent.headNameComponent.get()
                     val char = (++imageChar).parseChar()
-                    array.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        val encode = "pixel_${headLayout.head.pixel}".encodeKey()
-                        addProperty("file", "$NAME_SPACE_ENCODED:$encode/$encode.png")
-                        addProperty("ascent", HudImpl.createBit(pixel.y + i * headLayout.head.pixel, shader))
-                        addProperty("height", headLayout.head.pixel)
-                        add("chars", JsonArray().apply {
-                            add(char)
+                    val ascent = HudImpl.createBit(pixel.y + i * headLayout.head.pixel, shader)
+                    val height = headLayout.head.pixel
+                    val bitmapKey = BitmapKey(fileName, ascent, height)
+
+                    map?.get(bitmapKey) ?: run {
+                        array.add(JsonObject().apply {
+                            addProperty("type", "bitmap")
+                            addProperty("file", fileName)
+                            addProperty("ascent", ascent)
+                            addProperty("height", height)
+                            add("chars", JsonArray().apply {
+                                add(char)
+                            })
                         })
-                    })
-                    Component.text().content(char).font(imageKey)
+                        val comp = Component.text().content(char).font(parent.imageKey)
+                        map?.put(bitmapKey, comp)
+                        comp
+                    }
                 },
                 headLayout.head.pixel,
                 pixel.x,

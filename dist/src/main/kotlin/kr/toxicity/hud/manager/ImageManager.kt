@@ -9,6 +9,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
+import java.util.regex.Pattern
 
 object ImageManager: BetterHudManager {
 
@@ -22,7 +23,7 @@ object ImageManager: BetterHudManager {
         imageMap[name]
     }
 
-
+    private val multiFrameRegex = Pattern.compile("(?<name>(([a-zA-Z]|/|.|(_))+)):(?<frame>([0-9]+))")
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         synchronized(imageMap) {
@@ -65,6 +66,7 @@ object ImageManager: BetterHudManager {
                         )
                     }
                     ImageType.SEQUENCE -> {
+                        val globalFrame = configurationSection.getInt("frame", 1).coerceAtLeast(1)
                         HudImage(
                             file.path,
                             s,
@@ -72,12 +74,22 @@ object ImageManager: BetterHudManager {
                                 warn("files is empty.")
                                 return@forEachAllYamlAsync
                             }.mapIndexed { index, string ->
-                                File(assets, string.replace('/', File.separatorChar))
+                                val matcher = multiFrameRegex.matcher(string)
+                                var fileName = string
+                                var frame = 1
+                                if (matcher.find()) {
+                                    fileName = matcher.group("name")
+                                    frame = matcher.group("frame").toInt()
+                                }
+                                val targetImage = File(assets, fileName.replace('/', File.separatorChar))
                                     .toImage()
                                     .removeEmptyWidth()
                                     .ifNull("Invalid image: $string")
                                     .toNamed("${s}_${index + 1}.png")
-                            },
+                                (0..<(frame * globalFrame).coerceAtLeast(1)).map {
+                                    targetImage
+                                }
+                            }.sum(),
                             type,
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
                         )
@@ -96,7 +108,9 @@ object ImageManager: BetterHudManager {
             imageMap.values.forEach { value ->
                 val list = value.image
                 if (list.isNotEmpty()) {
-                    list.forEach {
+                    list.distinctBy {
+                        it.name
+                    }.forEach {
                         val file = ArrayList(resource.textures).apply {
                             add(it.name.substringBefore('.'))
                             add(it.name)

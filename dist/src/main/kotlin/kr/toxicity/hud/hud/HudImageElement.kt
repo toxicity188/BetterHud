@@ -16,7 +16,6 @@ import net.kyori.adventure.text.Component
 
 class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: ImageLocation) {
 
-
     private val chars = run {
         val hud = image.image
 
@@ -32,24 +31,34 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         }
         val finalPixel = image.location + pixel
         hud.image.forEach { pair ->
+            val fileName = "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.')}/${pair.name}"
+            val map = parent.imageNameComponent.get()
 
-            val c = (++parent.imageChar).parseChar()
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
-            val finalWidth = WidthComponent(Component.text()
-                .content(c)
-                .font(parent.imageKey)
-                .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEW_LAYER
-            parent.jsonArray.add(JsonObject().apply {
-                addProperty("type", "bitmap")
-                addProperty("file", "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.')}/${pair.name}")
-                addProperty("ascent", HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader))
-                addProperty("height", height)
-                add("chars", JsonArray().apply {
-                    add(c)
+            val ascent = HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader)
+            val bitmapKey = BitmapKey(fileName, ascent, height)
+
+            val component = map?.get(bitmapKey) ?: run {
+                val c = (++parent.imageChar).parseChar()
+                val finalWidth = WidthComponent(Component.text()
+                    .content(c)
+                    .font(parent.imageKey)
+                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEW_LAYER
+                parent.jsonArray.get()?.add(JsonObject().apply {
+                    addProperty("type", "bitmap")
+                    addProperty("file", fileName)
+                    addProperty("ascent", ascent)
+                    addProperty("height", height)
+                    add("chars", JsonArray().apply {
+                        add(c)
+                    })
                 })
-            })
-            list.add(finalWidth.toPixelComponent(finalPixel.x + Math.round(pair.image.xOffset * scale).toInt()))
+                map?.put(bitmapKey, finalWidth)
+                finalWidth
+            }
+
+            list.add(component.toPixelComponent(finalPixel.x + Math.round(pair.image.xOffset * scale).toInt()))
         }
         val renderer = ImageRenderer(
             hud,

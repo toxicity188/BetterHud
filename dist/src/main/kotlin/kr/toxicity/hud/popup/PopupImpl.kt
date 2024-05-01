@@ -1,5 +1,7 @@
 package kr.toxicity.hud.popup
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
@@ -11,9 +13,12 @@ import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.EquationPairLocation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.configuration.ConfigurationSection
+import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -49,11 +54,19 @@ class PopupImpl(
             }
         }
     }
+
+    val imageNameComponent = WeakReference(WeakHashMap<BitmapKey, WidthComponent>())
+    val headNameComponent = WeakReference(WeakHashMap<BitmapKey, TextComponent.Builder>())
+    private val imageEncoded = "popup_${name}_image".encodeKey()
+    val array = WeakReference(JsonArray())
+    val imageKey = createAdventureKey(imageEncoded)
+
     private val sortType = section.getString("sort")?.let {
         PopupSortType.valueOf(it.uppercase())
     } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
+        val json = array.get().ifNull("error is occurred.")
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { _, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
@@ -62,6 +75,7 @@ class PopupImpl(
                     loc += GuiLocation(it)
                 }
                 add(PopupLayout(
+                    json,
                     LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                     this@PopupImpl,
                     loc,
@@ -97,6 +111,16 @@ class PopupImpl(
         }
         section.getConfigurationSection("triggers")?.forEachSubConfiguration { _, configurationSection ->
             TriggerManagerImpl.addTask(configurationSection, task)
+        }
+        array.get()?.let { arr ->
+            PackGenerator.addTask(ArrayList(file).apply {
+                add(imageEncoded)
+                add("$imageEncoded.json")
+            }) {
+                JsonObject().apply {
+                    add("providers", arr)
+                }.toByteArray()
+            }
         }
     }
 
