@@ -168,7 +168,7 @@ class BetterHudImpl: BetterHud() {
                                     )))
                             }
                         }
-                    }, PLUGIN)
+                    }, this)
                 }
             }
         }

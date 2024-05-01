@@ -21,6 +21,14 @@ public class CustomPopupEvent extends PlayerEvent implements BetterHudEvent {
         this.name = name;
     }
 
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @NotNull
     @Override
     public HandlerList getHandlers() {
