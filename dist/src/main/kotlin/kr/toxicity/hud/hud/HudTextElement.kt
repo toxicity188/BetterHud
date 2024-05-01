@@ -141,6 +141,7 @@ class HudTextElement(
             text.space,
             text.numberEquation,
             text.numberFormat,
+            text.disableNumberFormat,
             text.follow,
             text.conditions.and(text.text.conditions)
         )

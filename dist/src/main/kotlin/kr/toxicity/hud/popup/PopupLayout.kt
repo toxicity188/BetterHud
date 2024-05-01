@@ -283,6 +283,7 @@ class PopupLayout(
                 textLayout.space,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
+                textLayout.disableNumberFormat,
                 textLayout.follow,
                 textLayout.conditions.and(textLayout.text.conditions)
             )

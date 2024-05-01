@@ -69,6 +69,7 @@ class LayoutGroup(
                     configurationSection.getString("number-format")?.let {
                         DecimalFormat(it)
                     } ?: ConfigManagerImpl.numberFormat,
+                    configurationSection.getBoolean("disable-number-format", true),
                     configurationSection.getString("background")?.let {
                         BackgroundManager.getBackground(it)
                     },

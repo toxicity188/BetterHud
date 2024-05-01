@@ -37,6 +37,7 @@ class TextRenderer(
 
     private val numberEquation: TEquation,
     private val numberPattern: DecimalFormat,
+    private val disableNumberFormat: Boolean,
 
     follow: String?,
 
@@ -231,20 +232,22 @@ class TextRenderer(
                 }
                 var original = targetString
                 if (original == "") return
-                val matcher = decimalPattern.matcher(original)
-                val number = LinkedList<String>()
-                while (matcher.find()) {
-                    number.add(numberPattern.format(numberEquation.evaluate(matcher.group().toDouble())))
-                }
-                if (number.isNotEmpty()) {
-                    val sb = StringBuilder()
-                    original.split(decimalPattern).forEach {
-                        sb.append(it)
-                        number.poll()?.let { n ->
-                            sb.append(n)
-                        }
+                if (!disableNumberFormat) {
+                    val matcher = decimalPattern.matcher(original)
+                    val number = LinkedList<String>()
+                    while (matcher.find()) {
+                        number.add(numberPattern.format(numberEquation.evaluate(matcher.group().toDouble())))
                     }
-                    original = sb.toString()
+                    if (number.isNotEmpty()) {
+                        val sb = StringBuilder()
+                        original.split(decimalPattern).forEach {
+                            sb.append(it)
+                            number.poll()?.let { n ->
+                                sb.append(n)
+                            }
+                        }
+                        original = sb.toString()
+                    }
                 }
                 original.forEach { char ->
                     if (char == ' ') {

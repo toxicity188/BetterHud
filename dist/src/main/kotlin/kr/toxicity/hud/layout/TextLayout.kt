@@ -21,6 +21,7 @@ class TextLayout(
     val deserializeText: Boolean,
     val numberEquation: TEquation,
     val numberFormat: DecimalFormat,
+    val disableNumberFormat: Boolean,
     val background: HudBackground?,
     val backgroundScale: Double,
     val follow: String?,
