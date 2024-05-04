@@ -46,8 +46,10 @@ class HeadRenderer(
             }
             if (cond(targetPlayer)) {
                 var comp = EMPTY_WIDTH_COMPONENT
-                targetPlayerHead.colors.forEachIndexed { index, textColor ->
-                    comp += WidthComponent(components[index / 8].color(textColor), pixel)
+                var i = 0
+                targetPlayerHead.colors.forEachSync { next ->
+                    val index = i++
+                    comp += WidthComponent(components[index / 8].color(next), pixel)
                     comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
                 }
                 comp.toPixelComponent(

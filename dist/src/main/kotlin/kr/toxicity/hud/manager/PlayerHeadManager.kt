@@ -90,16 +90,21 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return synchronized(headLock) {
+        return synchronized(headCache) {
             headCache[playerName]?.update() ?: run {
-                headLock.computeIfAbsent(playerName) {
-                    CompletableFuture.runAsync {
-                        headCache[playerName] = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
-                        synchronized(headLock) {
-                            headLock.remove(playerName)
+                synchronized(headLock) {
+                    headLock.computeIfAbsent(playerName) {
+                        CompletableFuture.runAsync {
+                            val head = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
+                            synchronized(headCache) {
+                                headCache[playerName] = head
+                            }
+                            synchronized(headLock) {
+                                headLock.remove(playerName)
+                            }
                         }
+                        loadingHead()
                     }
-                    loadingHead()
                 }
             }
         }

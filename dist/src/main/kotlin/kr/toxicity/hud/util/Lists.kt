@@ -27,6 +27,17 @@ fun <T> Collection<T>.forEachAsync(block: (T) -> Unit, callback: () -> Unit) {
     callback()
 }
 
+fun <T> List<T>.forEachSync(block: (T) -> Unit) {
+    synchronized(this) {
+        val iterator = iterator()
+        synchronized(iterator) {
+            while (iterator.hasNext()) {
+                block(iterator.next())
+            }
+        }
+    }
+}
+
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
     if (isNotEmpty()) {
         val available = Runtime.getRuntime().availableProcessors()
