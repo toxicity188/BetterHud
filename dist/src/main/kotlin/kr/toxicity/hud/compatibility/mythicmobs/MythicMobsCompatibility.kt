@@ -4,6 +4,9 @@ import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.skills.SkillCaster
 import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.bukkit.MythicBukkit
+import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent
+import io.lumine.mythic.core.mobs.ActiveMob
+import io.lumine.mythic.core.players.PlayerData
 import io.lumine.mythic.core.skills.AbstractSkill
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -11,8 +14,15 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trgger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.Compatibility
+import kr.toxicity.hud.compatibility.mythicmobs.event.MythicMobsPopupEvent
+import kr.toxicity.hud.compatibility.mythicmobs.mechanic.HidePopupMechanic
+import kr.toxicity.hud.compatibility.mythicmobs.mechanic.ShowPopupMechanic
+import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.unwrap
+import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityEvent
 import java.util.function.Function
 
@@ -20,9 +30,7 @@ class MythicMobsCompatibility: Compatibility {
     override val triggers: Map<String, (ConfigurationSection) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (ConfigurationSection) -> (UpdateEvent) -> HudListener>
-        get() = mapOf(
-
-        )
+        get() = mapOf()
     override val numbers: Map<String, HudPlaceholder<Number>>
         get() = mapOf(
             "current_cooldown" to object : HudPlaceholder<Number> {
@@ -51,7 +59,43 @@ class MythicMobsCompatibility: Compatibility {
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
-
+            "caster_variable" to object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    val value = args[0]
+                    return reason.unwrap { e: MythicMobsPopupEvent ->
+                        val registry = when (val caster = e.caster) {
+                            is PlayerData -> caster.variables.get(value)
+                            is ActiveMob -> MythicBukkit.inst().variableManager.getRegistry(caster).get(value)
+                            else -> null
+                        }
+                        Function {
+                            registry?.get()?.toString() ?: "<none>"
+                        }
+                    }
+                }
+            },
+            "target_variable" to object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    val value = args[0]
+                    return reason.unwrap { e: MythicMobsPopupEvent ->
+                        val registry = MythicBukkit.inst().playerManager.getProfile(e.target).variables.get(value)
+                        Function {
+                            registry?.get()?.toString() ?: "<none>"
+                        }
+                    }
+                }
+            },
+            "world_variable" to object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    val registry = MythicBukkit.inst().variableManager.globalRegistry.get(args[0])
+                    return Function {
+                        registry?.get()?.toString() ?: "<none>"
+                    }
+                }
+            },
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
@@ -71,4 +115,16 @@ class MythicMobsCompatibility: Compatibility {
                 }
             }
         )
+
+    init {
+        Bukkit.getPluginManager().registerEvents(object : Listener {
+            @EventHandler
+            fun load(e: MythicMechanicLoadEvent) {
+                when (e.mechanicName.lowercase()) {
+                    "showpopup" -> e.register(ShowPopupMechanic(e.config))
+                    "hidepopup" -> e.register(HidePopupMechanic(e.config))
+                }
+            }
+        }, PLUGIN)
+    }
 }

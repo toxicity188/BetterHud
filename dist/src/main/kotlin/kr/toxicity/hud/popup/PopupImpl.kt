@@ -108,6 +108,13 @@ class PopupImpl(
         section.getConfigurationSection("triggers")?.forEachSubConfiguration { _, configurationSection ->
             TriggerManagerImpl.addTask(configurationSection, task)
         }
+        section.getConfigurationSection("hide-triggers")?.forEachSubConfiguration { _, configurationSection ->
+            TriggerManagerImpl.addTask(configurationSection) { _, uuid ->
+                PlayerManager.getHudPlayer(uuid)?.let {
+                    hide(it)
+                } ?: false
+            }
+        }
         array.get()?.let { arr ->
             PackGenerator.addTask(ArrayList(file).apply {
                 add(imageEncoded)

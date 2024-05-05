@@ -16,6 +16,7 @@ import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import java.util.UUID
 import java.util.function.Function
 
@@ -27,6 +28,11 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
             val n = it.getString("name").ifNull("name value not set.")
             createBukkitTrigger(CustomPopupEvent::class.java, { e ->
                 if (e.name == n) e.player.uniqueId else null
+            })
+        },
+        "death" to {
+            createBukkitTrigger(PlayerDeathEvent::class.java, {
+                it.entity.uniqueId
             })
         }
     )
