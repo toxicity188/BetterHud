@@ -49,6 +49,8 @@ void main() {
 
     vec3 color = Color.xyz;
 
+    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
+
     applyColor = 0;
 
     if (pos.y >= ui.y) {
@@ -153,6 +155,5 @@ void main() {
 
     vertexDistance = getDistance(ModelViewMat, pos, FogShape);
     texCoord0 = UV0;
-    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 }
