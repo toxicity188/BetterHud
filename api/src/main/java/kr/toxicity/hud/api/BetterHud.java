@@ -158,6 +158,11 @@ public abstract class BetterHud extends JavaPlugin {
      * @return database manager
      */
     public abstract @NotNull DatabaseManager getDatabaseManager();
+    /**
+     * Gets shader manager.
+     * @return shader manager
+     */
+    public abstract @NotNull ShaderManager getShaderManager();
 
     /**
      * Returns this plugin is currently on reload.

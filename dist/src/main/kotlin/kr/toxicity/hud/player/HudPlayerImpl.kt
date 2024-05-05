@@ -40,7 +40,7 @@ class HudPlayerImpl(
         objectSet.addAll(PopupManagerImpl.defaultPopups)
         objectSet.addAll(CompassManagerImpl.defaultCompasses)
         startTick()
-        PLUGIN.nms.inject(player, ShaderManager.barColor)
+        PLUGIN.nms.inject(player, ShaderManagerImpl.barColor)
     }
 
     override fun getHudComponent(): WidthComponent = last
@@ -64,7 +64,7 @@ class HudPlayerImpl(
 
     override fun startTick() {
         cancelTick()
-        PLUGIN.nms.reloadBossBar(player, ShaderManager.barColor)
+        PLUGIN.nms.reloadBossBar(player, ShaderManagerImpl.barColor)
         val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
@@ -126,8 +126,8 @@ class HudPlayerImpl(
             }
             last = comp
 
-            PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, comp.component.build())
-        } else PLUGIN.nms.showBossBar(player, color ?: ShaderManager.barColor, EMPTY_COMPONENT)
+            PLUGIN.nms.showBossBar(player, color ?: ShaderManagerImpl.barColor, comp.component.build())
+        } else PLUGIN.nms.showBossBar(player, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
     }
 
     override fun resetElements() {

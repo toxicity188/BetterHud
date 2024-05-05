@@ -12,7 +12,7 @@ import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
-import kr.toxicity.hud.manager.ShaderManager
+import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
@@ -32,7 +32,7 @@ class HudImpl(
         const val ADD_HEIGHT = (1 shl (DEFAULT_BIT - 1)) - 1
 
         fun createBit(y: Int, shader: HudShader): Int {
-            return -(((ShaderManager.addHudShader(shader) + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y)
+            return -(((ShaderManagerImpl.addHudShader(shader) + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y)
         }
     }
 

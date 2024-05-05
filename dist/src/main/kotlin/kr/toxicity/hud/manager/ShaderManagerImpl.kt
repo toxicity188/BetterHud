@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.event.CreateShaderEvent
+import kr.toxicity.hud.api.manager.ShaderManager
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.pack.PackGenerator
@@ -16,7 +17,7 @@ import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
-object ShaderManager: BetterHudManager {
+object ShaderManagerImpl: BetterHudManager, ShaderManager {
     var barColor = BarColor.YELLOW
         private set
 
@@ -63,11 +64,15 @@ object ShaderManager: BetterHudManager {
 
     private val constants = mutableMapOf<String, String>()
 
-    private val shaderConstants = mapOf(
+    private val shaderConstants = mutableMapOf(
         "HEIGHT_BIT" to HudImpl.DEFAULT_BIT.toString(),
         "MAX_BIT" to HudImpl.MAX_BIT.toString(),
         "ADD_OFFSET" to HudImpl.ADD_HEIGHT.toString()
     )
+
+    override fun addConstant(key: String, value: String) {
+        shaderConstants[key] = value
+    }
 
     override fun start() {
 

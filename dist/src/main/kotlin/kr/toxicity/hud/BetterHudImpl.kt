@@ -132,7 +132,7 @@ class BetterHudImpl: BetterHud() {
         PopupManagerImpl,
         CompassManagerImpl,
 
-        ShaderManager,
+        ShaderManagerImpl,
         PlayerManager
     )
 
@@ -338,6 +338,7 @@ class BetterHudImpl: BetterHud() {
     override fun getTriggerManager(): TriggerManager = TriggerManagerImpl
     override fun getHudManager(): HudManager = HudManagerImpl
     override fun getDatabaseManager(): DatabaseManager = DatabaseManagerImpl
+    override fun getShaderManager(): ShaderManager = ShaderManagerImpl
     override fun getCompassManager(): CompassManager = CompassManagerImpl
     override fun getConfigManager(): ConfigManager = ConfigManagerImpl
     override fun isOnReload(): Boolean = onReload
