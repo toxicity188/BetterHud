@@ -1,5 +1,6 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.event.CreateShaderEvent
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.pack.PackGenerator
@@ -34,6 +35,11 @@ object ShaderManager: BetterHudManager {
                     addAll(it.value.first)
                 }
             }
+        },
+        "CreateOtherShader" to {
+            CreateShaderEvent().apply {
+                call()
+            }.lines
         }
     )
 

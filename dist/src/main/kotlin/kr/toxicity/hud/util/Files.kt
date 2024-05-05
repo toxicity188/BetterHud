@@ -85,7 +85,7 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
     }
     list.map {
         {
-            it.second.forEachAsync { pair ->
+            it.second.forEach { pair ->
                 block(it.first, pair.first, pair.second)
             }
         }

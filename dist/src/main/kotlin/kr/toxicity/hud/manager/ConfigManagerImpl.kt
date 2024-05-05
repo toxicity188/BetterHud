@@ -9,6 +9,11 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bstats.bukkit.Metrics
+import org.bukkit.Bukkit
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.server.PluginDisableEvent
+import org.bukkit.plugin.Plugin
 import java.io.File
 import java.text.DecimalFormat
 
@@ -56,11 +61,21 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var loadingHead = "random"
         private set
+    private var disableLinkPlugin = emptyList<Plugin>()
 
     private var metrics: Metrics? = null
 
     override fun start() {
-
+        Bukkit.getPluginManager().registerEvents(object : Listener {
+            @EventHandler
+            fun disable(e: PluginDisableEvent) {
+                if (disableLinkPlugin.any {
+                    it.name == e.plugin.name
+                }) {
+                    Bukkit.getPluginManager().disablePlugin(PLUGIN)
+                }
+            }
+        }, PLUGIN)
     }
 
     override fun getBossbarLine(): Int = line
@@ -108,6 +123,11 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             mergeOtherFolders = yaml.getStringList("merge-other-folders")
             selfHostPort = yaml.getInt("self-host-port", 8163)
             forceUpdate = yaml.getBoolean("force-update")
+            disableLinkPlugin = yaml.getStringList("disable-link-plugin").filter {
+                it != PLUGIN.name
+            }.distinct().mapNotNull {
+                Bukkit.getPluginManager().getPlugin(it)
+            }
             if (yaml.getBoolean("metrics") && metrics == null) {
                 metrics = Metrics(PLUGIN, 21287)
             } else {

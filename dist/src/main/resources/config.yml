@@ -27,3 +27,5 @@ default-hud:
 default-popup: []
 
 default-compass: []
+
+disable-link-plugin: []
