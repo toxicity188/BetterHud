@@ -11,9 +11,11 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -25,7 +27,7 @@ public abstract class BetterHud extends JavaPlugin {
     private static BetterHud instance; // static
 
     public static final String DEFAULT_NAMESPACE = "betterhud";
-    public static final String ADVENTURE_VERSION = "4.16.0";
+    public static final String ADVENTURE_VERSION = "4.17.0";
     public static final String PLATFORM_VERSION = "4.3.2";
     public static final String EXAMINATION_VERSION = "1.3.0";
 
@@ -106,10 +108,10 @@ public abstract class BetterHud extends JavaPlugin {
 
     /**
      * Gets a width of default font's char
-     * @param target target char
+     * @param codepoint target codepoint
      * @return width
      */
-    public abstract int getWidth(char target);
+    public abstract int getWidth(int codepoint);
 
     /**
      * Gets the player's data from bukkit player.
@@ -181,4 +183,12 @@ public abstract class BetterHud extends JavaPlugin {
      * @return font key
      */
     public abstract @NotNull Key getDefaultKey();
+
+    /**
+     * Get a translated result of key.
+     * @param locale locale
+     * @param key key
+     * @return translated value
+     */
+    public abstract @Nullable String translate(@NotNull String locale, @NotNull String key);
 }

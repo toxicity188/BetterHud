@@ -126,7 +126,7 @@ object ImageManager: BetterHudManager {
                         it.name
                     }.forEach {
                         val file = ArrayList(resource.textures).apply {
-                            add(it.name.substringBefore('.'))
+                            add(it.name.substringBefore('.').encodeFolder())
                             add(it.name)
                         }
                         PackGenerator.addTask(file) {

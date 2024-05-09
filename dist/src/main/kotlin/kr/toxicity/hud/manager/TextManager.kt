@@ -16,14 +16,13 @@ import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import java.awt.AlphaComposite
 import java.awt.Font
-import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
-import java.util.Comparator
-import java.util.TreeMap
-import java.util.TreeSet
-import java.util.WeakHashMap
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -33,24 +32,112 @@ object TextManager: BetterHudManager {
     private val textMap = HashMap<String, HudText>()
     private val textCacheMap = HashMap<String, HudText>()
 
-    private val textWidthMap = HashMap<Char, Int>()
+    private val textWidthMap = HashMap<Int, Int>()
     private val textKeyMap = WeakHashMap<ShaderGroup, HudTextData>()
 
-    private val defaultBitmapImageMap = HashMap<Char, BufferedImage>()
+    private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
+    private val translatableString = HashMap<String, Map<String, String>>()
+
+    private val defaultLatin = HashSet<Int>().apply {
+        addAll(0x0021..0x0026)
+        addAll(0x0028..0x002F)
+        addAll(0x003A..0x0040)
+        addAll(0x005B..0x0060)
+        addAll(0x007B..0x007E)
+        addAll(0x00A0..0x00BF)
+        add(0x0027)
+        addAll(0x0030..0x0039)
+        addAll(0x0041..0x005A)
+        addAll(0x0061..0x007A)
+        addAll(0x00C0..0x00F6)
+        addAll(0x00F8..0x00FF)
+        addAll(0x0100..0x017F)
+    }
+
+    private val languageCodepointRange = mapOf(
+        "korean" to HashSet<Int>().apply {
+            addAll(0x1100..0x1112)
+            addAll(0x1161..0x1175)
+            addAll(0x11A8..0x11C2)
+            addAll(0xAC00..0xD7A3)
+        },
+        "japan" to HashSet<Int>().apply {
+            addAll(0x3041..0x3096)
+            addAll(0x30A1..0x30FA)
+        },
+        "china" to HashSet<Int>().apply {
+            addAll(0x4E00..0x9FFF)
+        },
+        "russia" to HashSet<Int>().apply {
+            addAll(0x0400..0x045F)
+        },
+        "bengal" to HashSet<Int>().apply {
+            addAll(0x0985..0x09B9)
+        },
+        "thailand" to HashSet<Int>().apply {
+            addAll(0x0E01..0x0E3A)
+            addAll(0x0E40..0x0E4E)
+        },
+        "greece" to HashSet<Int>().apply {
+            addAll(0x0390..0x03CE)
+        },
+        "hindi" to HashSet<Int>().apply {
+            addAll(0x0900..0x094F)
+            addAll(0x0966..0x096F)
+            addAll(0x0671..0x06D3)
+            addAll(0x06F0..0x06F9)
+        },
+        "arab" to HashSet<Int>().apply {
+            addAll(0x0620..0x064A)
+            addAll(0x0660..0x0669)
+        },
+        "hebrew" to HashSet<Int>().apply {
+            addAll(0x05D0..0x05EA)
+        }
+    )
 
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
     fun setKey(shaderGroup: ShaderGroup, key: HudTextData) {
         textKeyMap[shaderGroup] = key
     }
 
+    private lateinit var unifont: List<Pair<Int, ByteArray>>
+
     override fun start() {
         loadDefaultBitmap()
+        unifont = InputStreamReader(PLUGIN.getResource("unifont.hex").ifNull("unifont.hex not found.")).buffered().use {
+            fun String.toBitmap(): ByteArray {
+                val byteArray = ByteArray(length * 4)
+                var t = 0
+                forEach { c ->
+                    val char = c.digitToInt(16)
+                    for (i in (0..<4).reversed()) {
+                        byteArray[t++] = ((char shr i) and 1).toByte()
+                    }
+                }
+                return byteArray
+            }
+            it.readLines().map { s ->
+                val split = s.split(':')
+                split[0].toInt(16) to split[1].toBitmap()
+            }
+        }
+        InputStreamReader(PLUGIN.getResource("translatable.json").ifNull("translatable.json not found.")).buffered().use {
+            JsonParser.parseReader(it).asJsonObject.entrySet().forEach { e ->
+                val map = HashMap<String, String>()
+                e.value.asJsonObject.entrySet().forEach { se ->
+                    map[se.key] = se.value.asString
+                }
+                translatableString[e.key] = map
+            }
+        }
     }
-    fun getWidth(char: Char) = textWidthMap[char] ?: 3
+    fun getWidth(codepoint: Int) = textWidthMap[codepoint] ?: 3
 
     fun getText(name: String) = synchronized(textMap) {
         textMap[name]
     }
+    fun translate(locale: String, key: String) = translatableString[locale.uppercase()]?.get(key)
 
     override fun reload(resource: GlobalResource, callback: () -> Unit) {
         synchronized(this) {
@@ -76,14 +163,19 @@ object TextManager: BetterHudManager {
         val configScale = fontConfig.getInt("scale", 16)
         val configHeight = fontConfig.getInt("height", 9)
         val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
-        val defaultFont = File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).run {
-            (if (exists()) runCatching {
-                inputStream().buffered().use {
-                    Font.createFont(Font.TRUETYPE_FONT, it)
-                }
-            }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
-        }.deriveFont(configScale.toFloat())
-        val parseDefault = parseFont("",  "default_$configScale", defaultFont, configScale, resource.textures, emptyMap(),  ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+
+        val defaultProvider = if (!fontConfig.getBoolean("use-unifont")) {
+            JavaBitmapProvider(File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).run {
+                (if (exists()) runCatching {
+                    inputStream().buffered().use {
+                        Font.createFont(Font.TRUETYPE_FONT, it)
+                    }
+                }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
+            }.deriveFont(configScale.toFloat()))
+        } else {
+            UnifontBitmapProvider(configScale)
+        }
+        val parseDefault = parseFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.getStringList("include"),ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
         val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -91,14 +183,14 @@ object TextManager: BetterHudManager {
         parseDefault.array.forEach {
             defaultArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
-                addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.')}/${it.file}")
+                addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
                 addProperty("ascent", configAscent)
                 addProperty("height", configHeight)
                 add("chars", it.chars)
             })
         }
         PackGenerator.addTask(ArrayList(resource.font).apply {
-            add(KeyResource.default)
+            add(KeyResource.default.encodeFolder())
             add("${KeyResource.default}.json")
         }) {
             JsonObject().apply {
@@ -108,17 +200,22 @@ object TextManager: BetterHudManager {
 
         DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ file, s, section ->
             runCatching {
-                val fontDir = section.getString("file")
-                val scale = section.getInt("scale")
-                val fontTarget = fontDir?.let {
+                val fontDir = section.getString("file")?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
-                val fontFile = (fontTarget?.inputStream()?.buffered()?.use {
-                    Font.createFont(Font.TRUETYPE_FONT, it)
-                } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat())
-                val saveName = "${fontTarget?.nameWithoutExtension ?: "default"}_$scale"
+                val scale = section.getInt("scale", 16)
+
+                val provider = if (!section.getBoolean("use-unifont")) {
+                    JavaBitmapProvider((fontDir?.inputStream()?.buffered()?.use {
+                        Font.createFont(Font.TRUETYPE_FONT, it)
+                    } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat()))
+                } else {
+                    UnifontBitmapProvider(scale)
+                }
+
+                val saveName = "${fontDir?.nameWithoutExtension ?: "default"}_$scale"
                 textMap.putSync("text", s) {
-                    parseFont(file.path, saveName, fontFile, scale, resource.textures, HashMap<String, LocatedImage>().apply {
+                    parseFont(file.path, saveName, provider, scale, resource.textures, HashMap<String, LocatedImage>().apply {
                         section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
                             put(key, LocatedImage(
                                 File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
@@ -132,7 +229,7 @@ object TextManager: BetterHudManager {
                                 }
                             ))
                         }
-                    }, section.toConditions(), section.getBoolean("merge-default-bitmap"))
+                    }, section.getStringList("include"), section.toConditions(), section.getBoolean("merge-default-bitmap"))
                 }
             }.onFailure { e ->
                 warn(
@@ -176,7 +273,7 @@ object TextManager: BetterHudManager {
                         val width = image.width / str.length
                         var i2 = 0
                         str.codePoints().forEach { char ->
-                            defaultBitmapImageMap[char.toChar()] = image.getSubimage(width * (i2++), height * i1, width, height)
+                            defaultBitmapImageMap[char] = image.getSubimage(width * (i2++), height * i1, width, height)
                         }
                     }
                 }
@@ -190,11 +287,11 @@ object TextManager: BetterHudManager {
     }
 
     private class CharImage(
-        val char: Char,
-        val image: Image
+        val codepoint: Int,
+        val image: BufferedImage
     ): Comparable<CharImage> {
         override fun compareTo(other: CharImage): Int {
-            return char.compareTo(other.char)
+            return codepoint.compareTo(other.codepoint)
         }
 
         override fun equals(other: Any?): Boolean {
@@ -203,22 +300,64 @@ object TextManager: BetterHudManager {
 
             other as CharImage
 
-            return char == other.char
+            return codepoint == other.codepoint
         }
 
         override fun hashCode(): Int {
-            return char.hashCode()
+            return codepoint.hashCode()
         }
 
+    }
+
+    private interface FontBitmapProvider {
+        val height: Int
+        fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit)
+    }
+
+    private class JavaBitmapProvider(private val font: Font): FontBitmapProvider {
+        override val height: Int
+            get() = (font.size.toDouble() * 1.4).roundToInt()
+        override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
+            val width = font.size
+            (Char.MIN_VALUE..Char.MAX_VALUE).filter { char ->
+                font.canDisplay(char) && filter(char.code)
+            }.forEachAsync { char ->
+                val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).processFont(char.toString(), font) ?: return@forEachAsync
+                block(CharImage(char.code, image))
+            }
+        }
+    }
+    private class UnifontBitmapProvider(private val scale: Int): FontBitmapProvider {
+        override val height: Int
+            get() = scale
+        override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
+            unifont.filter {
+                filter(it.first)
+            }.forEachAsync {
+                val byteImage = it.second.hexToImage()
+                val imageWidth = (byteImage.width.toDouble() / 16 * scale).roundToInt()
+                val scaledImage = byteImage.getScaledInstance(imageWidth, scale, BufferedImage.SCALE_SMOOTH)
+
+                BufferedImage(imageWidth, scale, BufferedImage.TYPE_INT_ARGB).apply {
+                    createGraphics().run {
+                        drawImage(scaledImage, 0, 0, null)
+                        dispose()
+                    }
+                }.fontSubImage()?.let { image ->
+                    block(CharImage(it.first, image))
+                }
+            }
+        }
     }
 
     private fun parseFont(
         path: String,
         saveName: String,
-        fontFile: Font,
+        fontProvider: FontBitmapProvider,
         scale: Int,
         imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
+        supportedLanguage: List<String>,
         condition: ConditionBuilder,
         mergeDefaultBitmap: Boolean
     ): HudText {
@@ -227,44 +366,57 @@ object TextManager: BetterHudManager {
                 HudText(path, saveName, old.height, old.array, old.images, old.charWidth, old.conditions)
             }
         } ?: run {
-            val height = (scale.toDouble() * 1.4).toInt()
+            val height = fontProvider.height
             val pairMap = TreeMap<Int, MutableSet<CharImage>>()
-            val charWidthMap = HashMap<Char, Int>()
-            fun addImage(image: BufferedImage, char: Char) {
+            val charWidthMap = HashMap<Int, Int>()
+            fun addImage(image: CharImage) {
                 synchronized(pairMap) {
-                    pairMap.computeIfAbsent(image.width) {
+                    pairMap.computeIfAbsent(image.image.width) {
                         TreeSet()
-                    }.add(CharImage(char, image))
+                    }.add(image)
                 }
                 synchronized(charWidthMap) {
-                    charWidthMap[char] = image.width
+                    charWidthMap[image.codepoint] = image.image.width
                 }
             }
             if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync {
-                val newWidth = ((height.toDouble() / it.value.height) * it.value.width).roundToInt()
-                BufferedImage(newWidth, height, BufferedImage.TYPE_INT_ARGB).apply {
+                val mul = (scale.toDouble() / it.value.width)
+                val newWidth = (it.value.width * mul).roundToInt()
+                val newHeight = (it.value.height * mul).roundToInt()
+                BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).apply {
                     createGraphics().run {
-                        drawImage(it.value.getScaledInstance(newWidth, height, BufferedImage.SCALE_SMOOTH), 0, 0, null)
+                        drawImage(it.value.getScaledInstance(newWidth, newHeight, BufferedImage.SCALE_SMOOTH), 0, height - newHeight, null)
                         dispose()
                     }
                 }.fontSubImage()?.let { resizedImage ->
-                    addImage(resizedImage, it.key)
+                    addImage(CharImage(it.key, resizedImage))
                 }
             }
-            (Char.MIN_VALUE..Char.MAX_VALUE).filter { char ->
-                fontFile.canDisplay(char) && !charWidthMap.containsKey(char)
-            }.forEachAsync { char ->
-                if (fontFile.canDisplay(char) && !charWidthMap.containsKey(char)) {
-                    val image = BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).processFont(char, fontFile) ?: return@forEachAsync
-                    addImage(image, char)
+            val supportedCodepoint = HashSet<Int>()
+            supportedLanguage.forEach {
+                languageCodepointRange[it]?.let { lang ->
+                    supportedCodepoint.addAll(lang)
                 }
+            }
+            var filter = { i: Int ->
+                !charWidthMap.containsKey(i)
+            }
+            if (supportedCodepoint.isNotEmpty()) {
+                supportedCodepoint.addAll(defaultLatin)
+                val old = filter
+                filter = {
+                    old(it) && supportedCodepoint.contains(it)
+                }
+            }
+            fontProvider.provide(filter) {
+                addImage(it)
             }
             val textList = ArrayList<HudTextArray>()
             var i = 0
             images.forEach {
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                     val encode = "glyph_${it.key}".encodeKey()
-                    add(encode)
+                    add(encode.encodeFolder())
                     add("$encode.png")
                 }) {
                     it.value.image.image.toByteArray()
@@ -277,12 +429,12 @@ object TextManager: BetterHudManager {
                     val name = "$encode.png"
                     val json = JsonArray()
                     list.split(CHAR_LENGTH).forEach { subList ->
-                        json.add(subList.map { pair ->
-                            pair.char
-                        }.joinToString(""))
+                        json.add(subList.joinToString("") { pair ->
+                            pair.codepoint.parseChar()
+                        })
                     }
                     PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                        add(encode)
+                        add(encode.encodeFolder())
                         add(name)
                     }) {
                         BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {

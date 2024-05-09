@@ -144,7 +144,7 @@ object PlayerHeadManager : BetterHudManager {
                     val pixel = head.pixel
                     val targetFile = ArrayList(resource.textures).apply {
                         val encode = "pixel_$pixel".encodeKey()
-                        add(encode)
+                        add(encode.encodeFolder())
                         add("$encode.png")
                     }
                     PackGenerator.addTask(targetFile) {

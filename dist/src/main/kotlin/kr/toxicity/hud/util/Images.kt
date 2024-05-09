@@ -13,6 +13,8 @@ import java.io.OutputStream
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
+private const val WHITE = (0xFF shl 24) or (0xFF shl 16) or (0xFF shl 8) or 0xFF
+
 fun RenderedImage.save(file: File) {
     ImageIO.write(this, "png", file)
 }
@@ -25,6 +27,17 @@ fun RenderedImage.toByteArray(): ByteArray {
         ImageIO.write(this, "png", it)
         it
     }.toByteArray()
+}
+
+fun ByteArray.hexToImage(): BufferedImage {
+    val width = size / 16
+    val image = BufferedImage(width, 16, BufferedImage.TYPE_INT_ARGB)
+    for (i2 in 0..<16) {
+        for (i1 in 0..<width) {
+            if (get(i1 + i2 * width) == 1.toByte()) image.setRGB(i1, i2, WHITE)
+        }
+    }
+    return image
 }
 
 fun File.toImage(): BufferedImage = ImageIO.read(this)
@@ -58,9 +71,9 @@ fun BufferedImage.removeEmptyWidth(x: Int = 0, y: Int = 0): LoadedImage? {
 
 private val FRC = FontRenderContext(null, true, true)
 
-fun BufferedImage.processFont(char: Char, font: Font): BufferedImage? {
+fun BufferedImage.processFont(string: String, font: Font): BufferedImage? {
     createGraphics().run {
-        fill(font.createGlyphVector(FRC, char.toString()).getOutline(0F, font.size.toFloat()))
+        fill(font.createGlyphVector(FRC, string).getOutline(0F, font.size.toFloat()))
         dispose()
     }
 

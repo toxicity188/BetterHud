@@ -1,0 +1,510 @@
+{
+ "FO_FO": {
+  "entity.minecraft.ender_dragon": "Enderdreki",
+  "entity.minecraft.wither": "Wither"
+ },
+ "UK_UA": {
+  "entity.minecraft.ender_dragon": "Дракон Енду",
+  "entity.minecraft.wither": "Візер"
+ },
+ "SAH_SAH": {
+  "entity.minecraft.ender_dragon": "Энд уот моҕойо",
+  "entity.minecraft.wither": "Визер"
+ },
+ "LV_LV": {
+  "entity.minecraft.ender_dragon": "Ender pūķis",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ZH_CN": {
+  "entity.minecraft.ender_dragon": "末影龙",
+  "entity.minecraft.wither": "凋灵"
+ },
+ "NL_BE": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "AST_ES": {
+  "entity.minecraft.ender_dragon": "Cuélebre d\u0027Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BE_BY": {
+  "entity.minecraft.ender_dragon": "Эндар-цмок",
+  "entity.minecraft.wither": "Відар"
+ },
+ "ES_VE": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SV_SE": {
+  "entity.minecraft.ender_dragon": "Enderdrake",
+  "entity.minecraft.wither": "Wither"
+ },
+ "RU_RU": {
+  "entity.minecraft.ender_dragon": "Эндер-дракон",
+  "entity.minecraft.wither": "Визер"
+ },
+ "EN_UD": {
+  "entity.minecraft.ender_dragon": "uoᵷɐɹᗡ ɹǝpuƎ",
+  "entity.minecraft.wither": "ɹǝɥʇᴉM"
+ },
+ "YI_DE": {
+  "entity.minecraft.ender_dragon": "ענדערדראַקאָן",
+  "entity.minecraft.wither": "ווידער"
+ },
+ "TR_TR": {
+  "entity.minecraft.ender_dragon": "Ender Ejderhası",
+  "entity.minecraft.wither": "Wither"
+ },
+ "VI_VN": {
+  "entity.minecraft.ender_dragon": "Rồng Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SQ_AL": {
+  "entity.minecraft.ender_dragon": "Dragoi i Ender-it",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FR_FR": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FRA_DE": {
+  "entity.minecraft.ender_dragon": "Endadrachn",
+  "entity.minecraft.wither": "Wither"
+ },
+ "DE_DE": {
+  "entity.minecraft.ender_dragon": "Enderdrache",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ZH_TW": {
+  "entity.minecraft.ender_dragon": "終界龍",
+  "entity.minecraft.wither": "凋零怪"
+ },
+ "BS_BA": {
+  "entity.minecraft.ender_dragon": "Ender zmaj",
+  "entity.minecraft.wither": "Vider"
+ },
+ "ES_UY": {
+  "entity.minecraft.ender_dragon": "Enderdragón",
+  "entity.minecraft.wither": "Wither"
+ },
+ "RY_UA": {
+  "entity.minecraft.ender_dragon": "Ендерськый Шаркань",
+  "entity.minecraft.wither": "Відер"
+ },
+ "SK_SK": {
+  "entity.minecraft.ender_dragon": "Ender drak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ES_ES": {
+  "entity.minecraft.ender_dragon": "Enderdragón",
+  "entity.minecraft.wither": "Wither"
+ },
+ "LI_LI": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ES_MX": {
+  "entity.minecraft.ender_dragon": "Enderdragón",
+  "entity.minecraft.wither": "Wither"
+ },
+ "TOK": {
+  "entity.minecraft.ender_dragon": "akesi pi ma End",
+  "entity.minecraft.wither": "monsuta Wither"
+ },
+ "LA_LA": {
+  "entity.minecraft.ender_dragon": "Draco Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ZLM_ARAB": {
+  "entity.minecraft.ender_dragon": "ناݢا ءيندر",
+  "entity.minecraft.wither": "ويذر"
+ },
+ "AF_ZA": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "HY_AM": {
+  "entity.minecraft.ender_dragon": "Էնդեր-Վիշապ",
+  "entity.minecraft.wither": "Վիզեր"
+ },
+ "HI_IN": {
+  "entity.minecraft.ender_dragon": "एंडर ड्रैगन",
+  "entity.minecraft.wither": "विदर"
+ },
+ "QYA_AA": {
+  "entity.minecraft.ender_dragon": "Hlócë Endo",
+  "entity.minecraft.wither": "Wither"
+ },
+ "OVD": {
+  "entity.minecraft.ender_dragon": "Enderdratji",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ES_EC": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "DE_CH": {
+  "entity.minecraft.ender_dragon": "Enderdrache",
+  "entity.minecraft.wither": "Wither"
+ },
+ "AZ_AZ": {
+  "entity.minecraft.ender_dragon": "Ender Əjdahası",
+  "entity.minecraft.wither": "Wither"
+ },
+ "HR_HR": {
+  "entity.minecraft.ender_dragon": "Ender zmaj",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FI_FI": {
+  "entity.minecraft.ender_dragon": "Ender-lohikäärme",
+  "entity.minecraft.wither": "Wither"
+ },
+ "GL_ES": {
+  "entity.minecraft.ender_dragon": "Dragón do Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EN_CA": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "TLH_AA": {
+  "entity.minecraft.ender_dragon": "ender lung\u0027a\u0027",
+  "entity.minecraft.wither": "wither"
+ },
+ "IO_EN": {
+  "entity.minecraft.ender_dragon": "Ender drako",
+  "entity.minecraft.wither": "Withero"
+ },
+ "SL_SI": {
+  "entity.minecraft.ender_dragon": "Ender zmaj",
+  "entity.minecraft.wither": "Wither"
+ },
+ "DA_DK": {
+  "entity.minecraft.ender_dragon": "Ender-drage",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KA_GE": {
+  "entity.minecraft.ender_dragon": "ენდერის გველეშაპი",
+  "entity.minecraft.wither": "ვიზერი"
+ },
+ "LOL_US": {
+  "entity.minecraft.ender_dragon": "Dwagon Bos",
+  "entity.minecraft.wither": "Wither"
+ },
+ "MT_MT": {
+  "entity.minecraft.ender_dragon": "Dragun tal-Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "NDS_DE": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "IG_NG": {
+  "entity.minecraft.ender_dragon": "Ender Dragọn",
+  "entity.minecraft.wither": "Akpọrọ"
+ },
+ "HU_HU": {
+  "entity.minecraft.ender_dragon": "Endersárkány",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KO_KR": {
+  "entity.minecraft.ender_dragon": "엔더 드래곤",
+  "entity.minecraft.wither": "위더"
+ },
+ "ENWS": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "HAW_US": {
+  "entity.minecraft.ender_dragon": "Kalekona Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EU_ES": {
+  "entity.minecraft.ender_dragon": "Ender dragoia",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ES_CL": {
+  "entity.minecraft.ender_dragon": "Enderdragón",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ISV": {
+  "entity.minecraft.ender_dragon": "Drakon Enda",
+  "entity.minecraft.wither": "Vizer"
+ },
+ "OC_FR": {
+  "entity.minecraft.ender_dragon": "Dragon d\u0027Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "DE_AT": {
+  "entity.minecraft.ender_dragon": "Enderdroch",
+  "entity.minecraft.wither": "Wither"
+ },
+ "CS_CZ": {
+  "entity.minecraft.ender_dragon": "drak z Endu",
+  "entity.minecraft.wither": "wither"
+ },
+ "EL_GR": {
+  "entity.minecraft.ender_dragon": "Δράκος Έντερ",
+  "entity.minecraft.wither": "Ουίδερ"
+ },
+ "IS_IS": {
+  "entity.minecraft.ender_dragon": "Endadreki",
+  "entity.minecraft.wither": "Viðrini"
+ },
+ "GD_GB": {
+  "entity.minecraft.ender_dragon": "Dràgon Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "VEC_IT": {
+  "entity.minecraft.ender_dragon": "Enderdragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "LZH": {
+  "entity.minecraft.ender_dragon": "終眇龍",
+  "entity.minecraft.wither": "凋靈"
+ },
+ "ESAN": {
+  "entity.minecraft.ender_dragon": "Dragón d\u0027Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EN_AU": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SE_NO": {
+  "entity.minecraft.ender_dragon": "Endordrága",
+  "entity.minecraft.wither": "Wither"
+ },
+ "JA_JP": {
+  "entity.minecraft.ender_dragon": "エンダードラゴン",
+  "entity.minecraft.wither": "ウィザー"
+ },
+ "MS_MY": {
+  "entity.minecraft.ender_dragon": "Naga Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BA_RU": {
+  "entity.minecraft.ender_dragon": "Эндер-аждаһа",
+  "entity.minecraft.wither": "Виҙер"
+ },
+ "SR_SP": {
+  "entity.minecraft.ender_dragon": "Ендер змај",
+  "entity.minecraft.wither": "Видер"
+ },
+ "YO_NG": {
+  "entity.minecraft.ender_dragon": "Ender Dragoni",
+  "entity.minecraft.wither": "Wither"
+ },
+ "TA_IN": {
+  "entity.minecraft.ender_dragon": "எண்டர் டிராகன்",
+  "entity.minecraft.wither": "கவிழ்ந்துவிடும்"
+ },
+ "NO_NO": {
+  "entity.minecraft.ender_dragon": "Enderdrage",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SXU": {
+  "entity.minecraft.ender_dragon": "Enderdrache",
+  "entity.minecraft.wither": "Wither"
+ },
+ "PT_PT": {
+  "entity.minecraft.ender_dragon": "Dragão do Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ES_AR": {
+  "entity.minecraft.ender_dragon": "Enderdragón",
+  "entity.minecraft.wither": "Wither"
+ },
+ "IT_IT": {
+  "entity.minecraft.ender_dragon": "Enderdrago",
+  "entity.minecraft.wither": "Wither"
+ },
+ "PL_PL": {
+  "entity.minecraft.ender_dragon": "Smok Endu",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FIL_PH": {
+  "entity.minecraft.ender_dragon": "End na Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ID_ID": {
+  "entity.minecraft.ender_dragon": "Naga Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "MN_MN": {
+  "entity.minecraft.ender_dragon": "Ээндийн луу",
+  "entity.minecraft.wither": "Витер"
+ },
+ "CY_GB": {
+  "entity.minecraft.ender_dragon": "Draig Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ZH_HK": {
+  "entity.minecraft.ender_dragon": "終界龍",
+  "entity.minecraft.wither": "凋零怪"
+ },
+ "TT_RU": {
+  "entity.minecraft.ender_dragon": "Эндер-аҗдаһа",
+  "entity.minecraft.wither": "Визер"
+ },
+ "GA_IE": {
+  "entity.minecraft.ender_dragon": "Dragan na Críche",
+  "entity.minecraft.wither": "Wither"
+ },
+ "AR_SA": {
+  "entity.minecraft.ender_dragon": "تنين الاندر",
+  "entity.minecraft.wither": "ويذر"
+ },
+ "EO_UY": {
+  "entity.minecraft.ender_dragon": "Enderdrako",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SO_SO": {
+  "entity.minecraft.ender_dragon": "Dhamaadka Masduulaagii",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EN_PT": {
+  "entity.minecraft.ender_dragon": "Ender wyvern",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FY_NL": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "NL_NL": {
+  "entity.minecraft.ender_dragon": "Enderdraak",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FR_CA": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "HE_IL": {
+  "entity.minecraft.ender_dragon": "דרקון אנדר",
+  "entity.minecraft.wither": "ווית\u0027ר"
+ },
+ "LB_LU": {
+  "entity.minecraft.ender_dragon": "Enderdraach",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BG_BG": {
+  "entity.minecraft.ender_dragon": "Дракон от Края",
+  "entity.minecraft.wither": "Уидър"
+ },
+ "MK_MK": {
+  "entity.minecraft.ender_dragon": "Ендер змеј",
+  "entity.minecraft.wither": "Видер"
+ },
+ "FUR_IT": {
+  "entity.minecraft.ender_dragon": "Ender-drâc",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EN_GB": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "ET_EE": {
+  "entity.minecraft.ender_dragon": "Enderdraakon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "SZL": {
+  "entity.minecraft.ender_dragon": "Drak Endu",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KN_IN": {
+  "entity.minecraft.ender_dragon": "ಎಂಡರ್ ಡ್ರ್ಯಾಗನ್",
+  "entity.minecraft.wither": "ವಿದಾರ್"
+ },
+ "ENP": {
+  "entity.minecraft.ender_dragon": "Ender Wyrm",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KW_GB": {
+  "entity.minecraft.ender_dragon": "Dragon an Diwedh",
+  "entity.minecraft.wither": "Gwedhrer"
+ },
+ "LT_LT": {
+  "entity.minecraft.ender_dragon": "Enderio Drakonė",
+  "entity.minecraft.wither": "Witheris"
+ },
+ "NN_NO": {
+  "entity.minecraft.ender_dragon": "Endedrake",
+  "entity.minecraft.wither": "Wither"
+ },
+ "EN_NZ": {
+  "entity.minecraft.ender_dragon": "Ender Dragon",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BR_FR": {
+  "entity.minecraft.ender_dragon": "Aerouant an End",
+  "entity.minecraft.wither": "Wither"
+ },
+ "VAL_ES": {
+  "entity.minecraft.ender_dragon": "Drac d\u0027Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "FA_IR": {
+  "entity.minecraft.ender_dragon": "اژدهای فرجام",
+  "entity.minecraft.wither": "ويدر"
+ },
+ "RPR": {
+  "entity.minecraft.ender_dragon": "Эндеръ-змѣй",
+  "entity.minecraft.wither": "Визеръ"
+ },
+ "RO_RO": {
+  "entity.minecraft.ender_dragon": "Dragon de Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "TL_PH": {
+  "entity.minecraft.ender_dragon": "Bakunawang Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "TH_TH": {
+  "entity.minecraft.ender_dragon": "มังกรเอนเดอร์",
+  "entity.minecraft.wither": "วิทเธอร์"
+ },
+ "JBO_EN": {
+  "entity.minecraft.ender_dragon": ".endre drakono",
+  "entity.minecraft.wither": "la me uiter."
+ },
+ "CA_ES": {
+  "entity.minecraft.ender_dragon": "Drac d\u0027Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KSH": {
+  "entity.minecraft.ender_dragon": "Enderdrach",
+  "entity.minecraft.wither": "Wither"
+ },
+ "PT_BR": {
+  "entity.minecraft.ender_dragon": "Dragão Ender",
+  "entity.minecraft.wither": "Wither"
+ },
+ "LO_LA": {
+  "entity.minecraft.ender_dragon": "ມັງກອນເອັນເດີ",
+  "entity.minecraft.wither": "ວິດເທີ"
+ },
+ "SR_CS": {
+  "entity.minecraft.ender_dragon": "Ender zmaj",
+  "entity.minecraft.wither": "Wither"
+ },
+ "KK_KZ": {
+  "entity.minecraft.ender_dragon": "Эндер айдаһар",
+  "entity.minecraft.wither": "Уизер"
+ },
+ "LMO": {
+  "entity.minecraft.ender_dragon": "Dragon de l\u0027End",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BRB": {
+  "entity.minecraft.ender_dragon": "Enderdraok",
+  "entity.minecraft.wither": "Wither"
+ },
+ "BAR": {
+  "entity.minecraft.ender_dragon": "Enderdrachn",
+  "entity.minecraft.wither": "Wither"
+ },
+ "NAH": {
+  "entity.minecraft.ender_dragon": "Ender-ketsalkwetspalin",
+  "entity.minecraft.wither": "Wither"
+ }
+}

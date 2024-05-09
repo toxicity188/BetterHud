@@ -10,6 +10,6 @@ class HudText(
     val height: Int,
     val array: List<HudTextArray>,
     val images: Map<String, LocatedImage>,
-    val charWidth: Map<Char, Int>,
+    val charWidth: Map<Int, Int>,
     val conditions: ConditionBuilder
 ): HudConfiguration

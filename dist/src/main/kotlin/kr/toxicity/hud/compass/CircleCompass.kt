@@ -75,7 +75,7 @@ class CircleCompass(
         val div = newHeight.toDouble() / image.height.toDouble()
         array.get()?.add(JsonObject().apply {
             addProperty("type", "bitmap")
-            addProperty("file", "$NAME_SPACE_ENCODED:$nameEncoded/$nameEncoded.png")
+            addProperty("file", "$NAME_SPACE_ENCODED:${nameEncoded.encodeFolder()}/$nameEncoded.png")
             addProperty("ascent", HudImpl.createBit(pixel.y + y + (maxHeight - newHeight) / 2, shader))
             addProperty("height", newHeight)
             add("chars", JsonArray().apply {
@@ -84,7 +84,7 @@ class CircleCompass(
         })
         resourceRef.get()?.let {
             PackGenerator.addTask(ArrayList(it.textures).apply {
-                add(nameEncoded)
+                add(nameEncoded.encodeFolder())
                 add("$nameEncoded.png")
             }) {
                 image.toByteArray()
@@ -209,7 +209,7 @@ class CircleCompass(
     init {
         array.get()?.let {
             PackGenerator.addTask(ArrayList(resource.font).apply {
-                add(encode)
+                add(encode.encodeFolder())
                 add("$encode.json")
             }) {
                 JsonObject().apply {

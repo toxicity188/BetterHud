@@ -1,5 +1,7 @@
 package kr.toxicity.hud.util
 
+import java.util.UUID
+
 fun String.encodeFile(): String {
     val split = split('.')
     if (split.size != 2) throw RuntimeException("Invaild file name: $this")
@@ -9,6 +11,13 @@ fun String.decodeFile(): String {
     val split = split('.')
     if (split.size != 2) throw RuntimeException("Invaild file name: $this")
     return "${split[0].decodeKey()}.${split[1]}"
+}
+
+fun String.encodeFolder(): String {
+    val list = toByteArray()
+    return UUID.nameUUIDFromBytes(ByteArray(16) {
+        if (list.size > it) list[it] else 0
+    }).toString()
 }
 
 fun String.encodeKey(): String {

@@ -23,7 +23,7 @@ import java.util.LinkedList
 import java.util.regex.Pattern
 
 class TextRenderer(
-    private val widthMap: Map<Char, Int>,
+    private val widthMap: Map<Int, Int>,
     private val defaultColor: TextColor,
     private val data: HudTextData,
     pattern: String,
@@ -44,6 +44,7 @@ class TextRenderer(
     private val condition: ConditionBuilder
 ) {
     companion object {
+        private const val SPACE_POINT = ' '.code
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val componentPattern = Pattern.compile("<(?<name>(([a-zA-Z]|#|[0-9]|/)+))((:(?<argument>([a-zA-Z]|[0-9]|:|,)+))?)>")
 
@@ -249,12 +250,12 @@ class TextRenderer(
                         original = sb.toString()
                     }
                 }
-                original.forEach { char ->
-                    if (char == ' ') {
+                original.codePoints().forEach { char ->
+                    if (char == SPACE_POINT) {
                         comp += spaceComponent
                     } else {
                         widthMap[char]?.let { width ->
-                            comp += WidthComponent(Component.text().content(char.toString()).style(style), Math.round(width.toDouble() * scale).toInt() + multiply) + sComponent
+                            comp += WidthComponent(Component.text().content(char.parseChar()).style(style), Math.round(width.toDouble() * scale).toInt() + multiply) + sComponent
                         }
                     }
                 }

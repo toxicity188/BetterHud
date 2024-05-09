@@ -2,7 +2,6 @@ package kr.toxicity.hud.util
 
 import org.bukkit.configuration.ConfigurationSection
 import java.io.File
-import java.util.concurrent.CompletableFuture
 
 fun File.subFolder(dir: String) = File(this, dir).apply {
     if (!exists()) mkdir()

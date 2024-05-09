@@ -13,6 +13,7 @@ import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -271,16 +272,21 @@ class NMSImpl: NMS {
                             applyFont(it)
                         })
                     }
+                    @Suppress("DEPRECATION")
                     fun getWidth(component: Component): Int {
                         val style = component.style()
                         return component.children().sumOf {
                             getWidth(it)
-                        } + ((component as? TextComponent)?.content()?.sumOf {
+                        } + (when (component) {
+                            is TextComponent -> component.content()
+                            is TranslatableComponent -> BetterHud.getInstance().translate(player.locale, component.key())
+                            else -> null
+                        }?.codePoints()?.map {
                             var t = BetterHud.getInstance().getWidth(it)
                             if (style.hasDecoration(TextDecoration.BOLD)) t++
                             if (style.hasDecoration(TextDecoration.ITALIC)) t++
                             t + 1
-                        } ?: 0)
+                        }?.sum() ?: 0)
                     }
                     hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(comp))
                 }

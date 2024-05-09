@@ -33,7 +33,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         }
         val finalPixel = image.location + pixel
         hud.image.forEach { pair ->
-            val fileName = "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.')}/${pair.name}"
+            val fileName = "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.').encodeFolder()}/${pair.name}"
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
             val ascent = HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader)

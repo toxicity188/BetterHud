@@ -117,7 +117,7 @@ class PopupImpl(
         }
         array.get()?.let { arr ->
             PackGenerator.addTask(ArrayList(file).apply {
-                add(imageEncoded)
+                add(imageEncoded.encodeFolder())
                 add("$imageEncoded.json")
             }) {
                 JsonObject().apply {

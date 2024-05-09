@@ -37,6 +37,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -286,7 +287,7 @@ class BetterHudImpl: BetterHud() {
     }
 
     override fun getNMS(): NMS = nms
-    override fun getWidth(target: Char): Int = TextManager.getWidth(target)
+    override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint)
     override fun getBedrockAdapter(): BedrockAdapter = bedrockAdapter
     override fun getAudiences(): BukkitAudiences = audience
     override fun getHudPlayer(player: Player): HudPlayer = PlayerManager.getHudPlayer(player)
@@ -343,4 +344,5 @@ class BetterHudImpl: BetterHud() {
     override fun getConfigManager(): ConfigManager = ConfigManagerImpl
     override fun isOnReload(): Boolean = onReload
     override fun getDefaultKey(): Key = DEFAULT_KEY
+    override fun translate(locale: String, key: String): String? = TextManager.translate(locale, key)
 }

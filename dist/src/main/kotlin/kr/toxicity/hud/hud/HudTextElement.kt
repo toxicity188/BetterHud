@@ -53,7 +53,7 @@ class HudTextElement(
             text.text.array.forEach {
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.')}/${it.file}")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
                     addProperty("ascent", HudImpl.createBit(yAxis, shader))
                     addProperty("height", scale)
                     add("chars", it.chars)
@@ -71,7 +71,7 @@ class HudTextElement(
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
                     val encode = "glyph_${it.key}".encodeKey()
-                    addProperty("file", "$NAME_SPACE_ENCODED:$encode/$encode.png")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png")
                     addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, shader))
                     addProperty("height", height)
                     add("chars", JsonArray().apply {
@@ -98,7 +98,7 @@ class HudTextElement(
                         val div = height.toDouble() / image.image.height
                         array.add(JsonObject().apply {
                             addProperty("type", "bitmap")
-                            addProperty("file", "$NAME_SPACE_ENCODED:$file/$file.png")
+                            addProperty("file", "$NAME_SPACE_ENCODED:${file.encodeFolder()}/$file.png")
                             addProperty("ascent", y)
                             addProperty("height", height)
                             add("chars", JsonArray().apply {
@@ -119,7 +119,7 @@ class HudTextElement(
                 }
             )
             PackGenerator.addTask(ArrayList(file).apply {
-                add(textEncoded)
+                add(textEncoded.encodeFolder())
                 add("$textEncoded.json")
             }) {
                 JsonObject().apply {

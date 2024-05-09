@@ -78,7 +78,7 @@ class HudImpl(
         jsonArray.get()?.let { array ->
             PackGenerator.addTask(
                 ArrayList(file).apply {
-                    add(imageEncoded)
+                    add(imageEncoded.encodeFolder())
                     add("$imageEncoded.json")
                 }
             ) {
