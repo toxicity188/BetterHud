@@ -61,21 +61,18 @@ object MinecraftManager: BetterHudManager {
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                     JsonParser.parseReader(it)
                 }.asJsonObject
-                val latest = json.getAsJsonObject("latest")
-                    .asJsonObject
-                    .getAsJsonPrimitive("release")
-                    .asString
-                info("latest minecraft version: $latest")
-                val file = File(cache, "$latest.jar")
+                val current = MinecraftVersion.current.toString()
+                info("Current minecraft version: $current")
+                val file = File(cache, "$current.jar")
                 if (!file.exists()) {
-                    info("$latest.jar doesn't exist. so download it...")
+                    info("$current.jar doesn't exist. so download it...")
                     file.outputStream().buffered().use { outputStream ->
                         client.send(HttpRequest.newBuilder()
                             .uri(URI.create(InputStreamReader(client.send(HttpRequest.newBuilder()
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
                                 }.first {
-                                    it.getAsJsonPrimitive("id").asString == latest
+                                    it.getAsJsonPrimitive("id").asString == current
                                 }.getAsJsonPrimitive("url").asString))
                                 .GET()
                                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
