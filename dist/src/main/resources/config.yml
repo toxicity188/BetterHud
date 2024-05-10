@@ -29,3 +29,7 @@ default-popup: []
 default-compass: []
 
 disable-link-plugin: []
+load-minecraft-default-textures: true
+included-minecraft-list:
+  - block
+  - item

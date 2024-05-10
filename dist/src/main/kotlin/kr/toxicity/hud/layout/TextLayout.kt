@@ -25,5 +25,7 @@ class TextLayout(
     val background: HudBackground?,
     val backgroundScale: Double,
     val follow: String?,
+    val emojiLocation: ImageLocation,
+    val emojiScale: Double,
     val conditions: ConditionBuilder
 )

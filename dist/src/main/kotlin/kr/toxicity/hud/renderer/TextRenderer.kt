@@ -46,7 +46,7 @@ class TextRenderer(
     companion object {
         private const val SPACE_POINT = ' '.code
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
-        private val componentPattern = Pattern.compile("<(?<name>(([a-zA-Z]|#|[0-9]|/)+))((:(?<argument>([a-zA-Z]|[0-9]|:|,)+))?)>")
+        private val componentPattern = Pattern.compile("<(?<name>(([a-zA-Z]|#|[0-9]|/)+))((:(?<argument>([a-zA-Z]|[0-9]|:|,|_)+))?)>")
 
         private val formats: MutableMap<String, (List<String>, ComponentStyleBuilder) -> Unit> = HashMap()
 

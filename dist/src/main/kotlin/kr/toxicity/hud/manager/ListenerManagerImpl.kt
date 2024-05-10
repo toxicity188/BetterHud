@@ -40,7 +40,7 @@ object ListenerManagerImpl: BetterHudManager, ListenerManager {
         "air" to { _ ->
             {
                 HudListener { p ->
-                    p.bukkitPlayer.remainingAir.toDouble() / p.bukkitPlayer.maximumAir
+                    (p.bukkitPlayer.remainingAir.toDouble() / p.bukkitPlayer.maximumAir).coerceAtLeast(0.0)
                 }
             }
         },

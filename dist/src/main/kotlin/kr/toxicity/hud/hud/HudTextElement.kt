@@ -4,12 +4,15 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
+import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.manager.MinecraftManager
 import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
@@ -82,6 +85,13 @@ class HudTextElement(
                     .font(key)
                     .content(result)
                     .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (it.value.image.image.width.toDouble() * div).roundToInt())
+            }
+            if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
+                MinecraftManager.applyAll(array, HudImpl.createBit(text.emojiLocation.y, shader), text.emojiScale, key) {
+                    textIndex++
+                }.forEach {
+                    imageMap[it.key] = text.emojiLocation.x.toSpaceComponent() + it.value
+                }
             }
             val result = HudTextData(
                 key,

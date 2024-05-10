@@ -64,6 +64,13 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     private var disableLinkPlugin = emptyList<Plugin>()
 
     private var metrics: Metrics? = null
+    var loadMinecraftDefaultTextures = true
+        private set
+    var includedMinecraftTextures = listOf(
+        "block",
+        "item"
+    )
+        private set
 
     override fun start() {
         Bukkit.getPluginManager().registerEvents(object : Listener {
@@ -137,6 +144,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             yaml.getString("loading-head")?.let {
                 loadingHead = it
             }
+            loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
+            includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

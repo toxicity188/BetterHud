@@ -75,6 +75,12 @@ class LayoutGroup(
                     },
                     configurationSection.getDouble("background-scale", scale),
                     configurationSection.getString("follow"),
+                    configurationSection.getConfigurationSection("emoji-pixel")?.let {
+                        ImageLocation(it)
+                    } ?: ImageLocation.zero,
+                    configurationSection.getDouble("emoji-scale", 1.0).apply {
+                        if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
+                    },
                     configurationSection.toConditions()
                 )
             )

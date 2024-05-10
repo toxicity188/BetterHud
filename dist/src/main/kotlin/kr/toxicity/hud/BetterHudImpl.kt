@@ -114,6 +114,7 @@ class BetterHudImpl: BetterHud() {
 
     private val managers = listOf(
         ConfigManagerImpl,
+        MinecraftManager,
         CommandManager,
         CompatibilityManager,
         SkriptManager,
