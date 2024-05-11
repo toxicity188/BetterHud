@@ -412,11 +412,11 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         updateTask.clear()
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             DATA_FOLDER.subFolder("placeholders").forEachAllYaml { file, s, configurationSection ->
-                runCatching {
+                runWithExceptionHandling("Unable to read this placeholder task: $s in ${file.name}") {
                     val variable = configurationSection.getString("variable").ifNull("variable not set.")
                     val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
                     val update = configurationSection.getInt("update", 1).coerceAtLeast(1)
@@ -433,15 +433,9 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                             }
                         }
                     })
-                }.onFailure { e ->
-                    warn(
-                        "Unable to read this placeholder task: $s in ${file.name}",
-                        "Reason: ${e.message}"
-                    )
                 }
             }
         }
-        callback()
     }
 
     fun update(hudPlayer: HudPlayer) {

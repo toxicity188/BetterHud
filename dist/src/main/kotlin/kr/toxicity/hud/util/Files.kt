@@ -28,27 +28,22 @@ fun File.forEachAllFolder(block: (File) -> Unit) {
 }
 
 
-fun File.forEachAsync(block: (File) -> Unit, callback: () -> Unit) {
-    listFiles()?.toList()?.forEachAsync(block, callback) ?: return callback()
+fun File.forEachAsync(block: (File) -> Unit) {
+    listFiles()?.toList()?.forEachAsync(block)
 }
 
 fun File.forEachAllYaml(block: (File, String, ConfigurationSection) -> Unit) {
     forEachAllFolder {
         if (it.extension == "yml") {
-            runCatching {
+            runWithExceptionHandling("Unable to load this yml file: ${it.name}") {
                 it.toYaml().forEachSubConfiguration { s, configurationSection ->
                     block(it, s, configurationSection)
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this yml file: ${it.name}",
-                    "Reason: ${e.message}"
-                )
             }
         }
     }
 }
-fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit, callback: () -> Unit) {
+fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit) {
     fun getAll(file: File): List<File> {
         return if (file.isDirectory) {
             file.listFiles()?.map { subFile ->
@@ -79,7 +74,6 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
         }
     }
     if (list.isEmpty()) {
-        callback()
         return
     }
     list.map {
@@ -91,5 +85,4 @@ fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit
     }.forEachAsync {
         it()
     }
-    callback()
 }

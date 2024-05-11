@@ -8,6 +8,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import java.util.concurrent.CompletableFuture
 
 object CommandManager: BetterHudManager {
 
@@ -19,13 +20,14 @@ object CommandManager: BetterHudManager {
             permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
                 s.info("Try to start reloading. please wait...")
-                PLUGIN.reload { result ->
-                    when (result.state) {
+                CompletableFuture.runAsync {
+                    val reload = PLUGIN.reload()
+                    when (reload.state) {
                         ReloadState.STILL_ON_RELOAD -> {
                             s.warn("The plugin is still on reload!")
                         }
                         ReloadState.SUCCESS -> {
-                            s.info("Reload success. (${result.time} ms)")
+                            s.info("Reload success. (${reload.time} ms)")
                         }
                         ReloadState.FAIL -> {
                             s.info("Reload failed.")
@@ -367,8 +369,7 @@ object CommandManager: BetterHudManager {
         PLUGIN.getCommand(NAME_SPACE)?.setExecutor(command.createTabExecutor())
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun end() {

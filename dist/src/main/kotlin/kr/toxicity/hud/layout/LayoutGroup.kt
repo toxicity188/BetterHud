@@ -18,12 +18,12 @@ class LayoutGroup(
     private val loc = ImageLocation(section)
 
     val align = section.getString("align")?.let {
-        runCatching {
+        runWithExceptionHandling("Unable to find that align: $it") {
             LayoutAlign.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutAlign.LEFT
     val offset = section.getString("offset")?.let {
-        runCatching {
+        runWithExceptionHandling("Unable to find that offset: $it") {
             LayoutOffset.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutOffset.CENTER

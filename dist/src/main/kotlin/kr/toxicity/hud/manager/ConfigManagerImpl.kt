@@ -61,6 +61,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var loadingHead = "random"
         private set
+    var debug = false
+        private set
     private var disableLinkPlugin = emptyList<Plugin>()
 
     private var metrics: Metrics? = null
@@ -86,14 +88,14 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     }
 
     override fun getBossbarLine(): Int = line
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun preReload() {
         runCatching {
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
+            debug = yaml.getBoolean("debug")
             defaultHud = yaml.getStringList("default-hud")
             defaultPopup = yaml.getStringList("default-popup")
             defaultCompass = yaml.getStringList("default-compass")
@@ -102,13 +104,13 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
                 defaultFontName = it
             }
             yaml.getString("pack-type")?.let {
-                runCatching {
+                runWithExceptionHandling("Unable to find this pack type: $it") {
                     packType = PackType.valueOf(it.uppercase())
                 }
             }
             tickSpeed = yaml.getLong("tick-speed", 1)
             numberFormat = (yaml.getString("number-format")?.let {
-                runCatching {
+                runWithExceptionHandling("Unable to read this number-format: $it") {
                     DecimalFormat(it)
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#"))

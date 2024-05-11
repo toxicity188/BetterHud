@@ -1,21 +1,63 @@
 package kr.toxicity.hud.compatibility.skript
 
+import ch.njol.skript.Skript
+import ch.njol.skript.classes.ClassInfo
+import ch.njol.skript.classes.Parser
+import ch.njol.skript.lang.ExpressionType
+import ch.njol.skript.lang.ParseContext
 import ch.njol.skript.lang.VariableString
+import ch.njol.skript.registrations.Classes
 import kr.toxicity.hud.api.event.HudUpdateEvent
+import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.trgger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.update.UpdateReason
 import kr.toxicity.hud.compatibility.Compatibility
+import kr.toxicity.hud.manager.HudManagerImpl
+import kr.toxicity.hud.manager.PopupManagerImpl
+import kr.toxicity.hud.compatibility.skript.effect.EffCallPopupEvent
+import kr.toxicity.hud.compatibility.skript.effect.EffShowPopup
+import kr.toxicity.hud.compatibility.skript.effect.EffUpdateHud
+import kr.toxicity.hud.compatibility.skript.expression.ExprHudPlayer
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.unwrap
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.function.Function
 
 class SkriptCompatibility: Compatibility {
+    init {
+        Classes.registerClass(
+            ClassInfo(
+            Hud::class.java,
+            "hud"
+        ).parser(object : Parser<Hud>() {
+            override fun toString(p0: Hud, p1: Int): String = p0.toString()
+            override fun parse(s: String, context: ParseContext): Hud? = HudManagerImpl.getHud(s)
+            override fun toVariableNameString(p0: Hud): String = p0.name
+        }))
+        Classes.registerClass(
+            ClassInfo(
+            Popup::class.java,
+            "popup"
+        ).parser(object : Parser<Popup>() {
+            override fun toString(p0: Popup, p1: Int): String = p0.toString()
+            override fun parse(s: String, context: ParseContext): Popup? = PopupManagerImpl.getPopup(s)
+            override fun toVariableNameString(p0: Popup): String = p0.name
+        }))
+
+
+        Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
+        Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
+        Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
+        Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
+    }
+
     override val triggers: Map<String, (ConfigurationSection) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (ConfigurationSection) -> (UpdateEvent) -> HudListener>

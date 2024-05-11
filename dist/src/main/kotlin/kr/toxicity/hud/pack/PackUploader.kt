@@ -100,9 +100,6 @@ object PackUploader {
                         e.printStackTrace()
                         warn("Unable to open server.")
                     }
-            }.handle { _, e ->
-                e.printStackTrace()
-                warn("Unable to get host's ip.")
             }
     }
 }

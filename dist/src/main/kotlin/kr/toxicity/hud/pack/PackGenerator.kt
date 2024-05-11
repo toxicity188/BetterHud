@@ -70,8 +70,8 @@ object PackGenerator {
         }
     }
 
-    fun generate(callback: () -> Unit) {
-        runCatching {
+    fun generate() {
+        runWithExceptionHandling("Unable to make a resource pack.") {
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
@@ -191,35 +191,17 @@ object PackGenerator {
                     }
                 }
             }
-            tasks.values.forEachAsync({ t ->
-                runCatching {
+            tasks.values.forEachAsync { t ->
+                runWithExceptionHandling("Unable to save this file: ${t.path}") {
                     saveTask(t)
-                }.onFailure { e ->
-                    warn(
-                        "Unable to save this file: ${t.path}",
-                        "Reason: ${e.message}"
-                    )
                 }
-            }) {
-                runCatching {
-                    saveTask.close()
-                }.onFailure { e ->
-                    warn(
-                        "Unable to finalized resource pack build.",
-                        "Reason: ${e.message}"
-                    )
-                }
-                callback()
-                tasks.clear()
             }
-        }.onFailure { e ->
-            warn(
-                "Unable to make a resource pack.",
-                "Reason: ${e.message}"
-            )
-            callback()
+            runWithExceptionHandling("Unable to finalized resource pack build.") {
+                saveTask.close()
+            }
             tasks.clear()
         }
+        tasks.clear()
     }
 
     fun addTask(dir: Iterable<String>, byteArray: () -> ByteArray) {

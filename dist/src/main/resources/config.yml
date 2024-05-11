@@ -1,33 +1,24 @@
+debug: true
 metrics: true
 number-format: "#,###.#"
 tick-speed: 1
-
 namespace: "betterhud"
-
 default-font-name: "font.ttf"
-
 bossbar-line: 1
-
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"
-
 pack-type: folder #folder, zip
 enable-protection: false
 enable-self-host: false
 force-update: false
 self-host-port: 8163
 merge-other-folders: []
-
 loading-head: random #steve, alex, etc.
-
 default-hud:
   - test_hud
-
 default-popup: []
-
 default-compass: []
-
 disable-link-plugin: []
 load-minecraft-default-textures: true
 included-minecraft-list:

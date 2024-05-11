@@ -165,7 +165,7 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
 
     override fun getCurrentDatabase(): HudDatabase = current
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         CompletableFuture.runAsync {
             synchronized(this) {
                 runCatching {
@@ -180,13 +180,12 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                         "Unable to connect the database.",
                         "Reason: ${e.message}"
                     )
+                    if (ConfigManagerImpl.debug) e.printStackTrace()
                 }
-                callback()
             }
         }.handle { _, e ->
-            e.printStackTrace()
-            callback()
-        }
+            e?.printStackTrace()
+        }.join()
     }
 
     override fun end() {

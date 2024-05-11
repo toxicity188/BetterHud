@@ -17,20 +17,15 @@ object HudManagerImpl: BetterHudManager, HudManager {
 
     override fun getHud(name: String): Hud? = hudMap[name]
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         hudMap.clear()
-        DATA_FOLDER.subFolder("huds").forEachAllYamlAsync({ file, s, configurationSection ->
-            runCatching {
+        DATA_FOLDER.subFolder("huds").forEachAllYamlAsync { file, s, configurationSection ->
+            runWithExceptionHandling("Unable to load this hud: $s in ${file.name}") {
                 hudMap.putSync("hud", s) {
                     HudImpl(file.path, s, resource.font, configurationSection)
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this hud: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
             }
-        }, callback)
+        }
     }
 
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)

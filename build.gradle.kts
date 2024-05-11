@@ -1,10 +1,10 @@
 plugins {
     `java-library`
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version("1.9.24")
     id("io.github.goooler.shadow") version("8.1.7")
-    id("io.papermc.paperweight.userdev") version("1.6.0") apply(false)
-    id("xyz.jpenilla.run-paper") version "2.2.4"
-    id("org.jetbrains.dokka") version "1.9.20"
+    id("io.papermc.paperweight.userdev") version("1.7.0") apply(false)
+    id("xyz.jpenilla.run-paper") version("2.3.0")
+    id("org.jetbrains.dokka") version("1.9.20")
 }
 
 val minecraft = "1.20.6"
@@ -91,6 +91,11 @@ subprojects {
     kotlin {
         jvmToolchain(targetJavaVersion)
     }
+    tasks {
+        build {
+            finalizedBy(clean)
+        }
+    }
 }
 
 fun branch(project: Project) {
@@ -172,7 +177,6 @@ val dokkaJar by tasks.creating(Jar::class.java) {
 
 tasks {
     jar {
-        dependsOn(clean)
         finalizedBy(shadowJar)
     }
     runServer {

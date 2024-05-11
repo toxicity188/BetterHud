@@ -17,12 +17,12 @@ object BackgroundManager: BetterHudManager {
 
     fun getBackground(name: String) = backgroundMap[name]
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
         backgroundMap.clear()
-        folder.forEachAsync({
+        folder.forEachAsync {
             if (it.extension == "yml") {
-                runCatching {
+                runWithExceptionHandling("Unable to load this yml: ${it.name}") {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)
@@ -49,14 +49,9 @@ object BackgroundManager: BetterHudManager {
                             ImageLocation(yaml)
                         )
                     }
-                }.onFailure { e ->
-                    warn(
-                        "Unable to load this yml: ${it.name}",
-                        "Reason: ${e.message}"
-                    )
                 }
             }
-        }, callback)
+        }
     }
 
     override fun end() {

@@ -17,7 +17,6 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
-import kr.toxicity.hud.skript.SkriptManager
 import kr.toxicity.hud.util.*
 import net.byteflux.libby.BukkitLibraryManager
 import net.byteflux.libby.Library
@@ -37,7 +36,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -117,7 +115,6 @@ class BetterHudImpl: BetterHud() {
         MinecraftManager,
         CommandManager,
         CompatibilityManager,
-        SkriptManager,
         ModuleManager,
         DatabaseManagerImpl,
 
@@ -146,7 +143,7 @@ class BetterHudImpl: BetterHud() {
 
 
     override fun onEnable() {
-        runCatching {
+        runWithExceptionHandling("Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
@@ -213,67 +210,61 @@ class BetterHudImpl: BetterHud() {
         Bukkit.getOnlinePlayers().forEach {
             PlayerManager.register(it)
         }
-        reload {
-            info(
-                "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
-                "Plugin enabled."
-            )
+        task {
+            CompletableFuture.runAsync {
+                reload()
+                info(
+                    "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Plugin enabled."
+                )
+            }
         }
     }
 
     @Volatile
     private var onReload = false
 
-    override fun reload(consumer: Consumer<ReloadResult>) {
+    override fun reload(): ReloadResult {
         if (onReload) {
-            consumer.accept(ReloadResult(ReloadState.STILL_ON_RELOAD, 0))
-            return
+            return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
         }
         synchronized(this) {
             onReload = true
             val time = System.currentTimeMillis()
-            CompletableFuture.runAsync {
+            return CompletableFuture.supplyAsync {
                 PluginReloadStartEvent().call()
                 runCatching {
                     managers.forEach {
                         it.preReload()
                     }
                     val resource = GlobalResource()
-                    val index = TaskIndex(managers.size)
-
-                    fun managerReload() {
-                        if (index.current < managers.size) {
-                            val manager = synchronized(index) {
-                                managers[index.current++]
-                            }
-                            info("Loading ${manager.javaClass.simpleName}...")
-                            manager.reload(resource) {
-                                managerReload()
-                            }
-                        } else {
-                            PackGenerator.generate {
-                                onReload = false
-                                managers.forEach {
-                                    it.postReload()
-                                }
-                                val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-                                PluginReloadedEvent(result).call()
-                                consumer.accept(result)
-                            }
-                        }
+                    managers.forEach {
+                        CompletableFuture.runAsync {
+                            it.reload(resource)
+                        }.join()
                     }
-                    managerReload()
-                }.onFailure { e ->
+                    PackGenerator.generate()
+                    val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                    onReload = false
+                    managers.forEach {
+                        it.postReload()
+                    }
+                    PluginReloadedEvent(result).call()
+                    result
+                }.getOrElse { e ->
                     warn(
                         "Unable to reload.",
                         "Reason: ${e.message}"
                     )
                     onReload = false
-                    consumer.accept(ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time))
+                    val result = ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
+                    PluginReloadedEvent(result).call()
+                    result
                 }
-            }.handle { _, e ->
-                e.printStackTrace()
-            }
+            }.handle { s, e ->
+                e?.printStackTrace()
+                s
+            }.join()
         }
     }
 

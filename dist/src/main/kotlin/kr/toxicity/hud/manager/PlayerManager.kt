@@ -89,11 +89,10 @@ object PlayerManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         hudPlayer.values.forEach {
             it.resetElements()
         }
-        callback()
     }
 
     override fun postReload() {

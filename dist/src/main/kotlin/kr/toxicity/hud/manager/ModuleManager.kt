@@ -2,7 +2,6 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.module.MODULE_BUKKIT
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.task
 import kr.toxicity.hud.util.warn
 import java.util.function.Function
 
@@ -40,8 +39,7 @@ object ModuleManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun end() {

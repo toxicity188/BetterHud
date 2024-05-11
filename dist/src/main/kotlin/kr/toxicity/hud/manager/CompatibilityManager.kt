@@ -11,6 +11,7 @@ import kr.toxicity.hud.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.runWithExceptionHandling
 import kr.toxicity.hud.util.warn
 import org.bukkit.Bukkit
 import java.util.function.Function
@@ -47,7 +48,7 @@ object CompatibilityManager: BetterHudManager {
     override fun start() {
         compatibilities.forEach {
             if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
-                runCatching {
+                runWithExceptionHandling("Unable to load ${it.key} support.") {
                     val obj = it.value()
                     val namespace = it.key.lowercase()
                     obj.listeners.forEach { entry ->
@@ -70,18 +71,12 @@ object CompatibilityManager: BetterHudManager {
                     obj.triggers.forEach { entry ->
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
-                }.onFailure { e ->
-                    warn(
-                        "Unable to load ${it.key} support.",
-                        "Reason: ${e.message}"
-                    )
                 }
             }
         }
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun end() {

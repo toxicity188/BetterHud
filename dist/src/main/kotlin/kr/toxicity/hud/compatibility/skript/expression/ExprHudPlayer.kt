@@ -1,4 +1,4 @@
-package kr.toxicity.hud.skript.expression
+package kr.toxicity.hud.compatibility.skript.expression
 
 import ch.njol.skript.lang.Expression
 import ch.njol.skript.lang.SkriptParser

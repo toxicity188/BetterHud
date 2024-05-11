@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import java.util.UUID
@@ -35,4 +36,19 @@ fun <T : Event> createBukkitTrigger(
         override fun getValue(t: T): UUID? = valueMapper(t)
         override fun getKey(t: T): Any = keyMapper(t)
     }
+}
+fun <R> runWithExceptionHandling(message: String, block: () -> R) = runCatching(block).onFailure {
+    warn(
+        message,
+        "Reason: ${it.message ?: it.javaClass.name}"
+    )
+    if (ConfigManagerImpl.debug) it.printStackTrace()
+}
+
+fun <T, R> T.runWithExceptionHandling(message: String, block: T.() -> R) = runCatching(block).onFailure {
+    warn(
+        message,
+        "Reason: ${it.message ?: it.javaClass.name}"
+    )
+    if (ConfigManagerImpl.debug) it.printStackTrace()
 }

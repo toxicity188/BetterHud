@@ -139,7 +139,7 @@ object TextManager: BetterHudManager {
     }
     fun translate(locale: String, key: String) = translatableString[locale.uppercase()]?.get(key)
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         synchronized(this) {
             textMap.clear()
             textWidthMap.clear()
@@ -198,8 +198,8 @@ object TextManager: BetterHudManager {
             }.toByteArray()
         }
 
-        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync({ file, s, section ->
-            runCatching {
+        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync { file, s, section ->
+            runWithExceptionHandling("Unable to load this text: $s in ${file.name}") {
                 val fontDir = section.getString("file")?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
@@ -208,36 +208,49 @@ object TextManager: BetterHudManager {
                 val provider = if (!section.getBoolean("use-unifont")) {
                     JavaBitmapProvider((fontDir?.inputStream()?.buffered()?.use {
                         Font.createFont(Font.TRUETYPE_FONT, it)
-                    } ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font).deriveFont(scale.toFloat()))
+                    } ?: BufferedImage(
+                        1,
+                        1,
+                        BufferedImage.TYPE_INT_ARGB
+                    ).createGraphics().font).deriveFont(scale.toFloat()))
                 } else {
                     UnifontBitmapProvider(scale)
                 }
 
                 val saveName = "${fontDir?.nameWithoutExtension ?: "default"}_$scale"
                 textMap.putSync("text", s) {
-                    parseFont(file.path, saveName, provider, scale, resource.textures, HashMap<String, LocatedImage>().apply {
-                        section.getConfigurationSection("images")?.forEachSubConfiguration { key, configurationSection ->
-                            put(key, LocatedImage(
-                                File(assetsFolder, configurationSection.getString("name").ifNull("image does not set: $key"))
-                                    .ifNotExist("this image doesn't exist: $key")
-                                    .toImage()
-                                    .removeEmptyWidth()
-                                    .ifNull("invalid image: $key"),
-                                ImageLocation(configurationSection),
-                                configurationSection.getDouble("scale", 1.0).apply {
-                                    if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
+                    parseFont(
+                        file.path,
+                        saveName,
+                        provider,
+                        scale,
+                        resource.textures,
+                        HashMap<String, LocatedImage>().apply {
+                            section.getConfigurationSection("images")
+                                ?.forEachSubConfiguration { key, configurationSection ->
+                                    put(key, LocatedImage(
+                                        File(
+                                            assetsFolder,
+                                            configurationSection.getString("name").ifNull("image does not set: $key")
+                                        )
+                                            .ifNotExist("this image doesn't exist: $key")
+                                            .toImage()
+                                            .removeEmptyWidth()
+                                            .ifNull("invalid image: $key"),
+                                        ImageLocation(configurationSection),
+                                        configurationSection.getDouble("scale", 1.0).apply {
+                                            if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
+                                        }
+                                    ))
                                 }
-                            ))
-                        }
-                    }, section.getStringList("include"), section.toConditions(), section.getBoolean("merge-default-bitmap"))
+                        },
+                        section.getStringList("include"),
+                        section.toConditions(),
+                        section.getBoolean("merge-default-bitmap")
+                    )
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this text: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
             }
-        }, callback)
+        }
     }
 
     private fun loadDefaultBitmap() {

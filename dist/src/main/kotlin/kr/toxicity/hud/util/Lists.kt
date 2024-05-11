@@ -22,9 +22,8 @@ fun <T> List<List<T>>.sum(): List<T> {
     return result
 }
 
-fun <T> Collection<T>.forEachAsync(block: (T) -> Unit, callback: () -> Unit) {
+fun <T> Collection<T>.forEachAsync(block: (T) -> Unit) {
     toList().forEachAsync(block)
-    callback()
 }
 
 fun <T> List<T>.forEachSync(block: (T) -> Unit) {
@@ -41,7 +40,7 @@ fun <T> List<T>.forEachSync(block: (T) -> Unit) {
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
     if (isNotEmpty()) {
         val available = Runtime.getRuntime().availableProcessors()
-        val queue = if (available > size) {
+        val queue = if (available >= size) {
             LinkedList(map {
                 {
                     block(it)
@@ -51,7 +50,7 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
             val queue = LinkedList<() -> Unit>()
             var i = 0
             val add = (size.toDouble() / available).toInt()
-            while (i < size) {
+            while (i <= size) {
                 val get = subList(i, (i + add).coerceAtMost(size))
                 queue.add {
                     get.forEach { t ->

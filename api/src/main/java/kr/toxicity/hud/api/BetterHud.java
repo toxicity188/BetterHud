@@ -53,9 +53,9 @@ public abstract class BetterHud extends JavaPlugin {
 
     /**
      * Executes reload.
-     * @param consumer callback
+     * @return result of reload.
      */
-    public abstract void reload(@NotNull Consumer<ReloadResult> consumer);
+    public abstract @NotNull ReloadResult reload();
 
     /**
      * Gets bukkit audiences.

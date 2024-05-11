@@ -52,7 +52,7 @@ object MinecraftManager: BetterHudManager {
     override fun start() {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val cache = DATA_FOLDER.subFolder(".cache")
-            runCatching {
+            runWithExceptionHandling("Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -112,17 +112,11 @@ object MinecraftManager: BetterHudManager {
                     }
                 }
 
-            }.onFailure { e ->
-                warn(
-                    "Unable to load minecraft default textures.",
-                    "Reason: ${e.message}"
-                )
             }
         }
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun end() {

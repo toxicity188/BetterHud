@@ -114,7 +114,7 @@ object PlayerHeadManager : BetterHudManager {
         headMap[name]
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         synchronized(headMap) {
             headMap.clear()
         }
@@ -137,8 +137,8 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYamlAsync({ file, s, configurationSection ->
-            runCatching {
+        DATA_FOLDER.subFolder("heads").forEachAllYamlAsync { file, s, configurationSection ->
+            runWithExceptionHandling("Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
                     val head = HudHead(file.path, s, configurationSection)
                     val pixel = head.pixel
@@ -158,13 +158,8 @@ object PlayerHeadManager : BetterHudManager {
                     }
                     head
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this head: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
             }
-        }, callback)
+        }
     }
 
     override fun end() {

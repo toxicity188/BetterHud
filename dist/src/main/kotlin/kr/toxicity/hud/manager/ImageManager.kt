@@ -3,7 +3,6 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageType
-import kr.toxicity.hud.image.NamedLoadedImage
 import kr.toxicity.hud.image.SplitType
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
@@ -35,49 +34,65 @@ object ImageManager: BetterHudManager {
 
     private val multiFrameRegex = Pattern.compile("(?<name>(([a-zA-Z]|/|.|(_))+)):(?<frame>([0-9]+))")
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         synchronized(imageMap) {
             imageMap.clear()
             imageNameComponent.clear()
         }
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYamlAsync({ file, s, configurationSection ->
-            runCatching {
-                val image = when (val type = ImageType.valueOf(configurationSection.getString("type").ifNull("type value not set.").uppercase())) {
+        DATA_FOLDER.subFolder("images").forEachAllYamlAsync { file, s, configurationSection ->
+            runWithExceptionHandling("Unable to load this image: $s in ${file.name}") {
+                val image = when (val type = ImageType.valueOf(
+                    configurationSection.getString("type").ifNull("type value not set.").uppercase()
+                )) {
                     ImageType.SINGLE -> {
-                        val targetFile = File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
+                        val targetFile = File(
+                            assets,
+                            configurationSection.getString("file").ifNull("file value not set.")
+                                .replace('/', File.separatorChar)
+                        )
                         HudImage(
                             file.path,
                             s,
-                            listOf(targetFile
-                                .toImage()
-                                .removeEmptySide()
-                                .ifNull("Invalid image.")
-                                .toNamed(targetFile.name),
+                            listOf(
+                                targetFile
+                                    .toImage()
+                                    .removeEmptySide()
+                                    .ifNull("Invalid image.")
+                                    .toNamed(targetFile.name),
                             ),
                             type,
                             configurationSection.getConfigurationSection("setting") ?: emptySetting
                         )
                     }
+
                     ImageType.LISTENER -> {
                         val splitType = (configurationSection.getString("split-type")?.let { splitType ->
-                            runCatching {
+                            runWithExceptionHandling("Unable to find that split-type: $splitType") {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
                         } ?: SplitType.LEFT)
-                        val getFile = File(assets, configurationSection.getString("file").ifNull("file value not set.").replace('/', File.separatorChar))
+                        val getFile = File(
+                            assets,
+                            configurationSection.getString("file").ifNull("file value not set.")
+                                .replace('/', File.separatorChar)
+                        )
                         HudImage(
                             file.path,
                             s,
-                            splitType.split(getFile
-                                .toImage()
-                                .removeEmptySide()
-                                .ifNull("Invalid image.")
-                                .toNamed(getFile.name), configurationSection.getInt("split", 25).coerceAtLeast(1)),
+                            splitType.split(
+                                getFile
+                                    .toImage()
+                                    .removeEmptySide()
+                                    .ifNull("Invalid image.")
+                                    .toNamed(getFile.name), configurationSection.getInt("split", 25).coerceAtLeast(1)
+                            ),
                             type,
-                            configurationSection.getConfigurationSection("setting").ifNull("setting configuration not found.")
+                            configurationSection.getConfigurationSection("setting")
+                                .ifNull("setting configuration not found.")
                         )
                     }
+
                     ImageType.SEQUENCE -> {
                         val globalFrame = configurationSection.getInt("frame", 1).coerceAtLeast(1)
                         HudImage(
@@ -85,7 +100,7 @@ object ImageManager: BetterHudManager {
                             s,
                             configurationSection.getStringList("files").ifEmpty {
                                 warn("files is empty.")
-                                return@forEachAllYamlAsync
+                                return@runWithExceptionHandling
                             }.map { string ->
                                 val matcher = multiFrameRegex.matcher(string)
                                 var fileName = string
@@ -112,30 +127,23 @@ object ImageManager: BetterHudManager {
                 imageMap.putSync("image", s) {
                     image
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this image: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
             }
-        }) {
-            imageMap.values.forEach { value ->
-                val list = value.image
-                if (list.isNotEmpty()) {
-                    list.distinctBy {
-                        it.name
-                    }.forEach {
-                        val file = ArrayList(resource.textures).apply {
-                            add(it.name.substringBefore('.').encodeFolder())
-                            add(it.name)
-                        }
-                        PackGenerator.addTask(file) {
-                            it.image.image.toByteArray()
-                        }
+        }
+        imageMap.values.forEach { value ->
+            val list = value.image
+            if (list.isNotEmpty()) {
+                list.distinctBy {
+                    it.name
+                }.forEach {
+                    val file = ArrayList(resource.textures).apply {
+                        add(it.name.substringBefore('.').encodeFolder())
+                        add(it.name)
+                    }
+                    PackGenerator.addTask(file) {
+                        it.image.image.toByteArray()
                     }
                 }
             }
-            callback()
         }
     }
 

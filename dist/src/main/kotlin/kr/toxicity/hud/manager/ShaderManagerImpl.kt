@@ -78,12 +78,12 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
 
     }
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         CompletableFuture.runAsync {
             synchronized(this) {
                 constants.clear()
                 index = 0
-                runCatching {
+                runWithExceptionHandling("Unable to load shader.yml") {
                     fun getReader(name: String): Pair<String, BufferedReader> {
                         return (name to run {
                             val f = File(DATA_FOLDER, name)
@@ -213,18 +213,9 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         }
                     }
                     hudShaders.clear()
-                }.onFailure { e ->
-                    warn(
-                        "Unable to load shader.yml",
-                        "Reason: ${e.message}"
-                    )
                 }
             }
-            callback()
-        }.handle { _, e ->
-            e.printStackTrace()
-            callback()
-        }
+        }.join()
     }
 
     override fun end() {

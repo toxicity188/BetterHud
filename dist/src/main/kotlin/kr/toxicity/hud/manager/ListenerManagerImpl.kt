@@ -2,15 +2,12 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.manager.ListenerManager
-import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.armor
 import kr.toxicity.hud.util.ifNull
 import org.bukkit.attribute.Attribute
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.entity.LivingEntity
-import org.bukkit.event.entity.EntityEvent
 import java.util.function.Function
 
 object ListenerManagerImpl: BetterHudManager, ListenerManager {
@@ -93,8 +90,7 @@ object ListenerManagerImpl: BetterHudManager, ListenerManager {
             }
         }
     }
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
-        callback()
+    override fun reload(resource: GlobalResource) {
     }
 
     override fun end() {

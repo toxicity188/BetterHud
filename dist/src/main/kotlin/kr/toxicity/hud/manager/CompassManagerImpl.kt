@@ -15,23 +15,18 @@ object CompassManagerImpl: BetterHudManager, CompassManager {
     }
 
 
-    override fun reload(resource: GlobalResource, callback: () -> Unit) {
+    override fun reload(resource: GlobalResource) {
         compassMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("compasses").forEachAllYamlAsync({ f, s, c ->
-            runCatching {
+        DATA_FOLDER.subFolder("compasses").forEachAllYamlAsync { f, s, c ->
+            runWithExceptionHandling("Unable to load this compass: $s in ${f.name}") {
                 compassMap.putSync("compass", s) {
                     c.getString("type").ifNull("type value not set.").run {
                         CompassType.valueOf(uppercase()).build(resource, assets, f.path, s, c)
                     }
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this compass: $s in ${f.name}",
-                    "Reason: ${e.message}"
-                )
             }
-        }, callback)
+        }
     }
 
     override fun end() {
