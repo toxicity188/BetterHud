@@ -297,7 +297,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
         val type = types[group]
-        print("target: $target, group: $group, first: $first, args: $args, get: $get, type: $type")
 
         return object : PlaceholderBuilder<Any> {
             override val clazz: Class<out Any>
