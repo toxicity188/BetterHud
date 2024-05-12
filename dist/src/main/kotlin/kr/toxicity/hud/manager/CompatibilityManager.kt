@@ -10,9 +10,10 @@ import kr.toxicity.hud.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.CONSOLE
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.runWithExceptionHandling
-import kr.toxicity.hud.util.warn
+import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
 import java.util.function.Function
 
@@ -48,7 +49,7 @@ object CompatibilityManager: BetterHudManager {
     override fun start() {
         compatibilities.forEach {
             if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
-                runWithExceptionHandling("Unable to load ${it.key} support.") {
+                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support.") {
                     val obj = it.value()
                     val namespace = it.key.lowercase()
                     obj.listeners.forEach { entry ->
@@ -76,7 +77,7 @@ object CompatibilityManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

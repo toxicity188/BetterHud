@@ -15,15 +15,13 @@ import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -38,6 +36,8 @@ object TextManager: BetterHudManager {
 
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
+
+    private val unicodeRange = (0..0x10FFFF).toList()
 
     private val defaultLatin = HashSet<Int>().apply {
         addAll(0x0021..0x0026)
@@ -140,7 +140,7 @@ object TextManager: BetterHudManager {
     }
     fun translate(locale: String, key: String) = translatableString[locale.uppercase()]?.get(key)
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(this) {
             textMap.clear()
             textWidthMap.clear()
@@ -198,7 +198,7 @@ object TextManager: BetterHudManager {
         }
 
         DATA_FOLDER.subFolder("texts").forEachAllYamlAsync { file, s, section ->
-            runWithExceptionHandling("Unable to load this text: $s in ${file.name}") {
+            runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
                 val fontDir = section.getString("file")?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
@@ -331,11 +331,11 @@ object TextManager: BetterHudManager {
             get() = (font.size.toDouble() * 1.4).roundToInt()
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             val width = font.size
-            (Char.MIN_VALUE..Char.MAX_VALUE).filter { char ->
-                font.canDisplay(char) && filter(char.code)
+            unicodeRange.filter { char ->
+                font.canDisplay(char) && filter(char)
             }.forEachAsync { char ->
                 val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).processFont(char.toString(), font) ?: return@forEachAsync
-                block(CharImage(char.code, image))
+                block(CharImage(char, image))
             }
         }
     }

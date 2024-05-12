@@ -5,6 +5,7 @@ import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import java.io.File
 
 object BackgroundManager: BetterHudManager {
@@ -17,12 +18,12 @@ object BackgroundManager: BetterHudManager {
 
     fun getBackground(name: String) = backgroundMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
         backgroundMap.clear()
         folder.forEachAsync {
             if (it.extension == "yml") {
-                runWithExceptionHandling("Unable to load this yml: ${it.name}") {
+                runWithExceptionHandling(sender, "Unable to load this yml: ${it.name}") {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)

@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.module.MODULE_BUKKIT
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.warn
+import net.kyori.adventure.audience.Audience
 import java.util.function.Function
 
 object ModuleManager: BetterHudManager {
@@ -39,7 +40,7 @@ object ModuleManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

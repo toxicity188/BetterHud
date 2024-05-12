@@ -21,6 +21,7 @@ import kr.toxicity.hud.util.*
 import net.byteflux.libby.BukkitLibraryManager
 import net.byteflux.libby.Library
 import net.byteflux.libby.relocation.Relocation
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
@@ -38,7 +39,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 import java.util.jar.JarFile
 
 @Suppress("UNUSED")
@@ -143,34 +143,6 @@ class BetterHudImpl: BetterHud() {
 
 
     override fun onEnable() {
-        runWithExceptionHandling("Unable to get latest version.") {
-            HttpClient.newHttpClient().sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val body = it.body()
-                if (description.version != body) {
-                    warn("New version found: $body")
-                    warn("Download: https://www.spigotmc.org/resources/115559")
-                    Bukkit.getPluginManager().registerEvents(object : Listener {
-                        @EventHandler
-                        fun join(e: PlayerJoinEvent) {
-                            val player = e.player
-                            if (player.isOp) {
-                                player.info("New BetterHud version found: $body")
-                                player.info(Component.text("Download: https://www.spigotmc.org/resources/115559")
-                                    .clickEvent(ClickEvent.clickEvent(
-                                        ClickEvent.Action.OPEN_URL,
-                                        "https://www.spigotmc.org/resources/115559"
-                                    )))
-                            }
-                        }
-                    }, this)
-                }
-            }
-        }
         val pluginManager = Bukkit.getPluginManager()
         if (MinecraftVersion.current >= MinecraftVersion.version1_20_5) {
             nms = when (MinecraftVersion.current) {
@@ -219,12 +191,40 @@ class BetterHudImpl: BetterHud() {
                 )
             }
         }
+        runWithExceptionHandling(Bukkit.getConsoleSender().audience, "Unable to get latest version.") {
+            HttpClient.newHttpClient().sendAsync(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
+                    .GET()
+                    .build(), HttpResponse.BodyHandlers.ofString()
+            ).thenAccept {
+                val body = it.body()
+                if (description.version != body) {
+                    warn("New version found: $body")
+                    warn("Download: https://www.spigotmc.org/resources/115559")
+                    Bukkit.getPluginManager().registerEvents(object : Listener {
+                        @EventHandler
+                        fun join(e: PlayerJoinEvent) {
+                            val player = e.player
+                            if (player.isOp) {
+                                player.info("New BetterHud version found: $body")
+                                player.info(Component.text("Download: https://www.spigotmc.org/resources/115559")
+                                    .clickEvent(ClickEvent.clickEvent(
+                                        ClickEvent.Action.OPEN_URL,
+                                        "https://www.spigotmc.org/resources/115559"
+                                    )))
+                            }
+                        }
+                    }, this)
+                }
+            }
+        }
     }
 
     @Volatile
     private var onReload = false
 
-    override fun reload(): ReloadResult {
+    override fun reload(sender: Audience): ReloadResult {
         synchronized(this) {
             if (onReload) {
                 return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
@@ -240,10 +240,10 @@ class BetterHudImpl: BetterHud() {
                     val resource = GlobalResource()
                     managers.forEach {
                         CompletableFuture.runAsync {
-                            it.reload(resource)
+                            it.reload(sender, resource)
                         }.join()
                     }
-                    PackGenerator.generate()
+                    PackGenerator.generate(sender)
                     val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
                     onReload = false
                     managers.forEach {

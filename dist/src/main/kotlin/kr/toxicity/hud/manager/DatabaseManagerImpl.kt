@@ -9,6 +9,7 @@ import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.configuration.MemoryConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -165,7 +166,7 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
 
     override fun getCurrentDatabase(): HudDatabase = current
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         CompletableFuture.runAsync {
             synchronized(this) {
                 runCatching {

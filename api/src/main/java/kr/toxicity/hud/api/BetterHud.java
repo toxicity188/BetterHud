@@ -6,8 +6,11 @@ import kr.toxicity.hud.api.nms.NMS;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.plugin.ReloadResult;
 import kr.toxicity.hud.api.scheduler.HudScheduler;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +58,15 @@ public abstract class BetterHud extends JavaPlugin {
      * Executes reload.
      * @return result of reload.
      */
-    public abstract @NotNull ReloadResult reload();
+    public @NotNull ReloadResult reload() {
+        return reload(getAudiences().sender(Bukkit.getConsoleSender()));
+    }
+    /**
+     * Executes reload.
+     * @param sender log handler.
+     * @return result of reload.
+     */
+    public abstract @NotNull ReloadResult reload(@NotNull Audience sender);
 
     /**
      * Gets bukkit audiences.

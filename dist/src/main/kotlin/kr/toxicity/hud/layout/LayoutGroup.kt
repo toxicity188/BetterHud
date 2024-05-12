@@ -6,24 +6,26 @@ import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.configuration.ConfigurationSection
 import java.text.DecimalFormat
 
 class LayoutGroup(
     override val path: String,
+    sender: Audience,
     section: ConfigurationSection
 ): HudConfiguration {
 
     private val loc = ImageLocation(section)
 
     val align = section.getString("align")?.let {
-        runWithExceptionHandling("Unable to find that align: $it") {
+        runWithExceptionHandling(sender, "Unable to find that align: $it") {
             LayoutAlign.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutAlign.LEFT
     val offset = section.getString("offset")?.let {
-        runWithExceptionHandling("Unable to find that offset: $it") {
+        runWithExceptionHandling(sender, "Unable to find that offset: $it") {
             LayoutOffset.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutOffset.CENTER

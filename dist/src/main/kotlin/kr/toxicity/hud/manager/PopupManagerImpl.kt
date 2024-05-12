@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.popup.PopupImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import java.util.*
 
 object PopupManagerImpl: BetterHudManager, PopupManager {
@@ -13,7 +14,7 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
 
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         popupMap.clear()
         DATA_FOLDER.subFolder("popups").forEachAllYamlAsync { file, s, configurationSection ->
             runCatching {

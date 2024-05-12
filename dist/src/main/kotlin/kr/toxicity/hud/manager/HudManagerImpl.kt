@@ -5,7 +5,8 @@ import kr.toxicity.hud.api.manager.HudManager
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import java.util.Collections
+import net.kyori.adventure.audience.Audience
+import java.util.*
 
 object HudManagerImpl: BetterHudManager, HudManager {
 
@@ -17,10 +18,10 @@ object HudManagerImpl: BetterHudManager, HudManager {
 
     override fun getHud(name: String): Hud? = hudMap[name]
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         hudMap.clear()
         DATA_FOLDER.subFolder("huds").forEachAllYamlAsync { file, s, configurationSection ->
-            runWithExceptionHandling("Unable to load this hud: $s in ${file.name}") {
+            runWithExceptionHandling(sender, "Unable to load this hud: $s in ${file.name}") {
                 hudMap.putSync("hud", s) {
                     HudImpl(file.path, s, resource.font, configurationSection)
                 }

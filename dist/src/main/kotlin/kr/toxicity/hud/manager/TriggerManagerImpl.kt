@@ -10,6 +10,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.createBukkitTrigger
 import kr.toxicity.hud.util.ifNull
+import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.event.Event
@@ -17,7 +18,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
-import java.util.UUID
+import java.util.*
 import java.util.function.Function
 
 object TriggerManagerImpl: BetterHudManager, TriggerManager {
@@ -66,7 +67,7 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         HandlerList.unregisterAll(listener)
     }
     override fun end() {

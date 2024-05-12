@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.io.File
@@ -14,7 +15,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.Collections
+import java.util.*
 import java.util.jar.JarFile
 import kotlin.math.roundToInt
 
@@ -52,7 +53,7 @@ object MinecraftManager: BetterHudManager {
     override fun start() {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling("Unable to load minecraft default textures.") {
+            runWithExceptionHandling(CONSOLE, "Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -116,7 +117,7 @@ object MinecraftManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

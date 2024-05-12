@@ -6,6 +6,7 @@ import kr.toxicity.hud.compass.CompassImpl
 import kr.toxicity.hud.compass.CompassType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 
 object CompassManagerImpl: BetterHudManager, CompassManager {
 
@@ -15,11 +16,11 @@ object CompassManagerImpl: BetterHudManager, CompassManager {
     }
 
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         compassMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("compasses").forEachAllYamlAsync { f, s, c ->
-            runWithExceptionHandling("Unable to load this compass: $s in ${f.name}") {
+            runWithExceptionHandling(sender, "Unable to load this compass: $s in ${f.name}") {
                 compassMap.putSync("compass", s) {
                     c.getString("type").ifNull("type value not set.").run {
                         CompassType.valueOf(uppercase()).build(resource, assets, f.path, s, c)

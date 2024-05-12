@@ -8,6 +8,7 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
 import java.util.*
@@ -34,14 +35,14 @@ object ImageManager: BetterHudManager {
 
     private val multiFrameRegex = Pattern.compile("(?<name>(([a-zA-Z]|/|.|(_))+)):(?<frame>([0-9]+))")
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(imageMap) {
             imageMap.clear()
             imageNameComponent.clear()
         }
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYamlAsync { file, s, configurationSection ->
-            runWithExceptionHandling("Unable to load this image: $s in ${file.name}") {
+            runWithExceptionHandling(sender, "Unable to load this image: $s in ${file.name}") {
                 val image = when (val type = ImageType.valueOf(
                     configurationSection.getString("type").ifNull("type value not set.").uppercase()
                 )) {
@@ -68,7 +69,7 @@ object ImageManager: BetterHudManager {
 
                     ImageType.LISTENER -> {
                         val splitType = (configurationSection.getString("split-type")?.let { splitType ->
-                            runWithExceptionHandling("Unable to find that split-type: $splitType") {
+                            runWithExceptionHandling(sender, "Unable to find that split-type: $splitType") {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
                         } ?: SplitType.LEFT)

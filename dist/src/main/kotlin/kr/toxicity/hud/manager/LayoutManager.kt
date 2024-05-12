@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 
 object LayoutManager: BetterHudManager {
 
@@ -16,14 +17,14 @@ object LayoutManager: BetterHudManager {
         layoutMap[name]
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(layoutMap) {
             layoutMap.clear()
         }
         DATA_FOLDER.subFolder("layouts").forEachAllYamlAsync { file, s, configurationSection ->
-            runWithExceptionHandling("Unable to load this layout: $s in ${file.name}") {
+            runWithExceptionHandling(sender, "Unable to load this layout: $s in ${file.name}") {
                 layoutMap.putSync("layout", s) {
-                    LayoutGroup(file.path, configurationSection)
+                    LayoutGroup(file.path, sender, configurationSection)
                 }
             }
         }

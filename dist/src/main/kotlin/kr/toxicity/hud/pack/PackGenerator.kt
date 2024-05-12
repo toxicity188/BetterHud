@@ -3,6 +3,7 @@ package kr.toxicity.hud.pack
 import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -70,8 +71,8 @@ object PackGenerator {
         }
     }
 
-    fun generate() {
-        runWithExceptionHandling("Unable to make a resource pack.") {
+    fun generate(sender: Audience) {
+        runWithExceptionHandling(sender, "Unable to make a resource pack.") {
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
@@ -192,11 +193,11 @@ object PackGenerator {
                 }
             }
             tasks.values.forEachAsync { t ->
-                runWithExceptionHandling("Unable to save this file: ${t.path}") {
+                runWithExceptionHandling(sender, "Unable to save this file: ${t.path}") {
                     saveTask(t)
                 }
             }
-            runWithExceptionHandling("Unable to finalized resource pack build.") {
+            runWithExceptionHandling(sender, "Unable to finalized resource pack build.") {
                 saveTask.close()
             }
             tasks.clear()

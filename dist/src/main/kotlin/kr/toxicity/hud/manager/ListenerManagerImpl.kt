@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.armor
 import kr.toxicity.hud.util.ifNull
+import net.kyori.adventure.audience.Audience
 import org.bukkit.attribute.Attribute
 import org.bukkit.configuration.ConfigurationSection
 import java.util.function.Function
@@ -90,7 +91,7 @@ object ListenerManagerImpl: BetterHudManager, ListenerManager {
             }
         }
     }
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

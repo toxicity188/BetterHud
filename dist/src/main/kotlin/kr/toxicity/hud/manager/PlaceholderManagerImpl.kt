@@ -12,6 +12,7 @@ import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -412,11 +413,11 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         updateTask.clear()
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            DATA_FOLDER.subFolder("placeholders").forEachAllYaml { file, s, configurationSection ->
-                runWithExceptionHandling("Unable to read this placeholder task: $s in ${file.name}") {
+            DATA_FOLDER.subFolder("placeholders").forEachAllYaml(sender) { file, s, configurationSection ->
+                runWithExceptionHandling(sender, "Unable to read this placeholder task: $s in ${file.name}") {
                     val variable = configurationSection.getString("variable").ifNull("variable not set.")
                     val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
                     val update = configurationSection.getInt("update", 1).coerceAtLeast(1)

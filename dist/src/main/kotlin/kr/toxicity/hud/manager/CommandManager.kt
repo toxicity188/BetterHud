@@ -6,6 +6,7 @@ import kr.toxicity.hud.command.CommandModule
 import kr.toxicity.hud.command.SenderType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
@@ -369,7 +370,7 @@ object CommandManager: BetterHudManager {
         PLUGIN.getCommand(NAME_SPACE)?.setExecutor(command.createTabExecutor())
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

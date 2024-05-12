@@ -6,6 +6,8 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import net.kyori.adventure.audience.Audience
+import org.bukkit.command.CommandSender
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import java.util.UUID
@@ -37,18 +39,18 @@ fun <T : Event> createBukkitTrigger(
         override fun getKey(t: T): Any = keyMapper(t)
     }
 }
-fun <R> runWithExceptionHandling(message: String, block: () -> R) = runCatching(block).onFailure {
-    warn(
-        message,
-        "Reason: ${it.message ?: it.javaClass.name}"
-    )
+fun <R> runWithExceptionHandling(sender: Audience, message: String, block: () -> R) = runCatching(block).onFailure {
+    synchronized(sender) {
+        sender.warn(message)
+        sender.warn("Reason: ${it.message ?: it.javaClass.name}")
+    }
     if (ConfigManagerImpl.debug) it.printStackTrace()
 }
 
-fun <T, R> T.runWithExceptionHandling(message: String, block: T.() -> R) = runCatching(block).onFailure {
-    warn(
-        message,
-        "Reason: ${it.message ?: it.javaClass.name}"
-    )
+fun <T, R> T.runWithExceptionHandling(sender: Audience, message: String, block: T.() -> R) = runCatching(block).onFailure {
+    synchronized(sender) {
+        sender.warn(message)
+        sender.warn("Reason: ${it.message ?: it.javaClass.name}")
+    }
     if (ConfigManagerImpl.debug) it.printStackTrace()
 }

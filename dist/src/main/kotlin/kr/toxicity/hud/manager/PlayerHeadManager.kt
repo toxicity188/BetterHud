@@ -6,6 +6,7 @@ import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
@@ -114,7 +115,7 @@ object PlayerHeadManager : BetterHudManager {
         headMap[name]
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(headMap) {
             headMap.clear()
         }
@@ -138,7 +139,7 @@ object PlayerHeadManager : BetterHudManager {
             }
         }
         DATA_FOLDER.subFolder("heads").forEachAllYamlAsync { file, s, configurationSection ->
-            runWithExceptionHandling("Unable to load this head: $s in ${file.name}") {
+            runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
                     val head = HudHead(file.path, s, configurationSection)
                     val pixel = head.pixel

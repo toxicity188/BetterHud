@@ -1,5 +1,6 @@
 package kr.toxicity.hud.util
 
+import net.kyori.adventure.audience.Audience
 import org.bukkit.configuration.ConfigurationSection
 import java.io.File
 
@@ -32,10 +33,10 @@ fun File.forEachAsync(block: (File) -> Unit) {
     listFiles()?.toList()?.forEachAsync(block)
 }
 
-fun File.forEachAllYaml(block: (File, String, ConfigurationSection) -> Unit) {
+fun File.forEachAllYaml(sender: Audience, block: (File, String, ConfigurationSection) -> Unit) {
     forEachAllFolder {
         if (it.extension == "yml") {
-            runWithExceptionHandling("Unable to load this yml file: ${it.name}") {
+            runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
                 it.toYaml().forEachSubConfiguration { s, configurationSection ->
                     block(it, s, configurationSection)
                 }

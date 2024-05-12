@@ -6,6 +6,7 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bstats.bukkit.Metrics
@@ -92,7 +93,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     }
 
     override fun getBossbarLine(): Int = line
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun preReload() {
@@ -117,13 +118,13 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
                 defaultFontName = it
             }
             yaml.getString("pack-type")?.let {
-                runWithExceptionHandling("Unable to find this pack type: $it") {
+                runWithExceptionHandling(CONSOLE, "Unable to find this pack type: $it") {
                     packType = PackType.valueOf(it.uppercase())
                 }
             }
             tickSpeed = yaml.getLong("tick-speed", 1)
             numberFormat = (yaml.getString("number-format")?.let {
-                runWithExceptionHandling("Unable to read this number-format: $it") {
+                runWithExceptionHandling(CONSOLE, "Unable to read this number-format: $it") {
                     DecimalFormat(it)
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#"))

@@ -8,6 +8,7 @@ import kr.toxicity.hud.player.location.GPSLocationProvider
 import kr.toxicity.hud.player.location.PointedLocationProvider
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -18,7 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
 
 object PlayerManager: BetterHudManager {
 
@@ -89,7 +89,7 @@ object PlayerManager: BetterHudManager {
         }
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         hudPlayer.values.forEach {
             it.resetElements()
         }

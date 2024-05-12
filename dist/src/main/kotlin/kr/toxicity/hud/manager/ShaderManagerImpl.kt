@@ -9,6 +9,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.boss.BarColor
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
@@ -78,12 +79,12 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
 
     }
 
-    override fun reload(resource: GlobalResource) {
+    override fun reload(sender: Audience, resource: GlobalResource) {
         CompletableFuture.runAsync {
             synchronized(this) {
                 constants.clear()
                 index = 0
-                runWithExceptionHandling("Unable to load shader.yml") {
+                runWithExceptionHandling(sender, "Unable to load shader.yml") {
                     fun getReader(name: String): Pair<String, BufferedReader> {
                         return (name to run {
                             val f = File(DATA_FOLDER, name)
