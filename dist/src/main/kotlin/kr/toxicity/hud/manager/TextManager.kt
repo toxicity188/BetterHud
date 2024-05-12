@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.pack.PackGenerator
@@ -157,9 +158,7 @@ object TextManager: BetterHudManager {
                 })
             })
         }
-        val fontConfig = File(DATA_FOLDER, "font.yml").apply {
-            if (!exists()) PLUGIN.saveResource("font.yml", false)
-        }.toYaml()
+        val fontConfig = PluginConfiguration.FONT.create()
         val configScale = fontConfig.getInt("scale", 16)
         val configHeight = fontConfig.getInt("height", 9)
         val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)

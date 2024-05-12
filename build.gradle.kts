@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm") version("1.9.24")
     id("io.github.goooler.shadow") version("8.1.7")
-    id("io.papermc.paperweight.userdev") version("1.7.0") apply(false)
+    id("io.papermc.paperweight.userdev") version("1.7.1") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.0")
     id("org.jetbrains.dokka") version("1.9.20")
 }

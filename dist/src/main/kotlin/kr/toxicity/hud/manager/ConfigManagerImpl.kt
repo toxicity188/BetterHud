@@ -24,6 +24,10 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     val info = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.GOLD))
     val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
     private var line = 1
+
+    var needToUpdateConfig = false
+        private set
+
     var defaultHud = emptyList<String>()
         private set
     var defaultPopup = emptyList<String>()
@@ -93,6 +97,15 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
 
     override fun preReload() {
         runCatching {
+            File(DATA_FOLDER, "version.yml").apply {
+                if (!exists()) createNewFile()
+            }.run {
+                val yaml = toYaml()
+                needToUpdateConfig = yaml.getString("plugin-version") != PLUGIN.description.version
+                yaml.set("plugin-version", PLUGIN.description.version)
+                yaml.save(this)
+            }
+
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getBoolean("debug")

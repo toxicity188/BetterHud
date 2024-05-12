@@ -1,5 +1,6 @@
 package kr.toxicity.hud.configuration
 
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -9,6 +10,7 @@ enum class PluginConfiguration(
 ) {
     CONFIG("config.yml"),
     DATABASE("database.yml"),
+    FONT("font.yml"),
     SHADER("shader.yml")
     ;
 
@@ -17,10 +19,9 @@ enum class PluginConfiguration(
         val exists = file.exists()
         if (!exists) PLUGIN.saveResource(dir, false)
         val yaml = file.toYaml()
-        val version = yaml.getString("plugin-version") ?: "unknown"
-        if (exists && PLUGIN.description.version != version) {
+        if (exists && ConfigManagerImpl.needToUpdateConfig) {
             warn(
-                "Old configuration version found: $dir in $version",
+                "Old configuration version found: $dir",
                 "Configuration will be automatically updated."
             )
             val newYaml = PLUGIN.getResource(dir).ifNull("Resource '$dir' not found.").toYaml()
@@ -35,7 +36,6 @@ enum class PluginConfiguration(
                 }
             }
         }
-        yaml.set("plugin-version", PLUGIN.description.version)
         return yaml.apply {
             save(file)
         }
