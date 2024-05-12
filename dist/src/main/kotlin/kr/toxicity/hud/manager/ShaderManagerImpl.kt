@@ -43,7 +43,9 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         if (shader.layer != 0) add("    layer = ${shader.layer};")
                         if (shader.outline) add("    outline = true;")
                         add("    break;")
-                        entry.value(id)
+                        entry.value.forEach {
+                            it(id)
+                        }
                     })
                 }
                 hudShaders.clear()
@@ -56,15 +58,13 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
         }
     )
 
-    private val hudShaders = TreeMap<HudShader, (Int) -> Unit>()
+    private val hudShaders = TreeMap<HudShader, MutableList<(Int) -> Unit>>()
     @Synchronized
     fun addHudShader(shader: HudShader, consumer: (Int) -> Unit) {
         synchronized(hudShaders) {
-            val old = hudShaders[shader] ?: {}
-            hudShaders[shader] = {
-                old(it)
-                consumer(it)
-            }
+            hudShaders.computeIfAbsent(shader) {
+                ArrayList()
+            }.add(consumer)
         }
     }
 

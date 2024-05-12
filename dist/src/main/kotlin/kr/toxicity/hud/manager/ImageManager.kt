@@ -12,6 +12,7 @@ import net.kyori.adventure.audience.Audience
 import org.bukkit.configuration.MemoryConfiguration
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object ImageManager: BetterHudManager {
@@ -19,15 +20,11 @@ object ImageManager: BetterHudManager {
     private val imageMap = HashMap<String, HudImage>()
     private val emptySetting = MemoryConfiguration()
 
-    private val imageNameComponent = WeakHashMap<ShaderGroup, WidthComponent>()
+    private val imageNameComponent = ConcurrentHashMap<ShaderGroup, WidthComponent>()
 
-    fun getImage(group: ShaderGroup) = synchronized(imageNameComponent) {
-        imageNameComponent[group]
-    }
+    fun getImage(group: ShaderGroup) = imageNameComponent[group]
     fun setImage(group: ShaderGroup, component: WidthComponent) {
-        synchronized(imageNameComponent) {
-            imageNameComponent[group] = component
-        }
+        imageNameComponent[group] = component
     }
 
     override fun start() {
@@ -150,6 +147,10 @@ object ImageManager: BetterHudManager {
                 }
             }
         }
+    }
+
+    override fun postReload() {
+        imageNameComponent.clear()
     }
 
     override fun end() {

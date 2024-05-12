@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -32,7 +33,7 @@ object TextManager: BetterHudManager {
     private val textCacheMap = HashMap<String, HudText>()
 
     private val textWidthMap = HashMap<Int, Int>()
-    private val textKeyMap = WeakHashMap<ShaderGroup, HudTextData>()
+    private val textKeyMap = ConcurrentHashMap<ShaderGroup, HudTextData>()
 
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
@@ -97,13 +98,9 @@ object TextManager: BetterHudManager {
         }
     )
 
-    fun getKey(shaderGroup: ShaderGroup) = synchronized(textKeyMap) {
-        textKeyMap[shaderGroup]
-    }
+    fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
     fun setKey(shaderGroup: ShaderGroup, key: HudTextData) {
-        synchronized(textKeyMap) {
-            textKeyMap[shaderGroup] = key
-        }
+        textKeyMap[shaderGroup] = key
     }
 
     private lateinit var unifont: List<Pair<Int, ByteArray>>
@@ -481,6 +478,10 @@ object TextManager: BetterHudManager {
             }
             result
         }
+    }
+
+    override fun postReload() {
+        textKeyMap.clear()
     }
 
     override fun end() {

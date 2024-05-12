@@ -24,16 +24,12 @@ object PlayerHeadManager : BetterHudManager {
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
 
-    private val headNameComponent = WeakHashMap<ShaderGroup, TextComponent.Builder>()
+    private val headNameComponent = ConcurrentHashMap<ShaderGroup, TextComponent.Builder>()
 
 
-    fun getHead(group: ShaderGroup) = synchronized(headNameComponent) {
-        headNameComponent[group]
-    }
+    fun getHead(group: ShaderGroup) = headNameComponent[group]
     fun setHead(group: ShaderGroup, component: TextComponent.Builder) {
-        synchronized(headNameComponent) {
-            headNameComponent[group] = component
-        }
+        headNameComponent[group] = component
     }
 
     private class CachedHead(
@@ -165,6 +161,10 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
+    }
+
+    override fun postReload() {
+        headNameComponent.clear()
     }
 
     override fun end() {
