@@ -36,7 +36,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             val fileName = "$NAME_SPACE_ENCODED:${pair.name.substringBefore('.').encodeFolder()}/${pair.name}"
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
-            val ascent = HudImpl.createBit((finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT), shader)
+            val ascent = (finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
             val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
 
             val component = ImageManager.getImage(shaderGroup) ?: run {
@@ -45,15 +45,19 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                     .content(c)
                     .font(parent.imageKey)
                     .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEW_LAYER
-                parent.jsonArray.get()?.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    addProperty("file", fileName)
-                    addProperty("ascent", ascent)
-                    addProperty("height", height)
-                    add("chars", JsonArray().apply {
-                        add(c)
-                    })
-                })
+                parent.jsonArray?.let { array ->
+                    HudImpl.createBit(shader, ascent) { y ->
+                        array.add(JsonObject().apply {
+                            addProperty("type", "bitmap")
+                            addProperty("file", fileName)
+                            addProperty("ascent", y)
+                            addProperty("height", height)
+                            add("chars", JsonArray().apply {
+                                add(c)
+                            })
+                        })
+                    }
+                }
                 ImageManager.setImage(shaderGroup, finalWidth)
                 finalWidth
             }

@@ -31,19 +31,23 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 val char = (++parent.imageChar).parseChar()
                 val encode = "pixel_${head.head.pixel}".encodeKey()
                 val fileName = "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png"
-                val ascent = HudImpl.createBit(final.y + i * head.head.pixel, shader)
+                val ascent = final.y + i * head.head.pixel
                 val height = head.head.pixel
                 val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
                 PlayerHeadManager.getHead(shaderGroup) ?: run {
-                    parent.jsonArray.get()?.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        addProperty("file", fileName)
-                        addProperty("ascent", ascent)
-                        addProperty("height", height)
-                        add("chars", JsonArray().apply {
-                            add(char)
-                        })
-                    })
+                    parent.jsonArray?.let { array ->
+                        HudImpl.createBit(shader, ascent) { y ->
+                            array.add(JsonObject().apply {
+                                addProperty("type", "bitmap")
+                                addProperty("file", fileName)
+                                addProperty("ascent", y)
+                                addProperty("height", height)
+                                add("chars", JsonArray().apply {
+                                    add(char)
+                                })
+                            })
+                        }
+                    }
                     val comp = Component.text().content(char).font(parent.imageKey)
                     PlayerHeadManager.setHead(shaderGroup, comp)
                     comp

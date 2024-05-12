@@ -334,7 +334,7 @@ object TextManager: BetterHudManager {
             unicodeRange.filter { char ->
                 font.canDisplay(char) && filter(char)
             }.forEachAsync { char ->
-                val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).processFont(char.toString(), font) ?: return@forEachAsync
+                val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).processFont(char, font) ?: return@forEachAsync
                 block(CharImage(char, image))
             }
         }

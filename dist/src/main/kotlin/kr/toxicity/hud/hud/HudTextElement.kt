@@ -4,7 +4,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageLocation
@@ -54,13 +53,15 @@ class HudTextElement(
                 })
             }
             text.text.array.forEach {
-                array.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
-                    addProperty("ascent", HudImpl.createBit(yAxis, shader))
-                    addProperty("height", scale)
-                    add("chars", it.chars)
-                })
+                HudImpl.createBit(shader, yAxis) { y ->
+                    array.add(JsonObject().apply {
+                        addProperty("type", "bitmap")
+                        addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
+                        addProperty("ascent", y)
+                        addProperty("height", scale)
+                        add("chars", it.chars)
+                    })
+                }
             }
             var textIndex = 0xC0000
             val textEncoded = "hud_${parent.name}_text_${index + 1}_${index2 + 1}".encodeKey()
@@ -71,50 +72,55 @@ class HudTextElement(
                 val imageScale = it.value.scale * text.scale
                 val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                 val div = height.toDouble() / it.value.image.image.height
-                array.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    val encode = "glyph_${it.key}".encodeKey()
-                    addProperty("file", "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png")
-                    addProperty("ascent", HudImpl.createBit(pixel.y + it.value.location.y, shader))
-                    addProperty("height", height)
-                    add("chars", JsonArray().apply {
-                        add(result)
+                HudImpl.createBit(shader, pixel.y + it.value.location.y) { y ->
+                    array.add(JsonObject().apply {
+                        addProperty("type", "bitmap")
+                        val encode = "glyph_${it.key}".encodeKey()
+                        addProperty("file", "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png")
+                        addProperty("ascent", y)
+                        addProperty("height", height)
+                        add("chars", JsonArray().apply {
+                            add(result)
+                        })
                     })
-                })
+                }
                 imageMap[it.key] = it.value.location.x.toSpaceComponent() + WidthComponent(Component.text()
                     .font(key)
                     .content(result)
                     .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (it.value.image.image.width.toDouble() * div).roundToInt())
             }
             if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-                MinecraftManager.applyAll(array, HudImpl.createBit(text.emojiLocation.y, shader), text.emojiScale, key) {
-                    textIndex++
-                }.forEach {
-                    imageMap[it.key] = text.emojiLocation.x.toSpaceComponent() + it.value
+                HudImpl.createBit(shader, text.emojiLocation.y) { y ->
+                    MinecraftManager.applyAll(array, y, text.emojiScale, key) {
+                        textIndex++
+                    }.forEach {
+                        imageMap[it.key] = text.emojiLocation.x.toSpaceComponent() + it.value
+                    }
                 }
             }
             val result = HudTextData(
                 key,
                 imageMap,
                 text.background?.let {
-                    val y = HudImpl.createBit(pixel.y + it.location.y, HudShader(
-                        gui,
-                        text.layer - 1,
-                        false
-                    ))
                     fun getString(image: LoadedImage, file: String): WidthComponent {
                         val result = (textIndex++).parseChar()
                         val height = (image.image.height.toDouble() * text.backgroundScale).roundToInt()
                         val div = height.toDouble() / image.image.height
-                        array.add(JsonObject().apply {
-                            addProperty("type", "bitmap")
-                            addProperty("file", "$NAME_SPACE_ENCODED:${file.encodeFolder()}/$file.png")
-                            addProperty("ascent", y)
-                            addProperty("height", height)
-                            add("chars", JsonArray().apply {
-                                add(result)
+                        HudImpl.createBit(HudShader(
+                            gui,
+                            text.layer - 1,
+                            false
+                        ), pixel.y + it.location.y) { y ->
+                            array.add(JsonObject().apply {
+                                addProperty("type", "bitmap")
+                                addProperty("file", "$NAME_SPACE_ENCODED:${file.encodeFolder()}/$file.png")
+                                addProperty("ascent", y)
+                                addProperty("height", height)
+                                add("chars", JsonArray().apply {
+                                    add(result)
+                                })
                             })
-                        })
+                        }
                         return WidthComponent(Component.text()
                             .font(key)
                             .content(result)

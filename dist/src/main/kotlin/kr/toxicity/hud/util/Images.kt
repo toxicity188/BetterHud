@@ -71,9 +71,9 @@ fun BufferedImage.removeEmptyWidth(x: Int = 0, y: Int = 0): LoadedImage? {
 
 private val FRC = FontRenderContext(null, true, true)
 
-fun BufferedImage.processFont(string: String, font: Font): BufferedImage? {
+fun BufferedImage.processFont(codepoint: Int, font: Font): BufferedImage? {
     createGraphics().run {
-        fill(font.createGlyphVector(FRC, string).getOutline(0F, font.size.toFloat()))
+        fill(font.createGlyphVector(FRC, codepoint.parseChar()).getOutline(0F, font.size.toFloat()))
         dispose()
     }
 

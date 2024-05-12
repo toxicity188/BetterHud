@@ -243,12 +243,12 @@ class BetterHudImpl: BetterHud() {
                             it.reload(sender, resource)
                         }.join()
                     }
-                    PackGenerator.generate(sender)
-                    val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-                    onReload = false
                     managers.forEach {
                         it.postReload()
                     }
+                    PackGenerator.generate(sender)
+                    val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                    onReload = false
                     PluginReloadedEvent(result).call()
                     result
                 }.getOrElse { e ->

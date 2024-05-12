@@ -17,7 +17,6 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.ConfigurationSection
-import java.lang.ref.WeakReference
 import java.util.*
 
 class PopupImpl(
@@ -54,7 +53,7 @@ class PopupImpl(
     }
 
     private val imageEncoded = "popup_${name}_image".encodeKey()
-    val array = WeakReference(JsonArray())
+    var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
     private val sortType = section.getString("sort")?.let {
@@ -62,7 +61,7 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section.getConfigurationSection("layouts")?.let {
-        val json = array.get().ifNull("error is occurred.")
+        val json = array.ifNull("error is occurred.")
         ArrayList<PopupLayout>().apply {
             it.forEachSubConfiguration { _, configurationSection ->
                 val layout = configurationSection.getString("name").ifNull("name value not set.")
@@ -115,7 +114,7 @@ class PopupImpl(
                 } ?: false
             }
         }
-        array.get()?.let { arr ->
+        array?.let { arr ->
             PackGenerator.addTask(ArrayList(file).apply {
                 add(imageEncoded.encodeFolder())
                 add("$imageEncoded.json")

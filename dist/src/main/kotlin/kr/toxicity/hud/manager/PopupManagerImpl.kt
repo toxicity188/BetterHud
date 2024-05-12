@@ -30,6 +30,12 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
         }
     }
 
+    override fun postReload() {
+        popupMap.values.forEach {
+            it.array = null
+        }
+    }
+
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(popupMap.keys)
     override fun getPopup(name: String): Popup? = popupMap[name]
     override fun getDefaultPopups(): Set<Popup> = popupMap.values.filter {

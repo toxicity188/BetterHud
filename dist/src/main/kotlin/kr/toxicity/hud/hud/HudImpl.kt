@@ -18,7 +18,6 @@ import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import org.bukkit.configuration.ConfigurationSection
-import java.lang.ref.WeakReference
 
 class HudImpl(
     override val path: String,
@@ -31,8 +30,10 @@ class HudImpl(
         const val MAX_BIT = 23 - DEFAULT_BIT
         const val ADD_HEIGHT = (1 shl (DEFAULT_BIT - 1)) - 1
 
-        fun createBit(y: Int, shader: HudShader): Int {
-            return -(((ShaderManagerImpl.addHudShader(shader) + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y)
+        fun createBit(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
+            ShaderManagerImpl.addHudShader(shader) { id ->
+                consumer(-(((id + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y))
+            }
         }
     }
 
@@ -40,7 +41,7 @@ class HudImpl(
 
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
     val imageKey = createAdventureKey(imageEncoded)
-    val jsonArray = WeakReference(JsonArray())
+    var jsonArray: JsonArray? = JsonArray()
     private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
 
@@ -75,7 +76,7 @@ class HudImpl(
         }
     }
     init {
-        jsonArray.get()?.let { array ->
+        jsonArray?.let { array ->
             PackGenerator.addTask(
                 ArrayList(file).apply {
                     add(imageEncoded.encodeFolder())

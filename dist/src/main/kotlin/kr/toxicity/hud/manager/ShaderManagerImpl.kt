@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.TreeMap
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
@@ -22,7 +23,6 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
     var barColor = BarColor.YELLOW
         private set
 
-    private var index = 0
     private val tagPattern = Pattern.compile("#(?<name>[a-zA-Z]+)")
     private val deactivatePattern = Pattern.compile("//(?<name>[a-zA-Z]+)")
     private val tagBuilders: Map<String, () -> List<String>> = mapOf(
@@ -33,9 +33,20 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
         },
         "CreateLayout" to {
             ArrayList<String>().apply {
-                hudShaders.forEach {
-                    addAll(it.value.first)
+                hudShaders.entries.forEachIndexed { index, entry ->
+                    addAll(ArrayList<String>().apply {
+                        val shader = entry.key
+                        val id = index + 1
+                        add("case ${id}:")
+                        if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
+                        if (shader.gui.y != 0.0) add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
+                        if (shader.layer != 0) add("    layer = ${shader.layer};")
+                        if (shader.outline) add("    outline = true;")
+                        add("    break;")
+                        entry.value(id)
+                    })
                 }
+                hudShaders.clear()
             }
         },
         "CreateOtherShader" to {
@@ -45,20 +56,14 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
         }
     )
 
-    private val hudShaders = mutableMapOf<HudShader, Pair<List<String>, Int>>()
-    fun addHudShader(shader: HudShader): Int {
-        return synchronized(hudShaders) {
-            hudShaders[shader]?.second ?: run {
-                index++
-                hudShaders[shader] = listOf(
-                    "case ${index}:",
-                    "    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;",
-                    "    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;",
-                    "    layer = ${shader.layer};",
-                    "    outline = ${shader.outline};",
-                    "    break;"
-                ) to index
-                index
+    private val hudShaders = TreeMap<HudShader, (Int) -> Unit>()
+    @Synchronized
+    fun addHudShader(shader: HudShader, consumer: (Int) -> Unit) {
+        synchronized(hudShaders) {
+            val old = hudShaders[shader] ?: {}
+            hudShaders[shader] = {
+                old(it)
+                consumer(it)
             }
         }
     }
@@ -83,7 +88,6 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
         CompletableFuture.runAsync {
             synchronized(this) {
                 constants.clear()
-                index = 0
                 runWithExceptionHandling(sender, "Unable to load shader.yml") {
                     fun getReader(name: String): Pair<String, BufferedReader> {
                         return (name to run {
@@ -213,7 +217,6 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                             }
                         }
                     }
-                    hudShaders.clear()
                 }
             }
         }.join()

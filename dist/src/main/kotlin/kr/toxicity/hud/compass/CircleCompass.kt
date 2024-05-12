@@ -20,7 +20,6 @@ import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.ConfigurationSection
 import java.awt.image.BufferedImage
 import java.io.File
-import java.lang.ref.WeakReference
 import kotlin.math.*
 
 class CircleCompass(
@@ -39,12 +38,12 @@ class CircleCompass(
             )
         }
     }
-    private val resourceRef = WeakReference(resource)
+    private var resourceRef: GlobalResource? = resource
     private val length = section.getInt("length", 20).coerceAtLeast(20).coerceAtMost(360)
     private val encode = internalName.encodeKey()
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
-    private val array = WeakReference(JsonArray())
+    private var array: JsonArray? = JsonArray()
     private val applyOpacity = section.getBoolean("apply-opacity")
     private val scale = section.getDouble("scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("scale cannot be <= 0")
@@ -73,16 +72,20 @@ class CircleCompass(
         val maxHeight = (image.height.toDouble() * scale).roundToInt()
         val newHeight = (image.height.toDouble() * scale * scaleMultiplier).roundToInt()
         val div = newHeight.toDouble() / image.height.toDouble()
-        array.get()?.add(JsonObject().apply {
-            addProperty("type", "bitmap")
-            addProperty("file", "$NAME_SPACE_ENCODED:${nameEncoded.encodeFolder()}/$nameEncoded.png")
-            addProperty("ascent", HudImpl.createBit(pixel.y + y + (maxHeight - newHeight) / 2, shader))
-            addProperty("height", newHeight)
-            add("chars", JsonArray().apply {
-                add(char)
-            })
-        })
-        resourceRef.get()?.let {
+        array?.let { array ->
+            HudImpl.createBit(shader, pixel.y + y + (maxHeight - newHeight) / 2) { bit ->
+                array.add(JsonObject().apply {
+                    addProperty("type", "bitmap")
+                    addProperty("file", "$NAME_SPACE_ENCODED:${nameEncoded.encodeFolder()}/$nameEncoded.png")
+                    addProperty("ascent", bit)
+                    addProperty("height", newHeight)
+                    add("chars", JsonArray().apply {
+                        add(char)
+                    })
+                })
+            }
+        }
+        resourceRef?.let {
             PackGenerator.addTask(ArrayList(it.textures).apply {
                 add(nameEncoded.encodeFolder())
                 add("$nameEncoded.png")
@@ -207,7 +210,7 @@ class CircleCompass(
     data class CompassData(val opacity: Int)
 
     init {
-        array.get()?.let {
+        array?.let {
             PackGenerator.addTask(ArrayList(resource.font).apply {
                 add(encode.encodeFolder())
                 add("$encode.json")

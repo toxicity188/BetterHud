@@ -29,6 +29,12 @@ object HudManagerImpl: BetterHudManager, HudManager {
         }
     }
 
+    override fun postReload() {
+        hudMap.values.forEach {
+            it.jsonArray = null
+        }
+    }
+
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)
 
     override fun getDefaultHuds(): Set<Hud> = hudMap.values.filter {
