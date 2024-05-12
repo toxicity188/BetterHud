@@ -35,6 +35,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var defaultCompass = emptyList<String>()
         private set
+    var versionCheck = true
+        private set
 
     var numberFormat = DecimalFormat("#,###.#")
         private set
@@ -140,6 +142,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
                 line = newLine
                 needToUpdatePack = true
             }
+            versionCheck = yaml.getBoolean("version-check")
             enableProtection = yaml.getBoolean("enable-protection")
             mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
             enableSelfHost = yaml.getBoolean("enable-self-host")

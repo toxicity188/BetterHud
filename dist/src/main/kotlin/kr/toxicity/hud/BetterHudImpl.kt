@@ -206,7 +206,7 @@ class BetterHudImpl: BetterHud() {
                         @EventHandler
                         fun join(e: PlayerJoinEvent) {
                             val player = e.player
-                            if (player.isOp) {
+                            if (player.isOp && ConfigManagerImpl.versionCheck) {
                                 player.info("New BetterHud version found: $body")
                                 player.info(Component.text("Download: https://www.spigotmc.org/resources/115559")
                                     .clickEvent(ClickEvent.clickEvent(
@@ -229,40 +229,36 @@ class BetterHudImpl: BetterHud() {
             if (onReload) {
                 return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
             }
-            onReload = true
-            val time = System.currentTimeMillis()
-            return CompletableFuture.supplyAsync {
-                PluginReloadStartEvent().call()
-                runCatching {
-                    managers.forEach {
-                        it.preReload()
-                    }
-                    val resource = GlobalResource()
-                    managers.forEach {
-                        CompletableFuture.runAsync {
-                            it.reload(sender, resource)
-                        }.join()
-                    }
-                    managers.forEach {
-                        it.postReload()
-                    }
-                    PackGenerator.generate(sender)
-                    val result = ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
-                    onReload = false
-                    PluginReloadedEvent(result).call()
-                    result
-                }.getOrElse { e ->
-                    warn(
-                        "Unable to reload.",
-                        "Reason: ${e.message}"
-                    )
-                    onReload = false
-                    val result = ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
-                    PluginReloadedEvent(result).call()
-                    result
-                }
-            }.join()
         }
+        val time = System.currentTimeMillis()
+        onReload = true
+        val result = CompletableFuture.supplyAsync {
+            PluginReloadStartEvent().call()
+            val result = runWithExceptionHandling(sender, "Unable to reload.") {
+                managers.forEach {
+                    it.preReload()
+                }
+                val resource = GlobalResource()
+                managers.forEach {
+                    CompletableFuture.runAsync {
+                        it.reload(sender, resource)
+                    }.join()
+                }
+                managers.forEach {
+                    it.postReload()
+                }
+                PackGenerator.generate(sender)
+                ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+            }.getOrElse {
+                ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
+            }
+            PluginReloadedEvent(result).call()
+            result
+        }.join()
+        synchronized(this) {
+            onReload = false
+        }
+        return result
     }
 
 

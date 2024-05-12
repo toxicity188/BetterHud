@@ -21,9 +21,13 @@ object ImageManager: BetterHudManager {
 
     private val imageNameComponent = WeakHashMap<ShaderGroup, WidthComponent>()
 
-    fun getImage(group: ShaderGroup) = imageNameComponent[group]
+    fun getImage(group: ShaderGroup) = synchronized(imageNameComponent) {
+        imageNameComponent[group]
+    }
     fun setImage(group: ShaderGroup, component: WidthComponent) {
-        imageNameComponent[group] = component
+        synchronized(imageNameComponent) {
+            imageNameComponent[group] = component
+        }
     }
 
     override fun start() {

@@ -1,6 +1,5 @@
 package kr.toxicity.hud.util
 
-import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.placeholder.Conditions
 import org.bukkit.configuration.ConfigurationSection

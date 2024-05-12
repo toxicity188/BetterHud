@@ -15,11 +15,11 @@ class HudElement(
     gui: GuiLocation,
     pixel: ImageLocation
 ) {
-    private val imageElement = layout.image.map {image ->
+    private val imageElement = layout.image.map { image ->
         HudImageElement(hud, image, gui, pixel)
     }
-    private val textElement = layout.text.mapIndexed { index, textLayout ->
-        HudTextElement(hud, file, textLayout, index, gui, pixel)
+    private val textElement = layout.text.map { textLayout ->
+        HudTextElement(hud, file, textLayout, gui, pixel)
     }
     private val headElement = layout.head.map {image ->
         HudHeadElement(hud, image, gui, pixel)

@@ -1,5 +1,6 @@
 debug: true
 metrics: true
+version-check: true
 number-format: "#,###.#"
 tick-speed: 1
 namespace: "betterhud"

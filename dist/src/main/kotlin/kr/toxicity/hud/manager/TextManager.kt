@@ -97,9 +97,13 @@ object TextManager: BetterHudManager {
         }
     )
 
-    fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
+    fun getKey(shaderGroup: ShaderGroup) = synchronized(textKeyMap) {
+        textKeyMap[shaderGroup]
+    }
     fun setKey(shaderGroup: ShaderGroup, key: HudTextData) {
-        textKeyMap[shaderGroup] = key
+        synchronized(textKeyMap) {
+            textKeyMap[shaderGroup] = key
+        }
     }
 
     private lateinit var unifont: List<Pair<Int, ByteArray>>

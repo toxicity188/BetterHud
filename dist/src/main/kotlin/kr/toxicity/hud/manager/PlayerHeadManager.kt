@@ -27,9 +27,13 @@ object PlayerHeadManager : BetterHudManager {
     private val headNameComponent = WeakHashMap<ShaderGroup, TextComponent.Builder>()
 
 
-    fun getHead(group: ShaderGroup) = headNameComponent[group]
+    fun getHead(group: ShaderGroup) = synchronized(headNameComponent) {
+        headNameComponent[group]
+    }
     fun setHead(group: ShaderGroup, component: TextComponent.Builder) {
-        headNameComponent[group] = component
+        synchronized(headNameComponent) {
+            headNameComponent[group] = component
+        }
     }
 
     private class CachedHead(

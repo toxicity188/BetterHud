@@ -27,7 +27,6 @@ class HudTextElement(
     parent: HudImpl,
     file: List<String>,
     private val text: TextLayout,
-    index: Int,
     gui: GuiLocation,
     pixel: ImageLocation
 ) {
@@ -64,7 +63,7 @@ class HudTextElement(
                 }
             }
             var textIndex = 0xC0000
-            val textEncoded = "hud_${parent.name}_text_${index + 1}_${index2 + 1}".encodeKey()
+            val textEncoded = "hud_${parent.name}_text_${index2 + 1}".encodeKey()
             val key = createAdventureKey(textEncoded)
             val imageMap = HashMap<String, WidthComponent>()
             text.text.images.forEach {
