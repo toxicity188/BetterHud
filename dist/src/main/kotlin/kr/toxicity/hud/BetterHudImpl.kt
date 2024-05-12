@@ -225,10 +225,10 @@ class BetterHudImpl: BetterHud() {
     private var onReload = false
 
     override fun reload(): ReloadResult {
-        if (onReload) {
-            return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
-        }
         synchronized(this) {
+            if (onReload) {
+                return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
+            }
             onReload = true
             val time = System.currentTimeMillis()
             return CompletableFuture.supplyAsync {
@@ -261,9 +261,6 @@ class BetterHudImpl: BetterHud() {
                     PluginReloadedEvent(result).call()
                     result
                 }
-            }.handle { s, e ->
-                e?.printStackTrace()
-                s
             }.join()
         }
     }
