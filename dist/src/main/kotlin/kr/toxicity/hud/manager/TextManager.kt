@@ -98,7 +98,9 @@ object TextManager: BetterHudManager {
         }
     )
 
+    @Synchronized
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
+    @Synchronized
     fun setKey(shaderGroup: ShaderGroup, key: HudTextData) {
         textKeyMap[shaderGroup] = key
     }

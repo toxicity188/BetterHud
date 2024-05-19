@@ -22,7 +22,9 @@ object ImageManager: BetterHudManager {
 
     private val imageNameComponent = ConcurrentHashMap<ShaderGroup, WidthComponent>()
 
+    @Synchronized
     fun getImage(group: ShaderGroup) = imageNameComponent[group]
+    @Synchronized
     fun setImage(group: ShaderGroup, component: WidthComponent) {
         imageNameComponent[group] = component
     }

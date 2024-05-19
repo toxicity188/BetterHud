@@ -27,7 +27,9 @@ object PlayerHeadManager : BetterHudManager {
     private val headNameComponent = ConcurrentHashMap<ShaderGroup, TextComponent.Builder>()
 
 
+    @Synchronized
     fun getHead(group: ShaderGroup) = headNameComponent[group]
+    @Synchronized
     fun setHead(group: ShaderGroup, component: TextComponent.Builder) {
         headNameComponent[group] = component
     }

@@ -21,7 +21,7 @@ class HudElement(
     private val textElement = layout.text.map { textLayout ->
         HudTextElement(hud, file, textLayout, gui, pixel)
     }
-    private val headElement = layout.head.map {image ->
+    private val headElement = layout.head.map { image ->
         HudHeadElement(hud, image, gui, pixel)
     }
 

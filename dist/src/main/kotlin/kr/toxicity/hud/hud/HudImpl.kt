@@ -31,7 +31,7 @@ class HudImpl(
         const val ADD_HEIGHT = (1 shl (DEFAULT_BIT - 1)) - 1
 
         fun createBit(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
-            ShaderManagerImpl.addHudShader(shader, y) { id ->
+            ShaderManagerImpl.addHudShader(shader) { id ->
                 consumer(-(((id + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y))
             }
         }
@@ -86,6 +86,7 @@ class HudImpl(
                 }.toByteArray()
             }
         }
+        jsonArray = null
     }
 
 

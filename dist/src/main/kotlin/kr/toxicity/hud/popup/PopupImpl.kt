@@ -124,6 +124,7 @@ class PopupImpl(
                 }.toByteArray()
             }
         }
+        array = null
     }
 
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
