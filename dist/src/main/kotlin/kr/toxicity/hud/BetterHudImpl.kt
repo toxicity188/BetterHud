@@ -222,9 +222,9 @@ class BetterHudImpl: BetterHud() {
             if (onReload) {
                 return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
             }
+            onReload = true
         }
         val time = System.currentTimeMillis()
-        onReload = true
         val result = CompletableFuture.supplyAsync {
             PluginReloadStartEvent().call()
             val result = runWithExceptionHandling(sender, "Unable to reload.") {

@@ -31,7 +31,7 @@ class HudImpl(
         const val ADD_HEIGHT = (1 shl (DEFAULT_BIT - 1)) - 1
 
         fun createBit(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
-            ShaderManagerImpl.addHudShader(shader) { id ->
+            ShaderManagerImpl.addHudShader(shader, y) { id ->
                 consumer(-(((id + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y))
             }
         }
@@ -45,35 +45,33 @@ class HudImpl(
     private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getBoolean("default")
     var textIndex = 0
 
-    private val elements = run {
-        ArrayList<HudAnimation>().apply {
-            section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
-                val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
-                    LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
-                }
-                var gui = GuiLocation(configurationSection)
-                configurationSection.getConfigurationSection("gui")?.let {
-                    gui += GuiLocation(it)
-                }
-                val pixel = configurationSection.getConfigurationSection("pixel")?.let {
-                    ImageLocation(it)
-                } ?: ImageLocation.zero
-                add(HudAnimation(
-                    layout.animation.type,
-                    layout.animation.location.map {
-                        HudElement(
-                            this@HudImpl,
-                            file,
-                            layout,
-                            gui,
-                            ImageLocation(it.x, it.y) + pixel
-                        )
-                    }
-                ))
+    private val elements = ArrayList<HudAnimation>().apply {
+        section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
+            val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
+                LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
             }
-        }.ifEmpty {
-            throw RuntimeException("layout is empty.")
+            var gui = GuiLocation(configurationSection)
+            configurationSection.getConfigurationSection("gui")?.let {
+                gui += GuiLocation(it)
+            }
+            val pixel = configurationSection.getConfigurationSection("pixel")?.let {
+                ImageLocation(it)
+            } ?: ImageLocation.zero
+            add(HudAnimation(
+                layout.animation.type,
+                layout.animation.location.map {
+                    HudElement(
+                        this@HudImpl,
+                        file,
+                        layout,
+                        gui,
+                        ImageLocation(it.x, it.y) + pixel
+                    )
+                }
+            ))
         }
+    }.ifEmpty {
+        throw RuntimeException("layout is empty.")
     }
     init {
         jsonArray?.let { array ->

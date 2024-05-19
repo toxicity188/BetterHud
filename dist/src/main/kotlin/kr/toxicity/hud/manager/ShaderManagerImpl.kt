@@ -35,7 +35,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
             ArrayList<String>().apply {
                 hudShaders.entries.forEachIndexed { index, entry ->
                     addAll(ArrayList<String>().apply {
-                        val shader = entry.key
+                        val shader = entry.key.hudShader
                         val id = index + 1
                         add("case ${id}:")
                         if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
@@ -58,11 +58,24 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
         }
     )
 
-    private val hudShaders = TreeMap<HudShader, MutableList<(Int) -> Unit>>()
-    @Synchronized
-    fun addHudShader(shader: HudShader, consumer: (Int) -> Unit) {
+    private val hudShaders = TreeMap<ShaderKey, MutableList<(Int) -> Unit>>()
+
+    private val keyComparator = Comparator.comparing { key: ShaderKey ->
+        key.hudShader
+    }.thenComparing { key: ShaderKey ->
+        key.y
+    }
+
+    private data class ShaderKey(val hudShader: HudShader, val y: Int): Comparable<ShaderKey> {
+        override fun compareTo(other: ShaderKey): Int {
+            return keyComparator.compare(this, other)
+        }
+    }
+
+    fun addHudShader(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
+        val key = ShaderKey(shader, y)
         synchronized(hudShaders) {
-            hudShaders.computeIfAbsent(shader) {
+            hudShaders.computeIfAbsent(key) {
                 ArrayList()
             }.add(consumer)
         }

@@ -183,7 +183,10 @@ tasks {
         version(minecraft)
     }
     shadowJar {
-        legacyNmsVersion.forEach {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "spigot"
+        }
+        allNmsVersion.forEach {
             dependsOn(":nms:$it:reobfJar")
         }
         archiveClassifier = ""
