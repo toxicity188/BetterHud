@@ -16,7 +16,7 @@ object PopupManagerImpl: BetterHudManager, PopupManager {
 
     override fun reload(sender: Audience, resource: GlobalResource) {
         popupMap.clear()
-        DATA_FOLDER.subFolder("popups").forEachAllYamlAsync { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("popups").forEachAllYaml(sender) { file, s, configurationSection ->
             runCatching {
                 popupMap.putSync("popup", s) {
                     PopupImpl(file.path, resource.font, s, configurationSection)

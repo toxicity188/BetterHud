@@ -44,7 +44,7 @@ object ImageManager: BetterHudManager {
             imageNameComponent.clear()
         }
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYamlAsync { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("images").forEachAllYaml(sender) { file, s, configurationSection ->
             runWithExceptionHandling(sender, "Unable to load this image: $s in ${file.name}") {
                 val image = when (val type = ImageType.valueOf(
                     configurationSection.getString("type").ifNull("type value not set.").uppercase()

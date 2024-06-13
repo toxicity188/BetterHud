@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    kotlin("jvm") version("1.9.24")
+    kotlin("jvm") version("2.0.0")
     id("io.github.goooler.shadow") version("8.1.7")
     id("io.papermc.paperweight.userdev") version("1.7.1") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.0")
@@ -8,7 +8,7 @@ plugins {
 }
 
 val minecraft = "1.20.6"
-val folia = "1.20.4" // TODO Bumps version.
+val folia = "1.20.6"
 val adventure = "4.17.0"
 val platform = "4.3.2"
 val targetJavaVersion = 21
@@ -43,7 +43,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-23"
+    version = "beta-24"
 
     repositories {
         mavenCentral()
@@ -75,26 +75,38 @@ allprojects {
             useJUnitPlatform()
         }
         compileJava {
+            options.compilerArgs.addAll(listOf("-source", "17", "-target", "17"))
             options.encoding = Charsets.UTF_8.name()
         }
+        compileKotlin {
+            compilerOptions {
+                freeCompilerArgs.addAll(listOf("-jvm-target", "17"))
+            }
+        }
     }
-}
-
-subprojects {
-    val targetJavaVersion = 17
-
     java {
         toolchain.vendor = JvmVendorSpec.ADOPTIUM
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+}
 
-    kotlin {
-        jvmToolchain(targetJavaVersion)
-    }
+subprojects {
     tasks {
         build {
             finalizedBy(clean)
         }
+    }
+}
+
+api.java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+legacyNmsVersion.map {
+    project("nms:$it")
+}.forEach {
+    it.java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -203,20 +215,5 @@ tasks {
         relocate("net.kyori", "hud.net.kyori")
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
-    }
-}
-
-ArrayList<Project>().apply {
-    add(project)
-    addAll(currentNmsVersion.map {
-        project("nms:$it")
-    })
-}.forEach {
-    it.java {
-        toolchain.vendor = JvmVendorSpec.ADOPTIUM
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-    it.kotlin {
-        jvmToolchain(targetJavaVersion)
     }
 }

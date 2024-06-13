@@ -52,7 +52,7 @@ object TriggerManagerImpl: BetterHudManager, TriggerManager {
     fun addTask(section: ConfigurationSection, task: (UpdateEvent, UUID) -> Boolean) {
         val clazz = section.getString("class").ifNull("class value not set.")
         when (val get = map[clazz].ifNull("unable to find this trigger: $clazz")(section)) {
-            is HudBukkitEventTrigger<out Event> -> {
+            is HudBukkitEventTrigger -> {
                 Bukkit.getPluginManager().registerEvent(get.eventClass, listener, EventPriority.MONITOR, { _, e ->
                     if (get.eventClass.isAssignableFrom(e.javaClass)) {
                         val cast = get.eventClass.cast(e)

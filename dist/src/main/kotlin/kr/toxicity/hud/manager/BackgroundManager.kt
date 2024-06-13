@@ -21,7 +21,7 @@ object BackgroundManager: BetterHudManager {
     override fun reload(sender: Audience, resource: GlobalResource) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
         backgroundMap.clear()
-        folder.forEachAsync {
+        folder.forEach {
             if (it.extension == "yml") {
                 runWithExceptionHandling(sender, "Unable to load this yml: ${it.name}") {
                     val yaml = it.toYaml()

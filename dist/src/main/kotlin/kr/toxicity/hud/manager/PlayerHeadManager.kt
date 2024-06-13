@@ -140,7 +140,7 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYamlAsync { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, configurationSection ->
             runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
                     val head = HudHead(file.path, s, configurationSection)

@@ -19,7 +19,7 @@ object CompassManagerImpl: BetterHudManager, CompassManager {
     override fun reload(sender: Audience, resource: GlobalResource) {
         compassMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("compasses").forEachAllYamlAsync { f, s, c ->
+        DATA_FOLDER.subFolder("compasses").forEachAllYaml(sender) { f, s, c ->
             runWithExceptionHandling(sender, "Unable to load this compass: $s in ${f.name}") {
                 compassMap.putSync("compass", s) {
                     c.getString("type").ifNull("type value not set.").run {

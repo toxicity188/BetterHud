@@ -200,7 +200,7 @@ object TextManager: BetterHudManager {
             }.toByteArray()
         }
 
-        DATA_FOLDER.subFolder("texts").forEachAllYamlAsync { file, s, section ->
+        DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
             runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
                 val fontDir = section.getString("file")?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
