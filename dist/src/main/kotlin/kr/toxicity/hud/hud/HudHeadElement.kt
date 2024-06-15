@@ -48,7 +48,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                             })
                         }
                     }
-                    val comp = Component.text().content(char).font(parent.imageKey)
+                    val comp = Component.text(char).font(parent.imageKey)
                     PlayerHeadManager.setHead(shaderGroup, comp)
                     comp
                 }

@@ -7,6 +7,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
@@ -24,13 +25,13 @@ object PlayerHeadManager : BetterHudManager {
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
 
-    private val headNameComponent = ConcurrentHashMap<ShaderGroup, TextComponent.Builder>()
+    private val headNameComponent = ConcurrentHashMap<ShaderGroup, Component>()
 
 
     @Synchronized
     fun getHead(group: ShaderGroup) = headNameComponent[group]
     @Synchronized
-    fun setHead(group: ShaderGroup, component: TextComponent.Builder) {
+    fun setHead(group: ShaderGroup, component: Component) {
         headNameComponent[group] = component
     }
 

@@ -25,7 +25,8 @@ val legacyNmsVersion = listOf(
     "v1_20_R3",
 )
 val currentNmsVersion = listOf(
-    "v1_20_R4"
+    "v1_20_R4",
+    "v1_21_R1"
 )
 
 val allNmsVersion = ArrayList<String>().apply {

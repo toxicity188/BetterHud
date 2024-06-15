@@ -332,7 +332,7 @@ class PopupLayout(
                                 })
                             })
                         }
-                        val comp = Component.text().content(char).font(parent.imageKey)
+                        val comp = Component.text(char).font(parent.imageKey)
                         PlayerHeadManager.setHead(shaderGroup, comp)
                         comp
                     }

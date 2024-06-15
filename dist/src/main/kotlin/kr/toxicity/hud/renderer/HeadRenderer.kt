@@ -11,12 +11,13 @@ import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManager
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import java.util.UUID
 
 class HeadRenderer(
-    private val components: List<TextComponent.Builder>,
+    private val components: List<Component>,
     private val pixel: Int,
     private val x: Int,
     private val align: LayoutAlign,
@@ -49,7 +50,7 @@ class HeadRenderer(
                 var i = 0
                 targetPlayerHead.colors.forEachSync { next ->
                     val index = i++
-                    comp += WidthComponent(components[index / 8].color(next), pixel)
+                    comp += WidthComponent(Component.text().append(components[index / 8]).color(next), pixel)
                     comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
                 }
                 comp.toPixelComponent(
