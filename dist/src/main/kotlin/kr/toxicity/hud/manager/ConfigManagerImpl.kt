@@ -72,6 +72,12 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     private var disableLinkPlugin = emptyList<Plugin>()
 
+    var resourcePackObfuscation = false
+        private set
+
+    var clearBuildFolder = true
+        private set
+
     private var metrics: Metrics? = null
     var loadMinecraftDefaultTextures = true
         private set
@@ -154,6 +160,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             }.distinct().mapNotNull {
                 Bukkit.getPluginManager().getPlugin(it)
             }
+            resourcePackObfuscation = yaml.getBoolean("resourcepack-obfuscation")
             if (yaml.getBoolean("metrics") && metrics == null) {
                 metrics = Metrics(PLUGIN, 21287)
             } else {
@@ -163,6 +170,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             yaml.getString("loading-head")?.let {
                 loadingHead = it
             }
+            clearBuildFolder = yaml.getBoolean("default-build-folder", true)
             loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
             includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
         }.onFailure { e ->

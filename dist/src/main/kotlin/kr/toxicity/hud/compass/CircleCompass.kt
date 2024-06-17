@@ -76,7 +76,7 @@ class CircleCompass(
             HudImpl.createBit(shader, pixel.y + y + (maxHeight - newHeight) / 2) { bit ->
                 array.add(JsonObject().apply {
                     addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:${nameEncoded.encodeFolder()}/$nameEncoded.png")
+                    addProperty("file", "$NAME_SPACE_ENCODED:$nameEncoded.png")
                     addProperty("ascent", bit)
                     addProperty("height", newHeight)
                     add("chars", JsonArray().apply {
@@ -87,7 +87,6 @@ class CircleCompass(
         }
         resourceRef?.let {
             PackGenerator.addTask(ArrayList(it.textures).apply {
-                add(nameEncoded.encodeFolder())
                 add("$nameEncoded.png")
             }) {
                 image.toByteArray()
@@ -212,7 +211,6 @@ class CircleCompass(
     init {
         array?.let {
             PackGenerator.addTask(ArrayList(resource.font).apply {
-                add(encode.encodeFolder())
                 add("$encode.json")
             }) {
                 JsonObject().apply {

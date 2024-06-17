@@ -12,7 +12,6 @@ import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.NAME_SPACE_ENCODED
-import kr.toxicity.hud.util.encodeFolder
 import kr.toxicity.hud.util.encodeKey
 import kr.toxicity.hud.util.parseChar
 import net.kyori.adventure.text.Component
@@ -30,7 +29,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             (0..7).map { i ->
                 val char = (++parent.imageChar).parseChar()
                 val encode = "pixel_${head.head.pixel}".encodeKey()
-                val fileName = "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png"
+                val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                 val ascent = final.y + i * head.head.pixel
                 val height = head.head.pixel
                 val shaderGroup = ShaderGroup(shader, fileName, ascent, height)

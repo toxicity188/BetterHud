@@ -185,14 +185,13 @@ object TextManager: BetterHudManager {
         parseDefault.array.forEach {
             defaultArray.add(JsonObject().apply {
                 addProperty("type", "bitmap")
-                addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
+                addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                 addProperty("ascent", configAscent)
                 addProperty("height", configHeight)
                 add("chars", it.chars)
             })
         }
         PackGenerator.addTask(ArrayList(resource.font).apply {
-            add(KeyResource.default.encodeFolder())
             add("${KeyResource.default}.json")
         }) {
             JsonObject().apply {
@@ -431,7 +430,6 @@ object TextManager: BetterHudManager {
             images.forEach {
                 PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
                     val encode = "glyph_${it.key}".encodeKey()
-                    add(encode.encodeFolder())
                     add("$encode.png")
                 }) {
                     it.value.image.image.toByteArray()
@@ -449,7 +447,6 @@ object TextManager: BetterHudManager {
                         })
                     }
                     PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                        add(encode.encodeFolder())
                         add(name)
                     }) {
                         BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {

@@ -1,6 +1,5 @@
 package kr.toxicity.hud.resource
 
-import kr.toxicity.hud.util.encodeFolder
 import kr.toxicity.hud.util.encodeKey
 import net.kyori.adventure.key.Key
 
@@ -15,7 +14,7 @@ class KeyResource(namespace: String) {
 
     val encodedNamespace = namespace.encodeKey()
 
-    private fun create(name: String) = Key.key(encodedNamespace, "${name.encodeFolder()}/$name")
+    private fun create(name: String) = Key.key(encodedNamespace, name)
 
     val spaceKey = create(space)
     val legacySpaceKey = create(legacySpace)

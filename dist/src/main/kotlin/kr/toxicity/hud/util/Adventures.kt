@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
 import kotlin.math.abs
 
-fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, "${value.encodeFolder()}/$value")
+fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
 val CONSOLE
     get() = Bukkit.getConsoleSender().audience

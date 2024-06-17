@@ -55,7 +55,7 @@ class HudTextElement(
                 HudImpl.createBit(shader, yAxis) { y ->
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:${it.file.substringBefore('.').encodeFolder()}/${it.file}")
+                        addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                         addProperty("ascent", y)
                         addProperty("height", scale)
                         add("chars", it.chars)
@@ -75,7 +75,7 @@ class HudTextElement(
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         val encode = "glyph_${it.key}".encodeKey()
-                        addProperty("file", "$NAME_SPACE_ENCODED:${encode.encodeFolder()}/$encode.png")
+                        addProperty("file", "$NAME_SPACE_ENCODED:$encode.png")
                         addProperty("ascent", y)
                         addProperty("height", height)
                         add("chars", JsonArray().apply {
@@ -112,7 +112,7 @@ class HudTextElement(
                         ), pixel.y + it.location.y) { y ->
                             array.add(JsonObject().apply {
                                 addProperty("type", "bitmap")
-                                addProperty("file", "$NAME_SPACE_ENCODED:${file.encodeFolder()}/$file.png")
+                                addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
                                 addProperty("ascent", y)
                                 addProperty("height", height)
                                 add("chars", JsonArray().apply {
@@ -134,7 +134,6 @@ class HudTextElement(
                 }
             )
             PackGenerator.addTask(ArrayList(file).apply {
-                add(textEncoded.encodeFolder())
                 add("$textEncoded.json")
             }) {
                 JsonObject().apply {
