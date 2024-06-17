@@ -26,4 +26,4 @@ included-minecraft-list:
   - block
   - item
 resourcepack-obfuscation: false
-default-build-folder: true #If you use Oraxen, set this to false.
+clear-build-folder: true #If you use Oraxen, set this to false.

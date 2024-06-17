@@ -170,7 +170,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             yaml.getString("loading-head")?.let {
                 loadingHead = it
             }
-            clearBuildFolder = yaml.getBoolean("default-build-folder", true)
+            clearBuildFolder = yaml.getBoolean("clear-build-folder", true)
             loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
             includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
         }.onFailure { e ->
