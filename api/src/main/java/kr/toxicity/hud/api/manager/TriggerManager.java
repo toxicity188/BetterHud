@@ -1,6 +1,6 @@
 package kr.toxicity.hud.api.manager;
 
-import kr.toxicity.hud.api.trgger.HudTrigger;
+import kr.toxicity.hud.api.trigger.HudTrigger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 

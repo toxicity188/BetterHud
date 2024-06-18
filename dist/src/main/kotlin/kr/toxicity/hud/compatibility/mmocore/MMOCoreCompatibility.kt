@@ -4,7 +4,7 @@ import io.lumine.mythic.lib.player.modifier.ModifierSource
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.api.trgger.HudTrigger
+import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.Compatibility
 import kr.toxicity.hud.util.ifNull

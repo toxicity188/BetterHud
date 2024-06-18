@@ -1,4 +1,4 @@
-package kr.toxicity.hud.api.trgger;
+package kr.toxicity.hud.api.trigger;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerEvent;

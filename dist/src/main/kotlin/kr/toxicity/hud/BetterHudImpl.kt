@@ -292,9 +292,7 @@ class BetterHudImpl: BetterHud() {
 
     private fun loadAssets(prefix: String, dir: (String) -> Unit, consumer: (String, InputStream) -> Unit) {
         JarFile(file).use {
-            it.entries().asSequence().sortedBy { dir ->
-                dir.name.length
-            }.forEach { entry ->
+            it.entries().asSequence().forEach { entry ->
                 if (!entry.name.startsWith(prefix)) return@forEach
                 if (entry.name.length <= prefix.length + 1) return@forEach
                 val name = entry.name.substring(prefix.length + 1)

@@ -1,10 +1,9 @@
-package kr.toxicity.hud.api.trgger;
+package kr.toxicity.hud.api.trigger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * Represents the popup trigger

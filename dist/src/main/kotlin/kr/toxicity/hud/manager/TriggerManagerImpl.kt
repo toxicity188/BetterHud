@@ -2,8 +2,8 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.event.CustomPopupEvent
 import kr.toxicity.hud.api.manager.TriggerManager
-import kr.toxicity.hud.api.trgger.HudBukkitEventTrigger
-import kr.toxicity.hud.api.trgger.HudTrigger
+import kr.toxicity.hud.api.trigger.HudBukkitEventTrigger
+import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.resource.GlobalResource

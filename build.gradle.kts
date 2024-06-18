@@ -8,7 +8,7 @@ plugins {
 }
 
 val minecraft = "1.20.6" // TODO bumps version to 1.21
-val folia = "1.20.6" // TODO bumps verstion to 1.21
+val folia = "1.20.6" // TODO bumps version to 1.21
 val adventure = "4.17.0"
 val platform = "4.3.2"
 val targetJavaVersion = 21
@@ -44,7 +44,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "beta-26"
+    version = "beta-27"
 
     repositories {
         mavenCentral()

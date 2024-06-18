@@ -2,7 +2,7 @@ package kr.toxicity.hud.module.bukkit
 
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.trgger.HudBukkitEventTrigger
+import kr.toxicity.hud.api.trigger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.module.BukkitModule
 import kr.toxicity.hud.util.createBukkitTrigger

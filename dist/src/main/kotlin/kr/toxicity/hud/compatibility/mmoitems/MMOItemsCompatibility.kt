@@ -10,7 +10,7 @@ import io.lumine.mythic.lib.skill.trigger.TriggerType
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.api.trgger.HudTrigger
+import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.compatibility.Compatibility
 import net.Indyuce.mmoitems.ItemStats

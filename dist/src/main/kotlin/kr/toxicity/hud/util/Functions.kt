@@ -1,13 +1,12 @@
 package kr.toxicity.hud.util
 
-import kr.toxicity.hud.api.trgger.HudBukkitEventTrigger
+import kr.toxicity.hud.api.trigger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.audience.Audience
-import org.bukkit.command.CommandSender
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import java.util.UUID
