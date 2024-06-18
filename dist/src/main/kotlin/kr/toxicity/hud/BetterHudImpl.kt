@@ -273,32 +273,28 @@ class BetterHudImpl: BetterHud() {
 
 
     override fun loadAssets(prefix: String, dir: File) {
-        loadAssets(prefix, {
-            File(dir, it).run {
-                if (!exists()) mkdir()
-            }
-        }) { s, i ->
-            File(dir, s).outputStream().buffered().use {
+        loadAssets(prefix) { s, i ->
+            File(dir, s).apply {
+                parentFile.mkdirs()
+            }.outputStream().buffered().use {
                 i.copyTo(it)
             }
         }
     }
 
     override fun loadAssets(prefix: String, consumer: BiConsumer<String, InputStream>) {
-        loadAssets(prefix, {}) { s, i ->
+        loadAssets(prefix) { s, i ->
             consumer.accept(s, i)
         }
     }
 
-    private fun loadAssets(prefix: String, dir: (String) -> Unit, consumer: (String, InputStream) -> Unit) {
+    private fun loadAssets(prefix: String, consumer: (String, InputStream) -> Unit) {
         JarFile(file).use {
             it.entries().asSequence().forEach { entry ->
                 if (!entry.name.startsWith(prefix)) return@forEach
                 if (entry.name.length <= prefix.length + 1) return@forEach
                 val name = entry.name.substring(prefix.length + 1)
-                if (entry.isDirectory) {
-                    dir(name)
-                } else getResource(entry.name)?.buffered()?.use { stream ->
+                if (!entry.isDirectory) getResource(entry.name)?.buffered()?.use { stream ->
                     consumer(name, stream)
                 }
             }
