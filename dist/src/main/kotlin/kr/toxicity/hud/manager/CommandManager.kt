@@ -16,19 +16,19 @@ object CommandManager: BetterHudManager {
     private val command = CommandModule("hud")
         .addCommand("reload") {
             aliases = listOf("re", "rl", "리로드")
-            description = "Reload this plugin.".toComponent()
+            description = "Reload BetterHud.".toComponent()
             usage = "reload".toComponent()
             permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
-                s.info("Try to start reloading. please wait...")
+                s.info("Trying to reload. please wait...")
                 CompletableFuture.runAsync {
                     val reload = PLUGIN.reload()
                     when (reload.state) {
                         ReloadState.STILL_ON_RELOAD -> {
-                            s.warn("The plugin is still on reload!")
+                            s.warn("The plugin is still reloading!")
                         }
                         ReloadState.SUCCESS -> {
-                            s.info("Reload success. (${reload.time} ms)")
+                            s.info("Reload successful! (${reload.time} ms)")
                         }
                         ReloadState.FAIL -> {
                             s.info("Reload failed.")
@@ -44,7 +44,7 @@ object CommandManager: BetterHudManager {
         }) {
             addCommand("add") {
                 aliases = listOf("a")
-                description = "Adds the hud for some player.".toComponent()
+                description = "Adds the hud for a player.".toComponent()
                 usage = "add <player> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.add")
@@ -60,7 +60,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.add(hud)) s.info("Successfully added.")
-                    else s.warn("Hud '${a[1]}' is already added in this player.")
+                    else s.warn("Hud '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -78,7 +78,7 @@ object CommandManager: BetterHudManager {
             }
             addCommand("remove") {
                 aliases = listOf("r")
-                description = "Removes the hud for some player.".toComponent()
+                description = "Removes the hud for a player.".toComponent()
                 usage = "remove <player> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.remove")
@@ -94,7 +94,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.remove(hud)) s.info("Successfully removed.")
-                    else s.warn("Hud '${a[1]}' is already removed in this player.")
+                    else s.warn("Hud '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -118,7 +118,7 @@ object CommandManager: BetterHudManager {
         }) {
             addCommand("add") {
                 aliases = listOf("a")
-                description = "Adds the compass for some player.".toComponent()
+                description = "Adds the compass for a player.".toComponent()
                 usage = "add <player> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.add")
@@ -134,7 +134,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.add(compass)) s.info("Successfully added.")
-                    else s.warn("compass '${a[1]}' is already added in this player.")
+                    else s.warn("compass '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -152,7 +152,7 @@ object CommandManager: BetterHudManager {
             }
             addCommand("remove") {
                 aliases = listOf("r")
-                description = "Removes the compass for some player.".toComponent()
+                description = "Removes the compass for a player.".toComponent()
                 usage = "remove <player> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.remove")
@@ -168,7 +168,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.remove(compass)) s.info("Successfully removed.")
-                    else s.warn("compass '${a[1]}' is already removed in this player.")
+                    else s.warn("compass '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -192,7 +192,7 @@ object CommandManager: BetterHudManager {
         }) {
             addCommand("add") {
                 aliases = listOf("a")
-                description = "Adds the popup for some player.".toComponent()
+                description = "Adds a popup for a player.".toComponent()
                 usage = "add <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.add")
@@ -208,7 +208,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.add(hud)) s.info("Successfully added.")
-                    else s.warn("Popup '${a[1]}' is already added in this player.")
+                    else s.warn("Popup '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -226,7 +226,7 @@ object CommandManager: BetterHudManager {
             }
             addCommand("remove") {
                 aliases = listOf("r")
-                description = "Removes the popup for some player.".toComponent()
+                description = "Removes a popup from a player.".toComponent()
                 usage = "remove <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.remove")
@@ -242,7 +242,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     if (player.hudObjects.remove(hud)) s.info("Successfully removed.")
-                    else s.warn("Popup '${a[1]}' is already removed in this player.")
+                    else s.warn("Popup '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
@@ -260,7 +260,7 @@ object CommandManager: BetterHudManager {
             }
             addCommand("show") {
                 aliases = listOf("r")
-                description = "Shows the popup for some player.".toComponent()
+                description = "Shows a popup for a player.".toComponent()
                 usage = "show <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.show")
@@ -276,7 +276,7 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     runCatching {
-                        if (popup.show(UpdateEvent.EMPTY, player) != null) s.info("Popup is successfully displayed.")
+                        if (popup.show(UpdateEvent.EMPTY, player) != null) s.info("Popup was successfully displayed.")
                         else s.warn("Failed to show this popup.")
                     }.onFailure { e ->
                         s.warn("Unable to show this popup in command.")
@@ -299,7 +299,7 @@ object CommandManager: BetterHudManager {
             }
             addCommand("hide") {
                 aliases = listOf("r")
-                description = "Hides the popup for some player.".toComponent()
+                description = "Hides a popup for a player.".toComponent()
                 usage = "hide <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.hide")
@@ -315,10 +315,10 @@ object CommandManager: BetterHudManager {
                         return@exec
                     }
                     runCatching {
-                        if (popup.hide(player)) s.info("Popup is successfully removed.")
+                        if (popup.hide(player)) s.info("Popup was successfully removed.")
                         else s.warn("Failed to remove this popup.")
                     }.onFailure { e ->
-                        s.warn("Unable to show this popup in command.")
+                        s.warn("Unable to show this popup in a command.")
                         s.warn("Reason: ${e.message}")
                     }
                 }
@@ -349,8 +349,8 @@ object CommandManager: BetterHudManager {
                 executer = { sender, _ ->
                     PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
                         it.isHudEnabled = true
-                        sender.info("Successfully turns on.")
-                    } ?: sender.warn("You are not available player!")
+                        sender.info("Successfully turned the hud on.")
+                    } ?: sender.warn("You are not a valid player!")
                 }
             }
             addCommand("off") {
@@ -360,8 +360,8 @@ object CommandManager: BetterHudManager {
                 executer = { sender, _ ->
                     PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
                         it.isHudEnabled = false
-                        sender.info("Successfully turns off.")
-                    } ?: sender.warn("You are not available player!")
+                        sender.info("Successfully turned the hud off.")
+                    } ?: sender.warn("You are not a valid player!")
                 }
             }
         }
