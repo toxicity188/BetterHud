@@ -50,15 +50,15 @@ class CommandModule(
             entry.value.aliases().contains(totalArgs[0])
         }?.value)?.let {
             if (it.requireOp() && !sender.isOp) {
-                sender.warn("You have no OP!".toComponent())
+                sender.warn("You are not OP!".toComponent())
                 return
             }
             if (it.permission().isNotEmpty() && it.permission().none { permission -> sender.hasPermission(permission) }) {
-                sender.warn("You have not permission to do that!".toComponent())
+                sender.warn("You do not have permission to do that!".toComponent())
                 return
             }
             if (it.allowedSender().isNotEmpty() && it.allowedSender().none { type -> type.clazz.isAssignableFrom(sender.javaClass)}) {
-                sender.warn("You are not matched at allowed sender type!".toComponent())
+                sender.warn("You are not list as an allowed sender type!".toComponent())
                 return
             }
             val subList = totalArgs.subList(1, totalArgs.size)
