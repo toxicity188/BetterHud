@@ -37,8 +37,10 @@ val EMPTY_PIXEL_COMPONENT
 val NEW_LAYER
     get() = if (VERSION.version <= 18) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
 
-private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
-private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT = WidthComponent(Component.text().content((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
+private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
+    get() = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
+    get() = WidthComponent(Component.text().content((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
     get() = if (VERSION.version <= 18) {
         LEGACY_NEGATIVE_ONE_SPACE_COMPONENT

@@ -13,6 +13,7 @@ pack-type: folder #folder, zip
 enable-protection: false
 enable-self-host: false
 force-update: false
+self-host-ip: "*"
 self-host-port: 8163
 merge-other-folders: []
 loading-head: random #steve, alex, etc.
@@ -27,3 +28,4 @@ included-minecraft-list:
   - item
 resourcepack-obfuscation: false
 clear-build-folder: true #If you use Oraxen, set this to false.
+legacy-serializer: ampersand #section, ampersand

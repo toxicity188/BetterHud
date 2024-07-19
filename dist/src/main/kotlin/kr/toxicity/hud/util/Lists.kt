@@ -67,10 +67,8 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
                 while (!isInterrupted) {
                     queue.poll()?.let {
                         Thread {
-                            runCatching {
+                            runWithExceptionHandling(CONSOLE, "Fail to run thread $id.") {
                                 it()
-                            }.onFailure { e ->
-                                e.printStackTrace()
                             }
                             synchronized(index) {
                                 if (++index.current == index.max) {

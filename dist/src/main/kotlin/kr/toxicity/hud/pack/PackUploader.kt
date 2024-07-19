@@ -49,57 +49,61 @@ object PackUploader {
         val uuid = UUID.nameUUIDFromBytes(ByteArray(20) {
             ((Character.digit(hash.codePointAt(t++), 16) shl 4) or Character.digit(hash.codePointAt(t++), 16)).toByte()
         })
-        HttpClient.newHttpClient()
-            .sendAsync(HttpRequest.newBuilder()
-                .uri(URI.create("http://checkip.amazonaws.com/"))
-                .GET()
-                .build(), HttpResponse.BodyHandlers.ofString()).thenAccept {
-                    val host = ConfigManagerImpl.selfHostPort
-                    val body = it.body()
-                    val url = "http://${body.substring(0, body.length - 1)}:$host/$string.zip"
-                    runCatching {
-                        server?.stop()
-                        val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
-                            createContext("/") { exec ->
-                                exec.use { exchange ->
-                                    if (exchange.requestURI.path != "/$string.zip") {
-                                        exchange.responseHeaders.set("Content-Type", "application/json")
-                                        val byte = JsonPrimitive("Invalid file name.").toByteArray()
-                                        exchange.sendResponseHeaders(200, byte.size.toLong())
-                                        exchange.responseBody.write(byte)
-                                    } else {
-                                        exchange.responseHeaders.set("Content-Type", "application/zip")
-                                        exchange.sendResponseHeaders(200, byteArray.size.toLong())
-                                        exchange.responseBody.write(byteArray)
-                                    }
-                                }
-                            }
-                            start()
-                        }
-                        server = object : PackServer {
-                            override fun stop() {
-                                http.stop(0)
-                            }
-                            override fun apply(player: Player) {
-                                if (useUrl) {
-                                    player.setResourcePack(uuid, url, digest, null, false)
-                                } else {
-                                    player.setResourcePack(url, digest, null, false)
-                                }
-                            }
-                        }
-                        Bukkit.getOnlinePlayers().forEach { player ->
-                            if (useUrl) {
-                                player.setResourcePack(uuid, url, digest, null, false)
+        fun openServer(body: String) {
+            val host = ConfigManagerImpl.selfHostPort
+            val url = "http://$body:$host/$string.zip"
+            runWithExceptionHandling(CONSOLE, "Unable to open server.") {
+                server?.stop()
+                val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
+                    createContext("/") { exec ->
+                        exec.use { exchange ->
+                            if (exchange.requestURI.path != "/$string.zip") {
+                                exchange.responseHeaders.set("Content-Type", "application/json")
+                                val byte = JsonPrimitive("Invalid file name.").toByteArray()
+                                exchange.sendResponseHeaders(200, byte.size.toLong())
+                                exchange.responseBody.write(byte)
                             } else {
-                                player.setResourcePack(url, digest, null, false)
+                                exchange.responseHeaders.set("Content-Type", "application/zip")
+                                exchange.sendResponseHeaders(200, byteArray.size.toLong())
+                                exchange.responseBody.write(byteArray)
                             }
                         }
-                        info("Resource pack server opened at $url")
-                    }.onFailure { e ->
-                        e.printStackTrace()
-                        warn("Unable to open server.")
                     }
+                    start()
+                }
+                server = object : PackServer {
+                    override fun stop() {
+                        http.stop(0)
+                    }
+                    override fun apply(player: Player) {
+                        if (useUrl) {
+                            player.setResourcePack(uuid, url, digest, null, false)
+                        } else {
+                            player.setResourcePack(url, digest, null, false)
+                        }
+                    }
+                }
+                Bukkit.getOnlinePlayers().forEach { player ->
+                    if (useUrl) {
+                        player.setResourcePack(uuid, url, digest, null, false)
+                    } else {
+                        player.setResourcePack(url, digest, null, false)
+                    }
+                }
+                info("Resource pack server opened at $url")
             }
+        }
+        when (val host = ConfigManagerImpl.selfHostIp) {
+            "*" -> HttpClient.newHttpClient()
+                .sendAsync(HttpRequest.newBuilder()
+                    .uri(URI.create("http://checkip.amazonaws.com/"))
+                    .GET()
+                    .build(), HttpResponse.BodyHandlers.ofString()).thenAccept {
+                        val body = it.body()
+                        openServer(body.substring(0, body.length - 1))
+                }
+            else -> openServer(host)
+        }
+
     }
 }

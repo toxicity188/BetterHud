@@ -185,7 +185,7 @@ class BetterHudImpl: BetterHud() {
                 )
             }
         }
-        runWithExceptionHandling(Bukkit.getConsoleSender().audience, "Unable to get latest version.") {
+        runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))

@@ -39,7 +39,7 @@ class GlobalResource {
         PLUGIN.getResource("splitter.png")?.buffered()?.use {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(textures).apply {
-                add("${KeyResource.splitter}.png")
+                add("${ConfigManagerImpl.key.splitterKey.value()}.png")
             }) {
                 read
             }
@@ -47,13 +47,13 @@ class GlobalResource {
         PLUGIN.getResource("spaces.ttf")?.buffered()?.use {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(font).apply {
-                add("${KeyResource.spaces}.ttf")
+                add("${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf")
             }) {
                 read
             }
         }
         PackGenerator.addTask(ArrayList(font).apply {
-            add("${KeyResource.space}.json")
+            add("${ConfigManagerImpl.key.spaceKey.value()}.json")
         }) {
             JsonObject().apply {
                 add("providers", JsonArray().apply {
@@ -79,7 +79,7 @@ class GlobalResource {
             }.toByteArray()
         }
         PackGenerator.addTask(ArrayList(font).apply {
-            add("${KeyResource.legacySpace}.json")
+            add("${ConfigManagerImpl.key.legacySpaceKey.value()}.json")
         }) {
             JsonObject().apply {
                 add("providers", JsonArray().apply {

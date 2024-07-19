@@ -4,21 +4,13 @@ import kr.toxicity.hud.util.encodeKey
 import net.kyori.adventure.key.Key
 
 class KeyResource(namespace: String) {
-    companion object {
-        val space = "space".encodeKey()
-        val legacySpace = "legacy_space".encodeKey()
-        val default = "default".encodeKey()
-        val spaces = "spaces".encodeKey()
-        val splitter = "splitter".encodeKey()
-    }
-
     val encodedNamespace = namespace.encodeKey()
 
     private fun create(name: String) = Key.key(encodedNamespace, name)
 
-    val spaceKey = create(space)
-    val legacySpaceKey = create(legacySpace)
-    val defaultKey = create(default)
-    val spacesTtfKey = create(spaces)
-    val splitterKey = create(splitter)
+    val spaceKey = create("space".encodeKey())
+    val legacySpaceKey = create("legacy_space".encodeKey())
+    val defaultKey = create("default".encodeKey())
+    val spacesTtfKey = create("spaces".encodeKey())
+    val splitterKey = create("splitter".encodeKey())
 }

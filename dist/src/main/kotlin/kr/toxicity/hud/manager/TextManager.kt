@@ -192,7 +192,7 @@ object TextManager: BetterHudManager {
             })
         }
         PackGenerator.addTask(ArrayList(resource.font).apply {
-            add("${KeyResource.default}.json")
+            add("${ConfigManagerImpl.key.defaultKey.value()}.json")
         }) {
             JsonObject().apply {
                 add("providers", defaultArray)

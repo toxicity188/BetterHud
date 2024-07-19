@@ -9,6 +9,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -59,6 +60,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var enableSelfHost = false
         private set
+    var selfHostIp = "*"
+        private set
     var selfHostPort = 8163
         private set
     var mergeOtherFolders = emptyList<String>()
@@ -85,6 +88,9 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         "block",
         "item"
     )
+        private set
+
+    var legacySerializer = LegacyComponentSerializer.legacyAmpersand()
         private set
 
     override fun start() {
@@ -140,9 +146,6 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             yaml.getString("build-folder-location")?.let {
                 buildFolderLocation = it.replace('/', File.separatorChar)
             }
-            yaml.getString("namespace")?.let {
-                key = KeyResource(it.lowercase())
-            }
             val newLine = yaml.getInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
             if (line != newLine) {
                 line = newLine
@@ -153,6 +156,9 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
             enableSelfHost = yaml.getBoolean("enable-self-host")
             mergeOtherFolders = yaml.getStringList("merge-other-folders")
+            yaml.getString("self-host-ip")?.let { ip ->
+                selfHostIp = ip
+            }
             selfHostPort = yaml.getInt("self-host-port", 8163)
             forceUpdate = yaml.getBoolean("force-update")
             disableLinkPlugin = yaml.getStringList("disable-link-plugin").filter {
@@ -173,6 +179,13 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             clearBuildFolder = yaml.getBoolean("clear-build-folder", true)
             loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
             includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
+            yaml.getString("legacy-serializer")?.let {
+                when (it) {
+                    "section" -> legacySerializer = LegacyComponentSerializer.legacySection()
+                    "ampersand" -> legacySerializer = LegacyComponentSerializer.legacyAmpersand()
+                }
+            }
+            key = KeyResource(yaml.getString("namespace") ?: NAME_SPACE)
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",
