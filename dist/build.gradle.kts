@@ -7,8 +7,8 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    compileOnly("com.github.SkriptLang:Skript:2.8.7")
-    compileOnly("net.skinsrestorer:skinsrestorer-api:15.0.15")
+    compileOnly("com.github.SkriptLang:Skript:2.9.0")
+    compileOnly("net.skinsrestorer:skinsrestorer-api:15.2.0")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.15")
 }
 
