@@ -65,7 +65,7 @@ object MinecraftManager: BetterHudManager {
                 val current = MinecraftVersion.current.toString()
                 info("Current minecraft version: $current")
                 val file = File(cache, "$current.jar")
-                if (!file.exists()) {
+                if (!file.exists() || file.length() == 0L) {
                     info("$current.jar doesn't exist. so download it...")
                     file.outputStream().buffered().use { outputStream ->
                         client.send(HttpRequest.newBuilder()

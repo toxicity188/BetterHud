@@ -50,6 +50,6 @@ data class MinecraftVersion(
     }
 
     override fun toString(): String {
-        return "$first.$second.$third"
+        return if (third == 0) "$first.$second" else "$first.$second.$third"
     }
 }

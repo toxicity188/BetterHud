@@ -293,7 +293,6 @@ class PopupLayout(
                 textLayout.align,
                 scale.toDouble() / textLayout.text.height.toDouble(),
                 pixel.x,
-                textLayout.space,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
                 textLayout.disableNumberFormat,

@@ -19,7 +19,6 @@ class TextLayout(
     val color: TextColor,
     val outline: Boolean,
     val layer: Int,
-    val deserializeText: Boolean,
     val numberEquation: TEquation,
     val numberFormat: DecimalFormat,
     val disableNumberFormat: Boolean,

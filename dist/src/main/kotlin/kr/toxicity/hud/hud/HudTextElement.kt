@@ -151,7 +151,6 @@ class HudTextElement(
             text.align,
             scale.toDouble() / text.text.height.toDouble(),
             loc.x,
-            text.space,
             text.numberEquation,
             text.numberFormat,
             text.disableNumberFormat,

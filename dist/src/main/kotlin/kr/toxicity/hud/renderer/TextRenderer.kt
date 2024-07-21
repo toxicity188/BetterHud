@@ -32,8 +32,6 @@ class TextRenderer(
     private val scale: Double,
     private val x: Int,
 
-    private val space: Int,
-
     private val numberEquation: TEquation,
     private val numberPattern: DecimalFormat,
     private val disableNumberFormat: Boolean,
@@ -50,8 +48,6 @@ class TextRenderer(
         private val allPattern = Pattern.compile(".+")
         private val imagePattern = Pattern.compile("<image:(?<name>([a-zA-Z]+))>")
     }
-
-    private val sComponent = space.toSpaceComponent().component.build()
 
     private val followPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
@@ -95,13 +91,16 @@ class TextRenderer(
                     .build())
             fun applyDecoration(component: Component): Component {
                 var ret = component
-                if (component is TextComponent) {
-                    var group = component.content()
-                    if (!disableNumberFormat) group = decimalPattern.matcher(group).replaceAll {
-                        val g = it.group()
-                        runCatching {
-                            numberPattern.format(numberEquation.evaluate(g.toDouble()))
-                        }.getOrDefault(g)
+                if (ret is TextComponent) {
+                    var group = ret.content()
+                    if (!disableNumberFormat) {
+                        group = decimalPattern.matcher(group).replaceAll {
+                            val g = it.group()
+                            runCatching {
+                                numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                            }.getOrDefault(g)
+                        }
+                        ret = ret.content(group)
                     }
                     val codepoint = group.codePoints().toArray()
                     val count = codepoint.count {

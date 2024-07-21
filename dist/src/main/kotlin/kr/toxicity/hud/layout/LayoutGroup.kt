@@ -64,7 +64,6 @@ class LayoutGroup(
                     configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
                     configurationSection.getInt("layer"),
-                    configurationSection.getBoolean("deserialize-text"),
                     configurationSection.getString("number-equation")?.let {
                         TEquation(it)
                     } ?: TEquation.t,
