@@ -76,6 +76,7 @@ object PlayerManager: BetterHudManager {
         }
     }
 
+    fun getAllHudPlayer(): Collection<HudPlayer> = Collections.unmodifiableCollection(hudPlayer.values)
     fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")
     fun getHudPlayer(uuid: UUID) = hudPlayer[uuid]
 

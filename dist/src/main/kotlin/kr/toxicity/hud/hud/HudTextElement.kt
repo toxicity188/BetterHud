@@ -151,12 +151,13 @@ class HudTextElement(
             text.align,
             scale.toDouble() / text.text.height.toDouble(),
             loc.x,
-            text.deserializeText,
             text.space,
             text.numberEquation,
             text.numberFormat,
             text.disableNumberFormat,
             text.follow,
+            text.useLegacyFormat,
+            text.legacySerializer,
             text.conditions.and(text.text.conditions)
         )
     }.getText(UpdateEvent.EMPTY)

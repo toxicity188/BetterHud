@@ -15,9 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -194,6 +196,12 @@ public abstract class BetterHud extends JavaPlugin {
      * @return font key
      */
     public abstract @NotNull Key getDefaultKey();
+
+    /**
+     * Gets all online player instance.
+     * @return all player instance.
+     */
+    public abstract @NotNull @Unmodifiable Collection<HudPlayer> getAllPlayers();
 
     /**
      * Get a translated result of key.

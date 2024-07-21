@@ -83,6 +83,8 @@ class LayoutGroup(
                     configurationSection.getDouble("emoji-scale", 1.0).apply {
                         if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
                     },
+                    configurationSection.getBoolean("use-legacy-format", true),
+                    configurationSection.getString("legacy-serializer")?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer,
                     configurationSection.toConditions()
                 )
             )

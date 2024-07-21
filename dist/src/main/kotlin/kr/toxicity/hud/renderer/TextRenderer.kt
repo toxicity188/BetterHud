@@ -12,15 +12,16 @@ import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import java.text.DecimalFormat
-import java.util.EnumMap
-import java.util.LinkedList
 import java.util.regex.Pattern
+import kotlin.math.roundToInt
 
 class TextRenderer(
     private val widthMap: Map<Int, Int>,
@@ -31,9 +32,7 @@ class TextRenderer(
     private val scale: Double,
     private val x: Int,
 
-    private val deserializeText: Boolean,
-
-    space: Int,
+    private val space: Int,
 
     private val numberEquation: TEquation,
     private val numberPattern: DecimalFormat,
@@ -41,166 +40,18 @@ class TextRenderer(
 
     follow: String?,
 
+    private val useLegacyFormat: Boolean,
+    private val legacySerializer: LegacyComponentSerializer,
     private val condition: ConditionBuilder
 ) {
     companion object {
         private const val SPACE_POINT = ' '.code
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
-        private val componentPattern = Pattern.compile("<(?<name>(([a-zA-Z]|#|[0-9]|/)+))((:(?<argument>([a-zA-Z]|[0-9]|:|,|_)+))?)>")
-
-        private val formats: MutableMap<String, (List<String>, ComponentStyleBuilder) -> Unit> = HashMap()
-
-        private fun addFormat(name: List<String>, function: (List<String>, ComponentStyleBuilder) -> Unit) {
-            name.forEach {
-                formats[it] = function
-            }
-        }
-
-        private fun getFormat(name: String): ((List<String>, ComponentStyleBuilder) -> Unit)? {
-            return if (name.startsWith('#') && name.length == 7) {
-                TextColor.fromHexString(name)?.let {
-                    { _, builder ->
-                        builder.color = it
-                    }
-                }
-            } else formats[name]
-        }
-
-        init {
-            NamedTextColor.NAMES.keyToValue().forEach {
-                addFormat(listOf(it.key)) { _, builder ->
-                    builder.color = it.value
-                }
-                addFormat(listOf("/${it.key}")) { _, builder ->
-                    if (builder.color == it.value) builder.color = NamedTextColor.WHITE
-                }
-            }
-            fun addDecoration(names: List<String>, decoration: TextDecoration) {
-                addFormat(names) { args, format ->
-                    format.decoration[decoration] = if (args.isEmpty()) TextDecoration.State.TRUE else when (args[0]) {
-                        "false" -> TextDecoration.State.FALSE
-                        "true" -> TextDecoration.State.TRUE
-                        else -> TextDecoration.State.NOT_SET
-                    }
-                }
-                addFormat(names.map {
-                    "/$it"
-                }) { _, format ->
-                    format.decoration[decoration] = TextDecoration.State.FALSE
-                }
-            }
-            addDecoration(listOf("bold", "b"), TextDecoration.BOLD)
-            addDecoration(listOf("italic", "em", "i"), TextDecoration.ITALIC)
-        }
+        private val allPattern = Pattern.compile(".+")
+        private val imagePattern = Pattern.compile("<image:(?<name>([a-zA-Z]+))>")
     }
 
-    private val sComponent = space.toSpaceComponent()
-    private val spaceComponent = 4.toSpaceComponent()
-
-    private val patternMapper = parseStyle(pattern) {
-        it.build()
-    }
-
-    private fun <T> parseStyle(target: String, mapper: (ComponentStyleBuilder) -> T): List<T> {
-        val format = ArrayList<ComponentFormat>()
-        val matcher = componentPattern.matcher(target)
-        while (matcher.find()) format.add(
-            ComponentFormat(
-                matcher.group("name"),
-                matcher.group("argument")?.split(':') ?: emptyList()
-            )
-        )
-        val strings = target.split(componentPattern).map {
-            ComponentStyleBuilder(it)
-        }
-        for ((i, componentFormat) in format.withIndex()) {
-            val t = i + 1
-            if (t > strings.lastIndex) break
-            if (componentFormat.name == "image" && componentFormat.args.isNotEmpty()) {
-                data.images[componentFormat.args[0]]?.let {
-                    strings[t].images.add(it)
-                }
-            } else getFormat(componentFormat.name)?.let {
-                strings.subList(t, strings.size).forEach { str ->
-                    it(componentFormat.args, str)
-                }
-            }
-        }
-        return strings.map {
-            mapper(it)
-        }
-    }
-
-    private class ComponentFormat(
-        val name: String,
-        val args: List<String>
-    )
-    private inner class ComponentStyleBuilder(
-        val pattern: String
-    ) {
-        var color: TextColor = defaultColor
-        var decoration = EnumMap(TextDecoration.entries.associateWith {
-            TextDecoration.State.FALSE
-        })
-        val images = ArrayList<WidthComponent>()
-
-        fun build() = ComponentStyle(
-            PlaceholderManagerImpl.parse(pattern),
-            images,
-            Style.style()
-                .color(color)
-                .decorations(decoration)
-                .font(data.word)
-                .build(),
-            run {
-                var i = 1
-                if (decoration[TextDecoration.BOLD] == TextDecoration.State.TRUE) i++
-                if (decoration[TextDecoration.ITALIC] == TextDecoration.State.TRUE) i++
-                i
-            }
-        )
-
-        fun buildRaw() = RawComponentStyle(
-            pattern,
-            images,
-            Style.style()
-                .decorations(decoration)
-                .color(color)
-                .font(data.word)
-                .build(),
-            run {
-                var i = 1
-                if (decoration[TextDecoration.BOLD] == TextDecoration.State.TRUE) i++
-                if (decoration[TextDecoration.ITALIC] == TextDecoration.State.TRUE) i++
-                i
-            }
-        )
-    }
-    private class ComponentStyle(
-        val pattern: (UpdateEvent) -> (HudPlayer) -> String,
-        val images: List<WidthComponent>,
-        val style: Style,
-        val multiply: Int
-    ) {
-        fun map(updateEvent: UpdateEvent) = MappedComponentStyle(
-            pattern(updateEvent),
-            images,
-            style,
-            multiply
-        )
-    }
-    private class MappedComponentStyle(
-        val value: (HudPlayer) -> String,
-        val images: List<WidthComponent>,
-        val style: Style,
-        val multiply: Int
-    )
-    private class RawComponentStyle(
-        val value: String,
-        val images: List<WidthComponent>,
-        val style: Style,
-        val multiply: Int
-    )
+    private val sComponent = space.toSpaceComponent().component.build()
 
     private val followPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
@@ -208,11 +59,10 @@ class TextRenderer(
         }
     }
 
+    private val parsedPatter = PlaceholderManagerImpl.parse(pattern)
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
-        val patternMap = patternMapper.map {
-            it.map(reason)
-        }
+        val buildPattern = parsedPatter(reason)
         val cond = condition.build(reason)
 
         val followTarget = followPlayer?.build(reason)
@@ -225,51 +75,54 @@ class TextRenderer(
                 } ?: return@build EMPTY_PIXEL_COMPONENT
             }
             if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
-            var comp = EMPTY_WIDTH_COMPONENT
+            var width = 0
+            val targetString = (if (useLegacyFormat) legacySerializer.deserialize(buildPattern(targetPlayer)) else Component.text(buildPattern(targetPlayer)))
+                .color(defaultColor)
+                .replaceText(TextReplacementConfig.builder()
+                    .match(imagePattern)
+                    .replacement { r, _ ->
+                        data.images[r.group(1)]?.let {
+                            width += it.width + 1
+                            it.component.build()
+                        } ?: Component.empty()
+                    }
+                    .build())
+                .replaceText(TextReplacementConfig.builder()
+                    .match(allPattern)
+                    .replacement { r, _ ->
+                        MiniMessage.miniMessage().deserialize(r.group())
+                    }
+                    .build())
+            fun applyDecoration(component: Component): Component {
+                var ret = component
+                if (component is TextComponent) {
+                    var group = component.content()
+                    if (!disableNumberFormat) group = decimalPattern.matcher(group).replaceAll {
+                        val g = it.group()
+                        runCatching {
+                            numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                        }.getOrDefault(g)
+                    }
+                    val codepoint = group.codePoints().toArray()
+                    val count = codepoint.count {
+                        it != SPACE_POINT
+                    }
+                    if (component.hasDecoration(TextDecoration.BOLD)) width += count
+                    if (component.hasDecoration(TextDecoration.ITALIC)) width += count
+                    if (component.font() == null) {
+                        width += codepoint.sumOf {
+                            if (it != SPACE_POINT) ((widthMap[it] ?: 0).toDouble() * scale).roundToInt() + 1 else 4
+                        }
+                        ret = ret.font(data.word)
+                    }
+                }
+                return ret.children(ret.children().map {
+                    applyDecoration(it)
+                })
+            }
 
-            fun applyString(targetString: String, style: Style, multiply: Int, images: List<WidthComponent>) {
-                images.forEach {
-                    comp += it
-                }
-                var original = targetString
-                if (original == "") return
-                if (!disableNumberFormat) {
-                    val matcher = decimalPattern.matcher(original)
-                    val number = LinkedList<String>()
-                    while (matcher.find()) {
-                        number.add(numberPattern.format(numberEquation.evaluate(matcher.group().toDouble())))
-                    }
-                    if (number.isNotEmpty()) {
-                        val sb = StringBuilder()
-                        original.split(decimalPattern).forEach {
-                            sb.append(it)
-                            number.poll()?.let { n ->
-                                sb.append(n)
-                            }
-                        }
-                        original = sb.toString()
-                    }
-                }
-                original.codePoints().forEach { char ->
-                    if (char == SPACE_POINT) {
-                        comp += spaceComponent
-                    } else {
-                        widthMap[char]?.let { width ->
-                            comp += WidthComponent(Component.text().content(char.parseChar()).style(style), Math.round(width.toDouble() * scale).toInt() + multiply) + sComponent
-                        }
-                    }
-                }
-            }
-            for (mappedComponentStyle in patternMap) {
-                val target = mappedComponentStyle.value(targetPlayer)
-                if (deserializeText) {
-                    parseStyle(target) {
-                        it.buildRaw()
-                    }.forEach {
-                        applyString(it.value, it.style, it.multiply, it.images)
-                    }
-                } else applyString(target, mappedComponentStyle.style, mappedComponentStyle.multiply, mappedComponentStyle.images)
-            }
+            var comp = WidthComponent(Component.text().append(applyDecoration(targetString)), width)
+
             data.background?.let {
                 val builder = Component.text().append(it.left.component)
                 var length = 0

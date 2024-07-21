@@ -70,6 +70,7 @@ class BetterHudImpl: BetterHud() {
                 "adventure-text-serializer-json",
                 "adventure-text-serializer-gson-legacy-impl",
                 "adventure-text-serializer-json-legacy-impl",
+                "adventure-text-minimessage",
             ).forEach {
                 loadLibrary(Library.builder()
                     .groupId("net{}kyori")
@@ -318,4 +319,5 @@ class BetterHudImpl: BetterHud() {
     override fun isOnReload(): Boolean = onReload
     override fun getDefaultKey(): Key = DEFAULT_KEY
     override fun translate(locale: String, key: String): String? = TextManager.translate(locale, key)
+    override fun getAllPlayers(): Collection<HudPlayer> = PlayerManager.getAllHudPlayer()
 }

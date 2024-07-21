@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import kotlin.math.abs
 
@@ -25,6 +26,12 @@ val DEFAULT_KEY
 
 val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
     TextDecoration.State.FALSE
+}
+
+fun String.toLegacySerializer() = when (this) {
+    "ampersand" -> LegacyComponentSerializer.legacyAmpersand()
+    "section" -> LegacyComponentSerializer.legacySection()
+    else -> throw RuntimeException("Unknown legacy serializer: $this")
 }
 
 fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).decorations(DEFAULT_TEXT_DECORATION)

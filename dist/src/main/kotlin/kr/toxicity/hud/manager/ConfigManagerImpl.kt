@@ -180,9 +180,8 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
             includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
             yaml.getString("legacy-serializer")?.let {
-                when (it) {
-                    "section" -> legacySerializer = LegacyComponentSerializer.legacySection()
-                    "ampersand" -> legacySerializer = LegacyComponentSerializer.legacyAmpersand()
+                runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
+                    legacySerializer = it.toLegacySerializer()
                 }
             }
             key = KeyResource(yaml.getString("namespace") ?: NAME_SPACE)

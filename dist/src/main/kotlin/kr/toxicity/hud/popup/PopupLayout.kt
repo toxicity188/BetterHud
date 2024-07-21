@@ -293,12 +293,13 @@ class PopupLayout(
                 textLayout.align,
                 scale.toDouble() / textLayout.text.height.toDouble(),
                 pixel.x,
-                textLayout.deserializeText,
                 textLayout.space,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
                 textLayout.disableNumberFormat,
                 textLayout.follow,
+                textLayout.useLegacyFormat,
+                textLayout.legacySerializer,
                 textLayout.conditions.and(textLayout.text.conditions)
             )
         }

@@ -9,7 +9,6 @@ import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.text.HudTextArray
@@ -27,10 +26,39 @@ import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
 
+
+    private class TextCache(
+        val name: String,
+        val imagesName: Set<String>
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as TextCache
+
+            if (name != other.name) return false
+            if (!imagesName.containsAll(other.imagesName) || imagesName.size != other.imagesName.size) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            imagesName.forEach {
+                result = 31 * result + it.hashCode()
+            }
+            return result
+        }
+    }
+
     private const val CHAR_LENGTH = 16
 
+    @Volatile
+    private var fontIndex = 0
+
     private val textMap = HashMap<String, HudText>()
-    private val textCacheMap = HashMap<String, HudText>()
+    private val textCacheMap = HashMap<TextCache, HudText>()
 
     private val textWidthMap = HashMap<Int, Int>()
     private val textKeyMap = ConcurrentHashMap<ShaderGroup, HudTextData>()
@@ -145,6 +173,7 @@ object TextManager: BetterHudManager {
 
     override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(this) {
+            fontIndex = 0
             textMap.clear()
             textWidthMap.clear()
             textKeyMap.clear()
@@ -376,10 +405,13 @@ object TextManager: BetterHudManager {
         mergeDefaultBitmap: Boolean
     ): HudText {
         return synchronized(textCacheMap) {
-            textCacheMap[saveName]?.let { old ->
+            textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
                 HudText(path, saveName, old.height, old.array, old.images, old.charWidth, old.conditions)
             }
         } ?: run {
+            val saveFontName = synchronized (this) {
+                "font${++fontIndex}"
+            }
             val height = fontProvider.height
             val pairMap = TreeMap<Int, MutableSet<CharImage>>()
             val charWidthMap = HashMap<Int, Int>()
@@ -438,7 +470,7 @@ object TextManager: BetterHudManager {
             pairMap.forEach {
                 val width = it.key
                 fun save(list: List<CharImage>) {
-                    val encode = "text_${saveName}_${++i}".encodeKey()
+                    val encode = "text_${saveFontName}_${++i}".encodeKey()
                     val name = "$encode.png"
                     val json = JsonArray()
                     list.split(CHAR_LENGTH).forEach { subList ->
@@ -473,7 +505,7 @@ object TextManager: BetterHudManager {
             }
             val result = HudText(path, saveName, height, textList, images, charWidthMap, condition)
             synchronized(textCacheMap) {
-                textCacheMap[saveName] = result
+                textCacheMap[TextCache(saveName, images.keys)] = result
             }
             result
         }

@@ -6,6 +6,7 @@ import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudText
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.text.DecimalFormat
 
 class TextLayout(
@@ -27,5 +28,7 @@ class TextLayout(
     val follow: String?,
     val emojiLocation: ImageLocation,
     val emojiScale: Double,
+    val useLegacyFormat: Boolean,
+    val legacySerializer: LegacyComponentSerializer,
     val conditions: ConditionBuilder
 )

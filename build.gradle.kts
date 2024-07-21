@@ -130,6 +130,7 @@ listOf(
     it.dependencies {
         compileOnly("net.kyori:adventure-api:$adventure")
         compileOnly("net.kyori:adventure-platform-bukkit:$platform")
+        compileOnly("net.kyori:adventure-text-minimessage:$adventure")
         compileOnly("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
     }
 }

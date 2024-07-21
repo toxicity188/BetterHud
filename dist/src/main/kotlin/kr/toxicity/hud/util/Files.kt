@@ -17,7 +17,9 @@ fun File.ifNotExist(message: String) = apply {
 }
 
 fun File.forEach(block: (File) -> Unit) {
-    listFiles()?.forEach(block)
+    listFiles()?.sortedBy {
+        it.name
+    }?.forEach(block)
 }
 
 fun File.forEachAllFolder(block: (File) -> Unit) {
@@ -42,48 +44,5 @@ fun File.forEachAllYaml(sender: Audience, block: (File, String, ConfigurationSec
                 }
             }
         }
-    }
-}
-fun File.forEachAllYamlAsync(block: (File, String, ConfigurationSection) -> Unit) {
-    fun getAll(file: File): List<File> {
-        return if (file.isDirectory) {
-            file.listFiles()?.map { subFile ->
-                getAll(subFile)
-            }?.sum() ?: ArrayList()
-        } else {
-            listOf(file)
-        }
-    }
-    val list = getAll(this).filter {
-        it.extension == "yml"
-    }.mapNotNull {
-        runCatching {
-            val yaml = it.toYaml()
-            val list = ArrayList<Pair<String, ConfigurationSection>>()
-            yaml.getKeys(false).forEach {
-                yaml.getConfigurationSection(it)?.let { section ->
-                    list.add(it to section)
-                }
-            }
-            if (list.isNotEmpty()) it to list else null
-        }.getOrElse { e ->
-            warn(
-                "Unable to load this yml file: ${it.name}",
-                "Reason: ${e.message}"
-            )
-            null
-        }
-    }
-    if (list.isEmpty()) {
-        return
-    }
-    list.map {
-        {
-            it.second.forEach { pair ->
-                block(it.first, pair.first, pair.second)
-            }
-        }
-    }.forEachAsync {
-        it()
     }
 }
