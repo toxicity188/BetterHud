@@ -10,8 +10,6 @@ class GameProfileSkinProvider: PlayerSkinProvider {
     }
 
     override fun provide(playerName: String): String {
-        return Bukkit.getPlayerExact(playerName)?.let {
-            provide(it)
-        } ?: ""
+        return Bukkit.getPlayerExact(playerName)?.textures ?: ""
     }
 }

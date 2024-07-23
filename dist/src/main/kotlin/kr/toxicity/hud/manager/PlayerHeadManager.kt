@@ -8,7 +8,6 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import java.awt.Color
@@ -21,7 +20,7 @@ object PlayerHeadManager : BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
-    private val headLock = WeakHashMap<String, HudPlayerHeadImpl>()
+    private val headLock = Collections.synchronizedMap(WeakHashMap<String, HudPlayerHeadImpl>())
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
 
@@ -75,9 +74,7 @@ object PlayerHeadManager : BetterHudManager {
                 val next = iterator.next()
                 if (next.check()) {
                     iterator.remove()
-                    synchronized(headLock) {
-                        headLock.remove(next.name)
-                    }
+                    headLock.remove(next.name)
                 }
             }
         }
@@ -86,7 +83,9 @@ object PlayerHeadManager : BetterHudManager {
     fun provideSkin(playerName: String): String {
         for (skinProvider in skinProviders) {
             runCatching {
-                val value = skinProvider.provide(playerName)
+                val value = Bukkit.getPlayer(playerName)?.let {
+                    skinProvider.provide(it)
+                } ?: skinProvider.provide(playerName)
                 if (value != null) return value
             }
         }
@@ -94,22 +93,14 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return synchronized(headCache) {
-            headCache[playerName]?.update() ?: run {
-                synchronized(headLock) {
-                    headLock.computeIfAbsent(playerName) {
-                        CompletableFuture.runAsync {
-                            val head = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
-                            synchronized(headCache) {
-                                headCache[playerName] = head
-                            }
-                            synchronized(headLock) {
-                                headLock.remove(playerName)
-                            }
-                        }
-                        loadingHead()
-                    }
+        return headCache[playerName]?.update() ?: run {
+            headLock.computeIfAbsent(playerName) {
+                CompletableFuture.runAsync {
+                    val head = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
+                    headCache[playerName] = head
+                    headLock.remove(playerName)
                 }
+                loadingHead()
             }
         }
     }
@@ -119,15 +110,11 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     override fun reload(sender: Audience, resource: GlobalResource) {
-        synchronized(headMap) {
+        synchronized(this) {
             headMap.clear()
-        }
-        synchronized(headNameComponent) {
             headNameComponent.clear()
         }
-        synchronized(headLock) {
-            headLock.clear()
-        }
+        headLock.clear()
         headCache.clear()
         loadingHead = when (val name = ConfigManagerImpl.loadingHead) {
             "random" -> {

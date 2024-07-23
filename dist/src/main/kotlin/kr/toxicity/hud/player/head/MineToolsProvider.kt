@@ -10,12 +10,18 @@ import java.net.http.HttpResponse
 
 class MineToolsProvider : PlayerSkinProvider {
     override fun provide(player: Player): String? {
-        return provide(player.name)
+        return provideFromUUID(player.uniqueId.toString())
     }
 
     override fun provide(playerName: String): String? {
+        return getUUIDFromName(playerName)?.let {
+            provideFromUUID(it)
+        }
+    }
+
+    private fun getUUIDFromName(playerName: String): String? {
         return runCatching {
-            val uuid = InputStreamReader(
+            InputStreamReader(
                 HttpClient.newHttpClient().send(
                     HttpRequest.newBuilder()
                         .uri(URI.create("https://api.minetools.eu/uuid/${playerName}"))
@@ -25,6 +31,11 @@ class MineToolsProvider : PlayerSkinProvider {
             ).buffered().use {
                 JsonParser.parseReader(it)
             }.asJsonObject.getAsJsonPrimitive("id").asString
+        }.getOrNull()
+    }
+
+    private fun provideFromUUID(uuid: String): String? {
+        return runCatching {
             InputStreamReader(
                 HttpClient.newHttpClient().send(
                     HttpRequest.newBuilder()
