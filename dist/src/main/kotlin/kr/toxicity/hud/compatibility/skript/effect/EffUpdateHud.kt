@@ -4,7 +4,7 @@ import ch.njol.skript.lang.Effect
 import ch.njol.skript.lang.Expression
 import ch.njol.skript.lang.SkriptParser
 import ch.njol.util.Kleenean
-import kr.toxicity.hud.manager.PlayerManager
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
@@ -22,7 +22,7 @@ class EffUpdateHud: Effect() {
 
     override fun execute(p0: Event) {
         expr.getAll(p0).forEach {
-            PlayerManager.getHudPlayer(it.uniqueId)?.update()
+            PlayerManagerImpl.getHudPlayer(it.uniqueId)?.update()
         }
     }
 }

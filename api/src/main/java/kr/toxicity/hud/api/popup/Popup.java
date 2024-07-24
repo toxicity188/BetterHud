@@ -62,6 +62,6 @@ public interface Popup extends HudObject {
      * @return updater of popup or null if showing has failed.
      */
     default @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull Player player) {
-        return show(reason, BetterHud.getInstance().getHudPlayer(player));
+        return show(reason, BetterHud.getInstance().getPlayerManager().getHudPlayer(player));
     }
 }

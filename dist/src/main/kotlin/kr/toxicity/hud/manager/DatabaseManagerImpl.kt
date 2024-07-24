@@ -81,7 +81,7 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
         }
     }
 
-    private val connectionMap = mapOf(
+    private val connectionMap = mutableMapOf(
         "yml" to defaultConnector,
         "mysql" to HudDatabaseConnector {
             val host = it.getString("host").ifNull("unable to find the host value.")
@@ -165,6 +165,9 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
     }
 
     override fun getCurrentDatabase(): HudDatabase = current
+    override fun addDatabase(name: String, connector: HudDatabaseConnector): Boolean {
+        return connectionMap.putIfAbsent(name, connector) == null
+    }
 
     override fun reload(sender: Audience, resource: GlobalResource) {
         CompletableFuture.runAsync {

@@ -9,7 +9,7 @@ import io.lumine.mythic.api.skills.SkillMetadata
 import io.lumine.mythic.api.skills.SkillResult
 import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.core.skills.SkillMechanic
-import kr.toxicity.hud.manager.PlayerManager
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.manager.PopupManagerImpl
 import org.bukkit.entity.Player
 
@@ -21,7 +21,7 @@ class HidePopupMechanic(mlc: MythicLineConfig): SkillMechanic(MythicBukkit.inst(
         val caster = p0.caster
         if (caster is AbstractPlayer) {
             val bukkit = caster.bukkitEntity as? Player ?: return SkillResult.CONDITION_FAILED
-            PopupManagerImpl.getPopup(popup)?.hide(PlayerManager.getHudPlayer(bukkit.uniqueId) ?: return SkillResult.CONDITION_FAILED)
+            PopupManagerImpl.getPopup(popup)?.hide(PlayerManagerImpl.getHudPlayer(bukkit.uniqueId) ?: return SkillResult.CONDITION_FAILED)
         }
         return SkillResult.SUCCESS
     }
@@ -29,7 +29,7 @@ class HidePopupMechanic(mlc: MythicLineConfig): SkillMechanic(MythicBukkit.inst(
     override fun castAtEntity(p0: SkillMetadata, p1: AbstractEntity): SkillResult {
         if (p1 is AbstractPlayer) {
             val bukkit = p1.bukkitEntity as? Player ?: return SkillResult.CONDITION_FAILED
-            PopupManagerImpl.getPopup(popup)?.hide(PlayerManager.getHudPlayer(bukkit.uniqueId) ?: return SkillResult.CONDITION_FAILED)
+            PopupManagerImpl.getPopup(popup)?.hide(PlayerManagerImpl.getHudPlayer(bukkit.uniqueId) ?: return SkillResult.CONDITION_FAILED)
         }
         return SkillResult.SUCCESS
     }

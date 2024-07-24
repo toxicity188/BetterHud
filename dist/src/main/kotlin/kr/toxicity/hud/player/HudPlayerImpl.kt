@@ -33,7 +33,7 @@ class HudPlayerImpl(
         save()
     }
     private val locationProvide = asyncTaskTimer(20, 20) {
-        PlayerManager.provideLocation(this)
+        PlayerManagerImpl.provideLocation(this)
     }
     init {
         objectSet.addAll(HudManagerImpl.defaultHuds)

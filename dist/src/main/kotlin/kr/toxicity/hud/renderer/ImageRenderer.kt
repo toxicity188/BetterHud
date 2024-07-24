@@ -7,7 +7,7 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
-import kr.toxicity.hud.manager.PlayerManager
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 import net.kyori.adventure.text.Component
@@ -46,7 +46,7 @@ class ImageRenderer(
             var target = player
             follow?.let {
                 target = Bukkit.getPlayer(it.value(player).toString())?.let { p ->
-                    PlayerManager.getHudPlayer(p.uniqueId)
+                    PlayerManagerImpl.getHudPlayer(p.uniqueId)
                 } ?: return@build EMPTY_PIXEL_COMPONENT
             }
             if (cond(target)) type.getComponent(listen, frame, components, target) else EMPTY_PIXEL_COMPONENT

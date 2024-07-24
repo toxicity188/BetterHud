@@ -89,7 +89,7 @@ class PopupImpl(
 
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
-            PlayerManager.getHudPlayer(uuid)?.let { player ->
+            PlayerManagerImpl.getHudPlayer(uuid)?.let { player ->
                 if (keyMapping) {
                     player.popupKeyMap[event.key]?.let {
                         if (it.update()) return@task true
@@ -109,7 +109,7 @@ class PopupImpl(
         }
         section.getConfigurationSection("hide-triggers")?.forEachSubConfiguration { _, configurationSection ->
             TriggerManagerImpl.addTask(configurationSection) { _, uuid ->
-                PlayerManager.getHudPlayer(uuid)?.let {
+                PlayerManagerImpl.getHudPlayer(uuid)?.let {
                     hide(it)
                 } ?: false
             }

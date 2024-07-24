@@ -37,7 +37,7 @@ public abstract class BetterHud extends JavaPlugin {
     public static final String EXAMINATION_VERSION = "1.3.0";
 
     @Override
-    public void onLoad() { // Do not use this
+    public final void onLoad() { // Do not use this
         if (instance != null) throw new RuntimeException();
         instance = this;
     }
@@ -60,7 +60,7 @@ public abstract class BetterHud extends JavaPlugin {
      * Executes reload.
      * @return result of reload.
      */
-    public @NotNull ReloadResult reload() {
+    public final @NotNull ReloadResult reload() {
         return reload(getAudiences().sender(Bukkit.getConsoleSender()));
     }
     /**
@@ -127,13 +127,6 @@ public abstract class BetterHud extends JavaPlugin {
     public abstract int getWidth(int codepoint);
 
     /**
-     * Gets the player's data from bukkit player.
-     * @param player target player
-     * @return player's data
-     */
-    public abstract @NotNull HudPlayer getHudPlayer(@NotNull Player player);
-
-    /**
      * Gets placeholder manager.
      * @return placeholder manager
      */
@@ -178,6 +171,11 @@ public abstract class BetterHud extends JavaPlugin {
      * @return shader manager
      */
     public abstract @NotNull ShaderManager getShaderManager();
+    /**
+     * Gets player manager.
+     * @return player manager
+     */
+    public abstract @NotNull PlayerManager getPlayerManager();
 
     /**
      * Returns this plugin is currently on reload.
@@ -197,11 +195,6 @@ public abstract class BetterHud extends JavaPlugin {
      */
     public abstract @NotNull Key getDefaultKey();
 
-    /**
-     * Gets all online player instance.
-     * @return all player instance.
-     */
-    public abstract @NotNull @Unmodifiable Collection<HudPlayer> getAllPlayers();
 
     /**
      * Get a translated result of key.

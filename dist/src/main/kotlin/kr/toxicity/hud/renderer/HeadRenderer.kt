@@ -8,13 +8,11 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerHeadManager
-import kr.toxicity.hud.manager.PlayerManager
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
-import java.util.UUID
 
 class HeadRenderer(
     private val components: List<Component>,
@@ -66,7 +64,7 @@ class HeadRenderer(
 
     private fun getHead(placeholderValue: String): Pair<HudPlayer?, HudPlayerHead> {
         return Bukkit.getPlayer(placeholderValue)?.let { bukkitPlayer ->
-            PlayerManager.getHudPlayer(bukkitPlayer.uniqueId)
+            PlayerManagerImpl.getHudPlayer(bukkitPlayer.uniqueId)
         } to PlayerHeadManager.provideHead(placeholderValue)
     }
 }

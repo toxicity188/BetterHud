@@ -2,10 +2,11 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.event.HudPlayerJoinEvent
 import kr.toxicity.hud.api.event.HudPlayerQuitEvent
+import kr.toxicity.hud.api.manager.PlayerManager
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.player.PointedLocationProvider
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.player.location.GPSLocationProvider
-import kr.toxicity.hud.player.location.PointedLocationProvider
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
@@ -20,7 +21,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
-object PlayerManager: BetterHudManager {
+object PlayerManagerImpl: BetterHudManager, PlayerManager {
 
     private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
 
@@ -76,9 +77,13 @@ object PlayerManager: BetterHudManager {
         }
     }
 
-    fun getAllHudPlayer(): Collection<HudPlayer> = Collections.unmodifiableCollection(hudPlayer.values)
-    fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")
-    fun getHudPlayer(uuid: UUID) = hudPlayer[uuid]
+    override fun getAllHudPlayer(): Collection<HudPlayer> = Collections.unmodifiableCollection(hudPlayer.values)
+    override fun getHudPlayer(player: Player) = hudPlayer[player.uniqueId] ?: throw RuntimeException("player is not online!")
+    override fun getHudPlayer(uuid: UUID) = hudPlayer[uuid]
+
+    override fun addLocationProvider(provider: PointedLocationProvider) {
+        locationProviders.add(provider)
+    }
 
     override fun preReload() {
         hudPlayer.values.forEach {

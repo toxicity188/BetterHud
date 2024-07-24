@@ -50,7 +50,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.hud.add")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -84,7 +84,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.hud.remove")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -124,7 +124,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.compass.add")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -158,7 +158,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.compass.remove")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -198,7 +198,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.popup.add")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -232,7 +232,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.popup.remove")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it.uniqueId)
+                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -266,7 +266,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.popup.show")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it)
+                        PlayerManagerImpl.getHudPlayer(it)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -305,7 +305,7 @@ object CommandManager: BetterHudManager {
                 permission = listOf("$NAME_SPACE.popup.hide")
                 executer = exec@ { s, a ->
                     val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManager.getHudPlayer(it)
+                        PlayerManagerImpl.getHudPlayer(it)
                     } ?: run {
                         s.warn("This player is not online: ${a[0]}")
                         return@exec
@@ -347,7 +347,7 @@ object CommandManager: BetterHudManager {
                 usage = "on".toComponent()
                 permission = listOf("$NAME_SPACE.turn.on")
                 executer = { sender, _ ->
-                    PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
+                    PlayerManagerImpl.getHudPlayer((sender as Player).uniqueId)?.let {
                         it.isHudEnabled = true
                         sender.info("Successfully turned the hud on.")
                     } ?: sender.warn("You are not a valid player!")
@@ -358,7 +358,7 @@ object CommandManager: BetterHudManager {
                 usage = "off".toComponent()
                 permission = listOf("$NAME_SPACE.turn.off")
                 executer = { sender, _ ->
-                    PlayerManager.getHudPlayer((sender as Player).uniqueId)?.let {
+                    PlayerManagerImpl.getHudPlayer((sender as Player).uniqueId)?.let {
                         it.isHudEnabled = false
                         sender.info("Successfully turned the hud off.")
                     } ?: sender.warn("You are not a valid player!")

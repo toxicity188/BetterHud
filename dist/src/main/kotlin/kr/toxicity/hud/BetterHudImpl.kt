@@ -6,7 +6,6 @@ import kr.toxicity.hud.api.event.PluginReloadStartEvent
 import kr.toxicity.hud.api.event.PluginReloadedEvent
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.nms.NMS
-import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.scheduler.HudScheduler
@@ -27,7 +26,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -133,7 +131,7 @@ class BetterHudImpl: BetterHud() {
         CompassManagerImpl,
 
         ShaderManagerImpl,
-        PlayerManager
+        PlayerManagerImpl,
     )
 
     private lateinit var nms: NMS
@@ -175,7 +173,7 @@ class BetterHudImpl: BetterHud() {
             it.start()
         }
         Bukkit.getOnlinePlayers().forEach {
-            PlayerManager.register(it)
+            PlayerManagerImpl.register(it)
         }
         task {
             CompletableFuture.runAsync {
@@ -270,7 +268,6 @@ class BetterHudImpl: BetterHud() {
     override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint)
     override fun getBedrockAdapter(): BedrockAdapter = bedrockAdapter
     override fun getAudiences(): BukkitAudiences = audience
-    override fun getHudPlayer(player: Player): HudPlayer = PlayerManager.getHudPlayer(player)
 
 
     override fun loadAssets(prefix: String, dir: File) {
@@ -316,8 +313,8 @@ class BetterHudImpl: BetterHud() {
     override fun getShaderManager(): ShaderManager = ShaderManagerImpl
     override fun getCompassManager(): CompassManager = CompassManagerImpl
     override fun getConfigManager(): ConfigManager = ConfigManagerImpl
+    override fun getPlayerManager(): PlayerManager = PlayerManagerImpl
     override fun isOnReload(): Boolean = onReload
     override fun getDefaultKey(): Key = DEFAULT_KEY
     override fun translate(locale: String, key: String): String? = TextManager.translate(locale, key)
-    override fun getAllPlayers(): Collection<HudPlayer> = PlayerManager.getAllHudPlayer()
 }

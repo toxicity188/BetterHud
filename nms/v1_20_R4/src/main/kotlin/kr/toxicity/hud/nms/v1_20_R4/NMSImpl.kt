@@ -276,7 +276,7 @@ class NMSImpl: NMS {
             ))
             fun changeName(targetBuf: HudByteBuf = buf) {
                 runCatching {
-                    val hud = BetterHud.getInstance().getHudPlayer(player)
+                    val hud = BetterHud.getInstance().getPlayerManager().getHudPlayer(player)
                     val comp = toAdventure(targetBuf.readComponentTrusted())
                     val key = BetterHud.getInstance().defaultKey
                     fun applyFont(component: Component): Component {
@@ -328,7 +328,7 @@ class NMSImpl: NMS {
                     onUse = target
                 } ?: run {
                     onUse = uuid to HudByteBuf(buf.unwrap())
-                    BetterHud.getInstance().getHudPlayer(player).additionalComponent = null
+                    BetterHud.getInstance().getPlayerManager().getHudPlayer(player).additionalComponent = null
                     listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))

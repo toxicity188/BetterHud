@@ -7,7 +7,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
-import kr.toxicity.hud.manager.PlayerManager
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
@@ -67,7 +67,7 @@ class TextRenderer(
             var targetPlayer = player
             followTarget?.let {
                 targetPlayer = Bukkit.getPlayer(it.value(player).toString())?.let { p ->
-                    PlayerManager.getHudPlayer(p.uniqueId)
+                    PlayerManagerImpl.getHudPlayer(p.uniqueId)
                 } ?: return@build EMPTY_PIXEL_COMPONENT
             }
             if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
