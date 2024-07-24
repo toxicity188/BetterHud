@@ -59,7 +59,7 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 No
 
 ### Version
-1.17-1.20.4
+1.17-1.21
 
 ### Build
 Requires Java 17, 21 Eclipse Adoptium.
