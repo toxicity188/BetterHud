@@ -17,6 +17,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
 import java.awt.Font
+import java.awt.font.FontRenderContext
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStreamReader
@@ -125,6 +126,8 @@ object TextManager: BetterHudManager {
             addAll(0x05D0..0x05EA)
         }
     )
+
+    private val FRC = FontRenderContext(null, true, true)
 
     @Synchronized
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
@@ -357,16 +360,29 @@ object TextManager: BetterHudManager {
         fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit)
     }
 
+
+
     private class JavaBitmapProvider(private val font: Font): FontBitmapProvider {
         override val height: Int
             get() = (font.size.toDouble() * 1.4).roundToInt()
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
-            val width = font.size
+            val h = height
             unicodeRange.filter { char ->
                 font.canDisplay(char) && filter(char)
             }.forEachAsync { char ->
-                val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).processFont(char, font) ?: return@forEachAsync
-                block(CharImage(char, image))
+                val vector = font.createGlyphVector(FRC, char.parseChar())
+                val width = vector.visualBounds.width.toInt()
+                if (width <= 0) return@forEachAsync
+                block(CharImage(char, BufferedImage(
+                    width,
+                    h,
+                    BufferedImage.TYPE_INT_ARGB
+                ).apply {
+                    createGraphics().run {
+                        fill(vector.getOutline(0F, font.size.toFloat()))
+                        dispose()
+                    }
+                }))
             }
         }
     }

@@ -203,4 +203,14 @@ public abstract class BetterHud extends JavaPlugin {
      * @return translated value
      */
     public abstract @Nullable String translate(@NotNull String locale, @NotNull String key);
+
+    /**
+     * Gets the player's data from bukkit player.
+     * @param player target player
+     * @return player's data
+     */
+    @NotNull
+    public final HudPlayer getHudPlayer(@NotNull Player player) {
+        return getPlayerManager().getHudPlayer(player);
+    }
 }
