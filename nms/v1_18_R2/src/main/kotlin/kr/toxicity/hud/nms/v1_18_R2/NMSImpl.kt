@@ -275,23 +275,35 @@ class NMSImpl: NMS {
                             applyFont(it)
                         })
                     }
+                    fun hasDecoration(parent: Boolean, state: TextDecoration.State) = when (state) {
+                        TextDecoration.State.TRUE -> true
+                        TextDecoration.State.NOT_SET -> parent
+                        TextDecoration.State.FALSE -> false
+                    }
                     @Suppress("DEPRECATION")
-                    fun getWidth(component: Component): Int {
-                        val style = component.style()
+                    fun getWidth(component: Component, bold: Boolean, italic: Boolean): Int {
+                        var i = 0
+                        if (bold) i++
+                        if (italic) i++
                         return component.children().sumOf {
-                            getWidth(it)
+                            getWidth(
+                                it,
+                                hasDecoration(bold, it.decoration(TextDecoration.BOLD)),
+                                hasDecoration(italic, it.decoration(TextDecoration.ITALIC))
+                            )
                         } + (when (component) {
                             is TextComponent -> component.content()
                             is TranslatableComponent -> BetterHud.getInstance().translate(player.locale, component.key())
                             else -> null
                         }?.codePoints()?.map {
-                            var t = BetterHud.getInstance().getWidth(it)
-                            if (style.hasDecoration(TextDecoration.BOLD)) t++
-                            if (style.hasDecoration(TextDecoration.ITALIC)) t++
-                            t + 1
+                            (if (it == ' '.code) 4 else (BetterHud.getInstance().getWidth(it)) + i + 1)
                         }?.sum() ?: 0)
                     }
-                    hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(comp))
+                    hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(
+                        comp,
+                        hasDecoration(false, comp.decoration(TextDecoration.BOLD)),
+                        hasDecoration(false, comp.decoration(TextDecoration.ITALIC))
+                    ))
                 }
             }
             fun removeBossbar(changeCache: Boolean = false): Boolean {
