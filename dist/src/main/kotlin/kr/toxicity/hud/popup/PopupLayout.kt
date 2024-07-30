@@ -188,14 +188,7 @@ class PopupLayout(
             val group = ShaderGroup(textShader, textLayout.text.name, scale, pixel.y)
             val textKey = TextManager.getKey(group) ?: run {
                 val index = ++textIndex
-                val array = JsonArray().apply {
-                    add(JsonObject().apply {
-                        addProperty("type", "space")
-                        add("advances", JsonObject().apply {
-                            addProperty(" ", 4)
-                        })
-                    })
-                }
+                val array = textLayout.startJson()
                 HudImpl.createBit(textShader, pixel.y) { y ->
                     textLayout.text.array.forEach {
                         array.add(JsonObject().apply {
@@ -299,6 +292,7 @@ class PopupLayout(
                 textLayout.follow,
                 textLayout.useLegacyFormat,
                 textLayout.legacySerializer,
+                textLayout.space,
                 textLayout.conditions.and(textLayout.text.conditions)
             )
         }

@@ -40,6 +40,7 @@ class TextRenderer(
 
     private val useLegacyFormat: Boolean,
     private val legacySerializer: LegacyComponentSerializer,
+    private val space: Int,
     private val condition: ConditionBuilder
 ) {
     companion object {
@@ -72,7 +73,16 @@ class TextRenderer(
             }
             if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var width = 0
-            val targetString = (if (useLegacyFormat) legacySerializer.deserialize(buildPattern(targetPlayer)) else Component.text(buildPattern(targetPlayer)))
+            var patternResult = buildPattern(targetPlayer)
+            if (!disableNumberFormat) {
+                patternResult = decimalPattern.matcher(patternResult).replaceAll {
+                    val g = it.group()
+                    runCatching {
+                        numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                    }.getOrDefault(g)
+                }
+            }
+            val targetString = (if (useLegacyFormat) legacySerializer.deserialize(patternResult) else Component.text(patternResult))
                 .color(defaultColor)
                 .replaceText(TextReplacementConfig.builder()
                     .match(imagePattern)
@@ -91,29 +101,34 @@ class TextRenderer(
                     .build())
             fun applyDecoration(component: Component): Component {
                 var ret = component
-                if (ret is TextComponent) {
+                if (ret is TextComponent && ret.font() == null) {
                     var group = ret.content()
-                    if (!disableNumberFormat) {
-                        group = decimalPattern.matcher(group).replaceAll {
-                            val g = it.group()
-                            runCatching {
-                                numberPattern.format(numberEquation.evaluate(g.toDouble()))
-                            }.getOrDefault(g)
+                    val codepoint = group.codePoints().toArray()
+                    var add = 1
+                    if (component.hasDecoration(TextDecoration.BOLD)) add++
+                    if (component.hasDecoration(TextDecoration.ITALIC)) add++
+                    if (space != 0) {
+                        group = buildString {
+                            codepoint.forEachIndexed { index, i ->
+                                appendCodePoint(i)
+                                width += if (i != SPACE_POINT) widthMap[i]?.let { width ->
+                                    (width.toDouble() * scale).roundToInt() + add
+                                } ?: 0 else 4
+                                if (index < codepoint.lastIndex) {
+                                    width += space
+                                    appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
+                                }
+                            }
                         }
                         ret = ret.content(group)
-                    }
-                    val codepoint = group.codePoints().toArray()
-                    val count = codepoint.count {
-                        it != SPACE_POINT
-                    }
-                    if (component.hasDecoration(TextDecoration.BOLD)) width += count
-                    if (component.hasDecoration(TextDecoration.ITALIC)) width += count
-                    if (component.font() == null) {
+                    } else {
                         width += codepoint.sumOf {
-                            if (it != SPACE_POINT) ((widthMap[it] ?: 0).toDouble() * scale).roundToInt() + 1 else 4
+                            if (it != SPACE_POINT) widthMap[it]?.let { width ->
+                                (width.toDouble() * scale).roundToInt() + add
+                            } ?: 0 else 4
                         }
-                        ret = ret.font(data.word)
                     }
+                    ret = ret.font(data.word)
                 }
                 return ret.children(ret.children().map {
                     applyDecoration(it)

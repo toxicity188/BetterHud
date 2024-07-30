@@ -1,10 +1,14 @@
 package kr.toxicity.hud.layout
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudText
+import kr.toxicity.hud.util.TEXT_SPACE_KEY_CODEPOINT
+import kr.toxicity.hud.util.parseChar
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.text.DecimalFormat
@@ -30,4 +34,14 @@ class TextLayout(
     val useLegacyFormat: Boolean,
     val legacySerializer: LegacyComponentSerializer,
     val conditions: ConditionBuilder
-)
+) {
+    fun startJson() = JsonArray().apply {
+        add(JsonObject().apply {
+            addProperty("type", "space")
+            add("advances", JsonObject().apply {
+                addProperty(" ", 4)
+                if (space != 0) addProperty(TEXT_SPACE_KEY_CODEPOINT.parseChar(), space)
+            })
+        })
+    }
+}

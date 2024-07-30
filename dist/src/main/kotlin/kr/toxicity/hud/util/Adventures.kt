@@ -14,6 +14,8 @@ import kotlin.math.abs
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
+const val TEXT_SPACE_KEY_CODEPOINT = 0xC0000
+
 val CONSOLE
     get() = Bukkit.getConsoleSender().audience
 

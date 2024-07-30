@@ -43,14 +43,7 @@ class HudTextElement(
         val group = ShaderGroup(shader, text.text.name, scale, yAxis)
         val key = TextManager.getKey(group) ?: run {
             val index2 = (++parent.textIndex)
-            val array = JsonArray().apply {
-                add(JsonObject().apply {
-                    addProperty("type", "space")
-                    add("advances", JsonObject().apply {
-                        addProperty(" ", 4)
-                    })
-                })
-            }
+            val array = text.startJson()
             text.text.array.forEach {
                 HudImpl.createBit(shader, yAxis) { y ->
                     array.add(JsonObject().apply {
@@ -157,6 +150,7 @@ class HudTextElement(
             text.follow,
             text.useLegacyFormat,
             text.legacySerializer,
+            text.space,
             text.conditions.and(text.text.conditions)
         )
     }.getText(UpdateEvent.EMPTY)

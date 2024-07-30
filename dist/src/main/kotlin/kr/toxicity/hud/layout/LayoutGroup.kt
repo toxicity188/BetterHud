@@ -59,7 +59,7 @@ class LayoutGroup(
                     },
                     ImageLocation(configurationSection) + loc,
                     scale,
-                    configurationSection.getInt("space", 2).coerceAtLeast(0),
+                    configurationSection.getInt("space").coerceAtLeast(0),
                     configurationSection.getString("align").toLayoutAlign(),
                     configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
                     configurationSection.getBoolean("outline"),
