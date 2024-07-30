@@ -99,43 +99,54 @@ class TextRenderer(
                         MiniMessage.miniMessage().deserialize(r.group())
                     }
                     .build())
-            fun applyDecoration(component: Component): Component {
+            fun hasDecoration(parent: Boolean, state: TextDecoration.State) = when (state) {
+                TextDecoration.State.TRUE -> true
+                TextDecoration.State.NOT_SET -> parent
+                TextDecoration.State.FALSE -> false
+            }
+            fun applyDecoration(component: Component, bold: Boolean, italic: Boolean): Component {
                 var ret = component
                 if (ret is TextComponent && ret.font() == null) {
-                    var group = ret.content()
-                    val codepoint = group.codePoints().toArray()
-                    var add = 1
-                    if (component.hasDecoration(TextDecoration.BOLD)) add++
-                    if (component.hasDecoration(TextDecoration.ITALIC)) add++
+                    val codepoint = ret.content().codePoints().toArray()
+                    var add = 0
+                    if (bold) add++
+                    if (italic) add++
                     if (space != 0) {
-                        group = buildString {
+                        ret = ret.content(buildString {
                             codepoint.forEachIndexed { index, i ->
                                 appendCodePoint(i)
                                 width += if (i != SPACE_POINT) widthMap[i]?.let { width ->
-                                    (width.toDouble() * scale).roundToInt() + add
-                                } ?: 0 else 4
+                                    (width.toDouble() * scale).roundToInt() + add + 1
+                                } ?: 0 else (4 + add)
                                 if (index < codepoint.lastIndex) {
-                                    width += space
+                                    width += space + add
                                     appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
                                 }
                             }
-                        }
-                        ret = ret.content(group)
+                        })
                     } else {
                         width += codepoint.sumOf {
                             if (it != SPACE_POINT) widthMap[it]?.let { width ->
-                                (width.toDouble() * scale).roundToInt() + add
-                            } ?: 0 else 4
+                                (width.toDouble() * scale).roundToInt() + add + 1
+                            } ?: 0 else (4 + add)
                         }
                     }
                     ret = ret.font(data.word)
                 }
                 return ret.children(ret.children().map {
-                    applyDecoration(it)
+                    applyDecoration(
+                        it,
+                        hasDecoration(bold, it.decoration(TextDecoration.BOLD)),
+                        hasDecoration(italic, it.decoration(TextDecoration.ITALIC)),
+                    )
                 })
             }
-
-            var comp = WidthComponent(Component.text().append(applyDecoration(targetString)), width)
+            val finalComp = Component.text().append(applyDecoration(
+                targetString,
+                hasDecoration(false, targetString.decoration(TextDecoration.BOLD)),
+                hasDecoration(false, targetString.decoration(TextDecoration.ITALIC))
+            ))
+            var comp = WidthComponent(finalComp, width)
 
             data.background?.let {
                 val builder = Component.text().append(it.left.component)
