@@ -116,7 +116,7 @@ class HudPlayerImpl(
         } else {
             popupGroup.clear()
         }
-        if (compList.isNotEmpty()) {
+        if (compList.isNotEmpty() || additionalComp != null) {
             additionalComp?.let {
                 compList.add((-it.width / 2).toSpaceComponent() + it)
             }

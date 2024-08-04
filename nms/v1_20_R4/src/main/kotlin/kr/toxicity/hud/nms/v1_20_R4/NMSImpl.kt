@@ -305,7 +305,7 @@ class NMSImpl: NMS {
                             is TranslatableComponent -> BetterHud.getInstance().translate(player.locale, component.key())
                             else -> null
                         }?.codePoints()?.map {
-                            (if (it == ' '.code) 4 else (BetterHud.getInstance().getWidth(it)) + i + 1)
+                            (if (it == ' '.code) 4 else (BetterHud.getInstance().getWidth(it)) + 1) + i
                         }?.sum() ?: 0)
                     }
                     hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(
