@@ -362,27 +362,26 @@ object TextManager: BetterHudManager {
 
 
 
-    private class JavaBitmapProvider(private val font: Font): FontBitmapProvider {
+    private class JavaBitmapProvider(private val targetFont: Font): FontBitmapProvider {
         override val height: Int
-            get() = (font.size.toDouble() * 1.4).roundToInt()
+            get() = (targetFont.size.toDouble() * 1.4).roundToInt()
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             val h = height
             unicodeRange.filter { char ->
-                font.canDisplay(char) && filter(char)
+                targetFont.canDisplay(char) && filter(char)
             }.forEachAsync { char ->
-                val vector = font.createGlyphVector(FRC, char.parseChar())
-                val width = vector.visualBounds.width.toInt()
-                if (width <= 0) return@forEachAsync
-                block(CharImage(char, BufferedImage(
-                    width,
+                BufferedImage(
+                    targetFont.size,
                     h,
                     BufferedImage.TYPE_INT_ARGB
                 ).apply {
                     createGraphics().run {
-                        fill(vector.getOutline(0F, font.size.toFloat()))
+                        fill(targetFont.createGlyphVector(FRC, char.parseChar()).getOutline(0F, targetFont.size.toFloat()))
                         dispose()
                     }
-                }))
+                }.removeEmptyWidth()?.let {
+                    block(CharImage(char, it.image))
+                }
             }
         }
     }
