@@ -83,7 +83,8 @@ class HudPlayerImpl(
         enabled = toEnable
     }
     override fun save() {
-        DatabaseManagerImpl.currentDatabase.save(this)
+        val current = DatabaseManagerImpl.currentDatabase
+        if (!current.isClosed) current.save(this)
     }
 
     override fun update() {

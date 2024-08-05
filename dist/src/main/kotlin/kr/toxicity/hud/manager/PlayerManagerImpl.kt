@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 
 object PlayerManagerImpl: BetterHudManager, PlayerManager {
 
@@ -108,7 +109,9 @@ object PlayerManagerImpl: BetterHudManager, PlayerManager {
     }
 
     override fun end() {
-        hudPlayer.values.forEach {
+        val list = ArrayList(hudPlayer.values)
+        hudPlayer.clear()
+        list.forEach {
             it.save()
         }
     }

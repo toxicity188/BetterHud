@@ -23,13 +23,18 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
     private val defaultConnector = HudDatabaseConnector {
         object : HudDatabase {
 
+            private var closed = false
+
             private fun getFile(player: Player): File {
                 return DATA_FOLDER
                     .subFolder(".users")
                     .subFile("${player.uniqueId}.yml")
             }
 
+            override fun isClosed(): Boolean = closed
+
             override fun close() {
+                closed = true
             }
 
             override fun load(player: Player): HudPlayer {
@@ -95,9 +100,12 @@ object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
                 }
             }
             object: HudDatabase {
+
                 override fun close() {
                     mysql.close()
                 }
+
+                override fun isClosed(): Boolean = mysql.isClosed
 
                 override fun load(player: Player): HudPlayer {
                     val hudPlayer = HudPlayerImpl(player)

@@ -21,4 +21,10 @@ public interface HudDatabase extends AutoCloseable {
      * @return whether to success
      */
     boolean save(@NotNull HudPlayer player);
+
+    /**
+     * Returns whether this database is closed.
+     * @return close or not
+     */
+    boolean isClosed();
 }
