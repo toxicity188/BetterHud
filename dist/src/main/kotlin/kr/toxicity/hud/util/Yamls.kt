@@ -17,7 +17,7 @@ fun ConfigurationSection.forEachSubConfiguration(block: (String, ConfigurationSe
     getKeys(false).forEach {
         getConfigurationSection(it)?.let { config ->
             block(it, config)
-        }
+        } ?: warn("Invalid section format: $it")
     }
 }
 

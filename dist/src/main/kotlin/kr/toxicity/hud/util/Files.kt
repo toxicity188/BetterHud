@@ -43,6 +43,8 @@ fun File.forEachAllYaml(sender: Audience, block: (File, String, ConfigurationSec
                     block(it, s, configurationSection)
                 }
             }
+        } else {
+            sender.warn("This is not a yml file: ${it.path}")
         }
     }
 }

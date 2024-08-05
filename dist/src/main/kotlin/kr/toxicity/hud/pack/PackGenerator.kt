@@ -133,9 +133,7 @@ object PackGenerator {
                         MessageDigest.getInstance("SHA-1")
                     }.getOrNull()
                     val file = File(DATA_FOLDER.parentFile, "${ConfigManagerImpl.buildFolderLocation}.zip")
-                    val stream = file.apply {
-                        if (!exists()) delete()
-                    }.outputStream().buffered()
+                    val stream = file.outputStream().buffered()
                     val zip = ZipBuilder(ZipOutputStream(message?.let {
                         DigestOutputStream(stream, it)
                     } ?: stream).apply {
