@@ -73,16 +73,8 @@ class TextRenderer(
             }
             if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var width = 0
-            var patternResult = buildPattern(targetPlayer)
-            if (!disableNumberFormat) {
-                patternResult = decimalPattern.matcher(patternResult).replaceAll {
-                    val g = it.group()
-                    runCatching {
-                        numberPattern.format(numberEquation.evaluate(g.toDouble()))
-                    }.getOrDefault(g)
-                }
-            }
-            val targetString = (if (useLegacyFormat) legacySerializer.deserialize(patternResult) else Component.text(patternResult))
+            val patternResult = buildPattern(targetPlayer)
+            var targetString = (if (useLegacyFormat) legacySerializer.deserialize(patternResult) else Component.text(patternResult))
                 .color(defaultColor)
                 .replaceText(TextReplacementConfig.builder()
                     .match(imagePattern)
@@ -99,6 +91,17 @@ class TextRenderer(
                         MiniMessage.miniMessage().deserialize(r.group())
                     }
                     .build())
+            if (!disableNumberFormat) {
+                targetString = targetString.replaceText(TextReplacementConfig.builder()
+                    .match(decimalPattern)
+                    .replacement { r, _ ->
+                        val g = r.group()
+                        Component.text(runCatching {
+                            numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                        }.getOrDefault(g))
+                    }
+                    .build())
+            }
             fun hasDecoration(parent: Boolean, state: TextDecoration.State) = when (state) {
                 TextDecoration.State.TRUE -> true
                 TextDecoration.State.NOT_SET -> parent

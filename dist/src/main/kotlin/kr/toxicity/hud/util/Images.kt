@@ -2,8 +2,6 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.NamedLoadedImage
-import java.awt.Font
-import java.awt.font.FontRenderContext
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.ByteArrayOutputStream
