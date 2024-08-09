@@ -55,7 +55,7 @@ class BetterHudImpl: BetterHud() {
         if (!dataFolder.exists()) loadAssets("default", dataFolder.apply {
             mkdir()
         })
-        val injector = DependencyInjector(dataFolder, logger, javaClass.classLoader as URLClassLoader)
+        val injector = DependencyInjector(description.version, dataFolder, logger, javaClass.classLoader as URLClassLoader)
         listOf(
             "adventure-api",
             "adventure-key",

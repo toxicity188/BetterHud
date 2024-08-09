@@ -51,9 +51,12 @@ object MinecraftManager: BetterHudManager {
     }
 
     override fun start() {
+    }
+
+    override fun reload(sender: Audience, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling(CONSOLE, "Unable to load minecraft default textures.") {
+            runWithExceptionHandling(sender, "Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -62,7 +65,9 @@ object MinecraftManager: BetterHudManager {
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                     JsonParser.parseReader(it)
                 }.asJsonObject
-                val current = MinecraftVersion.current.toString()
+                val current = (if (ConfigManagerImpl.minecraftJarVersion == "bukkit") MinecraftVersion.current else runWithExceptionHandling(sender, "Invalid minecraft version: ${ConfigManagerImpl.minecraftJarVersion}") {
+                    MinecraftVersion(ConfigManagerImpl.minecraftJarVersion)
+                }.getOrDefault(MinecraftVersion.current)).toString()
                 info("Current minecraft version: $current")
                 val file = File(cache, "$current.jar")
                 if (!file.exists() || file.length() == 0L) {
@@ -84,7 +89,7 @@ object MinecraftManager: BetterHudManager {
                                 .getAsJsonPrimitive("url")
                                 .asString))
                             .GET().build(), HttpResponse.BodyHandlers.ofInputStream()).body().buffered().use { inputStream ->
-                                inputStream.copyTo(outputStream)
+                            inputStream.copyTo(outputStream)
                         }
                     }
                 }
@@ -94,8 +99,8 @@ object MinecraftManager: BetterHudManager {
                         if (!s.name.startsWith(ASSETS_LOCATION)) return@forEachAsync
                         val sub = s.name.substring(ASSETS_LOCATION.length)
                         if (ConfigManagerImpl.includedMinecraftTextures.any { t ->
-                            sub.startsWith(t)
-                        }) {
+                                sub.startsWith(t)
+                            }) {
                             val split = sub.split('.')
                             fun add(name: String) {
                                 it.getInputStream(s).buffered().toImage().removeEmptySide()?.let { image ->
@@ -115,9 +120,6 @@ object MinecraftManager: BetterHudManager {
 
             }
         }
-    }
-
-    override fun reload(sender: Audience, resource: GlobalResource) {
     }
 
     override fun end() {

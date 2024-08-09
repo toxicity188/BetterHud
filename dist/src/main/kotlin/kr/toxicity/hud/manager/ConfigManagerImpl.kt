@@ -81,6 +81,9 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     var clearBuildFolder = true
         private set
 
+    var minecraftJarVersion = "bukkit"
+        private set
+
     private var metrics: Metrics? = null
     var loadMinecraftDefaultTextures = true
         private set
@@ -185,6 +188,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
                 }
             }
             key = KeyResource(yaml.getString("namespace") ?: NAME_SPACE)
+            minecraftJarVersion = yaml.getString("minecraft-jar-version") ?: "bukkit"
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

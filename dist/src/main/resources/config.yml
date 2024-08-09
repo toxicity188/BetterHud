@@ -29,3 +29,4 @@ included-minecraft-list:
 resourcepack-obfuscation: false
 clear-build-folder: true #If you use Oraxen, set this to false.
 legacy-serializer: ampersand #section, ampersand
+minecraft-jar-version: bukkit #1.21, 1.20.4, etc.

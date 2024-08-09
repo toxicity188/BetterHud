@@ -33,7 +33,7 @@ public abstract class BetterHud extends JavaPlugin {
 
     public static final String DEFAULT_NAMESPACE = "betterhud";
     public static final String ADVENTURE_VERSION = "4.17.0";
-    public static final String PLATFORM_VERSION = "4.3.2";
+    public static final String PLATFORM_VERSION = "4.3.3";
     public static final String EXAMINATION_VERSION = "1.3.0";
 
     @Override

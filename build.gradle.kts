@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm") version("2.0.0")
     id("io.github.goooler.shadow") version("8.1.8")
-    id("io.papermc.paperweight.userdev") version("1.7.1") apply(false)
+    id("io.papermc.paperweight.userdev") version("1.7.2") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.0")
     id("org.jetbrains.dokka") version("1.9.20")
 }
@@ -10,7 +10,7 @@ plugins {
 val minecraft = "1.21"
 val folia = "1.20.6" // TODO bumps version to 1.21
 val adventure = "4.17.0"
-val platform = "4.3.2"
+val platform = "4.3.3"
 val targetJavaVersion = 21
 
 val legacyNmsVersion = listOf(
@@ -44,7 +44,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.0"
+    version = "1.1"
 
     repositories {
         mavenCentral()
@@ -88,14 +88,6 @@ allprojects {
     java {
         toolchain.vendor = JvmVendorSpec.ADOPTIUM
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-subprojects {
-    tasks {
-        build {
-            finalizedBy(clean)
-        }
     }
 }
 
@@ -214,6 +206,7 @@ tasks {
         prefix("kotlin")
         prefix("net.objecthunter.exp4j")
         prefix("org.bstats")
+        prefix("org.objectweb.asm")
         prefix("me.lucko.jarrelocator")
         relocate("net.kyori", "hud.net.kyori")
         finalizedBy(sourceJar)

@@ -1,6 +1,8 @@
 package kr.toxicity.hud.dependency
 
+import kr.toxicity.hud.util.subFile
 import kr.toxicity.hud.util.subFolder
+import kr.toxicity.hud.util.toYaml
 import me.lucko.jarrelocator.JarRelocator
 import me.lucko.jarrelocator.Relocation
 import java.io.File
@@ -11,7 +13,7 @@ import java.net.URLClassLoader
 import java.util.logging.Logger
 
 
-class DependencyInjector(private val dataFolder: File, private val logger: Logger, classLoader: URLClassLoader) {
+class DependencyInjector(version: String, dataFolder: File, private val logger: Logger, classLoader: URLClassLoader) {
     companion object {
 
         private const val CENTERAL = "https://repo1.maven.org/maven2"
@@ -35,8 +37,13 @@ class DependencyInjector(private val dataFolder: File, private val logger: Logge
         }
     }
 
+    private val dir = dataFolder.subFolder(".libraries")
+
+    init {
+        if (dataFolder.subFile("version.yml").toYaml().getString("plugin-version") != version) dir.deleteRecursively()
+    }
+
     fun load(dependency: Dependency) {
-        val dir = dataFolder.subFolder(".libraries")
         val file = File(dir, dependency.toPath().replace('/', File.separatorChar)).apply {
             parentFile.mkdirs()
         }
