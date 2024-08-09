@@ -11,15 +11,15 @@ import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
+import kr.toxicity.hud.dependency.Dependency
+import kr.toxicity.hud.dependency.DependencyInjector
+import kr.toxicity.hud.dependency.Relocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
 import kr.toxicity.hud.util.*
-import net.byteflux.libby.BukkitLibraryManager
-import net.byteflux.libby.Library
-import net.byteflux.libby.relocation.Relocation
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.io.InputStream
 import java.net.URI
+import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -54,59 +55,57 @@ class BetterHudImpl: BetterHud() {
         if (!dataFolder.exists()) loadAssets("default", dataFolder.apply {
             mkdir()
         })
-        BukkitLibraryManager(this, ".libraries").run {
-            addMavenCentral()
-            listOf(
-                "adventure-api",
-                "adventure-key",
-                "adventure-text-logger-slf4j",
-                "adventure-text-serializer-ansi",
-                "adventure-text-serializer-gson",
-                "adventure-text-serializer-plain",
-                "adventure-text-serializer-legacy",
-                "adventure-nbt",
-                "adventure-text-serializer-json",
-                "adventure-text-serializer-gson-legacy-impl",
-                "adventure-text-serializer-json-legacy-impl",
-                "adventure-text-minimessage",
-            ).forEach {
-                loadLibrary(Library.builder()
-                    .groupId("net{}kyori")
-                    .artifactId(it)
-                    .version(ADVENTURE_VERSION)
-                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
-                    .build())
-            }
-            listOf(
-                "examination-api",
-                "examination-string"
-            ).forEach {
-                loadLibrary(Library.builder()
-                    .groupId("net{}kyori")
-                    .artifactId(it)
-                    .version(EXAMINATION_VERSION)
-                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
-                    .build())
-            }
-            listOf(
-                "adventure-platform-bukkit",
-                "adventure-platform-api",
-                "adventure-platform-facet",
-            ).forEach {
-                loadLibrary(Library.builder()
-                    .groupId("net{}kyori")
-                    .artifactId(it)
-                    .version(PLATFORM_VERSION)
-                    .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
-                    .build())
-            loadLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("option")
-                .version("1.0.0")
-                .relocate(Relocation("net{}kyori", "hud{}net{}kyori"))
-                .build())
-            }
+        val injector = DependencyInjector(dataFolder, logger, javaClass.classLoader as URLClassLoader)
+        listOf(
+            "adventure-api",
+            "adventure-key",
+            "adventure-text-logger-slf4j",
+            "adventure-text-serializer-ansi",
+            "adventure-text-serializer-gson",
+            "adventure-text-serializer-plain",
+            "adventure-text-serializer-legacy",
+            "adventure-nbt",
+            "adventure-text-serializer-json",
+            "adventure-text-serializer-gson-legacy-impl",
+            "adventure-text-serializer-json-legacy-impl",
+            "adventure-text-minimessage",
+        ).forEach {
+            injector.load(Dependency(
+                "net{}kyori",
+                it,
+                ADVENTURE_VERSION,
+                Relocation("net{}kyori", "hud{}net{}kyori")
+            ))
         }
+        listOf(
+            "examination-api",
+            "examination-string"
+        ).forEach {
+            injector.load(Dependency(
+                "net{}kyori",
+                it,
+                EXAMINATION_VERSION,
+                Relocation("net{}kyori", "hud{}net{}kyori")
+            ))
+        }
+        listOf(
+            "adventure-platform-bukkit",
+            "adventure-platform-api",
+            "adventure-platform-facet",
+        ).forEach {
+            injector.load(Dependency(
+                "net{}kyori",
+                it,
+                PLATFORM_VERSION,
+                Relocation("net{}kyori", "hud{}net{}kyori")
+            ))
+        }
+        injector.load(Dependency(
+            "net{}kyori",
+            "option",
+            "1.0.0",
+            Relocation("net{}kyori", "hud{}net{}kyori")
+        ))
     }
 
     private val managers = listOf(

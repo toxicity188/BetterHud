@@ -66,7 +66,7 @@ allprojects {
 
         implementation("net.objecthunter:exp4j:0.4.8")
         implementation("org.bstats:bstats-bukkit:3.0.2")
-        implementation("net.byteflux:libby-bukkit:1.3.0")
+        implementation("me.lucko:jar-relocator:1.7")
 
         implementation(rootProject.fileTree("shaded"))
     }
@@ -214,7 +214,7 @@ tasks {
         prefix("kotlin")
         prefix("net.objecthunter.exp4j")
         prefix("org.bstats")
-        prefix("net.byteflux")
+        prefix("me.lucko.jarrelocator")
         relocate("net.kyori", "hud.net.kyori")
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)

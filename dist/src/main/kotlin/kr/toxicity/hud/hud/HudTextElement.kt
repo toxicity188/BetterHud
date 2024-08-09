@@ -64,7 +64,7 @@ class HudTextElement(
                 val imageScale = it.value.scale * text.scale
                 val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                 val div = height.toDouble() / it.value.image.image.height
-                HudImpl.createBit(shader, pixel.y + it.value.location.y) { y ->
+                HudImpl.createBit(shader, loc.y + it.value.location.y) { y ->
                     array.add(JsonObject().apply {
                         addProperty("type", "bitmap")
                         val encode = "glyph_${it.key}".encodeKey()
@@ -102,7 +102,7 @@ class HudTextElement(
                             gui,
                             text.layer - 1,
                             false
-                        ), pixel.y + it.location.y) { y ->
+                        ), loc.y + it.location.y) { y ->
                             array.add(JsonObject().apply {
                                 addProperty("type", "bitmap")
                                 addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
