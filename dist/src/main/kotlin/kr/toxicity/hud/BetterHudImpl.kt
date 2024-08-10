@@ -144,7 +144,7 @@ class BetterHudImpl: BetterHud() {
         val pluginManager = Bukkit.getPluginManager()
 
         nms = when (MinecraftVersion.current) {
-            MinecraftVersion.version1_21 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
+            MinecraftVersion.version1_21, MinecraftVersion.version1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
             MinecraftVersion.version1_20_5, MinecraftVersion.version1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
             MinecraftVersion.version1_20_3, MinecraftVersion.version1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
             MinecraftVersion.version1_20_2 -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()

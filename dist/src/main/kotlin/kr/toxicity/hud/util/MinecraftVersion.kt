@@ -11,6 +11,7 @@ data class MinecraftVersion(
         val current = MinecraftVersion(Bukkit.getBukkitVersion()
             .substringBefore('-'))
 
+        val version1_21_1 = MinecraftVersion(1, 21, 1)
         val version1_21 = MinecraftVersion(1, 21, 0)
         val version1_20_6 = MinecraftVersion(1, 20, 6)
         val version1_20_5 = MinecraftVersion(1, 20, 5)
