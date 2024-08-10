@@ -7,10 +7,10 @@ plugins {
     id("org.jetbrains.dokka") version("1.9.20")
 }
 
-val minecraft = "1.21"
-val folia = "1.20.6" // TODO bumps version to 1.21
+val minecraft = "1.21.1"
+val folia = "1.20.6" // TODO bumps version to 1.21.1
 val adventure = "4.17.0"
-val platform = "4.3.3"
+val platform = "4.3.4"
 val targetJavaVersion = 21
 
 val legacyNmsVersion = listOf(
