@@ -138,12 +138,13 @@ fun BufferedImage.withOpacity(opacity: Double): BufferedImage {
     }
 }
 
-fun LoadedImage.circleCut(degree: Double) = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB).also {
+fun LoadedImage.circleCut(degree: Double, reversed: Boolean = false) = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB).also {
     val hw = image.width.toDouble() / 2
     val hh = image.height.toDouble() / 2
     for (w in 0..<image.width) {
         for (h in 0..<image.height) {
             var d = -(atan2(h.toDouble() - hh, w.toDouble() - hw) + PI / 2)
+            if (reversed) d *= -1
             if (d < 0) d += 2 * PI
             if (d > 2 * PI) d -= 2 * PI
             if (d <= degree) it.setRGB(w, h, image.getRGB(w, h))

@@ -90,7 +90,7 @@ enum class SplitType {
         override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
             val saveName = target.name.substringBefore('.')
             return (1..split).map {
-                val targetImage = target.image.circleCut(2 * PI * (split - it + 1).toDouble() / split.toDouble()) ?: throw RuntimeException()
+                val targetImage = target.image.circleCut(2 * PI * it.toDouble() / split.toDouble(), true) ?: throw RuntimeException()
                 NamedLoadedImage(
                     "${saveName}_$it.png",
                     targetImage
