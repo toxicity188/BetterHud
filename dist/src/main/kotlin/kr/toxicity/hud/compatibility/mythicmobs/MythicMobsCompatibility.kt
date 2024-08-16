@@ -56,6 +56,26 @@ class MythicMobsCompatibility: Compatibility {
                     }
                 }
             },
+            "aura_max_duration" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return Function { p ->
+                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
+                            it.startDuration
+                        } ?: 0
+                    }
+                }
+            },
+            "aura_duration" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return Function { p ->
+                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
+                            it.ticksRemaining
+                        } ?: 0
+                    }
+                }
+            },
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(

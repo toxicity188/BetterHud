@@ -1,8 +1,10 @@
 package kr.toxicity.hud.image
 
+import kr.toxicity.hud.util.circleCut
 import kr.toxicity.hud.util.removeEmptyWidth
 import java.awt.AlphaComposite
 import java.awt.image.BufferedImage
+import kotlin.math.PI
 
 enum class SplitType {
     LEFT {
@@ -68,6 +70,30 @@ enum class SplitType {
                             dispose()
                         }
                     }.removeEmptyWidth(target.image.xOffset, target.image.yOffset) ?: throw RuntimeException()
+                )
+            }
+        }
+    },
+    CIRCLE {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
+            return (1..split).map {
+                val targetImage = target.image.circleCut(2 * PI * it.toDouble() / split.toDouble()) ?: throw RuntimeException()
+                NamedLoadedImage(
+                    "${saveName}_$it.png",
+                    targetImage
+                )
+            }
+        }
+    },
+    REVERSE_CIRCLE {
+        override fun split(target: NamedLoadedImage, split: Int): List<NamedLoadedImage> {
+            val saveName = target.name.substringBefore('.')
+            return (1..split).map {
+                val targetImage = target.image.circleCut(2 * PI * (split - it + 1).toDouble() / split.toDouble()) ?: throw RuntimeException()
+                NamedLoadedImage(
+                    "${saveName}_$it.png",
+                    targetImage
                 )
             }
         }

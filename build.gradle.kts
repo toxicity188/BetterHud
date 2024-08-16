@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    kotlin("jvm") version("2.0.0")
+    kotlin("jvm") version("2.0.10")
     id("io.github.goooler.shadow") version("8.1.8")
     id("io.papermc.paperweight.userdev") version("1.7.2") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.0")
@@ -44,7 +44,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.1"
+    version = "1.2"
 
     repositories {
         mavenCentral()

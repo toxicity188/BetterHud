@@ -1,6 +1,5 @@
 package kr.toxicity.hud.compatibility.mmoitems
 
-import com.google.gson.JsonParser
 import io.lumine.mythic.lib.MythicLib
 import io.lumine.mythic.lib.api.item.ItemTag
 import io.lumine.mythic.lib.api.item.SupportedNBTTagValues
@@ -52,7 +51,7 @@ class MMOItemsCompatibility: Compatibility {
         val compact = ItemTag.getTagAtPath(ItemStats.ABILITIES.nbtPath, tags)?.value as? String ?: return emptyMap()
         return runCatching {
             val map = HashMap<TriggerType, SkillHandler<SkillResult>>()
-            JsonParser.parseString(compact).asJsonArray.forEach {
+            io.lumine.mythic.lib.gson.JsonParser.parseString(compact).asJsonArray.forEach {
                 if (it.isJsonObject) {
                     val data = AbilityData(it.asJsonObject)
                     map[data.trigger] = data.handler
