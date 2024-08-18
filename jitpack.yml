@@ -1,2 +1,7 @@
 jdk:
   - openjdk17
+
+build:
+  commands:
+    - cd api
+    - ../gradlew build

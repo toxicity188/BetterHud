@@ -13,12 +13,10 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
     }
 
-    afterEvaluate {
-        publishing {
-            publications {
-                create<MavenPublication>("maven") {
-                    from(components["java"])
-                }
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
             }
         }
     }

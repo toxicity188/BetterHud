@@ -3,6 +3,8 @@ plugins {
 }
 rootProject.name = "BetterHud"
 
+gradle.startParameter.isParallelProjectExecutionEnabled = true
+
 include(
     "api:standard-api",
     "api:bukkit-api",

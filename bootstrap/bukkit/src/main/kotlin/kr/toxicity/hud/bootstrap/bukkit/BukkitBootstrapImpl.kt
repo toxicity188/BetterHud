@@ -157,7 +157,7 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
     private lateinit var audiences: BukkitAudiences
 
     override fun isFolia(): Boolean = isFolia
-    override fun volatileCode(): VolatileCodeHandler = nms
+    override fun volatileCode(): NMS = nms
     override fun bedrockAdapter(): BedrockAdapter = bedrockAdapter
 
     override fun isPaper(): Boolean = isPaper
