@@ -1,7 +1,8 @@
 jdk:
   - openjdk17
 
+skip-default-build: true
+
 build:
   commands:
-    - cd api
-    - ../gradlew build
+    - ./gradlew :api:build
