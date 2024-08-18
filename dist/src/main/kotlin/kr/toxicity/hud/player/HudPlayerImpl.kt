@@ -10,13 +10,10 @@ import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
-import org.bukkit.boss.BarColor
-import org.bukkit.entity.Player
+import net.kyori.adventure.bossbar.BossBar
 import java.util.concurrent.ConcurrentHashMap
 
-class HudPlayerImpl(
-    private val player: Player,
-): HudPlayer {
+abstract class HudPlayerImpl: HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
     private val objectSet = HashSet<HudObject>()
 
@@ -27,7 +24,7 @@ class HudPlayerImpl(
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
     private val popupKey = HashMap<Any, PopupUpdater>()
     private var task: HudTask? = null
-    private var color: BarColor? = null
+    private var color: BossBar.Color? = null
     private var enabled = true
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
@@ -35,60 +32,61 @@ class HudPlayerImpl(
     private val locationProvide = asyncTaskTimer(20, 20) {
         PlayerManagerImpl.provideLocation(this)
     }
-    init {
+    protected fun inject() {
         objectSet.addAll(HudManagerImpl.defaultHuds)
         objectSet.addAll(PopupManagerImpl.defaultPopups)
         objectSet.addAll(CompassManagerImpl.defaultCompasses)
         startTick()
-        PLUGIN.nms.inject(player, ShaderManagerImpl.barColor)
+        VOLATILE_CODE.inject(this, ShaderManagerImpl.barColor)
     }
 
-    override fun getHudComponent(): WidthComponent = last
-    override fun getAdditionalComponent(): WidthComponent? = additionalComp
-    override fun setAdditionalComponent(component: WidthComponent?) {
+    final override fun getHudComponent(): WidthComponent = last
+    final override fun getAdditionalComponent(): WidthComponent? = additionalComp
+    final override fun setAdditionalComponent(component: WidthComponent?) {
         additionalComp = component
     }
-    override fun getHudObjects(): MutableSet<HudObject> = objectSet
+    final override fun getHudObjects(): MutableSet<HudObject> = objectSet
 
-    override fun getBarColor(): BarColor? = color
-    override fun setBarColor(color: BarColor?) {
+    final override fun getBarColor(): BossBar.Color? = color
+    final override fun setBarColor(color: BossBar.Color?) {
         this.color = color
     }
 
-    override fun getPointedLocation(): MutableSet<PointedLocation> = locationSet
+    final override fun getPointedLocation(): MutableSet<PointedLocation> = locationSet
 
-    override fun cancelTick() {
+    final override fun cancelTick() {
         task?.cancel()
         task = null
     }
 
-    override fun startTick() {
+    final override fun startTick() {
         cancelTick()
-        PLUGIN.nms.reloadBossBar(player, ShaderManagerImpl.barColor)
+        VOLATILE_CODE.reloadBossBar(this, ShaderManagerImpl.barColor)
         val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
         }
     }
 
-    override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
-    override fun getPopupKeyMap(): MutableMap<Any, PopupUpdater> = popupKey
+    final override fun getPopupGroupIteratorMap(): MutableMap<String, PopupIteratorGroup> = popupGroup
+    final override fun getPopupKeyMap(): MutableMap<Any, PopupUpdater> = popupKey
 
-    override fun getTick(): Long = tick
-    override fun getBukkitPlayer(): Player = player
-    override fun getVariableMap(): MutableMap<String, String> = variable
-    override fun getHead(): HudPlayerHead = PlayerHeadManager.provideHead(player.name)
-    override fun isHudEnabled(): Boolean = enabled
-    override fun setHudEnabled(toEnable: Boolean) {
+    final override fun getTick(): Long = tick
+    final override fun getVariableMap(): MutableMap<String, String> = variable
+    final override fun getHead(): HudPlayerHead = PlayerHeadManager.provideHead(name())
+    final override fun isHudEnabled(): Boolean = enabled
+    final override fun setHudEnabled(toEnable: Boolean) {
         enabled = toEnable
     }
-    override fun save() {
+    final override fun save() {
         val current = DatabaseManagerImpl.currentDatabase
         if (!current.isClosed) current.save(this)
     }
 
-    override fun update() {
-        PlaceholderManagerImpl.update(this)
+    protected abstract fun updatePlaceholder()
+
+    final override fun update() {
+        updatePlaceholder()
         tick++
         val compList = ArrayList<WidthComponent>()
 
@@ -127,11 +125,11 @@ class HudPlayerImpl(
             }
             last = comp
 
-            PLUGIN.nms.showBossBar(player, color ?: ShaderManagerImpl.barColor, comp.component.build())
-        } else PLUGIN.nms.showBossBar(player, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
+            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build())
+        } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
     }
 
-    override fun resetElements() {
+    final override fun resetElements() {
         val popupNames = popups.filter {
             !it.isDefault
         }.map {
@@ -168,11 +166,11 @@ class HudPlayerImpl(
         }
     }
 
-    override fun cancel() {
+    final override fun cancel() {
         popupGroup.forEach {
             it.value.clear()
         }
-        PLUGIN.nms.removeBossBar(player)
+        VOLATILE_CODE.removeBossBar(this)
         cancelTick()
         autoSave.cancel()
         locationProvide.cancel()

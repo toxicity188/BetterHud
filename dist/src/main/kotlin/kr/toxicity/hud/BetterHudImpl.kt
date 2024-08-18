@@ -1,119 +1,95 @@
 package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
-import kr.toxicity.hud.api.bedrock.BedrockAdapter
-import kr.toxicity.hud.api.event.PluginReloadStartEvent
-import kr.toxicity.hud.api.event.PluginReloadedEvent
+import kr.toxicity.hud.api.BetterHudBootstrap
+import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
+import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.manager.*
-import kr.toxicity.hud.api.nms.NMS
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
-import kr.toxicity.hud.api.scheduler.HudScheduler
-import kr.toxicity.hud.bedrock.FloodgateAdapter
-import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.dependency.Dependency
 import kr.toxicity.hud.dependency.DependencyInjector
-import kr.toxicity.hud.dependency.Relocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.scheduler.FoliaScheduler
-import kr.toxicity.hud.scheduler.StandardScheduler
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.DEFAULT_KEY
+import kr.toxicity.hud.util.NAME_SPACE_ENCODED
+import kr.toxicity.hud.util.info
+import kr.toxicity.hud.util.runWithExceptionHandling
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
-import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.io.InputStream
-import java.net.URI
 import java.net.URLClassLoader
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 import java.util.jar.JarFile
 
 @Suppress("UNUSED")
-class BetterHudImpl: BetterHud() {
+class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
 
-    private val isFolia = runCatching {
-        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
-        true
-    }.getOrDefault(false)
-    private val isPaper = isFolia || runCatching {
-        Class.forName("com.destroystokyo.paper.profile.PlayerProfile")
-        true
-    }.getOrDefault(false)
     init {
-        if (!dataFolder.exists()) loadAssets("default", dataFolder.apply {
+        if (!bootstrap.dataFolder().exists() && !bootstrap.isVelocity) loadAssets("default", bootstrap.dataFolder().apply {
             mkdir()
         })
-        val injector = DependencyInjector(description.version, dataFolder, logger, javaClass.classLoader as URLClassLoader)
-        listOf(
-            "adventure-api",
-            "adventure-key",
-            "adventure-text-logger-slf4j",
-            "adventure-text-serializer-ansi",
-            "adventure-text-serializer-gson",
-            "adventure-text-serializer-plain",
-            "adventure-text-serializer-legacy",
-            "adventure-nbt",
-            "adventure-text-serializer-json",
-            "adventure-text-serializer-gson-legacy-impl",
-            "adventure-text-serializer-json-legacy-impl",
-            "adventure-text-minimessage",
-        ).forEach {
-            injector.load(Dependency(
-                "net{}kyori",
-                it,
-                ADVENTURE_VERSION,
-                Relocation("net{}kyori", "hud{}net{}kyori")
-            ))
+        val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), javaClass.classLoader as URLClassLoader)
+        if (!bootstrap.isVelocity) {
+            if (!bootstrap.isPaper) {
+                listOf(
+                    "adventure-api",
+                    "adventure-key",
+                    "adventure-text-logger-slf4j",
+                    "adventure-text-serializer-ansi",
+                    "adventure-text-serializer-gson",
+                    "adventure-text-serializer-plain",
+                    "adventure-text-serializer-legacy",
+                    "adventure-nbt",
+                    "adventure-text-serializer-json",
+                    "adventure-text-serializer-gson-legacy-impl",
+                    "adventure-text-serializer-json-legacy-impl",
+                    "adventure-text-minimessage",
+                ).forEach {
+                    injector.load(Dependency(
+                        "net{}kyori",
+                        it,
+                        BetterHud.ADVENTURE_VERSION
+                    ))
+                }
+                listOf(
+                    "examination-api",
+                    "examination-string"
+                ).forEach {
+                    injector.load(Dependency(
+                        "net{}kyori",
+                        it,
+                        BetterHud.EXAMINATION_VERSION
+                    ))
+                }
+                injector.load(Dependency(
+                    "net{}kyori",
+                    "option",
+                    "1.0.0",
+                ))
+            }
+            listOf(
+                "adventure-platform-bukkit",
+                "adventure-platform-api",
+                "adventure-platform-facet",
+            ).forEach {
+                injector.load(Dependency(
+                    "net{}kyori",
+                    it,
+                    BetterHud.PLATFORM_VERSION
+                ))
+            }
         }
-        listOf(
-            "examination-api",
-            "examination-string"
-        ).forEach {
-            injector.load(Dependency(
-                "net{}kyori",
-                it,
-                EXAMINATION_VERSION,
-                Relocation("net{}kyori", "hud{}net{}kyori")
-            ))
-        }
-        listOf(
-            "adventure-platform-bukkit",
-            "adventure-platform-api",
-            "adventure-platform-facet",
-        ).forEach {
-            injector.load(Dependency(
-                "net{}kyori",
-                it,
-                PLATFORM_VERSION,
-                Relocation("net{}kyori", "hud{}net{}kyori")
-            ))
-        }
-        injector.load(Dependency(
-            "net{}kyori",
-            "option",
-            "1.0.0",
-            Relocation("net{}kyori", "hud{}net{}kyori")
-        ))
     }
 
     private val managers = listOf(
         ConfigManagerImpl,
         MinecraftManager,
         CommandManager,
-        CompatibilityManager,
-        ModuleManager,
         DatabaseManagerImpl,
 
         ListenerManagerImpl,
@@ -134,82 +110,27 @@ class BetterHudImpl: BetterHud() {
     )
 
     private lateinit var nms: NMS
-    private lateinit var audience: BukkitAudiences
     private lateinit var bedrockAdapter: BedrockAdapter
 
-    private val scheduler = if (isFolia) FoliaScheduler() else StandardScheduler()
 
-
-    override fun onEnable() {
-        val pluginManager = Bukkit.getPluginManager()
-
-        nms = when (MinecraftVersion.current) {
-            MinecraftVersion.version1_21, MinecraftVersion.version1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
-            MinecraftVersion.version1_20_5, MinecraftVersion.version1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
-            MinecraftVersion.version1_20_3, MinecraftVersion.version1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
-            MinecraftVersion.version1_20_2 -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
-            MinecraftVersion.version1_20, MinecraftVersion.version1_20_1 -> kr.toxicity.hud.nms.v1_20_R1.NMSImpl()
-            MinecraftVersion.version1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
-            MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
-            MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
-            MinecraftVersion.version1_18_2 -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
-            MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
-            MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
-            else -> {
-                warn("Unsupported minecraft version: ${MinecraftVersion.current}")
-                pluginManager.disablePlugin(this)
-                return
-            }
-        }
-        bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
-            GeyserAdapter()
-        } else if (pluginManager.isPluginEnabled("floodgate")) {
-            FloodgateAdapter()
-        } else BedrockAdapter { false }
-        audience = BukkitAudiences.create(this)
-
+    fun start() {
         managers.forEach {
             it.start()
         }
-        Bukkit.getOnlinePlayers().forEach {
-            PlayerManagerImpl.register(it)
+    }
+
+    private val reloadStartTask = ArrayList<() -> Unit>()
+    private val reloadEndTask = ArrayList<(ReloadResult) -> Unit>()
+
+    override fun addReloadStartTask(runnable: Runnable) {
+        reloadStartTask.add {
+            runnable.run()
         }
-        task {
-            CompletableFuture.runAsync {
-                reload()
-                info(
-                    "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
-                    "Plugin enabled."
-                )
-            }
-        }
-        runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
-            HttpClient.newHttpClient().sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val body = it.body()
-                if (description.version != body) {
-                    warn("New version found: $body")
-                    warn("Download: https://www.spigotmc.org/resources/115559")
-                    Bukkit.getPluginManager().registerEvents(object : Listener {
-                        @EventHandler
-                        fun join(e: PlayerJoinEvent) {
-                            val player = e.player
-                            if (player.isOp && ConfigManagerImpl.versionCheck) {
-                                player.info("New BetterHud version found: $body")
-                                player.info(Component.text("Download: https://www.spigotmc.org/resources/115559")
-                                    .clickEvent(ClickEvent.clickEvent(
-                                        ClickEvent.Action.OPEN_URL,
-                                        "https://www.spigotmc.org/resources/115559"
-                                    )))
-                            }
-                        }
-                    }, this)
-                }
-            }
+    }
+
+    override fun addReloadEndTask(runnable: Consumer<ReloadResult>) {
+        reloadEndTask.add {
+            runnable.accept(it)
         }
     }
 
@@ -225,7 +146,9 @@ class BetterHudImpl: BetterHud() {
         }
         val time = System.currentTimeMillis()
         val result = CompletableFuture.supplyAsync {
-            PluginReloadStartEvent().call()
+            reloadStartTask.forEach {
+                it()
+            }
             val result = runWithExceptionHandling(sender, "Unable to reload.") {
                 managers.forEach {
                     it.preReload()
@@ -244,7 +167,9 @@ class BetterHudImpl: BetterHud() {
             }.getOrElse {
                 ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
             }
-            PluginReloadedEvent(result).call()
+            reloadEndTask.forEach {
+                it(result)
+            }
             result
         }.join()
         synchronized(this) {
@@ -253,9 +178,10 @@ class BetterHudImpl: BetterHud() {
         return result
     }
 
+    override fun bootstrap(): BetterHudBootstrap = bootstrap
 
-    override fun onDisable() {
-        audience.close()
+
+    fun end() {
         managers.forEach {
             it.end()
         }
@@ -263,11 +189,7 @@ class BetterHudImpl: BetterHud() {
         info("Plugin disabled.")
     }
 
-    override fun getNMS(): NMS = nms
     override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint)
-    override fun getBedrockAdapter(): BedrockAdapter = bedrockAdapter
-    override fun getAudiences(): BukkitAudiences = audience
-
 
     override fun loadAssets(prefix: String, dir: File) {
         loadAssets(prefix) { s, i ->
@@ -286,12 +208,12 @@ class BetterHudImpl: BetterHud() {
     }
 
     private fun loadAssets(prefix: String, consumer: (String, InputStream) -> Unit) {
-        JarFile(file).use {
+        JarFile(bootstrap.jarFile()).use {
             it.entries().asSequence().forEach { entry ->
                 if (!entry.name.startsWith(prefix)) return@forEach
                 if (entry.name.length <= prefix.length + 1) return@forEach
                 val name = entry.name.substring(prefix.length + 1)
-                if (!entry.isDirectory) getResource(entry.name)?.buffered()?.use { stream ->
+                if (!entry.isDirectory) it.getInputStream(entry).buffered().use { stream ->
                     consumer(name, stream)
                 }
             }
@@ -299,9 +221,6 @@ class BetterHudImpl: BetterHud() {
     }
 
     override fun getEncodedNamespace(): String = NAME_SPACE_ENCODED
-    override fun getScheduler(): HudScheduler = scheduler
-    override fun isPaper(): Boolean = isPaper
-    override fun isFolia(): Boolean = isFolia
     override fun isMergeBossBar(): Boolean = ConfigManagerImpl.mergeBossBar
     override fun getPlaceholderManager(): PlaceholderManager = PlaceholderManagerImpl
     override fun getListenerManager(): ListenerManager = ListenerManagerImpl

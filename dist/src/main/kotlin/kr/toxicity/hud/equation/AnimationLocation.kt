@@ -2,7 +2,7 @@ package kr.toxicity.hud.equation
 
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 
 class AnimationLocation(
     val type: LayoutAnimationType,
@@ -26,11 +26,11 @@ class AnimationLocation(
         }
     )
 
-    constructor(section: ConfigurationSection): this(
-        section.getString("type")?.let {
+    constructor(section: YamlObject): this(
+        section.get("type")?.asString()?.let {
             LayoutAnimationType.valueOf(it.uppercase())
         } ?: LayoutAnimationType.LOOP,
-        section.getInt("duration", 20).coerceAtLeast(1),
+        section.getAsInt("duration", 20).coerceAtLeast(1),
         EquationPair(section)
     )
 }

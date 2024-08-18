@@ -36,7 +36,7 @@ class GlobalResource {
 
     init {
         val key = ConfigManagerImpl.key
-        PLUGIN.getResource("splitter.png")?.buffered()?.use {
+        BOOTSTRAP.resource("splitter.png")?.buffered()?.use {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(textures).apply {
                 add("${ConfigManagerImpl.key.splitterKey.value()}.png")
@@ -44,7 +44,7 @@ class GlobalResource {
                 read
             }
         }
-        PLUGIN.getResource("spaces.ttf")?.buffered()?.use {
+        BOOTSTRAP.resource("spaces.ttf")?.buffered()?.use {
             val read = it.readAllBytes()
             PackGenerator.addTask(ArrayList(font).apply {
                 add("${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf")

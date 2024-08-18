@@ -1,8 +1,7 @@
 package kr.toxicity.hud.configuration
 
-import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.util.*
-import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
 enum class PluginConfiguration(
@@ -14,28 +13,13 @@ enum class PluginConfiguration(
     SHADER("shader.yml")
     ;
 
-    fun create(): YamlConfiguration {
+    fun create(): YamlObject {
         val file = File(DATA_FOLDER, dir)
         val exists = file.exists()
-        if (!exists) PLUGIN.saveResource(dir, false)
+        if (!exists) file.createNewFile()
         val yaml = file.toYaml()
-        if (exists && ConfigManagerImpl.needToUpdateConfig) {
-            warn(
-                "Old configuration version found: $dir",
-                "Configuration will be automatically updated."
-            )
-            val newYaml = PLUGIN.getResource(dir).ifNull("Resource '$dir' not found.").toYaml()
-            yaml.getKeys(true).forEach {
-                if (!newYaml.contains(it)) yaml.set(it, null)
-            }
-            newYaml.getKeys(true).forEach {
-                if (!yaml.contains(it)) {
-                    yaml.set(it, newYaml.get(it))
-                    yaml.setComments(it ,newYaml.getComments(it))
-                    yaml.setInlineComments(it, newYaml.getComments(it))
-                }
-            }
-        }
+        val newYaml = BOOTSTRAP.resource(dir)?.toYaml().ifNull("Resource '$dir' not found.")
+        yaml.merge(newYaml)
         return yaml.apply {
             save(file)
         }

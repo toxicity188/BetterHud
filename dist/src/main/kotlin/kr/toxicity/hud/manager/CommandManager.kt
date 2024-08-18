@@ -1,38 +1,37 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.adapter.CommandSourceWrapper
+import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.CommandModule
-import kr.toxicity.hud.command.SenderType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
 
 object CommandManager: BetterHudManager {
 
-    private val command = CommandModule("hud")
+    val command = CommandModule("hud")
         .addCommand("reload") {
             aliases = listOf("re", "rl", "리로드")
             description = "Reload BetterHud.".toComponent()
             usage = "reload".toComponent()
             permission = listOf("$NAME_SPACE.reload")
             executer = { s, _ ->
-                s.info("Trying to reload. please wait...")
+                s.audience().info("Trying to reload. please wait...")
                 CompletableFuture.runAsync {
                     val reload = PLUGIN.reload()
                     when (reload.state) {
                         ReloadState.STILL_ON_RELOAD -> {
-                            s.warn("The plugin is still reloading!")
+                            s.audience().warn("The plugin is still reloading!")
                         }
                         ReloadState.SUCCESS -> {
-                            s.info("Reload successful! (${reload.time} ms)")
+                            s.audience().info("Reload successful! (${reload.time} ms)")
                         }
                         ReloadState.FAIL -> {
-                            s.info("Reload failed.")
-                            s.info("Check your server log to find the problem.")
+                            s.audience().info("Reload failed.")
+                            s.audience().info("Check your server log to find the problem.")
                         }
                     }
                 }
@@ -45,27 +44,25 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds the hud for a player.".toComponent()
-                usage = "add <player> <hud>".toComponent()
+                usage = "add <HudPlayer> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.add")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val hud = HudManagerImpl.getHud(a[1]) ?: run {
-                        s.warn("This hud doesn't exist: ${a[1]}")
+                        s.audience().warn("This hud doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.add(hud)) s.info("Successfully added.")
-                    else s.warn("Hud '${a[1]}' is already active for this player.")
+                    if (hudPlayer.hudObjects.add(hud)) s.audience().info("Successfully added.")
+                    else s.audience().warn("Hud '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -79,27 +76,25 @@ object CommandManager: BetterHudManager {
             addCommand("remove") {
                 aliases = listOf("r")
                 description = "Removes the hud for a player.".toComponent()
-                usage = "remove <player> <hud>".toComponent()
+                usage = "remove <HudPlayer> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.remove")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val hud = HudManagerImpl.getHud(a[1]) ?: run {
-                        s.warn("This hud doesn't exist: ${a[1]}")
+                        s.audience().warn("This hud doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.remove(hud)) s.info("Successfully removed.")
-                    else s.warn("Hud '${a[1]}' is not active for this player.")
+                    if (hudPlayer.hudObjects.remove(hud)) s.audience().info("Successfully removed.")
+                    else s.audience().warn("Hud '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -119,27 +114,25 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds the compass for a player.".toComponent()
-                usage = "add <player> <compass>".toComponent()
+                usage = "add <HudPlayer> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.add")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val compass = CompassManagerImpl.getCompass(a[1]) ?: run {
-                        s.warn("This compass doesn't exist: ${a[1]}")
+                        s.audience().warn("This compass doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.add(compass)) s.info("Successfully added.")
-                    else s.warn("compass '${a[1]}' is already active for this player.")
+                    if (hudPlayer.hudObjects.add(compass)) s.audience().info("Successfully added.")
+                    else s.audience().warn("compass '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -153,27 +146,25 @@ object CommandManager: BetterHudManager {
             addCommand("remove") {
                 aliases = listOf("r")
                 description = "Removes the compass for a player.".toComponent()
-                usage = "remove <player> <compass>".toComponent()
+                usage = "remove <HudPlayer> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.remove")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val compass = CompassManagerImpl.getCompass(a[1]) ?: run {
-                        s.warn("This compass doesn't exist: ${a[1]}")
+                        s.audience().warn("This compass doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.remove(compass)) s.info("Successfully removed.")
-                    else s.warn("compass '${a[1]}' is not active for this player.")
+                    if (hudPlayer.hudObjects.remove(compass)) s.audience().info("Successfully removed.")
+                    else s.audience().warn("compass '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -193,27 +184,25 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds a popup for a player.".toComponent()
-                usage = "add <player> <popup>".toComponent()
+                usage = "add <HudPlayer> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.add")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val hud = PopupManagerImpl.getPopup(a[1]) ?: run {
-                        s.warn("This popup doesn't exist: ${a[1]}")
+                        s.audience().warn("This popup doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.add(hud)) s.info("Successfully added.")
-                    else s.warn("Popup '${a[1]}' is already active for this player.")
+                    if (hudPlayer.hudObjects.add(hud)) s.audience().info("Successfully added.")
+                    else s.audience().warn("Popup '${a[1]}' is already active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -226,28 +215,26 @@ object CommandManager: BetterHudManager {
             }
             addCommand("remove") {
                 aliases = listOf("r")
-                description = "Removes a popup from a player.".toComponent()
-                usage = "remove <player> <popup>".toComponent()
+                description = "Removes a popup from a hudPlayer.".toComponent()
+                usage = "remove <HudPlayer> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.remove")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it.uniqueId)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val hud = PopupManagerImpl.getPopup(a[1]) ?: run {
-                        s.warn("This popup doesn't exist: ${a[1]}")
+                        s.audience().warn("This popup doesn't exist: ${a[1]}")
                         return@exec
                     }
-                    if (player.hudObjects.remove(hud)) s.info("Successfully removed.")
-                    else s.warn("Popup '${a[1]}' is not active for this player.")
+                    if (hudPlayer.hudObjects.remove(hud)) s.audience().info("Successfully removed.")
+                    else s.audience().warn("Popup '${a[1]}' is not active for this player.")
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -261,32 +248,30 @@ object CommandManager: BetterHudManager {
             addCommand("show") {
                 aliases = listOf("r")
                 description = "Shows a popup for a player.".toComponent()
-                usage = "show <player> <popup>".toComponent()
+                usage = "show <HudPlayer> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.show")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val popup = PopupManagerImpl.getPopup(a[1]) ?: run {
-                        s.warn("This popup doesn't exist: ${a[1]}")
+                        s.audience().warn("This popup doesn't exist: ${a[1]}")
                         return@exec
                     }
                     runCatching {
-                        if (popup.show(UpdateEvent.EMPTY, player) != null) s.info("Popup was successfully displayed.")
-                        else s.warn("Failed to show this popup.")
+                        if (popup.show(UpdateEvent.EMPTY, hudPlayer) != null) s.audience().info("Popup was successfully displayed.")
+                        else s.audience().warn("Failed to show this popup.")
                     }.onFailure { e ->
-                        s.warn("Unable to show this popup in command.")
-                        s.warn("Reason: ${e.message}")
+                        s.audience().warn("Unable to show this popup in command.")
+                        s.audience().warn("Reason: ${e.message}")
                     }
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -300,32 +285,30 @@ object CommandManager: BetterHudManager {
             addCommand("hide") {
                 aliases = listOf("r")
                 description = "Hides a popup for a player.".toComponent()
-                usage = "hide <player> <popup>".toComponent()
+                usage = "hide <HudPlayer> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.hide")
                 executer = exec@ { s, a ->
-                    val player = Bukkit.getPlayer(a[0])?.let {
-                        PlayerManagerImpl.getHudPlayer(it)
-                    } ?: run {
-                        s.warn("This player is not online: ${a[0]}")
+                    val hudPlayer = PlayerManagerImpl.getHudPlayer(a[0]) ?: run {
+                        s.audience().warn("This player is not online: ${a[0]}")
                         return@exec
                     }
                     val popup = PopupManagerImpl.getPopup(a[1]) ?: run {
-                        s.warn("This popup doesn't exist: ${a[1]}")
+                        s.audience().warn("This popup doesn't exist: ${a[1]}")
                         return@exec
                     }
                     runCatching {
-                        if (popup.hide(player)) s.info("Popup was successfully removed.")
-                        else s.warn("Failed to remove this popup.")
+                        if (popup.hide(hudPlayer)) s.audience().info("Popup was successfully removed.")
+                        else s.audience().warn("Failed to remove this popup.")
                     }.onFailure { e ->
-                        s.warn("Unable to show this popup in a command.")
-                        s.warn("Reason: ${e.message}")
+                        s.audience().warn("Unable to show this popup in a command.")
+                        s.audience().warn("Reason: ${e.message}")
                     }
                 }
                 tabCompleter = { _, a ->
                     when (a.size) {
-                        1 -> Bukkit.getOnlinePlayers().map {
-                            it.name
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
                         }.filter {
                             it.contains(a[0])
                         }
@@ -340,17 +323,15 @@ object CommandManager: BetterHudManager {
         .addCommandModule("turn", {
             aliases = listOf("t")
             permission = listOf("$NAME_SPACE.turn")
-            allowedSender = listOf(SenderType.PLAYER)
+            allowedSender = listOf(CommandSourceWrapper.Type.PLAYER)
         }) {
             addCommand("on") {
                 description = "Turns on your hud.".toComponent()
                 usage = "on".toComponent()
                 permission = listOf("$NAME_SPACE.turn.on")
                 executer = { sender, _ ->
-                    PlayerManagerImpl.getHudPlayer((sender as Player).uniqueId)?.let {
-                        it.isHudEnabled = true
-                        sender.info("Successfully turned the hud on.")
-                    } ?: sender.warn("You are not a valid player!")
+                    (sender as HudPlayer).isHudEnabled = true
+                    sender.audience().info("Successfully turned the hud on.")
                 }
             }
             addCommand("off") {
@@ -358,16 +339,13 @@ object CommandManager: BetterHudManager {
                 usage = "off".toComponent()
                 permission = listOf("$NAME_SPACE.turn.off")
                 executer = { sender, _ ->
-                    PlayerManagerImpl.getHudPlayer((sender as Player).uniqueId)?.let {
-                        it.isHudEnabled = false
-                        sender.info("Successfully turned the hud off.")
-                    } ?: sender.warn("You are not a valid player!")
+                    (sender as HudPlayer).isHudEnabled = false
+                    sender.audience().info("Successfully turned the hud off.")
                 }
             }
         }
 
     override fun start() {
-        PLUGIN.getCommand(NAME_SPACE)?.setExecutor(command.createTabExecutor())
     }
 
     override fun reload(sender: Audience, resource: GlobalResource) {

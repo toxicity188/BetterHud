@@ -12,6 +12,8 @@ val folia = "1.20.6" // TODO bumps version to 1.21.1
 val adventure = "4.17.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
+val velocity = "3.3.0"
+val bStats = "3.0.2"
 
 val legacyNmsVersion = listOf(
     "v1_17_R1",
@@ -34,17 +36,12 @@ val allNmsVersion = ArrayList<String>().apply {
     addAll(currentNmsVersion)
 }
 
-val api = project(":api")
-val dist = project(":dist")
-val scheduler = project(":scheduler")
-val bedrock = project(":bedrock")
-
 allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.2"
+    version = "1.3"
 
     repositories {
         mavenCentral()
@@ -63,12 +60,6 @@ allprojects {
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-
-        implementation("net.objecthunter:exp4j:0.4.8")
-        implementation("org.bstats:bstats-bukkit:3.0.2")
-        implementation("me.lucko:jar-relocator:1.7")
-
-        implementation(rootProject.fileTree("shaded"))
     }
 
     tasks {
@@ -91,16 +82,84 @@ allprojects {
     }
 }
 
-api.java {
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+fun Project.bukkit() = also {
+    it.dependencies {
+        compileOnly("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
+        compileOnly("org.bstats:bstats-bukkit:$bStats")
+        compileOnly(rootProject.fileTree("shaded"))
+    }
 }
+fun Project.velocity() = also {
+    it.dependencies {
+        compileOnly("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
+        compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
+        annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
+        compileOnly("io.netty:netty-all:4.1.112.Final")
+        compileOnly("org.bstats:bstats-velocity:$bStats")
+    }
+}
+fun Project.folia() = also {
+    it.dependencies {
+        compileOnly("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
+    }
+}
+fun Project.adventure() = also {
+    it.dependencies {
+        compileOnly("net.kyori:adventure-api:$adventure")
+        compileOnly("net.kyori:adventure-text-minimessage:$adventure")
+        compileOnly("net.kyori:adventure-text-serializer-legacy:$adventure")
+        compileOnly("net.kyori:adventure-text-serializer-gson:$adventure")
+    }
+}
+fun Project.library() = also {
+    it.dependencies {
+        implementation("org.yaml:snakeyaml:2.2")
+        implementation("com.google.code.gson:gson:2.11.0")
+        implementation("net.objecthunter:exp4j:0.4.8")
+        implementation(rootProject.fileTree("shaded"))
+    }
+}
+fun Project.bukkitAudience() = also {
+    it.dependencies {
+        compileOnly("net.kyori:adventure-platform-bukkit:$platform")
+    }
+}
+fun Project.legacy() = also {
+    it.java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+fun Project.dependency(any: Any) = also {
+    it.dependencies.compileOnly(any)
+}
+
+val apiShare = project("api:standard-api").adventure().legacy()
+
+val api = listOf(
+    apiShare,
+    project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy(),
+    project("api:velocity-api").velocity().dependency(apiShare).legacy()
+)
+
+fun Project.api() = also {
+    it.dependencies {
+        api.forEach { p ->
+            compileOnly(p)
+        }
+    }
+}
+
+val dist = project("dist").adventure().library().api()
+val scheduler = project("scheduler")
+val bedrock = project("bedrock")
+
+
 
 legacyNmsVersion.map {
     project("nms:$it")
 }.forEach {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-    }
+    it.legacy()
 }
 
 fun branch(project: Project) {
@@ -114,42 +173,47 @@ fun branch(project: Project) {
 }
 branch(project)
 
-listOf(
-    api,
-    dist,
-    scheduler.project("standard")
-).forEach {
-    it.dependencies {
-        compileOnly("net.kyori:adventure-api:$adventure")
-        compileOnly("net.kyori:adventure-platform-bukkit:$platform")
-        compileOnly("net.kyori:adventure-text-minimessage:$adventure")
-        compileOnly("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
-    }
-}
-
-scheduler.project("folia").dependencies {
-    compileOnly("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
-}
+scheduler.project("standard").adventure().bukkit().api()
+scheduler.project("folia").folia().api()
 
 dist.dependencies {
-    compileOnly(api)
-    scheduler.subprojects.forEach {
-        compileOnly(it)
-    }
-    bedrock.subprojects.forEach {
-        compileOnly(it)
-    }
     allNmsVersion.forEach {
         compileOnly(project(":nms:$it"))
     }
 }
+
+
+val bootstrap = listOf(
+    project("bootstrap:bukkit")
+        .adventure()
+        .bukkit()
+        .api()
+        .dependency(dist)
+        .bukkitAudience()
+        .also {
+            it.dependencies {
+                scheduler.subprojects.forEach { p ->
+                    compileOnly(p)
+                }
+                bedrock.subprojects.forEach { p ->
+                    compileOnly(p)
+                }
+                allNmsVersion.forEach { p ->
+                    compileOnly(project(":nms:$p"))
+                }
+            }
+    },
+    project("bootstrap:velocity").velocity().api().dependency(dist)
+)
 
 project(":nms").subprojects.forEach {
     it.apply(plugin = "io.papermc.paperweight.userdev")
 }
 
 dependencies {
-    implementation(api)
+    api.forEach {
+        implementation(it)
+    }
     implementation(dist)
     scheduler.subprojects.forEach {
         implementation(it)
@@ -160,6 +224,11 @@ dependencies {
     allNmsVersion.forEach {
         implementation(project(":nms:$it", configuration = "reobf"))
     }
+    bootstrap.forEach {
+        implementation(it)
+    }
+    implementation("org.bstats:bstats-bukkit:$bStats")
+    implementation("org.bstats:bstats-velocity:$bStats")
 }
 
 val sourceJar by tasks.creating(Jar::class.java) {
@@ -208,7 +277,9 @@ tasks {
         prefix("org.bstats")
         prefix("org.objectweb.asm")
         prefix("me.lucko.jarrelocator")
-        relocate("net.kyori", "hud.net.kyori")
+        prefix("org.yaml.snakeyaml")
+        prefix("com.google.gson")
+        prefix("com.google.errorprone")
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
     }

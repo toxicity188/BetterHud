@@ -1,5 +1,6 @@
 package kr.toxicity.hud.scheduler
 
+import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
 import org.bukkit.Bukkit
@@ -7,8 +8,10 @@ import org.bukkit.Location
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
 
-class FoliaScheduler: HudScheduler {
-    override fun task(plugin: Plugin, runnable: Runnable): HudTask {
+class FoliaScheduler(
+    private val plugin: Plugin
+): HudScheduler {
+    override fun task(runnable: Runnable): HudTask {
         val task = Bukkit.getGlobalRegionScheduler().run(plugin) {
             runnable.run()
         }
@@ -21,8 +24,15 @@ class FoliaScheduler: HudScheduler {
             }
         }
     }
-    override fun task(plugin: Plugin, location: Location, runnable: Runnable): HudTask {
-        val task = Bukkit.getRegionScheduler().run(plugin, location) {
+    override fun task(location: LocationWrapper, runnable: Runnable): HudTask {
+        val task = Bukkit.getRegionScheduler().run(plugin, Location(
+            Bukkit.getWorld(location.world.uuid),
+            location.x,
+            location.y,
+            location.z,
+            location.pitch,
+            location.yaw
+        )) {
             runnable.run()
         }
         return object : HudTask {
@@ -35,7 +45,7 @@ class FoliaScheduler: HudScheduler {
         }
     }
 
-    override fun taskLater(plugin: Plugin, delay: Long, runnable: Runnable): HudTask {
+    override fun taskLater(delay: Long, runnable: Runnable): HudTask {
         val task = Bukkit.getGlobalRegionScheduler().runDelayed(plugin, {
             runnable.run()
         }, delay)
@@ -49,7 +59,7 @@ class FoliaScheduler: HudScheduler {
         }
     }
 
-    override fun asyncTask(plugin: Plugin, runnable: Runnable): HudTask {
+    override fun asyncTask(runnable: Runnable): HudTask {
         val task = Bukkit.getAsyncScheduler().runNow(plugin) {
             runnable.run()
         }
@@ -63,7 +73,7 @@ class FoliaScheduler: HudScheduler {
         }
     }
 
-    override fun asyncTaskTimer(plugin: Plugin, delay: Long, period: Long, runnable: Runnable): HudTask {
+    override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
         val task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, {
             runnable.run()
         }, delay * 50, period * 50, TimeUnit.MILLISECONDS)

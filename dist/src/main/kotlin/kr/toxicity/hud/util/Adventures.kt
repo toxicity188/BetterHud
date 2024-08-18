@@ -9,7 +9,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import org.bukkit.Bukkit
 import kotlin.math.abs
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
@@ -17,7 +16,7 @@ fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 const val TEXT_SPACE_KEY_CODEPOINT = 0xC0000
 
 val CONSOLE
-    get() = Bukkit.getConsoleSender().audience
+    get() = BOOTSTRAP.console()
 
 val SPACE_KEY
     get() = ConfigManagerImpl.key.spaceKey
@@ -44,14 +43,14 @@ val EMPTY_WIDTH_COMPONENT
 val EMPTY_PIXEL_COMPONENT
     get() = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 val NEW_LAYER
-    get() = if (VERSION.version <= 18) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
+    get() = if (BOOTSTRAP.useLegacyFont()) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
 
 private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
     get() = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
 private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
     get() = WidthComponent(Component.text().content((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
-    get() = if (VERSION.version <= 18) {
+    get() = if (BOOTSTRAP.useLegacyFont()) {
         LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
     } else {
         CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
@@ -71,7 +70,7 @@ fun Int.parseChar(): String {
 }
 
 fun Int.toSpaceComponent() = toSpaceComponent(this)
-fun Int.toSpaceComponent(width: Int) = if (VERSION.version <= 18) {
+fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
     val abs = abs(this)
     if (abs > 256) {
         val i = if (this > 0) 1 else -1

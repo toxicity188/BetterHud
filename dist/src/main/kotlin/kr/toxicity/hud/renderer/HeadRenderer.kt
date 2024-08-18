@@ -12,7 +12,6 @@ import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 
 class HeadRenderer(
     private val components: List<Component>,
@@ -63,8 +62,6 @@ class HeadRenderer(
     }
 
     private fun getHead(placeholderValue: String): Pair<HudPlayer?, HudPlayerHead> {
-        return Bukkit.getPlayer(placeholderValue)?.let { bukkitPlayer ->
-            PlayerManagerImpl.getHudPlayer(bukkitPlayer.uniqueId)
-        } to PlayerHeadManager.provideHead(placeholderValue)
+        return PlayerManagerImpl.getHudPlayer(placeholderValue) to PlayerHeadManager.provideHead(placeholderValue)
     }
 }

@@ -1,6 +1,6 @@
 package kr.toxicity.hud.bedrock
 
-import kr.toxicity.hud.api.bedrock.BedrockAdapter
+import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
 import org.geysermc.floodgate.api.FloodgateApi
 import java.util.*
 

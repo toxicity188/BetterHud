@@ -1,6 +1,5 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.api.event.CustomPopupEvent
 import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
@@ -9,17 +8,8 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.Placeholder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
-import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import me.clip.placeholderapi.PlaceholderAPI
-import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Registry
-import org.bukkit.attribute.Attribute
-import org.bukkit.potion.PotionEffectType
 import java.text.DecimalFormat
 import java.util.function.Function
 import java.util.regex.Pattern
@@ -31,127 +21,18 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
 
     private val doubleDecimal = DecimalFormat("#.###")
 
-    private val updateTask = ArrayList<PlaceholderTask>()
-
     private val number = PlaceholderContainerImpl(
         java.lang.Number::class.java,
         0.0,
-        mapOf(
-            "empty_space" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.emptySpace
+        mapOf<String, HudPlaceholder<Number>>(
+            "popup_count" to HudPlaceholder.of { _, _ ->
+                Function {
+                    it.popupGroupIteratorMap.size
                 }
             },
-            "health" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.health
-                }
-            },
-            "food" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.foodLevel
-                }
-            },
-            "armor" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.armor
-                }
-            },
-            "air" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.remainingAir
-                }
-            },
-            "max_health" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
-                }
-            },
-            "max_health_with_absorption" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value + p.bukkitPlayer.absorptionAmount
-                }
-            },
-            "health_percentage" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value * 100.0
-                }
-            },
-            "max_air" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.maximumAir
-                }
-            },
-            "level" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.level
-                }
-            },
-            "hotbar_slot" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.inventory.heldItemSlot
-                }
-            },
-            "number" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
-                        p.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
-                    }
-                }
-            },
-            "potion_effect_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    val potion = (runCatching {
-                        NamespacedKey.fromString(args[0])?.let { key ->
-                            Registry.EFFECT.get(key)
-                        }
-                    }.onFailure {
-                        @Suppress("DEPRECATION")
-                        PotionEffectType.getByName(args[0])
-                    }.getOrNull() ?: throw RuntimeException("this potion effect doesn't exist: ${args[0]}"))
-                    return Function { p ->
-                        p.bukkitPlayer.getPotionEffect(potion)?.duration ?: 0
-                    }
-                }
-            },
-            "total_amount" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    val item = Material.valueOf(args[0].uppercase())
-                    return Function { p ->
-                        p.bukkitPlayer.totalAmount(item)
-                    }
-                }
-            },
-            "storage" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    val item = Material.valueOf(args[0].uppercase())
-                    return Function { p ->
-                        p.bukkitPlayer.storage(item)
-                    }
-                }
-            },
-            "air" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.remainingAir
-                }
-            },
-            "absorption" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.absorptionAmount
-                }
-            },
-            "max_air" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.maximumAir
-                }
-            },
-            "food" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.foodLevel
+            "tick" to HudPlaceholder.of { _, _ ->
+                Function {
+                    it.tick
                 }
             }
         ), {
@@ -164,35 +45,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         java.lang.String::class.java,
         "<none>",
         mapOf(
-            "name" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.name
-                }
-            },
-            "gamemode" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.gameMode.name
-                }
-            },
-            "string" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    return Function { p ->
-                        p.variableMap[args[0]] ?: "<none>"
-                    }
-                }
-            },
-            "custom_variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val key = args[0]
-                    return reason.unwrap { e: CustomPopupEvent ->
-                        Function { _ ->
-                            e.variables[key] ?: "<none>"
-                        }
-                    }
-                }
-            }
+
         ), {
             val matcher = stringPattern.matcher(it)
             if (matcher.find()) matcher.group("content") else null
@@ -204,11 +57,6 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         java.lang.Boolean::class.java,
         false,
         mapOf(
-            "dead" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.isDead
-                }
-            },
             "boolean" to object : HudPlaceholder<Boolean> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
@@ -397,63 +245,9 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     override fun getBooleanContainer(): PlaceholderContainer<Boolean> = boolean
     override fun getStringContainer(): PlaceholderContainer<String> = string
     override fun start() {
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            string.addPlaceholder("papi", object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val format = "%${args[0]}%"
-                    return Function { player ->
-                        runCatching {
-                            PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
-                        }.getOrDefault("<error>")
-                    }
-                }
-            })
-        }
     }
 
     override fun reload(sender: Audience, resource: GlobalResource) {
-        updateTask.clear()
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            DATA_FOLDER.subFolder("placeholders").forEachAllYaml(sender) { file, s, configurationSection ->
-                runWithExceptionHandling(sender, "Unable to read this placeholder task: $s in ${file.name}") {
-                    val variable = configurationSection.getString("variable").ifNull("variable not set.")
-                    val placeholder = configurationSection.getString("placeholder").ifNull("placeholder not set.")
-                    val update = configurationSection.getInt("update", 1).coerceAtLeast(1)
-                    val async = configurationSection.getBoolean("async", false)
-                    updateTask.add(object : PlaceholderTask {
-                        override val tick: Int
-                            get() = update
-                        override val async: Boolean
-                            get() = async
-
-                        override fun invoke(p1: HudPlayer) {
-                            runCatching {
-                                p1.variableMap[variable] = PlaceholderAPI.setPlaceholders(p1.bukkitPlayer, placeholder)
-                            }
-                        }
-                    })
-                }
-            }
-        }
-    }
-
-    fun update(hudPlayer: HudPlayer) {
-        val task = updateTask.filter {
-            hudPlayer.tick % it.tick == 0L
-        }
-        if (task.isNotEmpty()) {
-            val syncTask = ArrayList<PlaceholderTask>()
-            task.forEach {
-                if (it.async) it(hudPlayer) else syncTask.add(it)
-            }
-            if (syncTask.isEmpty()) return
-            task(hudPlayer.bukkitPlayer.location) {
-                syncTask.forEach {
-                    it(hudPlayer)
-                }
-            }
-        }
     }
 
     override fun end() {

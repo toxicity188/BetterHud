@@ -17,13 +17,13 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 
 class HudImpl(
     override val path: String,
     private val internalName: String,
     file: List<String>,
-    section: ConfigurationSection
+    section: YamlObject
 ): Hud, HudConfiguration {
     companion object {
         const val DEFAULT_BIT = 13
@@ -42,19 +42,19 @@ class HudImpl(
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
-    private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getBoolean("default")
+    private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getAsBoolean("default", false)
     var textIndex = 0
 
     private val elements = ArrayList<HudAnimation>().apply {
-        section.getConfigurationSection("layouts").ifNull("layout configuration not set.").forEachSubConfiguration { s, configurationSection ->
-            val layout = configurationSection.getString("name").ifNull("name value not set: $s").let {
+        section.get("layouts")?.asObject().ifNull("layout configuration not set.").forEachSubConfiguration { s, yamlObject ->
+            val layout = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
                 LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
             }
-            var gui = GuiLocation(configurationSection)
-            configurationSection.getConfigurationSection("gui")?.let {
+            var gui = GuiLocation(yamlObject)
+            yamlObject.get("gui")?.asObject()?.let {
                 gui += GuiLocation(it)
             }
-            val pixel = configurationSection.getConfigurationSection("pixel")?.let {
+            val pixel = yamlObject.get("pixel")?.asObject()?.let {
                 ImageLocation(it)
             } ?: ImageLocation.zero
             add(HudAnimation(
@@ -95,14 +95,14 @@ class HudImpl(
 
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
 
-    override fun getComponents(player: HudPlayer): List<WidthComponent> {
-        if (!conditions(player)) return emptyList()
+    override fun getComponents(hudPlayer: HudPlayer): List<WidthComponent> {
+        if (!conditions(hudPlayer)) return emptyList()
         return elements.map {
             val elements = it.elements
             elements[when (it.animationType) {
-                LayoutAnimationType.LOOP -> (player.tick % elements.size).toInt()
-                LayoutAnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(elements.lastIndex)
-            }].getComponent(player)
+                LayoutAnimationType.LOOP -> (hudPlayer.tick % elements.size).toInt()
+                LayoutAnimationType.PLAY_ONCE -> hudPlayer.tick.toInt().coerceAtMost(elements.lastIndex)
+            }].getComponent(hudPlayer)
         }
     }
 

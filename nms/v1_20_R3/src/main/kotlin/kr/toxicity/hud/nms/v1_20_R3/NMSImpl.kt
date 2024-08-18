@@ -6,9 +6,11 @@ import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import kr.toxicity.hud.api.BetterHud
+import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.api.nms.NMS
-import kr.toxicity.hud.api.nms.NMSVersion
+import kr.toxicity.hud.api.bukkit.nms.NMS
+import kr.toxicity.hud.api.bukkit.nms.NMSVersion
+import kr.toxicity.hud.api.player.HudPlayer
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
@@ -26,7 +28,6 @@ import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.WorldBorder
-import org.bukkit.boss.BarColor
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataContainer
@@ -44,7 +45,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class NMSImpl: NMS {
     companion object {
         private const val INJECT_NAME = BetterHud.DEFAULT_NAMESPACE
-        private val bossBarMap = ConcurrentHashMap<UUID, PlayerBossBar>()
+        private val bossBarMap = ConcurrentHashMap<UUID, HudPlayerBossBar>()
 
         @Suppress("UNCHECKED_CAST")
         private val operation = ClientboundBossEventPacket::class.java.declaredClasses.first {
@@ -52,7 +53,7 @@ class NMSImpl: NMS {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
-        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (BetterHud.getInstance().isPaper) {
+        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (BetterHudAPI.inst().bootstrap().isPaper) {
             {
                it.connection
             }
@@ -70,120 +71,120 @@ class NMSImpl: NMS {
 
         private fun toAdventure(component: net.minecraft.network.chat.Component) = GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(component))
         private fun fromAdventure(component: Component) = CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(component))
-        private fun getColor(color: BarColor) =  when (color) {
-            BarColor.PINK -> BossEvent.BossBarColor.PINK
-            BarColor.BLUE -> BossEvent.BossBarColor.BLUE
-            BarColor.RED -> BossEvent.BossBarColor.RED
-            BarColor.GREEN -> BossEvent.BossBarColor.GREEN
-            BarColor.YELLOW -> BossEvent.BossBarColor.YELLOW
-            BarColor.PURPLE -> BossEvent.BossBarColor.PURPLE
-            BarColor.WHITE -> BossEvent.BossBarColor.WHITE
+        private fun getColor(color: BossBar.Color) =  when (color) {
+            BossBar.Color.PINK -> BossEvent.BossBarColor.PINK
+            BossBar.Color.BLUE -> BossEvent.BossBarColor.BLUE
+            BossBar.Color.RED -> BossEvent.BossBarColor.RED
+            BossBar.Color.GREEN -> BossEvent.BossBarColor.GREEN
+            BossBar.Color.YELLOW -> BossEvent.BossBarColor.YELLOW
+            BossBar.Color.PURPLE -> BossEvent.BossBarColor.PURPLE
+            BossBar.Color.WHITE -> BossEvent.BossBarColor.WHITE
         }
     }
 
-    override fun inject(player: Player, color: BarColor) {
-        player as CraftPlayer
-        bossBarMap.computeIfAbsent(player.uniqueId) {
-            PlayerBossBar(player, player.handle.connection, color, Component.empty())
+    override fun inject(hudPlayer: HudPlayer, color: BossBar.Color) {
+        val h = hudPlayer.handle() as CraftPlayer
+        bossBarMap.computeIfAbsent(h.uniqueId) {
+            HudPlayerBossBar(h, h.handle.connection, color, Component.empty())
         }
     }
-    override fun showBossBar(player: Player, color: BarColor, component: Component) {
-        bossBarMap[player.uniqueId]?.update(color, component)
+    override fun showBossBar(hudPlayer: HudPlayer, color: BossBar.Color, component: Component) {
+        bossBarMap[hudPlayer.uuid()]?.update(color, component)
     }
 
-    override fun removeBossBar(player: Player) {
-        bossBarMap.remove(player.uniqueId)?.remove()
+    override fun removeBossBar(hudPlayer: HudPlayer) {
+        bossBarMap.remove(hudPlayer.uuid())?.remove()
     }
 
-    override fun reloadBossBar(player: Player, color: BarColor) {
-        bossBarMap[player.uniqueId]?.resetDummy(color)
+    override fun reloadBossBar(hudPlayer: HudPlayer, color: BossBar.Color) {
+        bossBarMap[hudPlayer.uuid()]?.resetDummy(color)
     }
 
     override fun getVersion(): NMSVersion {
         return NMSVersion.V1_20_R3
     }
 
-    override fun getTextureValue(player: Player): String {
-        return (player as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
+    override fun getTextureValue(player: HudPlayer): String {
+        return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
-    override fun getFoliaAdaptedPlayer(player: Player): Player {
-        val handle = (player as CraftPlayer).handle
+    override fun getFoliaAdaptedPlayer(hudPlayer: Player): Player {
+        val handle = (hudPlayer as CraftPlayer).handle
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {
             override fun getPersistentDataContainer(): CraftPersistentDataContainer {
-                return player.persistentDataContainer
+                return hudPlayer.persistentDataContainer
             }
             override fun getHandle(): ServerPlayer {
                 return handle
             }
             override fun getHealth(): Double {
-                return player.health
+                return hudPlayer.health
             }
             override fun getScaledHealth(): Float {
-                return player.scaledHealth
+                return hudPlayer.scaledHealth
             }
             override fun getFirstPlayed(): Long {
-                return player.firstPlayed
+                return hudPlayer.firstPlayed
             }
             override fun getInventory(): PlayerInventory {
-                return player.inventory
+                return hudPlayer.inventory
             }
             override fun getEnderChest(): Inventory {
-                return player.enderChest
+                return hudPlayer.enderChest
             }
             override fun isOp(): Boolean {
-                return player.isOp
+                return hudPlayer.isOp
             }
             override fun getGameMode(): GameMode {
-                return player.gameMode
+                return hudPlayer.gameMode
             }
             override fun getEquipment(): EntityEquipment {
-                return player.equipment
+                return hudPlayer.equipment
             }
             override fun hasPermission(name: String): Boolean {
-                return player.hasPermission(name)
+                return hudPlayer.hasPermission(name)
             }
             override fun hasPermission(perm: Permission): Boolean {
-                return player.hasPermission(perm)
+                return hudPlayer.hasPermission(perm)
             }
             override fun isPermissionSet(name: String): Boolean {
-                return player.isPermissionSet(name)
+                return hudPlayer.isPermissionSet(name)
             }
             override fun isPermissionSet(perm: Permission): Boolean {
-                return player.isPermissionSet(perm)
+                return hudPlayer.isPermissionSet(perm)
             }
             override fun hasPlayedBefore(): Boolean {
-                return player.hasPlayedBefore()
+                return hudPlayer.hasPlayedBefore()
             }
             override fun getWorldBorder(): WorldBorder? {
-                return player.getWorldBorder()
+                return hudPlayer.getWorldBorder()
             }
             override fun showBossBar(bar: BossBar) {
-                player.showBossBar(bar)
+                hudPlayer.showBossBar(bar)
             }
             override fun hideBossBar(bar: BossBar) {
-                player.hideBossBar(bar)
+                hudPlayer.hideBossBar(bar)
             }
             override fun sendMessage(message: String) {
-                player.sendMessage(message)
+                hudPlayer.sendMessage(message)
             }
             override fun getLastDamageCause(): EntityDamageEvent? {
-                return player.lastDamageCause
+                return hudPlayer.lastDamageCause
             }
             override fun pointers(): Pointers {
-                return player.pointers()
+                return hudPlayer.pointers()
             }
             override fun spigot(): Player.Spigot {
-                return player.spigot()
+                return hudPlayer.spigot()
             }
         }
     }
 
 
     private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID, val buf: FriendlyByteBuf)
-    private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BarColor, component: Component): ChannelDuplexHandler() {
-        private inner class PlayerDummyBossBar(color: BarColor) {
-            val line = BetterHud.getInstance().configManager.bossbarLine - 1
+    private class HudPlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BossBar.Color, component: Component): ChannelDuplexHandler() {
+        private inner class HudPlayerDummyBossBar(color: BossBar.Color) {
+            val line = BetterHudAPI.inst().configManager.bossbarLine - 1
             val dummyBars = (0..<line).map {
                 HudBossBar(UUID.randomUUID(), Component.empty(), color).apply {
                     listener.send(ClientboundBossEventPacket.createAddPacket(this))
@@ -193,14 +194,14 @@ class NMSImpl: NMS {
                 it.uuid
             }
         }
-        private var dummy = PlayerDummyBossBar(color)
+        private var dummy = HudPlayerDummyBossBar(color)
         private val dummyBarHandleMap = Collections.synchronizedMap(LinkedHashMap<UUID, CachedHudBossbar>())
         private val otherBarCache = ConcurrentLinkedQueue<Pair<UUID, HudByteBuf>>()
         private val uuid = UUID.randomUUID().apply {
             listener.send(ClientboundBossEventPacket.createAddPacket(HudBossBar(this, component, color)))
         }
 
-        private var last: HudBossBar = HudBossBar(uuid, Component.empty(), BarColor.RED)
+        private var last: HudBossBar = HudBossBar(uuid, Component.empty(), color)
         private var onUse = uuid to HudByteBuf(Unpooled.buffer())
 
         init {
@@ -210,18 +211,18 @@ class NMSImpl: NMS {
             }
         }
 
-        fun update(color: BarColor, component: Component) {
+        fun update(color: BossBar.Color, component: Component) {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
         }
         
-        fun resetDummy(color: BarColor) {
+        fun resetDummy(color: BossBar.Color) {
             listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
             dummy.dummyBarsUUID.forEach {
                 listener.send(ClientboundBossEventPacket.createRemovePacket(it))
             }
-            dummy = PlayerDummyBossBar(color)
+            dummy = HudPlayerDummyBossBar(color)
             dummy.dummyBars.forEach { 
                 listener.send(ClientboundBossEventPacket.createAddPacket(it))
             }
@@ -269,9 +270,9 @@ class NMSImpl: NMS {
             ))
             fun changeName(targetBuf: FriendlyByteBuf = buf) {
                 runCatching {
-                    val hud = BetterHud.getInstance().getPlayerManager().getHudPlayer(player)
+                    val hud = BetterHudAPI.inst().playerManager.getHudPlayer(player.uniqueId) ?: return
                     val comp = toAdventure(targetBuf.readComponentTrusted())
-                    val key = BetterHud.getInstance().defaultKey
+                    val key = BetterHudAPI.inst().defaultKey
                     fun applyFont(component: Component): Component {
                         return component.font(key).children(component.children().map {
                             applyFont(it)
@@ -295,10 +296,10 @@ class NMSImpl: NMS {
                             )
                         } + (when (component) {
                             is TextComponent -> component.content()
-                            is TranslatableComponent -> BetterHud.getInstance().translate(player.locale, component.key())
+                            is TranslatableComponent -> BetterHudAPI.inst().translate(player.locale, component.key())
                             else -> null
                         }?.codePoints()?.map {
-                            (if (it == ' '.code) 4 else (BetterHud.getInstance().getWidth(it)) + 1) + i
+                            (if (it == ' '.code) 4 else (BetterHudAPI.inst().getWidth(it)) + 1) + i
                         }?.sum() ?: 0)
                     }
                     hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(
@@ -333,7 +334,7 @@ class NMSImpl: NMS {
                     onUse = target
                 } ?: run {
                     onUse = uuid to HudByteBuf(buf.unwrap())
-                    BetterHud.getInstance().getPlayerManager().getHudPlayer(player).additionalComponent = null
+                    BetterHudAPI.inst().playerManager.getHudPlayer(player.uniqueId)?.additionalComponent = null
                     listener.send(ClientboundBossEventPacket.createUpdateNamePacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateProgressPacket(last))
                     listener.send(ClientboundBossEventPacket.createUpdateStylePacket(last))
@@ -437,7 +438,7 @@ class NMSImpl: NMS {
 
         override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
             if (msg is ClientboundBossEventPacket) {
-                if (BetterHud.getInstance().isMergeBossBar) {
+                if (BetterHudAPI.inst().isMergeBossBar) {
                     val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
                         msg.write(this)
                     }
@@ -455,10 +456,10 @@ class NMSImpl: NMS {
     }
 
     private class HudBossBar(val uuid: UUID, component: net.minecraft.network.chat.Component, color: BossBarColor): BossEvent(uuid, component, color, BossBarOverlay.PROGRESS) {
-        constructor(uuid: UUID, component: Component, color: BarColor): this(
+        constructor(uuid: UUID, component: Component, color: BossBar.Color): this(
             uuid,
             fromAdventure(component),
-            Companion.getColor(color)
+            getColor(color)
         )
         override fun getProgress(): Float {
             return 0F

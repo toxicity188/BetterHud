@@ -17,7 +17,7 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.math.*
@@ -27,7 +27,7 @@ class CircleCompass(
     assets: File,
     override val path: String,
     private val internalName: String,
-    section: ConfigurationSection
+    section: YamlObject
 ): CompassImpl {
     companion object {
         private val defaultColorEquation = TEquation("255").run {
@@ -39,32 +39,32 @@ class CircleCompass(
         }
     }
     private var resourceRef: GlobalResource? = resource
-    private val length = section.getInt("length", 20).coerceAtLeast(20).coerceAtMost(360)
+    private val length = section.getAsInt("length", 20).coerceAtLeast(20).coerceAtMost(360)
     private val encode = internalName.encodeKey()
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
     private var array: JsonArray? = JsonArray()
-    private val applyOpacity = section.getBoolean("apply-opacity")
-    private val scale = section.getDouble("scale", 1.0).apply {
+    private val applyOpacity = section.getAsBoolean("apply-opacity", false)
+    private val scale = section.getAsDouble("scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("scale cannot be <= 0")
     }
-    private val scaleEquation = section.getString("scale-equation")?.let {
+    private val scaleEquation = section.get("scale-equation")?.asString()?.let {
         TEquation(it)
     } ?: TEquation.one
-    private val colorEquation = section.getConfigurationSection("color-equation")?.let {
+    private val colorEquation = section.get("color-equation")?.asObject()?.let {
         ColorEquation(it)
     } ?: defaultColorEquation
-    private val space = section.getInt("space", 2).coerceAtLeast(0)
+    private val space = section.getAsInt("space", 2).coerceAtLeast(0)
 
     private val shader = HudShader(
-        GuiLocation(section.getConfigurationSection("gui").ifNull("gui value not set.")),
-        section.getInt("layer"),
-        section.getBoolean("outline")
+        GuiLocation(section.get("gui")?.asObject().ifNull("gui value not set.")),
+        section.getAsInt("layer", 0),
+        section.getAsBoolean("outline", false)
     )
-    private val pixel = ImageLocation(section.getConfigurationSection("pixel").ifNull("pixel value not set."))
-    private val images = CompassImage(assets, section.getConfigurationSection("file").ifNull("file value not set."))
+    private val pixel = ImageLocation(section.get("pixel")?.asObject().ifNull("pixel value not set."))
+    private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
-    private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getBoolean("default")
+    private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
     private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, y: Int): WidthComponent {
         val char = (center++).parseChar()
@@ -103,35 +103,35 @@ class CircleCompass(
     override fun isDefault(): Boolean = isDefault
     override fun getName(): String = internalName
 
-    private inner class CompassImage(assets: File, section: ConfigurationSection) {
-        val n = section.getConfigurationSection("n")?.let {
+    private inner class CompassImage(assets: File, section: YamlObject) {
+        val n = section.get("n")?.asObject()?.let {
             CompassImageMap(assets, "n", it)
         }
-        val e =section.getConfigurationSection("e")?.let {
+        val e = section.get("e")?.asObject()?.let {
             CompassImageMap(assets, "e", it)
         }
-        val s = section.getConfigurationSection("s")?.let {
+        val s = section.get("s")?.asObject()?.let {
             CompassImageMap(assets, "s", it)
         }
-        val w = section.getConfigurationSection("w")?.let {
+        val w = section.get("w")?.asObject()?.let {
             CompassImageMap(assets, "w", it)
         }
-        val nw =section.getConfigurationSection("nw")?.let {
+        val nw = section.get("nw")?.asObject()?.let {
             CompassImageMap(assets, "nw", it)
         }
-        val ne = section.getConfigurationSection("ne")?.let {
+        val ne = section.get("ne")?.asObject()?.let {
             CompassImageMap(assets, "ne", it)
         }
-        val sw = section.getConfigurationSection("sw")?.let {
+        val sw = section.get("sw")?.asObject()?.let {
             CompassImageMap(assets, "sw", it)
         }
-        val se = section.getConfigurationSection("se")?.let {
+        val se = section.get("se")?.asObject()?.let {
             CompassImageMap(assets, "se", it)
         }
-        val chain = section.getConfigurationSection("chain")?.let {
+        val chain = section.get("chain")?.asObject()?.let {
             CompassImageMap(assets, "chain", it)
         }
-        val point = section.getConfigurationSection("point")?.let {
+        val point = section.get("point")?.asObject()?.let {
             CompassImageMap(assets, "point", it)
         }
     }
@@ -140,7 +140,7 @@ class CircleCompass(
         val g: TEquation,
         val b: TEquation
     ) {
-        constructor(section: ConfigurationSection): this(
+        constructor(section: YamlObject): this(
             section.getTEquation("r").ifNull("r value not set."),
             section.getTEquation("g").ifNull("g value not set."),
             section.getTEquation("b").ifNull("b value not set.")
@@ -158,15 +158,15 @@ class CircleCompass(
     private inner class CompassImageMap(
         assets: File,
         imageName: String,
-        section: ConfigurationSection
+        section: YamlObject
     ) {
         val map = run {
-            val fileName = section.getString("name").ifNull("name value not set.").replace('/', File.separatorChar)
-            val scale = section.getDouble("scale", 1.0).apply {
+            val fileName = section.get("name")?.asString().ifNull("name value not set.").replace('/', File.separatorChar)
+            val scale = section.getAsDouble("scale", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0")
             }
             val location = ImageLocation(section)
-            val opacity = section.getDouble("opacity", 1.0).apply {
+            val opacity = section.getAsDouble("opacity", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("opacity cannot be <= 0.0")
             }
             val image = File(assets, fileName)
@@ -221,15 +221,15 @@ class CircleCompass(
     }
     override fun indicate(hudPlayer: HudPlayer): WidthComponent {
         if (!conditions(hudPlayer)) return EMPTY_WIDTH_COMPONENT
-        val yaw =  hudPlayer.bukkitPlayer.location.yaw.toDouble()
+        val yaw =  hudPlayer.location().yaw.toDouble()
         var degree = yaw
         if (degree < 0) degree += 360.0
         val div = (degree / 90 * length).roundToInt()
         var comp = EMPTY_WIDTH_COMPONENT
         val lengthDiv = length / 2
         val mod = (degree.toInt() % length).toDouble() / length
-        val loc = hudPlayer.bukkitPlayer.location
-        val world = hudPlayer.bukkitPlayer.world
+        val loc = hudPlayer.location()
+        val world = hudPlayer.world()
         for (i in 1..<length) {
             comp += when (div - i + lengthDiv) {
                 (length * 0.5).roundToInt() -> images.se
@@ -249,7 +249,7 @@ class CircleCompass(
         images.point?.let { p ->
             hudPlayer.pointedLocation.forEach {
                 val targetLoc = it.location
-                if (targetLoc.world?.uid != world.uid) return@forEach
+                if (targetLoc.world.uuid != world.uuid) return@forEach
                 var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x)
                 if (get < 0) get += 2 * PI
                 var yawRadian = Math.toRadians(yaw + 90)

@@ -140,7 +140,7 @@ object TextManager: BetterHudManager {
 
     override fun start() {
         loadDefaultBitmap()
-        unifont = InputStreamReader(PLUGIN.getResource("unifont.hex").ifNull("unifont.hex not found.")).buffered().use {
+        unifont = InputStreamReader(BOOTSTRAP.resource("unifont.hex").ifNull("unifont.hex not found.")).buffered().use {
             fun String.toBitmap(): ByteArray {
                 val byteArray = ByteArray(length * 4)
                 var t = 0
@@ -157,7 +157,7 @@ object TextManager: BetterHudManager {
                 split[0].toInt(16) to split[1].toBitmap()
             }
         }
-        InputStreamReader(PLUGIN.getResource("translatable.json").ifNull("translatable.json not found.")).buffered().use {
+        InputStreamReader(BOOTSTRAP.resource("translatable.json").ifNull("translatable.json not found.")).buffered().use {
             JsonParser.parseReader(it).asJsonObject.entrySet().forEach { e ->
                 val map = HashMap<String, String>()
                 e.value.asJsonObject.entrySet().forEach { se ->
@@ -194,11 +194,11 @@ object TextManager: BetterHudManager {
             })
         }
         val fontConfig = PluginConfiguration.FONT.create()
-        val configScale = fontConfig.getInt("scale", 16)
-        val configHeight = fontConfig.getInt("height", 9)
-        val configAscent = fontConfig.getInt("ascent", 8).coerceAtMost(configHeight)
+        val configScale = fontConfig.getAsInt("scale", 16)
+        val configHeight = fontConfig.getAsInt("height", 9)
+        val configAscent = fontConfig.getAsInt("ascent", 8).coerceAtMost(configHeight)
 
-        val defaultProvider = if (!fontConfig.getBoolean("use-unifont")) {
+        val defaultProvider = if (!fontConfig.getAsBoolean("use-unifont", false)) {
             JavaBitmapProvider(File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).run {
                 (if (exists()) runCatching {
                     inputStream().buffered().use {
@@ -209,7 +209,9 @@ object TextManager: BetterHudManager {
         } else {
             UnifontBitmapProvider(configScale)
         }
-        val parseDefault = parseFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.getStringList("include"),ConditionBuilder.alwaysTrue, fontConfig.getBoolean("merge-default-bitmap", true))
+        val parseDefault = parseFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
+            it.asString()
+        } ?: emptyList(),ConditionBuilder.alwaysTrue, fontConfig.getAsBoolean("merge-default-bitmap", true))
         val heightMultiply = configHeight.toDouble() / parseDefault.height.toDouble()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = Math.round(it.value.toDouble() * heightMultiply).toInt()
@@ -233,12 +235,12 @@ object TextManager: BetterHudManager {
 
         DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
             runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
-                val fontDir = section.getString("file")?.let {
+                val fontDir = section.get("file")?.asString()?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
-                val scale = section.getInt("scale", 16)
+                val scale = section.getAsInt("scale", 16)
 
-                val provider = if (!section.getBoolean("use-unifont")) {
+                val provider = if (!section.getAsBoolean("use-unifont", false)) {
                     JavaBitmapProvider((fontDir?.inputStream()?.buffered()?.use {
                         Font.createFont(Font.TRUETYPE_FONT, it)
                     } ?: BufferedImage(
@@ -259,27 +261,29 @@ object TextManager: BetterHudManager {
                         scale,
                         resource.textures,
                         HashMap<String, LocatedImage>().apply {
-                            section.getConfigurationSection("images")
-                                ?.forEachSubConfiguration { key, configurationSection ->
+                            section.get("images")?.asObject()
+                                ?.forEachSubConfiguration { key, yamlObject ->
                                     put(key, LocatedImage(
                                         File(
                                             assetsFolder,
-                                            configurationSection.getString("name").ifNull("image does not set: $key")
+                                            yamlObject.get("name")?.asString().ifNull("image does not set: $key")
                                         )
                                             .ifNotExist("this image doesn't exist: $key")
                                             .toImage()
                                             .removeEmptyWidth()
                                             .ifNull("invalid image: $key"),
-                                        ImageLocation(configurationSection),
-                                        configurationSection.getDouble("scale", 1.0).apply {
+                                        ImageLocation(yamlObject),
+                                        yamlObject.getAsDouble("scale", 1.0).apply {
                                             if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
                                         }
                                     ))
                                 }
                         },
-                        section.getStringList("include"),
+                        section.get("include")?.asArray()?.map {
+                            it.asString()
+                        } ?: emptyList(),
                         section.toConditions(),
-                        section.getBoolean("merge-default-bitmap")
+                        section.getAsBoolean("merge-default-bitmap", false)
                     )
                 }
             }
@@ -288,7 +292,7 @@ object TextManager: BetterHudManager {
 
     private fun loadDefaultBitmap() {
         defaultBitmapImageMap.clear()
-        PLUGIN.getResource("minecraft_default.json")?.let {
+        BOOTSTRAP.resource("minecraft_default.json")?.let {
             runCatching {
                 InputStreamReader(it).buffered().use { reader ->
                     JsonParser.parseReader(reader)
@@ -301,7 +305,7 @@ object TextManager: BetterHudManager {
                         if (contains('/')) substringAfterLast('/') else this
                     }
                     val image = runCatching {
-                        PLUGIN.getResource(imageName)?.buffered()?.toImage() ?: run {
+                        BOOTSTRAP.resource(imageName)?.buffered()?.toImage() ?: run {
                             warn("Unable to find this resource: $imageName")
                             return
                         }

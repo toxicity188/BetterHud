@@ -21,10 +21,10 @@ object LayoutManager: BetterHudManager {
         synchronized(layoutMap) {
             layoutMap.clear()
         }
-        DATA_FOLDER.subFolder("layouts").forEachAllYaml(sender) { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("layouts").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this layout: $s in ${file.name}") {
                 layoutMap.putSync("layout", s) {
-                    LayoutGroup(file.path, sender, configurationSection)
+                    LayoutGroup(file.path, sender, yamlObject)
                 }
             }
         }

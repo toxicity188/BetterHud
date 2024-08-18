@@ -155,5 +155,5 @@ class HudTextElement(
         )
     }.getText(UpdateEvent.EMPTY)
 
-    fun getText(player: HudPlayer): PixelComponent = renderer(player)
+    fun getText(hudPlayer: HudPlayer): PixelComponent = renderer(hudPlayer)
 }

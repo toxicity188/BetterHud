@@ -12,7 +12,6 @@ import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
-import org.bukkit.Bukkit
 
 class ImageRenderer(
     image: HudImage,
@@ -27,7 +26,7 @@ class ImageRenderer(
         PixelComponent(WidthComponent(Component.text().append(comp.component.build().color(color)), comp.width), it.pixel)
     }
 
-    private val followPlayer = follow?.let {
+    private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
@@ -41,12 +40,12 @@ class ImageRenderer(
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> PixelComponent {
         val cond = conditions.build(reason)
         val listen = listener(reason)
-        val follow = followPlayer?.build(reason)
-        return build@ { player, frame ->
-            var target = player
+        val follow = followHudPlayer?.build(reason)
+        return build@ { hudPlayer, frame ->
+            var target = hudPlayer
             follow?.let {
-                target = Bukkit.getPlayer(it.value(player).toString())?.let { p ->
-                    PlayerManagerImpl.getHudPlayer(p.uniqueId)
+                PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
+                    target = p
                 } ?: return@build EMPTY_PIXEL_COMPONENT
             }
             if (cond(target)) type.getComponent(listen, frame, components, target) else EMPTY_PIXEL_COMPONENT

@@ -3,7 +3,7 @@ package kr.toxicity.hud.equation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.shader.GuiLocation
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 
 class EquationPairLocation(
     duration: Int,
@@ -23,12 +23,12 @@ class EquationPairLocation(
         )
     }
 
-    constructor(section: ConfigurationSection): this(
-        section.getInt("duration").coerceAtLeast(1),
-        section.getConfigurationSection("gui")?.let {
+    constructor(section: YamlObject): this(
+        section.getAsInt("duration", 1).coerceAtLeast(1),
+        section.get("gui")?.asObject()?.let {
             EquationPair(it)
         } ?: EquationPair.zero,
-        section.getConfigurationSection("pixel")?.let {
+        section.get("pixel")?.asObject()?.let {
             EquationPair(it)
         } ?: EquationPair.zero
     )

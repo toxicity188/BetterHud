@@ -1,7 +1,7 @@
 package kr.toxicity.hud.command
 
+import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import net.kyori.adventure.text.Component
-import org.bukkit.command.CommandSender
 
 interface CommandPlayer {
     fun aliases(): List<String>
@@ -10,7 +10,7 @@ interface CommandPlayer {
     fun requireOp(): Boolean
     fun permission(): List<String>
     fun length(): Int
-    fun allowedSender(): List<SenderType>
-    fun execute(sender: CommandSender, args: List<String>)
-    fun tabComplete(sender: CommandSender, args: List<String>): List<String>?
+    fun allowedSender(): List<CommandSourceWrapper.Type>
+    fun execute(sender: CommandSourceWrapper, args: List<String>)
+    fun tabComplete(sender: CommandSourceWrapper, args: List<String>): List<String>?
 }

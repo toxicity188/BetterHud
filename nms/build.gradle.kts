@@ -1,5 +1,9 @@
+val api = rootProject.project("api")
+
 subprojects {
     dependencies {
-        compileOnly(project(":api"))
+        api.subprojects.forEach {
+            compileOnly(it)
+        }
     }
 }

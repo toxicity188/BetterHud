@@ -2,11 +2,8 @@ package kr.toxicity.hud.pack
 
 import com.google.gson.JsonPrimitive
 import com.sun.net.httpserver.HttpServer
-import kr.toxicity.hud.api.nms.NMSVersion
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
-import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.URI
@@ -16,19 +13,19 @@ import java.net.http.HttpResponse
 import java.security.MessageDigest
 import java.util.*
 
-
 object PackUploader {
 
-    private interface PackServer {
+    interface PackServer {
         fun stop()
-        fun apply(player: Player)
+        val uuid: UUID
+        val url: String
+        val digest: ByteArray
+        val digestString: String
     }
     @Volatile
-    private var server: PackServer? = null
+    var server: PackServer? = null
+        private set
 
-    fun apply(player: Player): Boolean {
-        return server?.apply(player) != null
-    }
     fun stop(): Boolean {
         val result = server?.stop() != null
         server = null
@@ -37,7 +34,6 @@ object PackUploader {
 
     fun upload(message: MessageDigest, byteArray: ByteArray) {
         val hash = StringBuilder(40)
-        val useUrl = VERSION >= NMSVersion.V1_20_R3
         val digest = message.digest()
         for (element in digest) {
             val byte = element.toInt()
@@ -75,21 +71,13 @@ object PackUploader {
                     override fun stop() {
                         http.stop(0)
                     }
-                    override fun apply(player: Player) {
-                        if (useUrl) {
-                            player.setResourcePack(uuid, url, digest, null, false)
-                        } else {
-                            player.setResourcePack(url, digest, null, false)
-                        }
-                    }
+
+                    override val uuid: UUID = uuid
+                    override val digest: ByteArray = digest
+                    override val digestString: String = string
+                    override val url: String = url
                 }
-                Bukkit.getOnlinePlayers().forEach { player ->
-                    if (useUrl) {
-                        player.setResourcePack(uuid, url, digest, null, false)
-                    } else {
-                        player.setResourcePack(url, digest, null, false)
-                    }
-                }
+                BOOTSTRAP.sendResourcePack()
                 info("Resource pack server opened at $url")
             }
         }

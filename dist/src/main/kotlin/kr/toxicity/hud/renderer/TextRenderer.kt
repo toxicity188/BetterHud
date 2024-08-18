@@ -18,7 +18,6 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import org.bukkit.Bukkit
 import java.text.DecimalFormat
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -50,7 +49,7 @@ class TextRenderer(
         private val imagePattern = Pattern.compile("<image:(?<name>([a-zA-Z]+))>")
     }
 
-    private val followPlayer = follow?.let {
+    private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
@@ -62,18 +61,18 @@ class TextRenderer(
         val buildPattern = parsedPatter(reason)
         val cond = condition.build(reason)
 
-        val followTarget = followPlayer?.build(reason)
+        val followTarget = followHudPlayer?.build(reason)
 
-        return build@ { player ->
-            var targetPlayer = player
+        return build@ { hudPlayer ->
+            var targetHudPlayer = hudPlayer
             followTarget?.let {
-                targetPlayer = Bukkit.getPlayer(it.value(player).toString())?.let { p ->
-                    PlayerManagerImpl.getHudPlayer(p.uniqueId)
+                PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
+                    targetHudPlayer = p
                 } ?: return@build EMPTY_PIXEL_COMPONENT
             }
-            if (!cond(targetPlayer)) return@build EMPTY_PIXEL_COMPONENT
+            if (!cond(targetHudPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var width = 0
-            val patternResult = buildPattern(targetPlayer)
+            val patternResult = buildPattern(targetHudPlayer)
             var targetString = (if (useLegacyFormat) legacySerializer.deserialize(patternResult) else Component.text(patternResult))
                 .color(defaultColor)
                 .replaceText(TextReplacementConfig.builder()

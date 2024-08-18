@@ -1,42 +1,31 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.BetterHud
+import kr.toxicity.hud.api.BetterHudAPI
+import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.manager.ConfigManagerImpl
-import org.bukkit.Location
 
 val PLUGIN
-    get() = BetterHud.getInstance()
+    get() = BetterHudAPI.inst()
+
+val BOOTSTRAP
+    get() = PLUGIN.bootstrap()
 
 const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
 val NAME_SPACE_ENCODED
     get() = ConfigManagerImpl.key.encodedNamespace
 
 val DATA_FOLDER
-    get() = PLUGIN.dataFolder.apply {
+    get() = BOOTSTRAP.dataFolder().apply {
         if (!exists()) mkdir()
     }
 
-val VERSION = PLUGIN.nms.version
+val VOLATILE_CODE = BOOTSTRAP.volatileCode()
 
-fun info(vararg message: String) {
-    val logger = PLUGIN.logger
-    synchronized(logger) {
-        message.forEach {
-            logger.info(it)
-        }
-    }
-}
-fun warn(vararg message: String) {
-    val logger = PLUGIN.logger
-    synchronized(logger) {
-        message.forEach {
-            logger.warning(it)
-        }
-    }
-}
-
-fun task(block: () -> Unit) = PLUGIN.scheduler.task(PLUGIN, block)
-fun task(location: Location, block: () -> Unit) = PLUGIN.scheduler.task(PLUGIN, location, block)
-fun taskLater(delay: Long, block: () -> Unit) = PLUGIN.scheduler.taskLater(PLUGIN, delay, block)
-fun asyncTask(block: () -> Unit) = PLUGIN.scheduler.asyncTask(PLUGIN, block)
-fun asyncTaskTimer(delay: Long, period: Long, block: () -> Unit) = PLUGIN.scheduler.asyncTaskTimer(PLUGIN, delay, period, block)
+fun info(vararg message: String) = BOOTSTRAP.logger().info(*message)
+fun warn(vararg message: String) = BOOTSTRAP.logger().warn(*message)
+fun task(block: () -> Unit) = BOOTSTRAP.scheduler().task(block)
+fun task(location: LocationWrapper, block: () -> Unit) = BOOTSTRAP.scheduler().task(location, block)
+fun taskLater(delay: Long, block: () -> Unit) = BOOTSTRAP.scheduler().taskLater(delay, block)
+fun asyncTask(block: () -> Unit) = BOOTSTRAP.scheduler().asyncTask(block)
+fun asyncTaskTimer(delay: Long, period: Long, block: () -> Unit) = BOOTSTRAP.scheduler().asyncTaskTimer(delay, period, block)

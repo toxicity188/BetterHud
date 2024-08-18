@@ -48,12 +48,12 @@ class PopupLayout(
         val map = groups.map {
             it.getComponent(reason)
         }
-        return { player, index, frame ->
-            if (build(player)) {
+        return { hudPlayer, index, frame ->
+            if (build(hudPlayer)) {
                 if (index > map.lastIndex) {
                     EMPTY_WIDTH_COMPONENT
                 } else {
-                    val get = map[index](player, frame)
+                    val get = map[index](hudPlayer, frame)
                     get[when (layout.animation.type) {
                         LayoutAnimationType.LOOP -> frame % get.size
                         LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
@@ -92,16 +92,16 @@ class PopupLayout(
             val headProcessing = heads.map {
                 it.getHead(reason)
             }
-            return { player, frame ->
+            return { hudPlayer, frame ->
                 LayoutComponentContainer(layout.offset, layout.align, max)
                     .append(imageProcessing.map {
-                        it(player, frame)
+                        it(hudPlayer, frame)
                     })
                     .append(textProcessing.map {
-                        it(player)
+                        it(hudPlayer)
                     })
                     .append(headProcessing.map {
-                        it(player)
+                        it(hudPlayer)
                     })
                     .build()
             }

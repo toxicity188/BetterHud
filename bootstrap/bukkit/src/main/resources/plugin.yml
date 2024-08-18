@@ -1,0 +1,65 @@
+main: kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
+version: ${version}
+name: BetterHud
+api-version: 1.17
+author: toxicity
+description: Make a hud in minecraft!
+folia-supported: true
+website: "https://www.spigotmc.org/resources/115559"
+softdepend:
+  - MythicLib
+  - MythicMobs
+  - MMOCore
+  - MMOItems
+  - PlaceholderAPI
+  - WorldGuard
+  - Vault
+  - floodgate
+  - Geyser-Spigot
+  - Skript
+  - SkinsRestorer
+  - Parties
+  - GPS
+commands:
+  betterhud:
+    aliases:
+      - hud
+    description: BetterHud's command.
+    usage: /<command>
+permissions:
+  hud.help:
+    description: Access to help command.
+    default: op
+  hud.reload:
+    description: Access to reload command.
+    default: op
+  hud.hud:
+    description: Access to hud command.
+    default: op
+    children:
+      hud.hud.help: true
+      hud.hud.add: true
+      hud.hud.remove: true
+  hud.compass:
+    description: Access to compass command.
+    default: op
+    children:
+      hud.compass.help: true
+      hud.compass.add: true
+      hud.compass.remove: true
+  hud.turn:
+    description: Access to turn command.
+    default: op
+    children:
+      hud.turn.help: true
+      hud.turn.on: true
+      hud.turn.off: true
+  hud.popup:
+    description: Access to popup command.
+    default: op
+    children:
+      hud.popup.help: true
+      hud.popup.add: true
+      hud.popup.remove: true
+      hud.popup.show: true
+      hud.popup.hide: true

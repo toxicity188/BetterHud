@@ -1,7 +1,7 @@
 package kr.toxicity.hud.player.head
 
 import com.google.gson.JsonParser
-import org.bukkit.entity.Player
+import kr.toxicity.hud.api.player.HudPlayer
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.http.HttpClient
@@ -9,8 +9,8 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 class HttpSkinProvider: PlayerSkinProvider {
-    override fun provide(player: Player): String? {
-        return provideFromUUID(player.uniqueId.toString())
+    override fun provide(player: HudPlayer): String? {
+        return provideFromUUID(player.uuid().toString())
     }
 
     override fun provide(playerName: String): String? {

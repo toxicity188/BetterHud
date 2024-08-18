@@ -8,107 +8,107 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 import java.text.DecimalFormat
 
 class LayoutGroup(
     override val path: String,
     sender: Audience,
-    section: ConfigurationSection
+    section: YamlObject
 ): HudConfiguration {
 
     private val loc = ImageLocation(section)
 
-    val align = section.getString("align")?.let {
+    val align = section.get("align")?.asString()?.let {
         runWithExceptionHandling(sender, "Unable to find that align: $it") {
             LayoutAlign.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutAlign.LEFT
-    val offset = section.getString("offset")?.let {
+    val offset = section.get("offset")?.asString()?.let {
         runWithExceptionHandling(sender, "Unable to find that offset: $it") {
             LayoutOffset.valueOf(it.uppercase())
         }.getOrNull()
     } ?: LayoutOffset.CENTER
 
     val image: List<ImageLayout> = ArrayList<ImageLayout>().apply {
-        section.getConfigurationSection("images")?.forEachSubConfiguration { s, configurationSection ->
+        section.get("images")?.asObject()?.forEachSubConfiguration { s, yamlObject ->
             add(
                 ImageLayout(
-                    configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
+                    yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
                         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
                     },
-                    configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
-                    ImageLocation(configurationSection) + loc,
-                    configurationSection.getDouble("scale", 1.0),
-                    configurationSection.getBoolean("outline"),
-                    configurationSection.getInt("layer"),
-                    configurationSection.getString("follow"),
-                    configurationSection.toConditions()
+                    yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE,
+                    ImageLocation(yamlObject) + loc,
+                    yamlObject.getAsDouble("scale", 1.0),
+                    yamlObject.getAsBoolean("outline", false),
+                    yamlObject.getAsInt("layer", 0),
+                    yamlObject.get("follow")?.asString(),
+                    yamlObject.toConditions()
                 )
             )
         }
     }
     val text: List<TextLayout> = ArrayList<TextLayout>().apply {
-        section.getConfigurationSection("texts")?.forEachSubConfiguration { s, configurationSection ->
-            val scale = configurationSection.getDouble("scale", 1.0)
+        section.get("texts")?.asObject()?.forEachSubConfiguration { s, yamlObject ->
+            val scale = yamlObject.getAsDouble("scale", 1.0)
             add(
                 TextLayout(
-                    configurationSection.getString("pattern").ifNull("pattern value not set: $s"),
-                    configurationSection.getString("name").ifNull("name value not set: $s").let { n ->
+                    yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s"),
+                    yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
                         TextManager.getText(n).ifNull("this text doesn't exist: $n")
                     },
-                    ImageLocation(configurationSection) + loc,
+                    ImageLocation(yamlObject) + loc,
                     scale,
-                    configurationSection.getInt("space").coerceAtLeast(0),
-                    configurationSection.getString("align").toLayoutAlign(),
-                    configurationSection.getString("color")?.toTextColor() ?: NamedTextColor.WHITE,
-                    configurationSection.getBoolean("outline"),
-                    configurationSection.getInt("layer"),
-                    configurationSection.getString("number-equation")?.let {
+                    yamlObject.getAsInt("space", 0).coerceAtLeast(0),
+                    yamlObject.get("align")?.asString().toLayoutAlign(),
+                    yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE,
+                    yamlObject.getAsBoolean("outline", false),
+                    yamlObject.getAsInt("layer", 0),
+                    yamlObject.get("number-equation")?.asString()?.let {
                         TEquation(it)
                     } ?: TEquation.t,
-                    configurationSection.getString("number-format")?.let {
+                    yamlObject.get("number-format")?.asString()?.let {
                         DecimalFormat(it)
                     } ?: ConfigManagerImpl.numberFormat,
-                    configurationSection.getBoolean("disable-number-format", true),
-                    configurationSection.getString("background")?.let {
+                    yamlObject.getAsBoolean("disable-number-format", true),
+                    yamlObject.get("background")?.asString()?.let {
                         BackgroundManager.getBackground(it)
                     },
-                    configurationSection.getDouble("background-scale", scale),
-                    configurationSection.getString("follow"),
-                    configurationSection.getConfigurationSection("emoji-pixel")?.let {
+                    yamlObject.getAsDouble("background-scale", scale),
+                    yamlObject.get("follow")?.asString(),
+                    yamlObject.get("emoji-pixel")?.asObject()?.let {
                         ImageLocation(it)
                     } ?: ImageLocation.zero,
-                    configurationSection.getDouble("emoji-scale", 1.0).apply {
+                    yamlObject.getAsDouble("emoji-scale", 1.0).apply {
                         if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
                     },
-                    configurationSection.getBoolean("use-legacy-format", true),
-                    configurationSection.getString("legacy-serializer")?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer,
-                    configurationSection.toConditions()
+                    yamlObject.getAsBoolean("use-legacy-format", true),
+                    yamlObject.get("legacy-serializer")?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer,
+                    yamlObject.toConditions()
                 )
             )
         }
     }
     val head: List<HeadLayout> = ArrayList<HeadLayout>().apply {
-        section.getConfigurationSection("heads")?.forEachSubConfiguration { s, configurationSection ->
+        section.get("heads")?.asObject()?.forEachSubConfiguration { s, yamlObject ->
             add(
                 HeadLayout(
-                    configurationSection.getString("name").ifNull("name value not set: $s").let {
+                    yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
                         PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
                     },
-                    ImageLocation(configurationSection) + loc,
-                    configurationSection.getBoolean("outline"),
-                    configurationSection.getInt("layer"),
-                    configurationSection.getString("align").toLayoutAlign(),
-                    configurationSection.getString("follow"),
-                    configurationSection.toConditions()
+                    ImageLocation(yamlObject) + loc,
+                    yamlObject.getAsBoolean("outline", false),
+                    yamlObject.getAsInt("layer", 0),
+                    yamlObject.get("align")?.asString().toLayoutAlign(),
+                    yamlObject.get("follow")?.asString(),
+                    yamlObject.toConditions()
                 )
             )
         }
     }
     val conditions = section.toConditions()
 
-    val animation = section.getConfigurationSection("animations")?.let { animations ->
+    val animation = section.get("animations")?.asObject()?.let { animations ->
         AnimationLocation(animations)
     } ?: AnimationLocation.zero
 }

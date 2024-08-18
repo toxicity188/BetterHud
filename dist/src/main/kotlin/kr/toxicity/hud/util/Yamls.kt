@@ -1,28 +1,63 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.hud.api.yaml.YamlElement
+import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.placeholder.Conditions
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.file.YamlConfiguration
+import kr.toxicity.hud.yaml.YamlArrayImpl
+import kr.toxicity.hud.yaml.YamlElementImpl
+import kr.toxicity.hud.yaml.YamlObjectImpl
+import net.kyori.adventure.audience.Audience
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.InputStream
-import java.io.InputStreamReader
 
-fun File.toYaml() = YamlConfiguration.loadConfiguration(this)
-fun InputStream.toYaml() = InputStreamReader(this).buffered().use {
-    YamlConfiguration.loadConfiguration(it)
+private val YAML = Yaml()
+
+fun Any.toYaml(path: String): YamlElement = when (this) {
+    is Map<* ,*> -> YamlObjectImpl(path, toMutableMap())
+    is List<*> -> YamlArrayImpl(path, this)
+    else -> YamlElementImpl(path, this)
 }
 
-fun ConfigurationSection.forEachSubConfiguration(block: (String, ConfigurationSection) -> Unit) {
-    getKeys(false).forEach {
-        getConfigurationSection(it)?.let { config ->
-            block(it, config)
-        } ?: warn("Invalid section format: $it")
+fun File.toYaml(): YamlObject = inputStream().buffered().use {
+    YamlObjectImpl(
+        "",
+        YAML.load(it) ?: mutableMapOf<String, Any>()
+    )
+}
+
+fun InputStream.toYaml() = YamlObjectImpl(
+    "",
+    YAML.load(this) ?: mutableMapOf<String, Any>()
+)
+
+fun Map<String, Any>.saveToYaml(file: File) {
+    file.bufferedWriter().use {
+        it.write(YAML.dumpAsMap(this))
     }
 }
 
-fun ConfigurationSection.toConditions() = getConfigurationSection("conditions")?.let {
+
+fun File.forEachAllYaml(sender: Audience, block: (File, String, YamlObject) -> Unit) {
+    forEachAllFolder {
+        if (it.extension == "yml") {
+            runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
+                it.toYaml().forEach { e ->
+                    val v = e.value
+                    if (v is YamlObject) block(it, e.key, v)
+                }
+            }
+        } else {
+            sender.warn("This is not a yml file: ${it.path}")
+        }
+    }
+}
+fun YamlObject.toConditions() = get("conditions")?.asObject()?.let {
     Conditions.parse(it)
 } ?: ConditionBuilder.alwaysTrue
 
-fun ConfigurationSection.getTEquation(name: String) = getString(name)?.toEquation()
+fun YamlObject.getTEquation(key: String) = get(key)?.asString()?.let {
+    TEquation(it)
+}

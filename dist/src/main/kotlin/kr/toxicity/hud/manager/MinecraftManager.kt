@@ -65,9 +65,7 @@ object MinecraftManager: BetterHudManager {
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                     JsonParser.parseReader(it)
                 }.asJsonObject
-                val current = (if (ConfigManagerImpl.minecraftJarVersion == "bukkit") MinecraftVersion.current else runWithExceptionHandling(sender, "Invalid minecraft version: ${ConfigManagerImpl.minecraftJarVersion}") {
-                    MinecraftVersion(ConfigManagerImpl.minecraftJarVersion)
-                }.getOrDefault(MinecraftVersion.current)).toString()
+                val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
                 info("Current minecraft version: $current")
                 val file = File(cache, "$current.jar")
                 if (!file.exists() || file.length() == 0L) {

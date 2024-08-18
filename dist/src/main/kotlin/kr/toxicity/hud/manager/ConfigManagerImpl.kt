@@ -6,16 +6,11 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
+import kr.toxicity.hud.yaml.YamlObjectImpl
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import org.bstats.bukkit.Metrics
-import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.server.PluginDisableEvent
-import org.bukkit.plugin.Plugin
 import java.io.File
 import java.text.DecimalFormat
 
@@ -73,7 +68,6 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
     var debug = false
         private set
-    private var disableLinkPlugin = emptyList<Plugin>()
 
     var resourcePackObfuscation = false
         private set
@@ -84,7 +78,6 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     var minecraftJarVersion = "bukkit"
         private set
 
-    private var metrics: Metrics? = null
     var loadMinecraftDefaultTextures = true
         private set
     var includedMinecraftTextures = listOf(
@@ -97,16 +90,6 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
         private set
 
     override fun start() {
-        Bukkit.getPluginManager().registerEvents(object : Listener {
-            @EventHandler
-            fun disable(e: PluginDisableEvent) {
-                if (disableLinkPlugin.any {
-                    it.name == e.plugin.name
-                }) {
-                    Bukkit.getPluginManager().disablePlugin(PLUGIN)
-                }
-            }
-        }, PLUGIN)
     }
 
     override fun getBossbarLine(): Int = line
@@ -118,77 +101,81 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             File(DATA_FOLDER, "version.yml").apply {
                 if (!exists()) createNewFile()
             }.run {
-                val yaml = toYaml()
-                needToUpdateConfig = yaml.getString("plugin-version") != PLUGIN.description.version
-                yaml.set("plugin-version", PLUGIN.description.version)
+                val yaml = toYaml() as YamlObjectImpl
+                needToUpdateConfig = yaml.get("plugin-version")?.asString() != BOOTSTRAP.version()
+                yaml.put("plugin-version", BOOTSTRAP.version())
                 yaml.save(this)
             }
 
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
-            debug = yaml.getBoolean("debug")
-            defaultHud = yaml.getStringList("default-hud")
-            defaultPopup = yaml.getStringList("default-popup")
-            defaultCompass = yaml.getStringList("default-compass")
-            yaml.getString("default-font-name")?.let {
+            debug = yaml.getAsBoolean("debug", false)
+            defaultHud = yaml.get("default-hud")?.asArray()?.map {
+                it.asString()
+            } ?: emptyList()
+            defaultPopup = yaml.get("default-popup")?.asArray()?.map {
+                it.asString()
+            } ?: emptyList()
+            defaultCompass = yaml.get("default-compass")?.asArray()?.map {
+                it.asString()
+            } ?: emptyList()
+            yaml.get("default-font-name")?.asString()?.let {
                 if (defaultFontName != it) needToUpdatePack = true
                 defaultFontName = it
             }
-            yaml.getString("pack-type")?.let {
+            yaml.get("pack-type")?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find this pack type: $it") {
                     packType = PackType.valueOf(it.uppercase())
                 }
             }
-            tickSpeed = yaml.getLong("tick-speed", 1)
-            numberFormat = (yaml.getString("number-format")?.let {
+            tickSpeed = yaml.getAsLong("tick-speed", 1)
+            numberFormat = (yaml.get("number-format")?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to read this number-format: $it") {
                     DecimalFormat(it)
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#"))
-            disableToBedrockPlayer = yaml.getBoolean("disable-to-bedrock-player", true)
-            yaml.getString("build-folder-location")?.let {
+            disableToBedrockPlayer = yaml.getAsBoolean("disable-to-bedrock-player", true)
+            yaml.get("build-folder-location")?.asString()?.let {
                 buildFolderLocation = it.replace('/', File.separatorChar)
             }
-            val newLine = yaml.getInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
+            val newLine = yaml.getAsInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
             if (line != newLine) {
                 line = newLine
                 needToUpdatePack = true
             }
-            versionCheck = yaml.getBoolean("version-check")
-            enableProtection = yaml.getBoolean("enable-protection")
-            mergeBossBar = yaml.getBoolean("merge-boss-bar", true)
-            enableSelfHost = yaml.getBoolean("enable-self-host")
-            mergeOtherFolders = yaml.getStringList("merge-other-folders")
-            yaml.getString("self-host-ip")?.let { ip ->
+            versionCheck = yaml.getAsBoolean("version-check", false)
+            enableProtection = yaml.getAsBoolean("enable-protection", false)
+            mergeBossBar = yaml.getAsBoolean("merge-boss-bar", true)
+            enableSelfHost = yaml.getAsBoolean("enable-self-host", false)
+            mergeOtherFolders = yaml.get("merge-other-folders")?.asArray()?.map {
+                it.asString()
+            } ?: emptyList()
+            yaml.get("self-host-ip")?.asString()?.let { ip ->
                 selfHostIp = ip
             }
-            selfHostPort = yaml.getInt("self-host-port", 8163)
-            forceUpdate = yaml.getBoolean("force-update")
-            disableLinkPlugin = yaml.getStringList("disable-link-plugin").filter {
-                it != PLUGIN.name
-            }.distinct().mapNotNull {
-                Bukkit.getPluginManager().getPlugin(it)
-            }
-            resourcePackObfuscation = yaml.getBoolean("resourcepack-obfuscation")
-            if (yaml.getBoolean("metrics") && metrics == null) {
-                metrics = Metrics(PLUGIN, 21287)
+            selfHostPort = yaml.getAsInt("self-host-port", 8163)
+            forceUpdate = yaml.getAsBoolean("force-update", false)
+            resourcePackObfuscation = yaml.getAsBoolean("resourcepack-obfuscation", false)
+            if (yaml.getAsBoolean("metrics", false)) {
+                BOOTSTRAP.startMetrics()
             } else {
-                metrics?.shutdown()
-                metrics = null
+                BOOTSTRAP.endMetrics()
             }
-            yaml.getString("loading-head")?.let {
+            yaml.get("loading-head")?.asString()?.let {
                 loadingHead = it
             }
-            clearBuildFolder = yaml.getBoolean("clear-build-folder", true)
-            loadMinecraftDefaultTextures = yaml.getBoolean("load-minecraft-default-textures", true)
-            includedMinecraftTextures = yaml.getStringList("included-minecraft-list")
-            yaml.getString("legacy-serializer")?.let {
+            clearBuildFolder = yaml.getAsBoolean("clear-build-folder", true)
+            loadMinecraftDefaultTextures = yaml.getAsBoolean("load-minecraft-default-textures", true)
+            includedMinecraftTextures = yaml.get("included-minecraft-list")?.asArray()?.map {
+                it.asString()
+            } ?: emptyList()
+            yaml.get("legacy-serializer")?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
                     legacySerializer = it.toLegacySerializer()
                 }
             }
-            key = KeyResource(yaml.getString("namespace") ?: NAME_SPACE)
-            minecraftJarVersion = yaml.getString("minecraft-jar-version") ?: "bukkit"
+            key = KeyResource(yaml.get("namespace")?.asString() ?: NAME_SPACE)
+            minecraftJarVersion = yaml.get("minecraft-jar-version")?.asString() ?: "bukkit"
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

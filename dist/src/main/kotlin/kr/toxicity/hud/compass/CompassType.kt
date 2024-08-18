@@ -1,7 +1,7 @@
 package kr.toxicity.hud.compass
 
 import kr.toxicity.hud.resource.GlobalResource
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 import java.io.File
 
 enum class CompassType {
@@ -11,12 +11,12 @@ enum class CompassType {
             assets: File,
             path: String,
             name: String,
-            section: ConfigurationSection
+            section: YamlObject
         ): CompassImpl {
             return CircleCompass(resource, assets, path, name, section)
         }
     }
     ;
 
-    abstract fun build(resource: GlobalResource, assets: File, path: String, name: String, section: ConfigurationSection): CompassImpl
+    abstract fun build(resource: GlobalResource, assets: File, path: String, name: String, section: YamlObject): CompassImpl
 }

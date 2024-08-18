@@ -1,6 +1,5 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.api.event.CreateShaderEvent
 import kr.toxicity.hud.api.manager.ShaderManager
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.hud.HudImpl
@@ -8,10 +7,9 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import org.bukkit.boss.BarColor
+import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
@@ -21,12 +19,12 @@ import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
 object ShaderManagerImpl: BetterHudManager, ShaderManager {
-    var barColor = BarColor.YELLOW
+    var barColor = BossBar.Color.YELLOW
         private set
 
     private val tagPattern = Pattern.compile("#(?<name>[a-zA-Z]+)")
     private val deactivatePattern = Pattern.compile("//(?<name>[a-zA-Z]+)")
-    private val tagBuilders: Map<String, () -> List<String>> = mapOf(
+    private val tagBuilders: MutableMap<String, () -> List<String>> = mutableMapOf(
         "CreateConstant" to {
             constants.map {
                 "#define ${it.key} ${it.value}"
@@ -52,16 +50,14 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                 hudShaders.clear()
             }
         },
-        "CreateOtherShader" to {
-            CreateShaderEvent().apply {
-                call()
-            }.lines
-        }
     )
 
     private val hudShaders = TreeMap<HudShader, MutableList<(Int) -> Unit>>()
 
 
+    fun addTagBuilder(key: String, valueBuilder: () -> List<String>) {
+        tagBuilders[key] = valueBuilder
+    }
 
     @Synchronized
     fun addHudShader(shader: HudShader, consumer: (Int) -> Unit) {
@@ -96,7 +92,11 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     fun getReader(name: String): Pair<String, BufferedReader> {
                         return (name to run {
                             val f = File(DATA_FOLDER, name)
-                            if (!f.exists()) PLUGIN.saveResource(name, false)
+                            if (!f.exists()) BOOTSTRAP.resource(name).ifNull("Unknown resource: $name").buffered().use {
+                                f.outputStream().buffered().use { output ->
+                                    output.write(it.readAllBytes())
+                                }
+                            }
                             runCatching {
                                 f.bufferedReader(Charsets.UTF_8)
                             }.getOrNull() ?: throw RuntimeException("plugin jar file has a problem.")
@@ -113,13 +113,13 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     val replaceList = mutableSetOf<String>()
 
                     val yaml = PluginConfiguration.SHADER.create()
-                    barColor = yaml.getString("bar-color")?.let {
+                    barColor = yaml.get("bar-color")?.asString()?.let {
                         runCatching {
-                            BarColor.valueOf(it.uppercase())
+                            BossBar.Color.valueOf(it.uppercase())
                         }.getOrNull()
-                    } ?: BarColor.RED
+                    } ?: BossBar.Color.RED
                     fun copy(suffix: String) {
-                        PLUGIN.getResource("background.png")?.buffered()?.use { input ->
+                        BOOTSTRAP.resource("background.png")?.buffered()?.use { input ->
                             val byte = input.readAllBytes()
                             PackGenerator.addTask(ArrayList(resource.bossBar).apply {
                                 add("sprites")
@@ -132,7 +132,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     }
                     copy("background")
                     copy("progress")
-                    PLUGIN.getResource("bars.png")?.buffered()?.use { target ->
+                    BOOTSTRAP.resource("bars.png")?.buffered()?.use { target ->
                         val oldImage = target.toImage()
                         val yAxis = 10 * barColor.ordinal
                         PackGenerator.addTask(ArrayList(resource.bossBar).apply {
@@ -162,22 +162,22 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         }
                     }
 
-                    if (yaml.getBoolean("disable-level-text")) replaceList.add("HideExp")
-                    if (yaml.getBoolean("disable-item-name")) replaceList.add("HideItemName")
+                    if (yaml.getAsBoolean("disable-level-text", false)) replaceList.add("HideExp")
+                    if (yaml.getAsBoolean("disable-item-name", false)) replaceList.add("HideItemName")
 
-                    yaml.getConfigurationSection("hotbar")?.let {
-                        if (it.getBoolean("disable")) {
+                    yaml.get("hotbar")?.asObject()?.let {
+                        if (it.getAsBoolean("disable", false)) {
                             replaceList.add("RemapHotBar")
                             val locations =
-                                it.getConfigurationSection("locations").ifNull("locations configuration not set.")
+                                it.get("locations")?.asObject().ifNull("locations configuration not set.")
                             (1..10).map { index ->
-                                locations.getConfigurationSection(index.toString())?.let { shaderConfig ->
+                                locations.get(index.toString())?.asObject()?.let { shaderConfig ->
                                     HotBarShader(
-                                        shaderConfig.getConfigurationSection("gui")?.let { gui ->
-                                            gui.getDouble("x") to gui.getDouble("y")
+                                        shaderConfig.get("gui")?.asObject()?.let { gui ->
+                                            gui.getAsDouble("x", 0.0) to gui.getAsDouble("y", 0.0)
                                         } ?: (0.0 to 0.0),
-                                        shaderConfig.getConfigurationSection("pixel")?.let { pixel ->
-                                            pixel.getInt("x") to pixel.getInt("y")
+                                        shaderConfig.get("pixel")?.asObject()?.let { pixel ->
+                                            pixel.getAsInt("x", 0) to pixel.getAsInt("y", 0)
                                         } ?: (0 to 0),
                                     )
                                 } ?: HotBarShader.empty

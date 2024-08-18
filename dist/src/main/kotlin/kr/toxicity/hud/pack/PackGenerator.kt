@@ -158,12 +158,12 @@ object PackGenerator {
                         }
                     }
                     if (host) {
-                        PLUGIN.getResource("icon.png")?.buffered()?.use {
+                        BOOTSTRAP.resource("icon.png")?.buffered()?.use {
                             addEntry(ZipEntry("pack.png"), it.readAllBytes())
                         }
                         addEntry(ZipEntry("pack.mcmeta"), JsonObject().apply {
                             add("pack", JsonObject().apply {
-                                addProperty("pack_format", PLUGIN.nms.version.metaVersion)
+                                addProperty("pack_format", BOOTSTRAP.mcmetaVersion())
                                 addProperty("description", "BetterHud's self host pack.")
                             })
                         }.toByteArray())

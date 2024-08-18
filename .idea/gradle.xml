@@ -10,9 +10,15 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/api" />
+            <option value="$PROJECT_DIR$/api/bukkit-api" />
+            <option value="$PROJECT_DIR$/api/standard-api" />
+            <option value="$PROJECT_DIR$/api/velocity-api" />
             <option value="$PROJECT_DIR$/bedrock" />
             <option value="$PROJECT_DIR$/bedrock/floodgate" />
             <option value="$PROJECT_DIR$/bedrock/geyser" />
+            <option value="$PROJECT_DIR$/bootstrap" />
+            <option value="$PROJECT_DIR$/bootstrap/bukkit" />
+            <option value="$PROJECT_DIR$/bootstrap/velocity" />
             <option value="$PROJECT_DIR$/dist" />
             <option value="$PROJECT_DIR$/nms" />
             <option value="$PROJECT_DIR$/nms/v1_17_R1" />

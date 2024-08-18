@@ -4,7 +4,10 @@ plugins {
 rootProject.name = "BetterHud"
 
 include(
-    "api",
+    "api:standard-api",
+    "api:bukkit-api",
+    "api:velocity-api",
+
     "dist",
     "nms:v1_17_R1",
     "nms:v1_18_R1",
@@ -22,5 +25,8 @@ include(
     "scheduler:folia",
 
     "bedrock:geyser",
-    "bedrock:floodgate"
+    "bedrock:floodgate",
+
+    "bootstrap:bukkit",
+    "bootstrap:velocity"
 )

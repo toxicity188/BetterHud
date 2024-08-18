@@ -20,10 +20,10 @@ object HudManagerImpl: BetterHudManager, HudManager {
 
     override fun reload(sender: Audience, resource: GlobalResource) {
         hudMap.clear()
-        DATA_FOLDER.subFolder("huds").forEachAllYaml(sender) { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("huds").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this hud: $s in ${file.name}") {
                 hudMap.putSync("hud", s) {
-                    HudImpl(file.path, s, resource.font, configurationSection)
+                    HudImpl(file.path, s, resource.font, yamlObject)
                 }
             }
         }

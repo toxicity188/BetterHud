@@ -76,6 +76,6 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
 
     val max = chars.first
 
-    fun getComponent(player: HudPlayer): PixelComponent = chars.second(player, (player.tick % Int.MAX_VALUE).toInt())
+    fun getComponent(hudPlayer: HudPlayer): PixelComponent = chars.second(hudPlayer, (hudPlayer.tick % Int.MAX_VALUE).toInt())
 
 }

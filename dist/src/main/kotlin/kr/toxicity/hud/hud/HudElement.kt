@@ -31,15 +31,15 @@ class HudElement(
         it.max
     } ?: 0
 
-    fun getComponent(player: HudPlayer) = if (conditions(player)) LayoutComponentContainer(layout.offset, layout.align, max)
+    fun getComponent(hudPlayer: HudPlayer) = if (conditions(hudPlayer)) LayoutComponentContainer(layout.offset, layout.align, max)
         .append(imageElement.map {
-            it.getComponent(player)
+            it.getComponent(hudPlayer)
         })
         .append(textElement.map {
-            it.getText(player)
+            it.getText(hudPlayer)
         })
         .append(headElement.map {
-            it.getHead(player)
+            it.getHead(hudPlayer)
         })
         .build() else EMPTY_WIDTH_COMPONENT
 }

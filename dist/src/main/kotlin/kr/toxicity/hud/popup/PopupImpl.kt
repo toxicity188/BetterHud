@@ -16,36 +16,36 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
-import org.bukkit.configuration.ConfigurationSection
+import kr.toxicity.hud.api.yaml.YamlObject
 import java.util.*
 
 class PopupImpl(
     override val path: String,
     file: List<String>,
     val internalName: String,
-    section: ConfigurationSection
+    section: YamlObject
 ): Popup, HudConfiguration {
     val gui = GuiLocation(section)
-    val move = section.getConfigurationSection("move")?.let {
+    val move = section.get("move")?.asObject()?.let {
         EquationPairLocation(it)
     } ?: EquationPairLocation.zero
-    private val duration = section.getInt("duration", -1)
-    private val update = section.getBoolean("update", true)
-    private val group = section.getString("group") ?: internalName
-    private val unique = section.getBoolean("unique")
-    private val dispose = section.getBoolean("dispose")
-    private val queue = duration > 0 && section.getBoolean("queue")
-    private val alwaysCheckCondition = queue && section.getBoolean("always-check-condition", true)
-    private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getBoolean("default")
-    private val keyMapping = section.getBoolean("key-mapping")
-    private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.getString("index")?.let {
+    private val duration = section.getAsInt("duration", -1)
+    private val update = section.getAsBoolean("update", true)
+    private val group = section.get("group")?.asString() ?: internalName
+    private val unique = section.getAsBoolean("unique", false)
+    private val dispose = section.getAsBoolean("dispose", false)
+    private val queue = duration > 0 && section.getAsBoolean("queue", false)
+    private val alwaysCheckCondition = queue && section.getAsBoolean("always-check-condition", true)
+    private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
+    private val keyMapping = section.getAsBoolean("key-mapping", false)
+    private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.get("index")?.asString()?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
         }.let {
             { reason ->
                 it.build(reason).let { placeholder ->
-                    { player ->
-                        (placeholder(player) as Number).toInt()
+                    { hudPlayer ->
+                        (placeholder(hudPlayer) as Number).toInt()
                     }
                 }
             }
@@ -56,17 +56,17 @@ class PopupImpl(
     var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
-    private val sortType = section.getString("sort")?.let {
+    private val sortType = section.get("sort")?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())
     } ?: PopupSortType.LAST
 
-    private val layouts = section.getConfigurationSection("layouts")?.let {
+    private val layouts = section.get("layouts")?.asObject()?.let {
         val json = array.ifNull("error is occurred.")
         ArrayList<PopupLayout>().apply {
-            it.forEachSubConfiguration { _, configurationSection ->
-                val layout = configurationSection.getString("name").ifNull("name value not set.")
-                var loc = GuiLocation(configurationSection)
-                configurationSection.getConfigurationSection("gui")?.let {
+            it.forEachSubConfiguration { _, yamlObject ->
+                val layout = yamlObject.get("name")?.asString().ifNull("name value not set.")
+                var loc = GuiLocation(yamlObject)
+                yamlObject.get("gui")?.asObject()?.let {
                     loc += GuiLocation(it)
                 }
                 add(PopupLayout(
@@ -74,7 +74,7 @@ class PopupImpl(
                     LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                     this@PopupImpl,
                     loc,
-                    configurationSection.getConfigurationSection("pixel")?.let {
+                    yamlObject.get("pixel")?.asObject()?.let {
                         ImageLocation(it)
                     } ?: ImageLocation.zero,
                     file,
@@ -89,29 +89,32 @@ class PopupImpl(
 
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
-            PlayerManagerImpl.getHudPlayer(uuid)?.let { player ->
+            PlayerManagerImpl.getHudPlayer(uuid)?.let { hudPlayer ->
                 if (keyMapping) {
-                    player.popupKeyMap[event.key]?.let {
+                    hudPlayer.popupKeyMap[event.key]?.let {
                         if (it.update()) return@task true
-                        else player.popupKeyMap.remove(event.key)
+                        else hudPlayer.popupKeyMap.remove(event.key)
                     }
                 }
-                show(event, player, event.key)?.let {
+                show(event, hudPlayer, event.key)?.let {
                     if (keyMapping) {
-                        player.popupKeyMap[event.key] = it
+                        hudPlayer.popupKeyMap[event.key] = it
                     }
                 }
             }
             true
         }
-        section.getConfigurationSection("triggers")?.forEachSubConfiguration { _, configurationSection ->
-            TriggerManagerImpl.addTask(configurationSection, task)
+        section.get("triggers")?.asObject()?.forEachSubConfiguration { _, yamlObject ->
+            TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
+                task(u, t)
+            }
         }
-        section.getConfigurationSection("hide-triggers")?.forEachSubConfiguration { _, configurationSection ->
-            TriggerManagerImpl.addTask(configurationSection) { _, uuid ->
-                PlayerManagerImpl.getHudPlayer(uuid)?.let {
+        section.get("hide-triggers")?.asObject()?.forEachSubConfiguration { _, yamlObject ->
+            TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
+                PlayerManagerImpl.getHudPlayer(t)?.let {
                     hide(it)
                 } ?: false
+                task(u, t)
             }
         }
         array?.let { arr ->
@@ -129,13 +132,13 @@ class PopupImpl(
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
 
     override fun getMaxStack(): Int = move.locations.size
-    override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? = show(reason, player, UUID.randomUUID())
-    private fun show(reason: UpdateEvent, player: HudPlayer, key: Any): PopupUpdater? {
-        val get = player.popupGroupIteratorMap.computeIfAbsent(group) {
+    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? = show(reason, hudPlayer, UUID.randomUUID())
+    private fun show(reason: UpdateEvent, hudPlayer: HudPlayer, key: Any): PopupUpdater? {
+        val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl(dispose)
         }
         val buildCondition = conditions.build(reason)
-        if (!buildCondition(player)) return null
+        if (!buildCondition(hudPlayer)) return null
         var updater = {
         }
         val valueMap = layouts.map {
@@ -144,13 +147,13 @@ class PopupImpl(
         val mapper: (Int, Int) -> List<WidthComponent> = if (update) {
             { t, index ->
                 valueMap.map {
-                    it(player, t, index)
+                    it(hudPlayer, t, index)
                 }
             }
         } else {
             fun getValue() = valueMap.map { func ->
                 { a: Int, b: Int ->
-                    func(player, a, b)
+                    func(hudPlayer, a, b)
                 }
             }
             var allValues = getValue()
@@ -165,7 +168,7 @@ class PopupImpl(
             mapper2
         }
         var cond = {
-            buildCondition(player)
+            buildCondition(hudPlayer)
         }
         if (duration > 0) {
             val old = cond
@@ -179,9 +182,9 @@ class PopupImpl(
                 (++i < duration) && old()
             }
         }
-        val value = index?.invoke(reason)?.invoke(player) ?: -1
+        val value = index?.invoke(reason)?.invoke(hudPlayer) ?: -1
         val remove0 = {
-            player.popupKeyMap.remove(key)
+            hudPlayer.popupKeyMap.remove(key)
             Unit
         }
         val iterator = PopupIteratorImpl(
@@ -206,7 +209,7 @@ class PopupImpl(
             }
             override fun remove() {
                 iterator.remove()
-                if (get.index == 0) player.popupGroupIteratorMap.remove(group)
+                if (get.index == 0) hudPlayer.popupGroupIteratorMap.remove(group)
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {

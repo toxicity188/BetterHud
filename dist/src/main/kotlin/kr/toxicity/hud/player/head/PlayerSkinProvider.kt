@@ -1,8 +1,8 @@
 package kr.toxicity.hud.player.head
 
-import org.bukkit.entity.Player
+import kr.toxicity.hud.api.player.HudPlayer
 
 interface PlayerSkinProvider {
-    fun provide(player: Player): String?
+    fun provide(player: HudPlayer): String?
     fun provide(playerName: String): String?
 }

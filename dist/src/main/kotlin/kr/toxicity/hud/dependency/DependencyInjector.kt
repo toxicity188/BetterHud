@@ -1,19 +1,17 @@
 package kr.toxicity.hud.dependency
 
+import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.util.subFile
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.toYaml
-import me.lucko.jarrelocator.JarRelocator
-import me.lucko.jarrelocator.Relocation
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.logging.Logger
 
 
-class DependencyInjector(version: String, dataFolder: File, private val logger: Logger, classLoader: URLClassLoader) {
+class DependencyInjector(version: String, dataFolder: File, private val logger: BetterHudLogger, classLoader: URLClassLoader) {
     companion object {
 
         private const val CENTERAL = "https://repo1.maven.org/maven2"
@@ -40,7 +38,7 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
     private val dir = dataFolder.subFolder(".libraries")
 
     init {
-        if (dataFolder.subFile("version.yml").toYaml().getString("plugin-version") != version) dir.deleteRecursively()
+        if (dataFolder.subFile("version.yml").toYaml().get("plugin-version")?.asString() != version) dir.deleteRecursively()
     }
 
     fun load(dependency: Dependency) {
@@ -49,20 +47,14 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         }
         if (!file.exists() || file.length() == 0L) {
             logger.info("Downloading ${dependency.name}-${dependency.version}...")
-            val temp = File.createTempFile(dependency.name, dependency.version)
             val connection = URI.create("$CENTERAL/${dependency.toPath()}").toURL().openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.inputStream.buffered().use { input ->
-                temp.outputStream().buffered().use { output ->
+                file.outputStream().buffered().use { output ->
                     input.copyTo(output)
                 }
             }
             connection.disconnect()
-            JarRelocator(temp, file, listOf(Relocation(
-                dependency.relocation.pattern.replace("{}", "."),
-                dependency.relocation.relocation.replace("{}", ".")
-            ))).run()
-            temp.delete()
         }
         addUrl(file.toURI().toURL())
     }

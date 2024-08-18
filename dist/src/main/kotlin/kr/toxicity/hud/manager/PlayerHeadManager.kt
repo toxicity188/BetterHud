@@ -9,7 +9,6 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
-import org.bukkit.Bukkit
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
@@ -54,14 +53,12 @@ object PlayerHeadManager : BetterHudManager {
         HudPlayerHeadImpl.allBlack
     }
 
+    fun addSkinProvider(provider: PlayerSkinProvider) {
+        skinProviders.add(provider)
+    }
+
     override fun start() {
-        if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
-            skinProviders.add(SkinsRestorerSkinProvider())
-        }
         skinProviders.add(MineToolsProvider())
-        if (!Bukkit.getServer().onlineMode) {
-            skinProviders.add(HttpSkinProvider())
-        }
         PLUGIN.loadAssets("skin") { s, stream ->
             val image = stream.toImage()
             loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->
@@ -83,7 +80,7 @@ object PlayerHeadManager : BetterHudManager {
     fun provideSkin(playerName: String): String {
         for (skinProvider in skinProviders) {
             runCatching {
-                val value = Bukkit.getPlayer(playerName)?.let {
+                val value = PlayerManagerImpl.getHudPlayer(playerName)?.let {
                     skinProvider.provide(it)
                 } ?: skinProvider.provide(playerName)
                 if (value != null) return value
@@ -128,10 +125,10 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, configurationSection ->
+        DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
-                    val head = HudHead(file.path, s, configurationSection)
+                    val head = HudHead(file.path, s, yamlObject)
                     val pixel = head.pixel
                     val targetFile = ArrayList(resource.textures).apply {
                         val encode = "pixel_$pixel".encodeKey()
