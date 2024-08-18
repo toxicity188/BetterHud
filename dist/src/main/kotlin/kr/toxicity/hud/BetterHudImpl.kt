@@ -46,8 +46,6 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                     "adventure-text-serializer-legacy",
                     "adventure-nbt",
                     "adventure-text-serializer-json",
-                    "adventure-text-serializer-gson-legacy-impl",
-                    "adventure-text-serializer-json-legacy-impl",
                     "adventure-text-minimessage",
                 ).forEach {
                     injector.load(Dependency(
@@ -70,6 +68,16 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                     "net{}kyori",
                     "option",
                     "1.0.0",
+                ))
+            }
+            listOf(
+                "adventure-text-serializer-gson-legacy-impl",
+                "adventure-text-serializer-json-legacy-impl"
+            ).forEach {
+                injector.load(Dependency(
+                    "net{}kyori",
+                    it,
+                    BetterHud.ADVENTURE_VERSION
                 ))
             }
             listOf(
