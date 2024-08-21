@@ -37,8 +37,11 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
@@ -223,7 +226,18 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
                     val format = "%${args[0]}%"
                     return Function { player ->
                         runCatching {
-                            PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
+                            // 1. Resolve the argument
+                            // 2. Replace the '&' with legacy color char
+                            // 3. Deserialize the legacy colored string into a component
+                            // 4. Serialize the component into a MiniMessage string
+                            MiniMessage.miniMessage().serialize(
+                                LegacyComponentSerializer.legacySection().deserialize(
+                                    ChatColor.translateAlternateColorCodes(
+                                        '&',
+                                        PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
+                                    )
+                                )
+                            )
                         }.getOrDefault("<error>")
                     }
                 }
