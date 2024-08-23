@@ -14,6 +14,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
+import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.potion.PotionEffectType
 import java.util.function.Function
@@ -39,6 +40,15 @@ class BukkitStandardModule: BukkitModule {
                 {
                     HudListener { p ->
                         p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                    }
+                }
+            },
+            "vehicle_health" to { _ ->
+                {
+                    HudListener { p ->
+                        (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
+                            entity.health / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                        } ?: 0.0
                     }
                 }
             },
@@ -90,6 +100,11 @@ class BukkitStandardModule: BukkitModule {
                     p.bukkitPlayer.health
                 }
             },
+            "vehicle_health" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.health ?: 0.0
+                }
+            },
             "food" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.foodLevel
@@ -110,14 +125,33 @@ class BukkitStandardModule: BukkitModule {
                     p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 }
             },
+            "vehicle_max_health" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0
+                }
+            },
             "max_health_with_absorption" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value + p.bukkitPlayer.absorptionAmount
                 }
             },
+            "vehicle_max_health_with_absorption" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
+                        entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value + entity.absorptionAmount
+                    } ?: 0.0
+                }
+            },
             "health_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value * 100.0
+                }
+            },
+            "vehicle_health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
+                        entity.health / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value * 100.0
+                    } ?: 0.0
                 }
             },
             "max_air" to HudPlaceholder.of { _, _ ->
@@ -235,6 +269,11 @@ class BukkitStandardModule: BukkitModule {
             "dead" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.isDead
+                }
+            },
+            "frozen" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.isFrozen
                 }
             }
         )

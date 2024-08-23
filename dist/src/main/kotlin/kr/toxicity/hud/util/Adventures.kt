@@ -10,6 +10,8 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
@@ -60,6 +62,17 @@ fun String.toTextColor() = if (startsWith('#') && length == 7) {
     TextColor.fromHexString(this)
 } else NamedTextColor.NAMES.value(this) ?: NamedTextColor.WHITE
 fun WidthComponent.toPixelComponent(pixel: Int) = PixelComponent(this, pixel)
+
+fun PixelComponent.append(space: Int, other: PixelComponent): PixelComponent {
+    var comp = EMPTY_WIDTH_COMPONENT + component
+    if (space != 1) {
+        comp += (space - 1).toSpaceComponent()
+    }
+    return PixelComponent(
+        comp + other.component,
+        if (abs(pixel) > abs(other.pixel)) pixel else other.pixel
+    )
+}
 
 fun Int.parseChar(): String {
     return if (this <= 0xFFFF) this.toChar().toString()

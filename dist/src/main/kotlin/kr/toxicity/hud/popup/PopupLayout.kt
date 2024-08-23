@@ -167,6 +167,9 @@ class PopupLayout(
             ImageRenderer(
                 hudImage,
                 target.color,
+                target.space,
+                target.stack,
+                target.maxStack,
                 list,
                 target.follow,
                 hudImage.conditions.and(target.conditions)

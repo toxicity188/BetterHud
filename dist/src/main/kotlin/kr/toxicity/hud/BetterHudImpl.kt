@@ -44,7 +44,6 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                     "adventure-text-serializer-gson",
                     "adventure-text-serializer-plain",
                     "adventure-text-serializer-legacy",
-                    "adventure-nbt",
                     "adventure-text-serializer-json",
                     "adventure-text-minimessage",
                 ).forEach {
@@ -71,6 +70,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                 ))
             }
             listOf(
+                "adventure-nbt",
                 "adventure-text-serializer-gson-legacy-impl",
                 "adventure-text-serializer-json-legacy-impl"
             ).forEach {

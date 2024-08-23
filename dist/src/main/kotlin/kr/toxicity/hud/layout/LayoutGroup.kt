@@ -42,6 +42,17 @@ class LayoutGroup(
                     yamlObject.getAsDouble("scale", 1.0),
                     yamlObject.getAsBoolean("outline", false),
                     yamlObject.getAsInt("layer", 0),
+                    yamlObject.getAsInt("space", 1),
+                    yamlObject.get("stack")?.asString()?.let {
+                        PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+                            if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
+                        }
+                    },
+                    yamlObject.get("max-stack")?.asString()?.let {
+                        PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+                            if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
+                        }
+                    },
                     yamlObject.get("follow")?.asString(),
                     yamlObject.toConditions()
                 )

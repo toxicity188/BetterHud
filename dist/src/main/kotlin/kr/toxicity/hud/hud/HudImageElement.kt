@@ -67,6 +67,9 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         val renderer = ImageRenderer(
             hud,
             image.color,
+            image.space,
+            image.stack,
+            image.maxStack,
             list,
             image.follow,
             image.conditions.and(image.image.conditions)
