@@ -16,7 +16,11 @@ import java.io.InputStream
 private val YAML = Yaml()
 
 fun Any.toYaml(path: String): YamlElement = when (this) {
-    is Map<* ,*> -> YamlObjectImpl(path, toMutableMap())
+    is Map<* ,*> -> YamlObjectImpl(path, LinkedHashMap<String, Any>().also {
+        entries.forEach { e ->
+            it[(e.key ?: return@forEach).toString()] = e.value ?: return@forEach
+        }
+    })
     is List<*> -> YamlArrayImpl(path, this)
     else -> YamlElementImpl(path, this)
 }

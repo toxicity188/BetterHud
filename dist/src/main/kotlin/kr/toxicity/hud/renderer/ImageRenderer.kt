@@ -68,7 +68,7 @@ class ImageRenderer(
                     if (stackFrame <= 0.0) return@build EMPTY_PIXEL_COMPONENT
                     var empty = EMPTY_PIXEL_COMPONENT
                     for (i in 0..<maxStackFrame) {
-                        empty = empty.append(space, components[((stackFrame - i) * components.size)
+                        empty = empty.append(space, components[((stackFrame - i - 0.1) * components.size)
                             .roundToInt()
                             .coerceAtLeast(0)
                             .coerceAtMost(components.lastIndex)])
