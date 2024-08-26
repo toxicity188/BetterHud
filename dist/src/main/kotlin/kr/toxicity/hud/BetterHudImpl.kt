@@ -2,8 +2,6 @@ package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudBootstrap
-import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
-import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
@@ -116,10 +114,6 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         ShaderManagerImpl,
         PlayerManagerImpl,
     )
-
-    private lateinit var nms: NMS
-    private lateinit var bedrockAdapter: BedrockAdapter
-
 
     fun start() {
         managers.forEach {
