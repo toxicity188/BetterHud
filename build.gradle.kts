@@ -13,7 +13,7 @@ val adventure = "4.17.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.3.0"
-val bStats = "3.0.2"
+val bStats = "3.0.3"
 
 val legacyNmsVersion = listOf(
     "v1_17_R1",

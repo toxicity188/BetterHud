@@ -104,7 +104,7 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
         addReloadEndTask {
             PluginReloadedEvent(it).call()
         }
-        addReloadEndTask {
+        addReloadStartTask {
             HandlerList.unregisterAll(listener)
         }
         addReloadEndTask {
