@@ -41,19 +41,14 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.5"
+    version = "1.4-HOTFIX"
 
     repositories {
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
-        maven("https://maven.enginehub.org/repo/")
         maven("https://repo.opencollab.dev/main/")
-        maven("https://repo.skriptlang.org/releases")
-        maven("https://repo.alessiodp.com/releases/")
-        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-        maven("https://mvn.lumine.io/repository/maven/")
         maven("https://repo.codemc.org/repository/maven-public/")
         maven("https://maven.fabricmc.net/")
     }
