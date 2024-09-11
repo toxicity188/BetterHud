@@ -79,7 +79,7 @@ class TextRenderer(
                     .match(imagePattern)
                     .replacement { r, _ ->
                         data.images[r.group(1)]?.let {
-                            width += it.width + 1
+                            width += it.width
                             it.component.build()
                         } ?: Component.empty()
                     }

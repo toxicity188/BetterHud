@@ -9,51 +9,55 @@ import java.util.*
 class PopupIteratorGroupImpl(
     private val dispose: Boolean,
 ): PopupIteratorGroup {
-    private var list = Collections.synchronizedSet(TreeSet<PopupIterator>(Comparator.naturalOrder()))
+    private val sourceSet = TreeSet<PopupIterator>()
 
     override fun addIterator(iterator: PopupIterator) {
-        if (iterator.isUnique && contains(iterator.name())) return
-        val p = iterator.priority
-        val map = HashSet<Int>()
-        val loop = list.iterator()
-        while (loop.hasNext()) {
-            val next = loop.next()
-            if (next.markedAsRemoval()) next.remove()
-            else map.add(next.index)
-        }
-        val i = if (iterator.index < 0) when (iterator.sortType) {
-            PopupSortType.FIRST -> if (p >= 0) p else 0
-            PopupSortType.LAST -> if (p >= 0) p else run {
-                var i = 0
-                while (map.contains(i)) i++
-                i
+        synchronized(sourceSet) {
+            if (iterator.isUnique && contains(iterator.name())) return
+            val p = iterator.priority
+            val map = HashSet<Int>()
+            val loop = sourceSet.iterator()
+            while (loop.hasNext()) {
+                val next = loop.next()
+                if (next.markedAsRemoval()) next.remove()
+                else map.add(next.index)
             }
-        } else iterator.index
-        iterator.index = i
-        if (map.contains(i)) {
-            var t = 0
-            var biggest = i
-            val more = list.filter {
-                it.index >= i
-            }
-            val newValue = ArrayList<PopupIterator>(more.size)
-            while (t < more.size && more[t].index >= biggest) {
-                val get = more[t++]
-                if (list.remove(get)) {
-                    biggest = ++get.index
-                    newValue.add(get)
+            val i = if (iterator.index < 0) when (iterator.sortType) {
+                PopupSortType.FIRST -> if (p >= 0) p else 0
+                PopupSortType.LAST -> if (p >= 0) p else run {
+                    var i = 0
+                    while (map.contains(i)) i++
+                    i
                 }
+            } else iterator.index
+            iterator.index = i
+            if (map.contains(i)) {
+                var t = 0
+                var biggest = i
+                val more = sourceSet.filter {
+                    it.index >= i
+                }
+                val newValue = ArrayList<PopupIterator>(more.size)
+                while (t < more.size && more[t].index >= biggest) {
+                    val get = more[t++]
+                    if (sourceSet.remove(get)) {
+                        biggest = ++get.index
+                        newValue.add(get)
+                    }
+                }
+                if (newValue.isNotEmpty()) sourceSet.addAll(newValue)
             }
-            if (newValue.isNotEmpty()) list.addAll(newValue)
+            sourceSet.add(iterator)
         }
-        list.add(iterator)
     }
 
     override fun clear() {
-        list.forEach {
-            it.remove()
+        synchronized(sourceSet) {
+            sourceSet.forEach {
+                it.remove()
+            }
+            sourceSet.clear()
         }
-        list.clear()
     }
 
     private fun checkCondition(iterator: PopupIterator): Boolean {
@@ -70,27 +74,29 @@ class PopupIteratorGroupImpl(
     }
 
     override fun next(): List<WidthComponent> {
-        val copy = list
-        list = Collections.synchronizedSet(TreeSet(Comparator.naturalOrder()))
-        val send = ArrayList<PopupIterator>()
-        val result = ArrayList<WidthComponent>()
-        copy.forEach { next ->
-            if (checkCondition(next)) {
-                result.addAll(next.next())
-                send.add(next)
+        synchronized(sourceSet) {
+            val send = ArrayList<PopupIterator>()
+            val result = ArrayList<WidthComponent>()
+            sourceSet.forEach { next ->
+                if (checkCondition(next)) {
+                    result.addAll(next.next())
+                    send.add(next)
+                }
+                else next.remove()
             }
-            else next.remove()
+            if (!dispose) send.forEach {
+                addIterator(it)
+            }
+            return result
         }
-        if (!dispose) send.forEach {
-            addIterator(it)
-        }
-        return result
     }
 
     override fun contains(name: String): Boolean {
-        return list.any {
-            it.name() == name
+        return synchronized(sourceSet) {
+            sourceSet.any {
+                it.name() == name
+            }
         }
     }
-    override fun getIndex(): Int = list.size
+    override fun getIndex(): Int = sourceSet.size
 }
