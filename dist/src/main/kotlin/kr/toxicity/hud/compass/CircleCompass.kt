@@ -232,13 +232,13 @@ class CircleCompass(
         val world = hudPlayer.world()
         for (i in 1..<length) {
             comp += when (div - i + lengthDiv) {
-                (length * 0.5).roundToInt() -> images.se
+                (length * 0.5).roundToInt() -> images.sw
                 length * 1 -> images.w
                 (length * 1.5).roundToInt() -> images.nw
                 length * 2 -> images.n
                 (length * 2.5).roundToInt() -> images.ne
                 length * 3 -> images.e
-                (length * 3.5).roundToInt() -> images.sw
+                (length * 3.5).roundToInt() -> images.se
                 0, length * 4 -> images.s
                 else -> images.chain
             }?.map?.get(CompassData(if (i > lengthDiv) length - i else i))?.let {
