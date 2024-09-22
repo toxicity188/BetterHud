@@ -14,7 +14,6 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.bootstrap.bukkit.manager.CompatibilityManager
@@ -280,7 +279,7 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
                 is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
                 is ConsoleCommandSender -> object : CommandSourceWrapper {
                     override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
-                    override fun audience(): Audience = audiences.console()
+                    override fun audience(): Audience = this@BukkitBootstrapImpl.console()
                     override fun isOp(): Boolean = true
                     override fun hasPermission(perm: String): Boolean = true
                 }
@@ -318,7 +317,7 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
         PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
             CompletableFuture.supplyAsync {
-                val impl = HudPlayerBukkit(adaptedPlayer, audiences.player(player))
+                val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
                     taskLater(20) {
@@ -334,7 +333,9 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
     override fun resource(path: String): InputStream? = getResource(path)
     override fun logger(): BetterHudLogger = log
     override fun dataFolder(): File = dataFolder
-    override fun console(): Audience = audiences.console()
+    override fun console(): Audience = Bukkit.getConsoleSender().let {
+        if (it is Audience) it else audiences.sender(it)
+    }
 
     private var metrics: Metrics? = null
     override fun startMetrics() {
