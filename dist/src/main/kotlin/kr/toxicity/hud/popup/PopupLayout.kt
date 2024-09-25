@@ -38,11 +38,10 @@ class PopupLayout(
     private var imageChar = 0xCE000
     private var textIndex = 0
 
-    private val groups = parent.move.locations.run {
-        map { location ->
-            PopupLayoutGroup(location, json)
-        }
+    private val groups = parent.move.locations.map { location ->
+        PopupLayoutGroup(location, json)
     }
+
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
         val build = layout.conditions.build(reason)
         val map = groups.map {

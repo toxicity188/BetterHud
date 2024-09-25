@@ -33,7 +33,6 @@ class PopupImpl(
     private val update = section.getAsBoolean("update", true)
     private val group = section.get("group")?.asString() ?: internalName
     private val unique = section.getAsBoolean("unique", false)
-    private val dispose = section.getAsBoolean("dispose", false)
     private val queue = duration > 0 && section.getAsBoolean("queue", false)
     private val alwaysCheckCondition = queue && section.getAsBoolean("always-check-condition", true)
     private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
@@ -135,7 +134,7 @@ class PopupImpl(
     override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? = show(reason, hudPlayer, UUID.randomUUID())
     private fun show(reason: UpdateEvent, hudPlayer: HudPlayer, key: Any): PopupUpdater? {
         val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
-            PopupIteratorGroupImpl(dispose)
+            PopupIteratorGroupImpl()
         }
         val buildCondition = conditions.build(reason)
         if (!buildCondition(hudPlayer)) return null
@@ -145,9 +144,9 @@ class PopupImpl(
             it.getComponent(reason)
         }
         val mapper: (Int, Int) -> List<WidthComponent> = if (update) {
-            { t, index ->
+            { index, t ->
                 valueMap.map {
-                    it(hudPlayer, t, index)
+                    it(hudPlayer, index, t)
                 }
             }
         } else {
@@ -160,9 +159,9 @@ class PopupImpl(
             updater = {
                 allValues = getValue()
             }
-            val mapper2: (Int, Int) -> List<WidthComponent> = { t, index ->
+            val mapper2: (Int, Int) -> List<WidthComponent> = { index, t ->
                 allValues.map {
-                    it(t, index)
+                    it(index, t)
                 }
             }
             mapper2

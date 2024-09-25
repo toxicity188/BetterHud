@@ -6,9 +6,7 @@ import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupSortType
 import java.util.*
 
-class PopupIteratorGroupImpl(
-    private val dispose: Boolean,
-): PopupIteratorGroup {
+class PopupIteratorGroupImpl: PopupIteratorGroup {
     private val sourceSet = TreeSet<PopupIterator>()
 
     override fun addIterator(iterator: PopupIterator) {
@@ -75,17 +73,21 @@ class PopupIteratorGroupImpl(
 
     override fun next(): List<WidthComponent> {
         synchronized(sourceSet) {
-            val send = ArrayList<PopupIterator>()
+            val copy = sourceSet.toList()
             val result = ArrayList<WidthComponent>()
-            sourceSet.forEach { next ->
+            var i = 0
+            sourceSet.removeIf { next ->
+                i++
                 if (checkCondition(next)) {
                     result.addAll(next.next())
-                    send.add(next)
+                    false
+                } else {
+                    next.remove()
+                    copy.subList(i, copy.size).forEach {
+                        it.index--
+                    }
+                    true
                 }
-                else next.remove()
-            }
-            if (!dispose) send.forEach {
-                addIterator(it)
             }
             return result
         }
