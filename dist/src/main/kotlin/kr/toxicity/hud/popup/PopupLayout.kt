@@ -125,7 +125,7 @@ class PopupLayout(
                 val scale = height.toDouble() / it.image.image.height
                 val xOffset = Math.round(it.image.xOffset * scale).toInt()
                 val ascent = pixel.y
-                val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, height)
+                val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
                 val component = ImageManager.getImage(shaderGroup) ?: run {
                     val char = (++imageChar).parseChar()
@@ -315,7 +315,7 @@ class PopupLayout(
                     val char = (++imageChar).parseChar()
                     val ascent = pixel.y + i * headLayout.head.pixel
                     val height = headLayout.head.pixel
-                    val shaderGroup = ShaderGroup(shader, fileName, 1.0, height)
+                    val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
 
                     PlayerHeadManager.getHead(shaderGroup) ?: run {
                         HudImpl.createBit(shader, ascent) { y ->

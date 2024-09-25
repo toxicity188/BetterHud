@@ -27,6 +27,14 @@ public interface BetterHud {
 
 
     /**
+     * Supports legacy api.
+     * @return BetterHud main instance.
+     */
+    static @NotNull BetterHud getInstance() {
+        return BetterHudAPI.inst();
+    }
+
+    /**
      * Executes reload.
      * @return result of reload.
      */
@@ -152,6 +160,15 @@ public interface BetterHud {
      */
     @Nullable String translate(@NotNull String locale, @NotNull String key);
 
+    /**
+     * Adds some task when reload is started.
+     * @param runnable reload start task
+     */
     void addReloadStartTask(@NotNull Runnable runnable);
+
+    /**
+     * Adds some task when reload is ended.
+     * @param runnable reload end task
+     */
     void addReloadEndTask(@NotNull Consumer<ReloadResult> runnable);
 }

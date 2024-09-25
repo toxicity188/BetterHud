@@ -1,7 +1,10 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.adapter.CommandSourceWrapper
+import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.player.PointedLocation
+import kr.toxicity.hud.api.player.PointedLocationSource
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.CommandModule
@@ -44,7 +47,7 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds the hud for a player.".toComponent()
-                usage = "add <HudPlayer> <hud>".toComponent()
+                usage = "add <player> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.add")
                 executer = exec@ { s, a ->
@@ -76,7 +79,7 @@ object CommandManager: BetterHudManager {
             addCommand("remove") {
                 aliases = listOf("r")
                 description = "Removes the hud for a player.".toComponent()
-                usage = "remove <HudPlayer> <hud>".toComponent()
+                usage = "remove <player> <hud>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.hud.remove")
                 executer = exec@ { s, a ->
@@ -114,7 +117,7 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds the compass for a player.".toComponent()
-                usage = "add <HudPlayer> <compass>".toComponent()
+                usage = "add <player> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.add")
                 executer = exec@ { s, a ->
@@ -146,7 +149,7 @@ object CommandManager: BetterHudManager {
             addCommand("remove") {
                 aliases = listOf("r")
                 description = "Removes the compass for a player.".toComponent()
-                usage = "remove <HudPlayer> <compass>".toComponent()
+                usage = "remove <player> <compass>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.compass.remove")
                 executer = exec@ { s, a ->
@@ -184,7 +187,7 @@ object CommandManager: BetterHudManager {
             addCommand("add") {
                 aliases = listOf("a")
                 description = "Adds a popup for a player.".toComponent()
-                usage = "add <HudPlayer> <popup>".toComponent()
+                usage = "add <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.add")
                 executer = exec@ { s, a ->
@@ -216,7 +219,7 @@ object CommandManager: BetterHudManager {
             addCommand("remove") {
                 aliases = listOf("r")
                 description = "Removes a popup from a hudPlayer.".toComponent()
-                usage = "remove <HudPlayer> <popup>".toComponent()
+                usage = "remove <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.remove")
                 executer = exec@ { s, a ->
@@ -248,7 +251,7 @@ object CommandManager: BetterHudManager {
             addCommand("show") {
                 aliases = listOf("r")
                 description = "Shows a popup for a player.".toComponent()
-                usage = "show <HudPlayer> <popup>".toComponent()
+                usage = "show <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.show")
                 executer = exec@ { s, a ->
@@ -285,7 +288,7 @@ object CommandManager: BetterHudManager {
             addCommand("hide") {
                 aliases = listOf("r")
                 description = "Hides a popup for a player.".toComponent()
-                usage = "hide <HudPlayer> <popup>".toComponent()
+                usage = "hide <player> <popup>".toComponent()
                 length = 2
                 permission = listOf("$NAME_SPACE.popup.hide")
                 executer = exec@ { s, a ->
@@ -341,6 +344,71 @@ object CommandManager: BetterHudManager {
                 executer = { sender, _ ->
                     (sender as HudPlayer).isHudEnabled = false
                     sender.audience().info("Successfully turned the hud off.")
+                }
+            }
+        }
+        .addCommandModule("pointer", {
+            aliases = listOf("p")
+            permission = listOf("$NAME_SPACE.pointer")
+        }) {
+            addCommand("set") {
+                description = "Sets the compass pointer location of some player.".toComponent()
+                usage = "set <player> <name> <world> <x,y,z>".toComponent()
+                length = 4
+                executer = exec@ { sender, args ->
+                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(args[3].split(',').apply {
+                        if (size < 3) return@exec sender.audience().warn("Location format must be x,y,z.")
+                    }.let {
+                        PointedLocation(
+                            PointedLocationSource.INTERNAL,
+                            args[1],
+                            LocationWrapper(
+                                BOOTSTRAP.world(args[2]) ?: return@exec sender.audience().warn("Unable to find this world: ${args[2]}"),
+                                it[0].toDoubleOrNull() ?: return@exec sender.audience().warn("X coordinate is not a number: ${it[0]}"),
+                                it[1].toDoubleOrNull() ?: return@exec sender.audience().warn("Y coordinate is not a number: ${it[0]}"),
+                                it[2].toDoubleOrNull() ?: return@exec sender.audience().warn("Z coordinate is not a number: ${it[0]}"),
+                                0F,
+                                0F
+                            )
+                        ).apply {
+                            sender.audience().info("Located successfully in ${location.x},${location.y},${location.z} in ${location.world.name}: $name")
+                        }
+                    })
+                }
+                tabCompleter = { _, a ->
+                    when (a.size) {
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
+                        }.filter {
+                            it.contains(a[0])
+                        }
+                        3 -> BOOTSTRAP.worlds().map {
+                            it.name
+                        }.filter {
+                            it.contains(a[2])
+                        }
+                        4 -> listOf("0,0,0")
+                        else -> null
+                    }
+                }
+            }
+            addCommand("clear") {
+                description = "Clears the compass pointer location of some player.".toComponent()
+                usage = "clear <player>".toComponent()
+                length = 1
+                executer = exec@ { sender, args ->
+                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(null)
+                    sender.audience().info("Cleared successfully.")
+                }
+                tabCompleter = { _, a ->
+                    when (a.size) {
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
+                        }.filter {
+                            it.contains(a[0])
+                        }
+                        else -> null
+                    }
                 }
             }
         }

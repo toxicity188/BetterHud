@@ -26,5 +26,9 @@ public interface HudTrigger<T> {
      */
     @NotNull Object getKey(T t);
 
+    /**
+     * Register some event handler at this trigger.
+     * @param eventConsumer event handler
+     */
     void registerEvent(@NotNull BiConsumer<UUID, UpdateEvent> eventConsumer);
 }

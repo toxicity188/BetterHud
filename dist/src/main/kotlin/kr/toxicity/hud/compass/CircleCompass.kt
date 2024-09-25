@@ -219,17 +219,17 @@ class CircleCompass(
             }
         }
     }
-    override fun indicate(hudPlayer: HudPlayer): WidthComponent {
-        if (!conditions(hudPlayer)) return EMPTY_WIDTH_COMPONENT
-        val yaw =  hudPlayer.location().yaw.toDouble()
+    override fun indicate(player: HudPlayer): WidthComponent {
+        if (!conditions(player)) return EMPTY_WIDTH_COMPONENT
+        val yaw =  player.location().yaw.toDouble()
         var degree = yaw
         if (degree < 0) degree += 360.0
         val div = (degree / 90 * length).roundToInt()
         var comp = EMPTY_WIDTH_COMPONENT
         val lengthDiv = length / 2
         val mod = (degree.toInt() % length).toDouble() / length
-        val loc = hudPlayer.location()
-        val world = hudPlayer.world()
+        val loc = player.location()
+        val world = player.world()
         for (i in 1..<length) {
             comp += when (div - i + lengthDiv) {
                 (length * 0.5).roundToInt() -> images.sw
@@ -247,7 +247,7 @@ class CircleCompass(
             } ?: (space * 2).toSpaceComponent()
         }
         images.point?.let { p ->
-            hudPlayer.pointedLocation.forEach {
+            player.pointedLocation.forEach {
                 val targetLoc = it.location
                 if (targetLoc.world.uuid != world.uuid) return@forEach
                 var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x)

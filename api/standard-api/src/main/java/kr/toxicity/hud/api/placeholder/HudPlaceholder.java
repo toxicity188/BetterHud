@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 /**
  * Represents placeholder
- * @param <T> reture value's type
+ * @param <T> returns value's type
  */
 public interface HudPlaceholder<T> {
     /**

@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface BedrockAdapter {
     /**
      * Returns whether given uuid's HudPlayer is from bedrock.
-     * @param uuid HudPlayer's uuid
+     * @param uuid player's uuid
      * @return whether This player is from bedrock client
      */
     boolean isBedrockPlayer(@NotNull UUID uuid);

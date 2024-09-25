@@ -26,6 +26,7 @@ abstract class HudPlayerImpl: HudPlayer {
     private var task: HudTask? = null
     private var color: BossBar.Color? = null
     private var enabled = true
+    private var pointer: PointedLocation? = null
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
@@ -174,5 +175,11 @@ abstract class HudPlayerImpl: HudPlayer {
         cancelTick()
         autoSave.cancel()
         locationProvide.cancel()
+    }
+
+    final override fun pointer(): PointedLocation? = pointer
+
+    final override fun pointer(location: PointedLocation?) {
+        pointer = location
     }
 }

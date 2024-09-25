@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Represents HudPlayer data.
+ * Represents player data.
  */
 public interface HudPlayer extends CommandSourceWrapper {
     @NotNull
@@ -34,31 +34,31 @@ public interface HudPlayer extends CommandSourceWrapper {
     WorldWrapper world();
 
     /**
-     * Gets HudPlayer head.
-     * @return HudPlayer head
+     * Gets player head.
+     * @return player head
      */
     @NotNull HudPlayerHead getHead();
     /**
-     * Gets original hudPlayer.
+     * Gets original player.
      * @return handle.
      */
     @NotNull
     Object handle();
 
     /**
-     * Gets HudPlayer's last bar's component.
+     * Gets player's last bar's component.
      * @return component
      */
     @NotNull WidthComponent getHudComponent();
 
     /**
-     * Sets HudPlayer's additional component.
+     * Sets player's additional component.
      * @param component component
      */
     void setAdditionalComponent(@Nullable WidthComponent component);
 
     /**
-     * Gets HudPlayer's additional component.
+     * Gets player's additional component.
      * @return component
      */
     @Nullable WidthComponent getAdditionalComponent();
@@ -76,29 +76,29 @@ public interface HudPlayer extends CommandSourceWrapper {
     void setHudEnabled(boolean toEnable);
 
     /**
-     * Gets HudPlayer's current tick
+     * Gets player's current tick
      * It represents the count of update() calling;
      * @return tick
      */
     long getTick();
 
     /**
-     * Cancel and close HudPlayer's data.
+     * Cancel and close player's data.
      */
     void cancel();
 
     /**
-     * Updates HudPlayer's bossbar.
+     * Updates player's bossbar.
      */
     void update();
 
     /**
-     * Cancels and Starts HudPlayer's task.
+     * Cancels and Starts player's task.
      */
     void startTick();
 
     /**
-     * Cancels HudPlayer's task.
+     * Cancels player's task.
      */
     void cancelTick();
 
@@ -110,8 +110,8 @@ public interface HudPlayer extends CommandSourceWrapper {
     @NotNull Map<String, PopupIteratorGroup> getPopupGroupIteratorMap();
 
     /**
-     * Gets a mutable map of HudPlayer's local variable.
-     * @return HudPlayer's variable map
+     * Gets a mutable map of player's local variable.
+     * @return player's variable map
      */
     @NotNull Map<String, String> getVariableMap();
 
@@ -122,20 +122,20 @@ public interface HudPlayer extends CommandSourceWrapper {
     @NotNull Map<Object, PopupUpdater> getPopupKeyMap();
 
     /**
-     * Gets a HudPlayer's current bossbar's color
+     * Gets a player's current bossbar's color
      * @return bar color
      */
     @Nullable
     BossBar.Color getBarColor();
 
     /**
-     * Gets a current HudPlayer's hud objects.
+     * Gets a current player's hud objects.
      * @return hud objects
      */
     @NotNull Set<HudObject> getHudObjects();
 
     /**
-     * Gets a current HudPlayer's popup.
+     * Gets a current player's popup.
      * @return popups
      */
     default @NotNull Set<Popup> getPopups() {
@@ -143,14 +143,14 @@ public interface HudPlayer extends CommandSourceWrapper {
     }
 
     /**
-     * Gets a current HudPlayer's hud.
+     * Gets a current player's hud.
      * @return hud
      */
     default @NotNull Set<Hud> getHuds() {
         return getHudObjects().stream().map(o -> o instanceof Hud hud ? hud : null).filter(Objects::nonNull).collect(Collectors.toSet());
     }
     /**
-     * Gets a current HudPlayer's compass.
+     * Gets a current player's compass.
      * @return compass
      */
     default @NotNull Set<Compass> getCompasses() {
@@ -174,8 +174,20 @@ public interface HudPlayer extends CommandSourceWrapper {
     void save();
 
     /**
-     * Sets HudPlayer's bossbar color.
+     * Sets player's bossbar color.
      * @param color bar color
      */
     void setBarColor(@Nullable BossBar.Color color);
+
+    /**
+     * Gets pointed location.
+     * @return location or null
+     */
+    @Nullable PointedLocation pointer();
+
+    /**
+     * Sets pointed location.
+     * @param location location or null
+     */
+    void pointer(@Nullable PointedLocation location);
 }

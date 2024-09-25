@@ -37,7 +37,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
             val ascent = (finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
-            val shaderGroup = ShaderGroup(shader, fileName, image.scale, height)
+            val shaderGroup = ShaderGroup(shader, fileName, image.scale, ascent)
 
             val component = ImageManager.getImage(shaderGroup) ?: run {
                 val c = (++parent.imageChar).parseChar()

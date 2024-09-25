@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.manager.PlayerManager
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationProvider
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
@@ -15,7 +16,13 @@ object PlayerManagerImpl: BetterHudManager, PlayerManager {
     private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
     private val stringPlayer = ConcurrentHashMap<String, HudPlayer>()
 
-    private val locationProviders = ArrayList<PointedLocationProvider>()
+    private val locationProviders = mutableListOf<PointedLocationProvider>(
+        object : PointedLocationProvider {
+            override fun provide(player: HudPlayer): PointedLocation? {
+                return player.pointer()
+            }
+        }
+    )
 
     override fun start() {
     }

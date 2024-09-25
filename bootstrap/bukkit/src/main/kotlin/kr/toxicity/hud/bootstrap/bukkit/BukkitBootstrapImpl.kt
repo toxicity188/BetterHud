@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.CommandSourceWrapper
+import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.bukkit.BukkitBootstrap
 import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
 import kr.toxicity.hud.api.bukkit.event.*
@@ -374,4 +375,14 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
     override fun mcmetaVersion(): Int = nms.version.metaVersion
     override fun triggerListener(): Listener = listener
     override fun useLegacyFont(): Boolean = nms.version.version <= 18
+
+    override fun world(name: String): WorldWrapper? {
+        return Bukkit.getWorld(name)?.let {
+            WorldWrapper(it.name, it.uid)
+        }
+    }
+
+    override fun worlds(): List<WorldWrapper> = Bukkit.getWorlds().map {
+        WorldWrapper(it.name, it.uid)
+    }
 }

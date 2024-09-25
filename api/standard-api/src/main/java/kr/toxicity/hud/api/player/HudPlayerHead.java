@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HudPlayerHead {
     /**
-     * Gets loaded HudPlayer's head colors.
+     * Gets loaded player's head colors.
      * @return head colors
      */
     @NotNull @Unmodifiable List<TextColor> getColors();

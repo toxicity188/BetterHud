@@ -19,6 +19,7 @@ import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
+import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
@@ -250,4 +251,7 @@ class VelocityBootstrapImpl @Inject constructor(
     override fun minecraftVersion(): String = "1.21.1"
     override fun mcmetaVersion(): Int = 34
     override fun useLegacyFont(): Boolean = false
+
+    override fun world(name: String): WorldWrapper? = null
+    override fun worlds(): List<WorldWrapper> = emptyList()
 }

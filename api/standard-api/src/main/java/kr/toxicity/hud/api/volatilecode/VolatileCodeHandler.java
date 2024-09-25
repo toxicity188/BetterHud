@@ -29,14 +29,14 @@ public interface VolatileCodeHandler {
 
 
     /**
-     * Gets textures value of HudPlayer's game profile.
+     * Gets textures value of player's game profile.
      * @param hudPlayer target HudPlayer
      * @return textures value
      */
     @NotNull String getTextureValue(@NotNull HudPlayer hudPlayer);
 
     /**
-     * Reloads HudPlayer's boss bar.
+     * Reloads player's boss bar.
      * @param hudPlayer target HudPlayer
      * @param color color
      */
