@@ -84,7 +84,7 @@ class PopupIteratorGroupImpl: PopupIteratorGroup {
                 } else {
                     next.remove()
                     copy.subList(i, copy.size).forEach {
-                        it.index--
+                        if (it.priority < 0) it.index--
                     }
                     true
                 }
