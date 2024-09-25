@@ -32,7 +32,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                 val ascent = final.y + i * head.head.pixel
                 val height = head.head.pixel
-                val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
+                val shaderGroup = ShaderGroup(shader, fileName, 1.0, height)
                 PlayerHeadManager.getHead(shaderGroup) ?: run {
                     parent.jsonArray?.let { array ->
                         HudImpl.createBit(shader, ascent) { y ->
@@ -56,6 +56,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             final.x,
             head.align,
             head.follow,
+            head.cancelIfFollowerNotExists,
             head.conditions.and(head.head.conditions)
         ).getHead(UpdateEvent.EMPTY)
     }

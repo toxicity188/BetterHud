@@ -25,6 +25,7 @@ class ImageRenderer(
     private val maxStack: PlaceholderBuilder<*>?,
     components: List<PixelComponent>,
     follow: String?,
+    private val cancelIfFollowerNotExists: Boolean,
     private val conditions: ConditionBuilder
 ) {
     private val type = image.type
@@ -61,7 +62,9 @@ class ImageRenderer(
             follow?.let {
                 PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
                     target = p
-                } ?: return@build EMPTY_PIXEL_COMPONENT
+                } ?: run {
+                    if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
+                }
             }
             if (cond(target)) {
                 if (maxStackFrame > 1) {

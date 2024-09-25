@@ -125,7 +125,7 @@ class PopupLayout(
                 val scale = height.toDouble() / it.image.image.height
                 val xOffset = Math.round(it.image.xOffset * scale).toInt()
                 val ascent = pixel.y
-                val shaderGroup = ShaderGroup(imageShader, fileName, ascent, height)
+                val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, height)
 
                 val component = ImageManager.getImage(shaderGroup) ?: run {
                     val char = (++imageChar).parseChar()
@@ -172,6 +172,7 @@ class PopupLayout(
                 target.maxStack,
                 list,
                 target.follow,
+                target.cancelIfFollowerNotExists,
                 hudImage.conditions.and(target.conditions)
             )
         }
@@ -187,8 +188,7 @@ class PopupLayout(
                 textLayout.layer,
                 textLayout.outline
             )
-            val scale = Math.round(textLayout.text.height.toDouble() * textLayout.scale).toInt()
-            val group = ShaderGroup(textShader, textLayout.text.name, scale, pixel.y)
+            val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y)
             val textKey = TextManager.getKey(group) ?: run {
                 val index = ++textIndex
                 val array = textLayout.startJson()
@@ -198,7 +198,7 @@ class PopupLayout(
                             addProperty("type", "bitmap")
                             addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                             addProperty("ascent", y)
-                            addProperty("height", scale)
+                            addProperty("height", (it.height * textLayout.scale).roundToInt())
                             add("chars", it.chars)
                         })
                     }
@@ -287,12 +287,13 @@ class PopupLayout(
                 textKey,
                 textLayout.pattern,
                 textLayout.align,
-                scale.toDouble() / textLayout.text.height.toDouble(),
+                textLayout.scale,
                 pixel.x,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
                 textLayout.disableNumberFormat,
                 textLayout.follow,
+                textLayout.cancelIfFollowerNotExists,
                 textLayout.useLegacyFormat,
                 textLayout.legacySerializer,
                 textLayout.space,
@@ -314,7 +315,7 @@ class PopupLayout(
                     val char = (++imageChar).parseChar()
                     val ascent = pixel.y + i * headLayout.head.pixel
                     val height = headLayout.head.pixel
-                    val shaderGroup = ShaderGroup(shader, fileName, ascent, height)
+                    val shaderGroup = ShaderGroup(shader, fileName, 1.0, height)
 
                     PlayerHeadManager.getHead(shaderGroup) ?: run {
                         HudImpl.createBit(shader, ascent) { y ->
@@ -337,6 +338,7 @@ class PopupLayout(
                 pixel.x,
                 headLayout.align,
                 headLayout.follow,
+                headLayout.cancelIfFollowerNotExists,
                 headLayout.conditions.and(headLayout.head.conditions)
             )
         }

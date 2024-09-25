@@ -11,5 +11,6 @@ class HeadLayout(
     val layer: Int,
     val align: LayoutAlign,
     val follow: String?,
+    val cancelIfFollowerNotExists: Boolean,
     val conditions: ConditionBuilder
 )

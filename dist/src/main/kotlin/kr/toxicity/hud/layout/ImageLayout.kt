@@ -19,5 +19,6 @@ class ImageLayout(
     val maxStack: PlaceholderBuilder<*>?,
 
     val follow: String?,
+    val cancelIfFollowerNotExists: Boolean,
     val conditions: ConditionBuilder
 )

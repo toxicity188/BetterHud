@@ -29,6 +29,7 @@ class TextLayout(
     val background: HudBackground?,
     val backgroundScale: Double,
     val follow: String?,
+    val cancelIfFollowerNotExists: Boolean,
     val emojiLocation: ImageLocation,
     val emojiScale: Double,
     val useLegacyFormat: Boolean,

@@ -41,7 +41,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.4-HOTFIX"
+    version = "1.5"
 
     repositories {
         mavenCentral()

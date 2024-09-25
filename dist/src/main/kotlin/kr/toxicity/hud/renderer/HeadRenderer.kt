@@ -19,6 +19,7 @@ class HeadRenderer(
     private val x: Int,
     private val align: LayoutAlign,
     follow: String?,
+    private val cancelIfFollowerNotExists: Boolean,
     private val conditions: ConditionBuilder,
 ) {
     private val followPlayer = follow?.let {
@@ -39,6 +40,8 @@ class HeadRenderer(
                 val pair = getHead(value.toString())
                 pair.first?.let { player ->
                     targetPlayer = player
+                } ?: run {
+                    if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
                 }
                 targetPlayerHead = pair.second
             }

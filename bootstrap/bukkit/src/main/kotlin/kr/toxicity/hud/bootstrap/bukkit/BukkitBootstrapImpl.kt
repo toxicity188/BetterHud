@@ -339,7 +339,7 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
 
     private var metrics: Metrics? = null
     override fun startMetrics() {
-        if (metrics == null) metrics = Metrics(this, BetterHud.BSTATS_ID)
+        if (metrics == null) metrics = Metrics(this, BetterHud.BSTATS_ID_BUKKIT)
     }
 
     override fun endMetrics() {

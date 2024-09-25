@@ -54,6 +54,7 @@ class LayoutGroup(
                         }
                     },
                     yamlObject.get("follow")?.asString(),
+                    yamlObject.getAsBoolean("cancel-if-follower-not-exists", true),
                     yamlObject.toConditions()
                 )
             )
@@ -87,6 +88,7 @@ class LayoutGroup(
                     },
                     yamlObject.getAsDouble("background-scale", scale),
                     yamlObject.get("follow")?.asString(),
+                    yamlObject.getAsBoolean("cancel-if-follower-not-exists", true),
                     yamlObject.get("emoji-pixel")?.asObject()?.let {
                         ImageLocation(it)
                     } ?: ImageLocation.zero,
@@ -112,6 +114,7 @@ class LayoutGroup(
                     yamlObject.getAsInt("layer", 0),
                     yamlObject.get("align")?.asString().toLayoutAlign(),
                     yamlObject.get("follow")?.asString(),
+                    yamlObject.getAsBoolean("cancel-if-follower-not-exists", true),
                     yamlObject.toConditions()
                 )
             )

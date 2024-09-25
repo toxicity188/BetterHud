@@ -39,8 +39,7 @@ class HudTextElement(
         )
         val loc = text.location + pixel
         val yAxis = (loc.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
-        val scale = Math.round(text.text.height * text.scale).toInt()
-        val group = ShaderGroup(shader, text.text.name, scale, yAxis)
+        val group = ShaderGroup(shader, text.text.name, text.scale, yAxis)
         val key = TextManager.getKey(group) ?: run {
             val index2 = (++parent.textIndex)
             val array = text.startJson()
@@ -50,7 +49,7 @@ class HudTextElement(
                         addProperty("type", "bitmap")
                         addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
                         addProperty("ascent", y)
-                        addProperty("height", scale)
+                        addProperty("height", (it.height * text.scale).roundToInt())
                         add("chars", it.chars)
                     })
                 }
@@ -142,12 +141,13 @@ class HudTextElement(
             key,
             text.pattern,
             text.align,
-            scale.toDouble() / text.text.height.toDouble(),
+            text.scale,
             loc.x,
             text.numberEquation,
             text.numberFormat,
             text.disableNumberFormat,
             text.follow,
+            text.cancelIfFollowerNotExists,
             text.useLegacyFormat,
             text.legacySerializer,
             text.space,

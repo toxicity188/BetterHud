@@ -22,7 +22,8 @@ public interface BetterHud {
     String PLATFORM_VERSION = "4.3.4";
     String EXAMINATION_VERSION = "1.3.0";
 
-    int BSTATS_ID = 21287;
+    int BSTATS_ID_BUKKIT = 21287;
+    int BSTATS_ID_VELOCITY = 23460;
 
 
     /**

@@ -9,6 +9,7 @@ import kr.toxicity.hud.layout.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.text.CharWidth
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
@@ -20,10 +21,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.text.DecimalFormat
 import java.util.regex.Pattern
-import kotlin.math.roundToInt
 
 class TextRenderer(
-    private val widthMap: Map<Int, Int>,
+    private val widthMap: Map<Int, CharWidth>,
     private val defaultColor: TextColor,
     private val data: HudTextData,
     pattern: String,
@@ -36,6 +36,7 @@ class TextRenderer(
     private val disableNumberFormat: Boolean,
 
     follow: String?,
+    private val cancelIfFollowerNotExists: Boolean,
 
     private val useLegacyFormat: Boolean,
     private val legacySerializer: LegacyComponentSerializer,
@@ -68,7 +69,9 @@ class TextRenderer(
             followTarget?.let {
                 PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
                     targetHudPlayer = p
-                } ?: return@build EMPTY_PIXEL_COMPONENT
+                } ?: run {
+                    if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
+                }
             }
             if (!cond(targetHudPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var width = 0
@@ -118,7 +121,7 @@ class TextRenderer(
                             codepoint.forEachIndexed { index, i ->
                                 appendCodePoint(i)
                                 width += if (i != SPACE_POINT) widthMap[i]?.let { width ->
-                                    (width.toDouble() * scale).roundToInt() + add + 1
+                                    width.scaledWidth(scale) + add + 1
                                 } ?: 0 else (4 + add)
                                 if (index < codepoint.lastIndex) {
                                     width += space + add
@@ -129,7 +132,7 @@ class TextRenderer(
                     } else {
                         width += codepoint.sumOf {
                             if (it != SPACE_POINT) widthMap[it]?.let { width ->
-                                (width.toDouble() * scale).roundToInt() + add + 1
+                                width.scaledWidth(scale) + add + 1
                             } ?: 0 else (4 + add)
                         }
                     }
