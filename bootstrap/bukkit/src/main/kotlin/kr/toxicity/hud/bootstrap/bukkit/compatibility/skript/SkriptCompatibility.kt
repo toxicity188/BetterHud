@@ -24,6 +24,7 @@ import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffUpdateHud
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.expression.ExprHudPlayer
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffPoint
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -54,6 +55,7 @@ class SkriptCompatibility: Compatibility {
         Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
         Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
         Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
+        Skript.registerEffect(EffPoint::class.java, "point %players% to %location% named %string%")
         Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
     }
 
