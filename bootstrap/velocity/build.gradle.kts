@@ -1,5 +1,5 @@
 plugins {
-    id("xyz.jpenilla.resource-factory-velocity-convention") version("1.1.2")
+    id("xyz.jpenilla.resource-factory-velocity-convention") version("1.2.0")
 }
 
 velocityPluginJson {

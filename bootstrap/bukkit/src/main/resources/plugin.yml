@@ -57,6 +57,12 @@ permissions:
       hud.turn.help: true
       hud.turn.on: true
       hud.turn.off: true
+  hud.pointer:
+    description: Access to pointer command.
+    default: op
+    children:
+      hud.pointer.set: true
+      hud.pointer.clear: true
   hud.popup:
     description: Access to popup command.
     default: op

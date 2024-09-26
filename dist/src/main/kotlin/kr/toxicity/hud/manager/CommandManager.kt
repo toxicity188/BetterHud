@@ -355,6 +355,7 @@ object CommandManager: BetterHudManager {
                 description = "Sets the compass pointer location of some player.".toComponent()
                 usage = "set <player> <name> <world> <x,y,z>".toComponent()
                 length = 4
+                permission = listOf("$NAME_SPACE.pointer.set")
                 executer = exec@ { sender, args ->
                     (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(args[3].split(',').apply {
                         if (size < 3) return@exec sender.audience().warn("Location format must be x,y,z.")
@@ -365,8 +366,8 @@ object CommandManager: BetterHudManager {
                             LocationWrapper(
                                 BOOTSTRAP.world(args[2]) ?: return@exec sender.audience().warn("Unable to find this world: ${args[2]}"),
                                 it[0].toDoubleOrNull() ?: return@exec sender.audience().warn("X coordinate is not a number: ${it[0]}"),
-                                it[1].toDoubleOrNull() ?: return@exec sender.audience().warn("Y coordinate is not a number: ${it[0]}"),
-                                it[2].toDoubleOrNull() ?: return@exec sender.audience().warn("Z coordinate is not a number: ${it[0]}"),
+                                it[1].toDoubleOrNull() ?: return@exec sender.audience().warn("Y coordinate is not a number: ${it[1]}"),
+                                it[2].toDoubleOrNull() ?: return@exec sender.audience().warn("Z coordinate is not a number: ${it[2]}"),
                                 0F,
                                 0F
                             )
@@ -396,6 +397,7 @@ object CommandManager: BetterHudManager {
                 description = "Clears the compass pointer location of some player.".toComponent()
                 usage = "clear <player>".toComponent()
                 length = 1
+                permission = listOf("$NAME_SPACE.pointer.clear")
                 executer = exec@ { sender, args ->
                     (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(null)
                     sender.audience().info("Cleared successfully.")
