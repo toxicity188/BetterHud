@@ -219,6 +219,7 @@ class CircleCompass(
             }
         }
     }
+
     override fun indicate(player: HudPlayer): WidthComponent {
         if (!conditions(player)) return EMPTY_WIDTH_COMPONENT
         val yaw =  player.location().yaw.toDouble()
@@ -250,12 +251,13 @@ class CircleCompass(
             player.pointedLocation.forEach {
                 val targetLoc = it.location
                 if (targetLoc.world.uuid != world.uuid) return@forEach
-                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x)
-                if (get < 0) get += 2 * PI
-                var yawRadian = Math.toRadians(yaw + 90)
-                if (yawRadian < 0) yawRadian += 2 * PI
+                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
+                if (get < 0) get += 2
+                var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
+                if (yawCal < 0) yawCal += 2
 
-                val minus = if (get > yawRadian) get - yawRadian else -(yawRadian - get)
+                val min = absMin(get - yawCal, -(yawCal - get))
+                val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
 
                 p.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
                     val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
@@ -264,6 +266,10 @@ class CircleCompass(
             }
         }
         return (-comp.width / 2).toSpaceComponent() + comp
+    }
+
+    private fun absMin(d1: Double, d2: Double): Double {
+        return if (abs(d1) < abs(d2)) d1 else d2
     }
 
     override fun equals(other: Any?): Boolean {

@@ -275,6 +275,15 @@ class BukkitStandardModule: BukkitModule {
                 Function { p ->
                     p.bukkitPlayer.isFrozen
                 }
+            },
+            "has_permission" to object : HudPlaceholder<Boolean> {
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
+                    return Function {
+                        it.bukkitPlayer.hasPermission(args[0])
+                    }
+                }
+
+                override fun getRequiredArgsLength(): Int = 1
             }
         )
 }

@@ -61,6 +61,7 @@ permissions:
     description: Access to pointer command.
     default: op
     children:
+      hud.pointer.help: true
       hud.pointer.set: true
       hud.pointer.clear: true
   hud.popup:
