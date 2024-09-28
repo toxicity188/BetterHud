@@ -329,6 +329,7 @@ hangarPublish {
         channel = "Snapshot"
         id = "BetterHud"
         apiKey = System.getenv("HANGAR_API_TOKEN")
+        changelog = System.getenv("COMMIT_MESSAGE")
         platforms {
             register(Platforms.PAPER) {
                 jar = file("build/libs/${project.name}-${project.version}.jar")
@@ -346,6 +347,7 @@ modrinth {
     token = System.getenv("MODRINTH_API_TOKEN")
     projectId = "betterhud2"
     versionType = "alpha"
+    changelog = System.getenv("COMMIT_MESSAGE")
     versionNumber = project.version as String
     uploadFile.set(file("build/libs/${project.name}-${project.version}.jar"))
     additionalFiles = listOf(
