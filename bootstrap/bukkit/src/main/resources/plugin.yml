@@ -64,6 +64,7 @@ permissions:
       hud.pointer.help: true
       hud.pointer.set: true
       hud.pointer.clear: true
+      hud.pointer.remove: true
   hud.popup:
     description: Access to popup command.
     default: op

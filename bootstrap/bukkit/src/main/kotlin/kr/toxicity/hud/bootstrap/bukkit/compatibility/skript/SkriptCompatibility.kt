@@ -18,13 +18,10 @@ import kr.toxicity.hud.api.update.UpdateReason
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.manager.HudManagerImpl
 import kr.toxicity.hud.manager.PopupManagerImpl
-import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffCallPopupEvent
-import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffShowPopup
-import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffUpdateHud
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.expression.ExprHudPlayer
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.EffPoint
+import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.effect.*
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -55,7 +52,8 @@ class SkriptCompatibility: Compatibility {
         Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
         Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
         Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
-        Skript.registerEffect(EffPoint::class.java, "point %players% to %location% named %string%")
+        Skript.registerEffect(EffPointAdd::class.java, "point add %location% named %string% [with icon %-string%] to %players%")
+        Skript.registerEffect(EffPointRemove::class.java, "point remove %string% to %players%")
         Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
     }
 

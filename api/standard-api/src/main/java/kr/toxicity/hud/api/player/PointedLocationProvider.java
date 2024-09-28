@@ -1,7 +1,8 @@
 package kr.toxicity.hud.api.player;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public interface PointedLocationProvider {
     /**
@@ -10,6 +11,6 @@ public interface PointedLocationProvider {
      * @param player target player.
      * @return location
      */
-    @Nullable
-    PointedLocation provide(@NotNull HudPlayer player);
+    @NotNull
+    Collection<PointedLocation> provide(@NotNull HudPlayer player);
 }

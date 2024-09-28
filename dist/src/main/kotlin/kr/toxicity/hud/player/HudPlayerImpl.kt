@@ -26,7 +26,9 @@ abstract class HudPlayerImpl: HudPlayer {
     private var task: HudTask? = null
     private var color: BossBar.Color? = null
     private var enabled = true
-    private var pointer: PointedLocation? = null
+    private val pointers: MutableSet<PointedLocation> = OverridableSet(keyMapper = {
+        it.name
+    })
     private val autoSave = asyncTaskTimer(6000, 6000) {
         save()
     }
@@ -177,9 +179,5 @@ abstract class HudPlayerImpl: HudPlayer {
         locationProvide.cancel()
     }
 
-    final override fun pointer(): PointedLocation? = pointer
-
-    final override fun pointer(location: PointedLocation?) {
-        pointer = location
-    }
+    override fun pointers(): MutableSet<PointedLocation> = pointers
 }

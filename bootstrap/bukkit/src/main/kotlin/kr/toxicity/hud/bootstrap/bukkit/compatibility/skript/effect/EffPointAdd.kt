@@ -13,28 +13,31 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
-class EffPoint: Effect() {
+class EffPointAdd: Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
-        return "point ${player.toString(p0, p1)} to ${location.toString(p0, p1)} named ${string.toString(p0, p1)}"
+        return "point add ${location.toString(p0, p1)} named ${name.toString(p0, p1)} with icon ${icon?.toString(p0, p1) ?: "default"} to ${player.toString(p0, p1)}"
     }
 
     private lateinit var player: Expression<Player>
     private lateinit var location: Expression<Location>
-    private lateinit var string: Expression<String>
+    private lateinit var name: Expression<String>
+    private var icon: Expression<String>? = null
 
     @Suppress("UNCHECKED_CAST")
     override fun init(p0: Array<out Expression<*>>, p1: Int, p2: Kleenean, p3: SkriptParser.ParseResult): Boolean {
-        player = p0[0] as Expression<Player>
-        location = p0[1] as Expression<Location>
-        string = p0[2] as Expression<String>
+        location = p0[0] as Expression<Location>
+        name = p0[1] as Expression<String>
+        icon = p0[2] as? Expression<String>
+        player = p0[3] as Expression<Player>
         return true
     }
 
     override fun execute(p0: Event) {
-        (PlayerManagerImpl.getHudPlayer((player.getSingle(p0) ?: return).uniqueId) ?: return).pointer(location.getSingle(p0)?.let {
+        (PlayerManagerImpl.getHudPlayer((player.getSingle(p0) ?: return).uniqueId) ?: return).pointers().add(location.getSingle(p0)?.let {
             PointedLocation(
                 PointedLocationSource.INTERNAL,
-                string.getSingle(p0) ?: return,
+                name.getSingle(p0) ?: return,
+                icon?.getSingle(p0),
                 LocationWrapper(
                     it.world?.let { w ->
                         WorldWrapper(w.name, w.uid)

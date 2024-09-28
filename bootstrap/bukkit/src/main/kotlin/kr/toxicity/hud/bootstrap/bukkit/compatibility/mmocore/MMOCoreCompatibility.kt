@@ -46,7 +46,7 @@ class MMOCoreCompatibility: Compatibility {
                 {
                     HudListener { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.stellium / mmo.stats.getStat("MAX_STELLIUM")
+                        mmo.stellium / mmo.stats.getStat("MAX_STELLIUM") * 100
                     }
                 }
             },
@@ -95,7 +95,7 @@ class MMOCoreCompatibility: Compatibility {
             "mana_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
-                        it.mana / it.stats.getStat("MAX_MANA")
+                        it.mana / it.stats.getStat("MAX_MANA") * 100
                     }
                 }
             },
@@ -112,7 +112,7 @@ class MMOCoreCompatibility: Compatibility {
             "stamina_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
-                        it.stamina / it.stats.getStat("MAX_STAMINA")
+                        it.stamina / it.stats.getStat("MAX_STAMINA") * 100
                     }
                 }
             },
@@ -129,7 +129,7 @@ class MMOCoreCompatibility: Compatibility {
             "stellium_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
-                        it.stellium / it.stats.getStat("MAX_STELLIUM")
+                        it.stellium / it.stats.getStat("MAX_STELLIUM") * 100
                     }
                 }
             },

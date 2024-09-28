@@ -353,16 +353,17 @@ object CommandManager: BetterHudManager {
         }) {
             addCommand("set") {
                 description = "Sets the compass pointer location of some player.".toComponent()
-                usage = "set <player> <name> <world> <x,y,z>".toComponent()
+                usage = "set <player> <name> <world> <x,y,z> [icon]".toComponent()
                 length = 4
                 permission = listOf("$NAME_SPACE.pointer.set")
                 executer = exec@ { sender, args ->
-                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(args[3].split(',').apply {
+                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointers().add(args[3].split(',').apply {
                         if (size < 3) return@exec sender.audience().warn("Location format must be x,y,z.")
                     }.let {
                         PointedLocation(
                             PointedLocationSource.INTERNAL,
                             args[1],
+                            if (args.size > 4) args[4] else null,
                             LocationWrapper(
                                 BOOTSTRAP.world(args[2]) ?: return@exec sender.audience().warn("Unable to find this world: ${args[2]}"),
                                 it[0].toDoubleOrNull() ?: return@exec sender.audience().warn("X coordinate is not a number: ${it[0]}"),
@@ -399,7 +400,7 @@ object CommandManager: BetterHudManager {
                 length = 1
                 permission = listOf("$NAME_SPACE.pointer.clear")
                 executer = exec@ { sender, args ->
-                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointer(null)
+                    (PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointers().clear()
                     sender.audience().info("Cleared successfully.")
                 }
                 tabCompleter = { _, a ->
@@ -409,6 +410,34 @@ object CommandManager: BetterHudManager {
                         }.filter {
                             it.contains(a[0])
                         }
+                        else -> null
+                    }
+                }
+            }
+            addCommand("remove") {
+                description = "Removes the compass pointer location of some player.".toComponent()
+                usage = "remove <player> <name>".toComponent()
+                length = 2
+                permission = listOf("$NAME_SPACE.pointer.remove")
+                executer = exec@ { sender, args ->
+                    if ((PlayerManagerImpl.getHudPlayer(args[0]) ?: return@exec sender.audience().warn("Unable to find this player: ${args[0]}")).pointers().removeIf {
+                        it.name == args[1]
+                    }) {
+                        sender.audience().info("Removed successfully.")
+                    } else {
+                        sender.audience().warn("This pointer doesn't exist: ${args[0]}")
+                    }
+                }
+                tabCompleter = { _, a ->
+                    when (a.size) {
+                        1 -> PlayerManagerImpl.allHudPlayer.map {
+                            it.name()
+                        }.filter {
+                            it.contains(a[0])
+                        }
+                        2 -> PlayerManagerImpl.getHudPlayer(a[1])?.pointers()?.map {
+                            it.name
+                        } ?: emptyList()
                         else -> null
                     }
                 }

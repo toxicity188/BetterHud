@@ -180,14 +180,9 @@ public interface HudPlayer extends CommandSourceWrapper {
     void setBarColor(@Nullable BossBar.Color color);
 
     /**
-     * Gets pointed location.
-     * @return location or null
+     * Gets all internal player's pointer.
+     * @return mutable pointer set
      */
-    @Nullable PointedLocation pointer();
-
-    /**
-     * Sets pointed location.
-     * @param location location or null
-     */
-    void pointer(@Nullable PointedLocation location);
+    @NotNull
+    Set<PointedLocation> pointers();
 }

@@ -18,8 +18,8 @@ object PlayerManagerImpl: BetterHudManager, PlayerManager {
 
     private val locationProviders = mutableListOf<PointedLocationProvider>(
         object : PointedLocationProvider {
-            override fun provide(player: HudPlayer): PointedLocation? {
-                return player.pointer()
+            override fun provide(player: HudPlayer): Collection<PointedLocation> {
+                return player.pointers()
             }
         }
     )
@@ -32,9 +32,8 @@ object PlayerManagerImpl: BetterHudManager, PlayerManager {
         synchronized(set) {
             set.clear()
             locationProviders.forEach {
-                it.provide(player)?.let { loc ->
-                    set.add(loc)
-                }
+                val provided = it.provide(player)
+                if (provided.isNotEmpty()) set.addAll(provided)
             }
         }
     }

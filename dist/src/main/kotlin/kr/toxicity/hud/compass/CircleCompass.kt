@@ -134,6 +134,9 @@ class CircleCompass(
         val point = section.get("point")?.asObject()?.let {
             CompassImageMap(assets, "point", it)
         }
+        val customIcon = section.get("custom-icon")?.asObject()?.associate {
+            it.key to CompassImageMap(assets, "custom_icon_${it.key}", it.value.asObject())
+        } ?: emptyMap()
     }
     private class ColorEquation(
         val r: TEquation,
@@ -247,22 +250,22 @@ class CircleCompass(
                 (glyphWidth + space).toSpaceComponent() + it + (-glyphWidth + space).toSpaceComponent()
             } ?: (space * 2).toSpaceComponent()
         }
-        images.point?.let { p ->
-            player.pointedLocation.forEach {
-                val targetLoc = it.location
-                if (targetLoc.world.uuid != world.uuid) return@forEach
-                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
-                if (get < 0) get += 2
-                var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
-                if (yawCal < 0) yawCal += 2
+        player.pointedLocation.forEach {
+            val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
 
-                val min = absMin(get - yawCal, -(yawCal - get))
-                val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
+            val targetLoc = it.location
+            if (targetLoc.world.uuid != world.uuid) return@forEach
+            var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
+            if (get < 0) get += 2
+            var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
+            if (yawCal < 0) yawCal += 2
 
-                p.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
-                    val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
-                    comp += (value - pointComponent.width / 2).toSpaceComponent() + pointComponent + (-value).toSpaceComponent()
-                }
+            val min = absMin(get - yawCal, -(yawCal - get))
+            val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
+
+            selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
+                val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
+                comp += (value - pointComponent.width / 2).toSpaceComponent() + pointComponent + (-value).toSpaceComponent()
             }
         }
         return (-comp.width / 2).toSpaceComponent() + comp

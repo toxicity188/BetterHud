@@ -10,11 +10,12 @@ import kr.toxicity.hud.player.location.GPSWrapper
 
 class GPSLocationProvider: PointedLocationProvider {
 
-    override fun provide(player: HudPlayer): PointedLocation? {
+    override fun provide(player: HudPlayer): Collection<PointedLocation> {
         return GPSWrapper.getNearestPoint(player.bukkitPlayer)?.let {
-            PointedLocation(
+            listOf(PointedLocation(
                 PointedLocationSource.GPS,
                 "target_location",
+                "gps",
                 LocationWrapper(
                     player.world(),
                     it.x,
@@ -23,7 +24,7 @@ class GPSLocationProvider: PointedLocationProvider {
                     it.yaw,
                     it.pitch
                 )
-            )
-        }
+            ))
+        } ?: emptyList()
     }
 }
