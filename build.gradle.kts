@@ -1,3 +1,5 @@
+import io.papermc.hangarpublishplugin.model.Platforms
+
 plugins {
     `java-library`
     kotlin("jvm") version("2.0.20")
@@ -5,6 +7,8 @@ plugins {
     id("io.papermc.paperweight.userdev") version("1.7.2") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.1")
     id("org.jetbrains.dokka") version("1.9.20")
+    id("io.papermc.hangar-publish-plugin") version("0.1.2")
+    id("com.modrinth.minotaur") version("2.+")
 }
 
 val minecraft = "1.21.1"
@@ -14,6 +18,36 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.3.0"
 val bStats = "3.0.3"
+
+val supportedMinecraftVersions = listOf(
+    //1.17
+    "1.17",
+    "1.17.1",
+    //1.18
+    "1.18",
+    "1.18.1",
+    "1.18.2",
+    //1.19
+    "1.19",
+    "1.19.1",
+    "1.19.2",
+    "1.19.3",
+    "1.19.4",
+    //1.20
+    "1.20",
+    "1.20.1",
+    "1.20.2",
+    "1.20.3",
+    "1.20.4",
+    "1.20.5",
+    "1.20.6",
+    //1.21
+    "1.21",
+    "1.21.1"
+)
+val supportedVelocityVersions = listOf(
+    "3.3"
+)
 
 val legacyNmsVersion = listOf(
     "v1_17_R1",
@@ -41,7 +75,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.5"
+    version = "1.5" + (rootProject.properties["buildNumber"]?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -276,4 +310,38 @@ tasks {
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
     }
+}
+
+tasks.modrinth {
+    dependsOn(tasks.modrinthSyncBody)
+}
+
+hangarPublish {
+    publications.register("plugin") {
+        version = project.version as String
+        channel = "Snapshot"
+        id = "BetterHud"
+        apiKey = System.getenv("HANGAR_API_TOKEN")
+        platforms {
+            register(Platforms.PAPER) {
+                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                platformVersions = supportedMinecraftVersions
+            }
+            register(Platforms.VELOCITY) {
+                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                platformVersions = supportedVelocityVersions
+            }
+        }
+    }
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_API_TOKEN")
+    projectId = "betterhud2"
+    versionType = "alpha"
+    versionNumber = project.version as String
+    uploadFile.set(tasks.shadowJar)
+    gameVersions = supportedMinecraftVersions
+    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
+    syncBodyFrom = rootProject.file("README.md").readText()
 }
