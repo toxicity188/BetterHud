@@ -315,7 +315,12 @@ tasks {
 }
 
 tasks.modrinth {
-    dependsOn(tasks.modrinthSyncBody)
+    dependsOn(
+        tasks.shadowJar,
+        sourceJar,
+        dokkaJar,
+        tasks.modrinthSyncBody
+    )
 }
 
 hangarPublish {
