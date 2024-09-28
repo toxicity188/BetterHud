@@ -307,6 +307,8 @@ tasks {
         prefix("org.yaml.snakeyaml")
         prefix("com.google.gson")
         prefix("com.google.errorprone")
+    }
+    build {
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
     }
@@ -314,12 +316,6 @@ tasks {
 
 tasks.modrinth {
     dependsOn(tasks.modrinthSyncBody)
-}
-
-tasks.create("publishAll") {
-    dependsOn(tasks.shadowJar)
-    dependsOn(tasks.publishAllPublicationsToHangar)
-    dependsOn(tasks.modrinth)
 }
 
 hangarPublish {

@@ -35,4 +35,16 @@ jobs:
         HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
         MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
         BUILD_NUMBER: ${{ github.run_number }}
-      run: ./gradlew publishAll --stacktrace
+      run: ./gradlew build --stacktrace
+    - name: Publish to Hangar
+      env:
+        HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+        MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
+        BUILD_NUMBER: ${{ github.run_number }}
+      run: ./gradlew publishPluginPublicationToHangar --stacktrace
+    - name: Publish to Modrinth
+      env:
+        HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+        MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
+        BUILD_NUMBER: ${{ github.run_number }}
+      run: ./gradlew modrinth --stacktrace
