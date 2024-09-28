@@ -92,6 +92,13 @@ class MMOCoreCompatibility: Compatibility {
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.getStat("MAX_MANA")
                 }
             },
+            "mana_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
+                        it.mana / it.stats.getStat("MAX_MANA")
+                    }
+                }
+            },
             "stamina" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stamina
@@ -102,6 +109,13 @@ class MMOCoreCompatibility: Compatibility {
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.getStat("MAX_STAMINA")
                 }
             },
+            "stamina_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
+                        it.stamina / it.stats.getStat("MAX_STAMINA")
+                    }
+                }
+            },
             "stellium" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stellium
@@ -110,6 +124,13 @@ class MMOCoreCompatibility: Compatibility {
             "max_stellium" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.getStat("MAX_STELLIUM")
+                }
+            },
+            "stellium_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).let {
+                        it.stellium / it.stats.getStat("MAX_STELLIUM")
+                    }
                 }
             },
             "party_member_count" to HudPlaceholder.of { _, _ ->
