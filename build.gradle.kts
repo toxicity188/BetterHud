@@ -75,7 +75,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.5" + (rootProject.properties["buildNumber"]?.let { ".$it" } ?: "")
+    version = "1.5" + (System.getenv("BUILD_NUMBER")?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -316,6 +316,12 @@ tasks.modrinth {
     dependsOn(tasks.modrinthSyncBody)
 }
 
+tasks.create("publishAll") {
+    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.publishAllPublicationsToHangar)
+    dependsOn(tasks.modrinth)
+}
+
 hangarPublish {
     publications.register("plugin") {
         version = project.version as String
@@ -324,11 +330,11 @@ hangarPublish {
         apiKey = System.getenv("HANGAR_API_TOKEN")
         platforms {
             register(Platforms.PAPER) {
-                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                jar = file("build/libs/${project.name}-${project.version}.jar")
                 platformVersions = supportedMinecraftVersions
             }
             register(Platforms.VELOCITY) {
-                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                jar = file("build/libs/${project.name}-${project.version}.jar")
                 platformVersions = supportedVelocityVersions
             }
         }
@@ -340,7 +346,11 @@ modrinth {
     projectId = "betterhud2"
     versionType = "alpha"
     versionNumber = project.version as String
-    uploadFile.set(tasks.shadowJar)
+    uploadFile.set(file("build/libs/${project.name}-${project.version}.jar"))
+    additionalFiles = listOf(
+        file("build/libs/${project.name}-${project.version}-dokka.jar"),
+        file("build/libs/${project.name}-${project.version}-source.jar")
+    )
     gameVersions = supportedMinecraftVersions
     loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
     syncBodyFrom = rootProject.file("README.md").readText()

@@ -31,12 +31,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build -PbuildNumber=${{ github.run_number }}
-    - name: Publish to Hanger
       env:
         HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
-      run: ./gradlew publishPluginPublicationToHangar --stacktrace
-    - name: Publish to Modrinth
-      env:
         MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
-      run: ./gradlew modrinth --stacktrace
+        BUILD_NUMBER: ${{ github.run_number }}
+      run: ./gradlew publishAll --stacktrace
