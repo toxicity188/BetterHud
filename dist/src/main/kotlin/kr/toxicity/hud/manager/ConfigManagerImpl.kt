@@ -22,8 +22,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
     private var line = 1
 
-    var needToUpdateConfig = false
-        private set
+    private var needToUpdateConfig = false
 
     var defaultHud = emptyList<String>()
         private set

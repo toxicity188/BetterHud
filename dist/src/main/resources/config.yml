@@ -21,7 +21,6 @@ default-hud:
   - test_hud
 default-popup: []
 default-compass: []
-disable-link-plugin: []
 load-minecraft-default-textures: false
 included-minecraft-list:
   - block

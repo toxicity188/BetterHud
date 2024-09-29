@@ -47,7 +47,7 @@ class TextRenderer(
         private const val SPACE_POINT = ' '.code
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
-        private val imagePattern = Pattern.compile("<image:(?<name>([a-zA-Z]+))>")
+        private val imagePattern = Pattern.compile("<(?<type>(image|space)):(?<name>(([a-zA-Z]|[0-9]|-)+))>")
     }
 
     private val followHudPlayer = follow?.let {
@@ -81,10 +81,17 @@ class TextRenderer(
                 .replaceText(TextReplacementConfig.builder()
                     .match(imagePattern)
                     .replacement { r, _ ->
-                        data.images[r.group(1)]?.let {
-                            width += it.width
-                            it.component.build()
-                        } ?: Component.empty()
+                        when (r.group(1)) {
+                            "image" -> data.images[r.group(3)]?.let {
+                                width += it.width
+                                it.component.build()
+                            } ?: Component.empty()
+                            "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.let {
+                                width += it.width
+                                it.component
+                            } ?: Component.empty()
+                            else -> Component.empty()
+                        }
                     }
                     .build())
                 .replaceText(TextReplacementConfig.builder()
