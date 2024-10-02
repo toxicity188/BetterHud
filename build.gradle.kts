@@ -417,6 +417,6 @@ modrinth {
         file("build/libs/${project.name}-${project.version}-fabric+$minecraft.jar")
     )
     gameVersions = supportedMinecraftVersions
-    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity", "fabric")
+    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
     syncBodyFrom = rootProject.file("README.md").readText()
 }
