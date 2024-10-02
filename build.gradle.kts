@@ -1,6 +1,16 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
 import io.papermc.paperweight.tasks.RemapJar
+import me.lucko.jarrelocator.JarRelocator
+import me.lucko.jarrelocator.Relocation
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("me.lucko:jar-relocator:1.7")
+    }
+}
 
 plugins {
     `java-library`
@@ -283,7 +293,7 @@ val dokkaJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "dokka"
     from(layout.buildDirectory.dir("dokka${File.separatorChar}htmlMultiModule").orNull?.asFile)
 }
-val fabricJar by tasks.creating(ShadowJar::class.java) {
+val fabricJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
@@ -292,10 +302,11 @@ val fabricJar by tasks.creating(ShadowJar::class.java) {
     from(zipTree(tasks.shadowJar.map {
         it.archiveFile
     }))
-    relocateAll()
+    doLast {
+        relocateAll()
+    }
 }
-val pluginJar by tasks.creating(ShadowJar::class.java) {
-    archiveClassifier = ""
+val pluginJar by tasks.creating(Jar::class.java) {
     from(zipTree(velocityBootstrap.tasks.jar.map {
         it.archiveFile
     }))
@@ -323,21 +334,26 @@ val pluginJar by tasks.creating(ShadowJar::class.java) {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
-    relocateAll()
+    doLast {
+        relocateAll()
+    }
 }
 
-fun ShadowJar.relocateAll() {
-    fun prefix(pattern: String) {
-        relocate(pattern, "${project.group}.shaded.$pattern")
-    }
-    dependencies {
-        exclude(dependency("org.jetbrains:annotations:13.0"))
-    }
-    prefix("kotlin")
-    prefix("net.objecthunter.exp4j")
-    prefix("org.bstats")
-    prefix("org.yaml.snakeyaml")
+fun Jar.relocateAll() {
+    val file = archiveFile.get().asFile
+    val tempFile = file.copyTo(File.createTempFile("jar-relocator", System.currentTimeMillis().toString()).apply {
+        if (exists()) delete()
+    })
+    JarRelocator(
+        tempFile,
+        file,
+        listOf("kotlin","net.objecthunter.exp4j","org.bstats","org.yaml.snakeyaml").map {
+            Relocation(it, "${project.group}.shaded.$it")
+        }
+    ).run()
+    tempFile.delete()
 }
+
 
 runPaper {
     disablePluginJarDetection()
@@ -362,6 +378,8 @@ tasks.modrinth {
         tasks.shadowJar,
         sourceJar,
         dokkaJar,
+        pluginJar,
+        fabricJar,
         tasks.modrinthSyncBody
     )
 }
