@@ -1,11 +1,8 @@
-package kr.toxicity.hud.api.velocity;
+package kr.toxicity.hud.api.fabric;
 
 import kr.toxicity.hud.api.BetterHudBootstrap;
 
-/**
- * Represents Velocity bootstrap.
- */
-public interface VelocityBootstrap extends BetterHudBootstrap {
+public interface FabricBootstrap extends BetterHudBootstrap {
     @Override
     default boolean isFolia() {
         return false;
@@ -16,10 +13,10 @@ public interface VelocityBootstrap extends BetterHudBootstrap {
     }
     @Override
     default boolean isVelocity() {
-        return true;
+        return false;
     }
     @Override
     default boolean isFabric() {
-        return false;
+        return true;
     }
 }

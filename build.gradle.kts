@@ -1,17 +1,20 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
+import io.papermc.paperweight.tasks.RemapJar
 
 plugins {
     `java-library`
     kotlin("jvm") version("2.0.20")
     id("io.github.goooler.shadow") version("8.1.8")
-    id("io.papermc.paperweight.userdev") version("1.7.2") apply(false)
+    id("io.papermc.paperweight.userdev") version("1.7.3") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.1")
     id("org.jetbrains.dokka") version("1.9.20")
     id("io.papermc.hangar-publish-plugin") version("0.1.2")
+    id("fabric-loom") version("1.7-SNAPSHOT") apply(false)
     id("com.modrinth.minotaur") version("2.+")
 }
 
-val minecraft = "1.21.1"
+val minecraft = project.properties["minecraft_version"]!!.toString()
 val folia = "1.20.6" // TODO bumps version to 1.21.1
 val adventure = "4.17.0"
 val platform = "4.3.4"
@@ -164,11 +167,15 @@ fun Project.dependency(any: Any) = also {
 }
 
 val apiShare = project("api:standard-api").adventure().legacy()
+val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
+val apiFabric = project("api:fabric-api").adventure().dependency(apiShare)
 
 val api = listOf(
     apiShare,
-    project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy(),
-    project("api:velocity-api").velocity().dependency(apiShare).legacy()
+    apiBukkit,
+    apiVelocity,
+    apiFabric
 )
 
 fun Project.api() = also {
@@ -183,12 +190,16 @@ val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
 val bedrock = project("bedrock")
 
-
-
 legacyNmsVersion.map {
     project("nms:$it")
 }.forEach {
     it.legacy()
+}
+
+allNmsVersion.forEach {
+    project("nms:$it")
+        .dependency(apiShare)
+        .dependency(apiBukkit)
 }
 
 fun branch(project: Project) {
@@ -211,28 +222,34 @@ dist.dependencies {
     }
 }
 
+val bukkitBootstrap = project("bootstrap:bukkit")
+    .adventure()
+    .bukkit()
+    .api()
+    .dependency(dist)
+    .bukkitAudience()
+    .also {
+        it.dependencies {
+            scheduler.subprojects.forEach { p ->
+                compileOnly(p)
+            }
+            bedrock.subprojects.forEach { p ->
+                compileOnly(p)
+            }
+            allNmsVersion.forEach { p ->
+                compileOnly(project(":nms:$p"))
+            }
+        }
+    }
+val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
+val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventure().also {
+    it.apply(plugin = "io.github.goooler.shadow")
+    it.apply(plugin = "fabric-loom")
+}
 
 val bootstrap = listOf(
-    project("bootstrap:bukkit")
-        .adventure()
-        .bukkit()
-        .api()
-        .dependency(dist)
-        .bukkitAudience()
-        .also {
-            it.dependencies {
-                scheduler.subprojects.forEach { p ->
-                    compileOnly(p)
-                }
-                bedrock.subprojects.forEach { p ->
-                    compileOnly(p)
-                }
-                allNmsVersion.forEach { p ->
-                    compileOnly(project(":nms:$p"))
-                }
-            }
-    },
-    project("bootstrap:velocity").velocity().api().dependency(dist)
+    bukkitBootstrap,
+    velocityBootstrap
 )
 
 project(":nms").subprojects.forEach {
@@ -244,18 +261,6 @@ dependencies {
         implementation(it)
     }
     implementation(dist)
-    scheduler.subprojects.forEach {
-        implementation(it)
-    }
-    bedrock.subprojects.forEach {
-        implementation(it)
-    }
-    allNmsVersion.forEach {
-        implementation(project(":nms:$it", configuration = "reobf"))
-    }
-    bootstrap.forEach {
-        implementation(it)
-    }
     implementation("org.bstats:bstats-bukkit:$bStats")
     implementation("org.bstats:bstats-velocity:$bStats")
 }
@@ -278,39 +283,77 @@ val dokkaJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "dokka"
     from(layout.buildDirectory.dir("dokka${File.separatorChar}htmlMultiModule").orNull?.asFile)
 }
+val fabricJar by tasks.creating(ShadowJar::class.java) {
+    archiveClassifier = "fabric+$minecraft"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
+        (it as org.gradle.jvm.tasks.Jar).archiveFile
+    }))
+    from(zipTree(tasks.shadowJar.map {
+        it.archiveFile
+    }))
+    relocateAll()
+}
+val pluginJar by tasks.creating(ShadowJar::class.java) {
+    archiveClassifier = ""
+    from(zipTree(velocityBootstrap.tasks.jar.map {
+        it.archiveFile
+    }))
+    from(zipTree(bukkitBootstrap.tasks.jar.map {
+        it.archiveFile
+    }))
+    scheduler.subprojects.forEach {
+        from(zipTree(it.tasks.jar.map { t ->
+            t.archiveFile
+        }))
+    }
+    bedrock.subprojects.forEach {
+        from(zipTree(it.tasks.jar.map { t ->
+            t.archiveFile
+        }))
+    }
+    allNmsVersion.forEach {
+        from(zipTree(project("nms:$it").tasks.named("reobfJar").map { t ->
+            (t as RemapJar).outputJar
+        }))
+    }
+    from(zipTree(tasks.shadowJar.map {
+        it.archiveFile
+    }))
+    manifest {
+        attributes["paperweight-mappings-namespace"] = "spigot"
+    }
+    relocateAll()
+}
+
+fun ShadowJar.relocateAll() {
+    fun prefix(pattern: String) {
+        relocate(pattern, "${project.group}.shaded.$pattern")
+    }
+    dependencies {
+        exclude(dependency("org.jetbrains:annotations:13.0"))
+    }
+    prefix("kotlin")
+    prefix("net.objecthunter.exp4j")
+    prefix("org.bstats")
+    prefix("org.yaml.snakeyaml")
+}
+
+runPaper {
+    disablePluginJarDetection()
+}
 
 tasks {
-    jar {
-        finalizedBy(shadowJar)
-    }
     runServer {
         version(minecraft)
+        pluginJars(pluginJar.archiveFile)
         pluginJars(fileTree("plugins"))
-    }
-    shadowJar {
-        manifest {
-            attributes["paperweight-mappings-namespace"] = "spigot"
-        }
-        allNmsVersion.forEach {
-            dependsOn(":nms:$it:reobfJar")
-        }
-        archiveClassifier = ""
-        fun prefix(pattern: String) {
-            relocate(pattern, "${project.group}.shaded.$pattern")
-        }
-        dependencies {
-            exclude(dependency("org.jetbrains:annotations:13.0"))
-        }
-        prefix("kotlin")
-        prefix("net.objecthunter.exp4j")
-        prefix("org.bstats")
-        prefix("org.yaml.snakeyaml")
-        prefix("com.google.gson")
-        prefix("com.google.errorprone")
     }
     build {
         finalizedBy(sourceJar)
         finalizedBy(dokkaJar)
+        finalizedBy(pluginJar)
+        finalizedBy(fabricJar)
     }
 }
 
@@ -352,9 +395,10 @@ modrinth {
     uploadFile.set(file("build/libs/${project.name}-${project.version}.jar"))
     additionalFiles = listOf(
         file("build/libs/${project.name}-${project.version}-dokka.jar"),
-        file("build/libs/${project.name}-${project.version}-source.jar")
+        file("build/libs/${project.name}-${project.version}-source.jar"),
+        file("build/libs/${project.name}-${project.version}-fabric+$minecraft.jar")
     )
     gameVersions = supportedMinecraftVersions
-    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
+    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity", "fabric")
     syncBodyFrom = rootProject.file("README.md").readText()
 }

@@ -1,6 +1,15 @@
+pluginManagement {
+    repositories {
+        maven("https://maven.fabricmc.net/")
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
+
 rootProject.name = "BetterHud"
 
 gradle.startParameter.isParallelProjectExecutionEnabled = true
@@ -9,6 +18,7 @@ include(
     "api:standard-api",
     "api:bukkit-api",
     "api:velocity-api",
+    "api:fabric-api",
 
     "dist",
     "nms:v1_17_R1",
@@ -30,5 +40,6 @@ include(
     "bedrock:floodgate",
 
     "bootstrap:bukkit",
-    "bootstrap:velocity"
+    "bootstrap:velocity",
+    "bootstrap:fabric"
 )

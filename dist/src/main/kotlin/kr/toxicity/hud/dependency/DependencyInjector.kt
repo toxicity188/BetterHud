@@ -59,7 +59,7 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         addUrl(file.toURI().toURL())
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "DEPRECATION")
     private class UnsafeURLClassLoader(classLoader: URLClassLoader) {
         private val unopenedURLs: MutableCollection<URL>
         private val pathURLs: MutableCollection<URL>

@@ -36,6 +36,17 @@ fun <T> List<T>.forEachSync(block: (T) -> Unit) {
         }
     }
 }
+fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
+    synchronized(this) {
+        val iterator = iterator()
+        synchronized(iterator) {
+            while (iterator.hasNext()) {
+                if (block(iterator.next())) iterator.remove()
+            }
+        }
+    }
+}
+
 
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
     if (isNotEmpty()) {

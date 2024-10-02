@@ -211,24 +211,19 @@ class BukkitStandardModule: BukkitModule {
                     }
                 }
             },
-            "air" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.remainingAir
-                }
-            },
             "absorption" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.absorptionAmount
                 }
             },
-            "max_air" to HudPlaceholder.of { _, _ ->
+            "vehicle_air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.bukkitPlayer.maximumAir
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.remainingAir ?: 0
                 }
             },
-            "food" to HudPlaceholder.of { _, _ ->
+            "vehicle_max_air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.bukkitPlayer.foodLevel
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.maximumAir ?: 0
                 }
             }
         )

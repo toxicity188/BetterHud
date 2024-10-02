@@ -18,7 +18,6 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import java.io.File
 import java.io.InputStream
-import java.net.URLClassLoader
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -31,8 +30,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         if (!bootstrap.dataFolder().exists() && !bootstrap.isVelocity) loadAssets("default", bootstrap.dataFolder().apply {
             mkdir()
         })
-        val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), javaClass.classLoader as URLClassLoader)
-        if (!bootstrap.isVelocity) {
+        val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), bootstrap.loader())
+        if (!bootstrap.isVelocity && !bootstrap.isFabric) {
             if (!bootstrap.isPaper) {
                 listOf(
                     "adventure-api",

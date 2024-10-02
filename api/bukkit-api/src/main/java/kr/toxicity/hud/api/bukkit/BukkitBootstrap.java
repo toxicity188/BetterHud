@@ -38,4 +38,8 @@ public interface BukkitBootstrap extends BetterHudBootstrap {
     default boolean isVelocity() {
         return false;
     }
+    @Override
+    default boolean isFabric() {
+        return false;
+    }
 }

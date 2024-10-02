@@ -41,6 +41,7 @@ import org.slf4j.Logger
 import java.io.File
 import java.io.InputStream
 import java.net.URI
+import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -254,4 +255,9 @@ class VelocityBootstrapImpl @Inject constructor(
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()
+
+
+    override fun loader(): URLClassLoader {
+        return javaClass.classLoader as URLClassLoader
+    }
 }

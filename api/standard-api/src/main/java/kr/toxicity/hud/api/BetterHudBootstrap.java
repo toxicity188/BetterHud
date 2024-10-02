@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URLClassLoader;
 import java.util.List;
 
 public interface BetterHudBootstrap {
@@ -80,6 +81,9 @@ public interface BetterHudBootstrap {
     @Nullable
     InputStream resource(@NotNull String path);
 
+    @NotNull
+    URLClassLoader loader();
+
     /**
      * Whether this platform is Paper or that's fork.
      * @return whether this platform is Paper
@@ -97,6 +101,11 @@ public interface BetterHudBootstrap {
      * @return whether this platform is Velocity
      */
     boolean isVelocity();
+    /**
+     * Whether this platform is Fabric
+     * @return whether this platform is Fabric
+     */
+    boolean isFabric();
 
     /**
      * Whether to use legacy space font.

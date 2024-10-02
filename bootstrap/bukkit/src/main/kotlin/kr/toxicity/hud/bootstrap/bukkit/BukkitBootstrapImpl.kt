@@ -54,6 +54,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.InputStream
 import java.net.URI
+import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -384,5 +385,9 @@ class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
 
     override fun worlds(): List<WorldWrapper> = Bukkit.getWorlds().map {
         WorldWrapper(it.name, it.uid)
+    }
+
+    override fun loader(): URLClassLoader {
+        return javaClass.classLoader as URLClassLoader
     }
 }
