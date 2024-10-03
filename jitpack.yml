@@ -1,5 +1,5 @@
 jdk:
-  - openjdk17
+  - openjdk21
 
 skip-default-build: true
 
