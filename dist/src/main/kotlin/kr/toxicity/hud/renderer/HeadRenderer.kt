@@ -32,10 +32,10 @@ class HeadRenderer(
     private val pixelGetter: (Int, TextColor) -> ComponentLike = if (!BOOTSTRAP.useLegacyFont()) {
         { index, next ->
             Component.text()
-                .content(if (index < 63) buildString {
+                .content(buildString {
                     append(components[index / 8])
-                    append(if (index % 8 == 7) nextPage else space)
-                } else components[index / 8])
+                    append(if (index < 63 && index % 8 == 7) nextPage else space)
+                })
                 .color(next)
         }
     } else {
@@ -43,7 +43,7 @@ class HeadRenderer(
             Component.text()
                 .content(components[index / 8])
                 .color(next)
-                .append((if (index < 63) NEGATIVE_ONE_SPACE_COMPONENT else (-pixel - 1).toSpaceComponent()).component)
+                .append((if (index < 63 && index % 8 == 7) (-pixel - 1).toSpaceComponent() else NEGATIVE_ONE_SPACE_COMPONENT).component)
         }
     }
 
