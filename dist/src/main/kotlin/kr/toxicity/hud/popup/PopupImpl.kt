@@ -34,6 +34,7 @@ class PopupImpl(
     private val group = section.get("group")?.asString() ?: internalName
     private val unique = section.getAsBoolean("unique", false)
     private val queue = duration > 0 && section.getAsBoolean("queue", false)
+    private val push = !queue && section.getAsBoolean("push", false)
     private val alwaysCheckCondition = queue && section.getAsBoolean("always-check-condition", true)
     private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
@@ -201,12 +202,14 @@ class PopupImpl(
             Unit
         }
         val iterator = PopupIteratorImpl(
+            this,
             unique,
             lastIndex,
             key,
             sortType,
             internalName,
             queue,
+            push,
             alwaysCheckCondition,
             mapper,
             value,

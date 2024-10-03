@@ -1,17 +1,20 @@
 package kr.toxicity.hud.popup
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupSortType
 import java.util.*
 
 class PopupIteratorImpl(
+    private val parent: Popup,
     private val unique: Boolean,
     private val maxIndex: Int,
     private val key: Any,
     private val sortType: PopupSortType,
     private val name: String,
     private val save: Boolean,
+    private val push: Boolean,
     private val alwaysCheckCondition: Boolean,
     private val mapper: (Int,  Int) -> List<WidthComponent>,
     private var value: Int,
@@ -22,6 +25,9 @@ class PopupIteratorImpl(
     private var i = -1
     private var removal = false
     private val id = UUID.randomUUID()
+
+    override fun parent(): Popup = parent
+
     override fun getMaxIndex(): Int = maxIndex
     override fun getUUID(): UUID = id
 
@@ -30,6 +36,8 @@ class PopupIteratorImpl(
     }
 
     override fun isUnique(): Boolean = unique
+
+    override fun push(): Boolean = push
 
     override fun canSave(): Boolean = save
     override fun alwaysCheckCondition(): Boolean = alwaysCheckCondition

@@ -12,6 +12,11 @@ import java.util.UUID;
  */
 public interface PopupIterator extends Comparable<PopupIterator> {
     /**
+     * Returns parent popup.
+     * @return parent
+     */
+    @NotNull Popup parent();
+    /**
      * Returns whether this iterator is unique
      * @return whether to unique
      */
@@ -22,6 +27,12 @@ public interface PopupIterator extends Comparable<PopupIterator> {
      * @return whether to removal
      */
     boolean markedAsRemoval();
+
+    /**
+     * When added, this iterator will reduce all iterator's index when true.
+     * @return whether to reduce
+     */
+    boolean push();
 
     /**
      * Gets the index of iterator.

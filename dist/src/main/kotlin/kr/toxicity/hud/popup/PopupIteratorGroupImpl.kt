@@ -45,6 +45,16 @@ class PopupIteratorGroupImpl: PopupIteratorGroup {
                 }
                 if (newValue.isNotEmpty()) sourceSet.addAll(newValue)
             }
+            if (iterator.index >= iterator.parent().maxStack && iterator.push()) {
+                val minus = iterator.index - iterator.parent().maxStack + 1
+                sourceSet.removeIf {
+                    if (it.priority < 0) {
+                        it.index -= minus
+                        it.index < 0
+                    } else false
+                }
+                iterator.index -= minus
+            }
             sourceSet.add(iterator)
         }
     }

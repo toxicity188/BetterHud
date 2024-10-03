@@ -4,7 +4,7 @@
 
 Welcome to BetterHud!
 
-[SpigotMC](https://www.spigotmc.org/resources/115559/) | [Hangar](https://hangar.papermc.io/toxicity188/BetterHud) | [Modrinth](https://modrinth.com/plugin/betterhud2)
+[SpigotMC](https://www.spigotmc.org/resources/115559/) | [Hangar](https://hangar.papermc.io/toxicity188/BetterHud) | [Modrinth](https://modrinth.com/plugin/betterhud2) | [Github](https://github.com/toxicity188/BetterHud)
 
 [![GitHub Release](https://img.shields.io/github/v/release/toxicity188/BetterHud?display_name=release&style=for-the-badge&logo=kotlin)](https://github.com/toxicity188/BetterHud/releases/latest)
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/rePyFESDbk) 
@@ -61,12 +61,17 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 No
 
 ### Version
-1.17-1.21
+Plugin: 1.17-1.21.1  
+Fabric mod: server 1.12.1
 
 ### Build
 Requires Java 17, 21 Eclipse Adoptium.
 
-./gradlew build
+Builds all available jar: ./gradlew build  
+Builds Bukkit plugin: ./gradlew pluginJar  
+Builds Fabric server side mod: ./gradlew fabricJar  
+Builds source code jar: ./gradlew sourceJar  
+Builds dokka-based docs jar: ./gradlew dokkaJar  
 
 ### API
 ``` kotlin
@@ -78,6 +83,27 @@ repositories {
 dependencies {
     compileOnly("com.github.toxicity188:BetterHud:VERSION")
 }
+```
+
+### Use BetterHud with Skript
+```
+command /pointadd:
+    trigger:
+        #compass marker add
+        point add location at 0, 0, 0 in world "world" named "test1" to player
+        point add location at 10, 0, 0 in world "world" named "test2" with icon "other" to player
+
+command /pointremove:
+    trigger:
+        #compass marker remove
+        point remove "test1" to player
+        point remove "test2" to player
+
+command /popup:
+    trigger:
+        #show popup with custom event
+        set {_o::rand} to random integer between 1 to 100
+        show popup "test_popup" to player with variable of {_o::*}
 ```
 
 ### Contirbuting
