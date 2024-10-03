@@ -88,7 +88,7 @@ allprojects {
     apply(plugin = "kotlin")
 
     group = "kr.toxicity.hud"
-    version = "1.5" + (System.getenv("BUILD_NUMBER")?.let { ".$it" } ?: "")
+    version = "1.6" + (System.getenv("BUILD_NUMBER")?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -353,7 +353,6 @@ fun Jar.relocateAll() {
     ).run()
     tempFile.delete()
 }
-
 
 runPaper {
     disablePluginJarDetection()

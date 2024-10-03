@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.util.TreeMap
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 

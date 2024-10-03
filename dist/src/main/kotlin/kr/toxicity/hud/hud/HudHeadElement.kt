@@ -14,7 +14,6 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.NAME_SPACE_ENCODED
 import kr.toxicity.hud.util.encodeKey
 import kr.toxicity.hud.util.parseChar
-import net.kyori.adventure.text.Component
 
 class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: ImageLocation) {
 

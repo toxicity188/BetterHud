@@ -1,5 +1,6 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.AnimationLocation
 import kr.toxicity.hud.equation.TEquation
@@ -8,7 +9,6 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.format.NamedTextColor
-import kr.toxicity.hud.api.yaml.YamlObject
 import java.text.DecimalFormat
 
 class LayoutGroup(

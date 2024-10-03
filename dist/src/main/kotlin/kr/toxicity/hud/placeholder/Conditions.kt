@@ -2,11 +2,11 @@ package kr.toxicity.hud.placeholder
 
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.util.forEachSubConfiguration
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.warn
-import kr.toxicity.hud.api.yaml.YamlObject
 
 object Conditions {
     fun parse(section: YamlObject): ConditionBuilder {

@@ -4,7 +4,7 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.player.head.PlayerSkinProvider
 import net.skinsrestorer.api.SkinsRestorerProvider
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 
 class SkinsRestorerSkinProvider: PlayerSkinProvider {
     override fun provide(player: HudPlayer): String? {

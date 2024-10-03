@@ -18,7 +18,6 @@ import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.text.DecimalFormat
 import java.util.regex.Pattern
 
@@ -39,7 +38,7 @@ class TextRenderer(
     private val cancelIfFollowerNotExists: Boolean,
 
     private val useLegacyFormat: Boolean,
-    private val legacySerializer: LegacyComponentSerializer,
+    private val legacySerializer: ComponentDeserializer,
     private val space: Int,
     private val condition: ConditionBuilder
 ) {
@@ -76,7 +75,7 @@ class TextRenderer(
             if (!cond(targetHudPlayer)) return@build EMPTY_PIXEL_COMPONENT
             var width = 0
             val patternResult = buildPattern(targetHudPlayer)
-            var targetString = (if (useLegacyFormat) legacySerializer.deserialize(patternResult) else Component.text(patternResult))
+            var targetString = (if (useLegacyFormat) legacySerializer(patternResult) else Component.text(patternResult))
                 .color(defaultColor)
                 .replaceText(TextReplacementConfig.builder()
                     .match(imagePattern)

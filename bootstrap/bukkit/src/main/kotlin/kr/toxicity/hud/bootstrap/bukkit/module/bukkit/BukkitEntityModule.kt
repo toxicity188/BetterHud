@@ -1,16 +1,16 @@
 package kr.toxicity.hud.bootstrap.bukkit.module.bukkit
 
+import kr.toxicity.hud.api.bukkit.trigger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.bukkit.trigger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.bootstrap.bukkit.module.BukkitModule
-import org.bukkit.attribute.Attribute
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.bukkit.module.BukkitModule
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.createBukkitTrigger
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import org.bukkit.Material
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile

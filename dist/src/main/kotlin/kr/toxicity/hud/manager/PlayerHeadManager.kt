@@ -7,7 +7,6 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import java.awt.Color
 import java.awt.image.BufferedImage

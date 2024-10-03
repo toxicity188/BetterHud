@@ -3,8 +3,7 @@ package kr.toxicity.hud.yaml
 import kr.toxicity.hud.api.yaml.YamlArray
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.util.toYaml
-import java.util.ArrayList
-import java.util.Collections
+import java.util.*
 
 class YamlArrayImpl(
     path: String,

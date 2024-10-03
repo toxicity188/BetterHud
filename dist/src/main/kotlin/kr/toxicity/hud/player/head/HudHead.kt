@@ -1,8 +1,8 @@
 package kr.toxicity.hud.player.head
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.util.toConditions
-import kr.toxicity.hud.api.yaml.YamlObject
 
 class HudHead(
     override val path: String,

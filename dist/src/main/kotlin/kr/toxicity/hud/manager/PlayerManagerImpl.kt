@@ -9,7 +9,6 @@ import kr.toxicity.hud.resource.GlobalResource
 import net.kyori.adventure.audience.Audience
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
 
 object PlayerManagerImpl: BetterHudManager, PlayerManager {
 

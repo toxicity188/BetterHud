@@ -10,7 +10,9 @@ import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
+import kr.toxicity.hud.util.forEachSync
+import kr.toxicity.hud.util.toPixelComponent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 

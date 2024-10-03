@@ -1,9 +1,9 @@
 package kr.toxicity.hud.image
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.util.toConditions
-import kr.toxicity.hud.api.yaml.YamlObject
 
 class HudImage(
     override val path: String,

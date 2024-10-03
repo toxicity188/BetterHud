@@ -13,15 +13,15 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mythicmobs.event.MythicMobsPopupEvent
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mythicmobs.mechanic.HidePopupMechanic
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mythicmobs.mechanic.ShowPopupMechanic
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
-import org.bukkit.Bukkit
-import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import kr.toxicity.hud.util.BOOTSTRAP
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityEvent

@@ -1,3 +1,4 @@
+import net.fabricmc.loom.task.RunGameTask
 import xyz.jpenilla.resourcefactory.fabric.Environment
 
 plugins {
@@ -60,5 +61,8 @@ tasks {
         inputFile = shadowJar.map {
             it.archiveFile
         }.get()
+    }
+    runServer {
+        enabled = false
     }
 }

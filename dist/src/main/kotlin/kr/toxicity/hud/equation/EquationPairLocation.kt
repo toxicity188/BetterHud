@@ -1,9 +1,9 @@
 package kr.toxicity.hud.equation
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.shader.GuiLocation
-import kr.toxicity.hud.api.yaml.YamlObject
 
 class EquationPairLocation(
     duration: Int,

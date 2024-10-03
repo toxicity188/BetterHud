@@ -11,7 +11,7 @@ import kr.toxicity.hud.bootstrap.bukkit.util.toHud
 import kr.toxicity.hud.manager.PopupManagerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
-import java.util.UUID
+import java.util.*
 
 class EffShowPopup: Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {

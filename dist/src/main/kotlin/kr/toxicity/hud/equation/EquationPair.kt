@@ -1,8 +1,8 @@
 package kr.toxicity.hud.equation
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toEquation
-import kr.toxicity.hud.api.yaml.YamlObject
 
 class EquationPair(val x: TEquation, val y: TEquation) {
     companion object {

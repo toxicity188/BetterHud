@@ -7,9 +7,9 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
-import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
+import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.pointer.Pointers

@@ -1,8 +1,7 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.configuration.HudConfiguration
-import java.util.Collections
-import java.util.HashSet
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 private val CACHE_MAP = ConcurrentHashMap<String, MutableSet<String>>()

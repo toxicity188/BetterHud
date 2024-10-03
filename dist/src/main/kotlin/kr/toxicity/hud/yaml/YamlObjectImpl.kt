@@ -5,8 +5,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.util.saveToYaml
 import kr.toxicity.hud.util.toYaml
 import java.io.File
-import java.util.Collections
-import java.util.LinkedHashMap
+import java.util.*
 
 class YamlObjectImpl(
     path: String,

@@ -1,7 +1,6 @@
 package kr.toxicity.hud.util
 
 import java.util.*
-import kotlin.collections.ArrayList
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()
@@ -72,13 +71,15 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
             }
             queue
         }
+        var i = 0
         object : Thread() {
             private val index = TaskIndex(queue.size)
             override fun run() {
                 while (!isInterrupted) {
                     queue.poll()?.let {
+                        val task = i++
                         Thread {
-                            runWithExceptionHandling(CONSOLE, "Fail to run thread $id.") {
+                            runWithExceptionHandling(CONSOLE, "Fail to run thread $task.") {
                                 it()
                             }
                             synchronized(index) {

@@ -20,15 +20,15 @@ import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.bootstrap.bukkit.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.bukkit.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.bukkit.player.HudPlayerBukkit
-import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
-import kr.toxicity.hud.bootstrap.bukkit.util.call
-import kr.toxicity.hud.pack.PackUploader
-import kr.toxicity.hud.player.head.HttpSkinProvider
 import kr.toxicity.hud.bootstrap.bukkit.player.head.SkinsRestorerSkinProvider
-import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
-import kr.toxicity.hud.manager.*
-import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.bootstrap.bukkit.player.location.GPSLocationProvider
+import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
+import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
+import kr.toxicity.hud.bootstrap.bukkit.util.call
+import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.pack.PackUploader
+import kr.toxicity.hud.placeholder.PlaceholderTask
+import kr.toxicity.hud.player.head.HttpSkinProvider
 import kr.toxicity.hud.scheduler.FoliaScheduler
 import kr.toxicity.hud.scheduler.StandardScheduler
 import kr.toxicity.hud.util.*
@@ -58,8 +58,8 @@ import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.function.Function
 import java.util.concurrent.CompletableFuture
+import java.util.function.Function
 
 @Suppress("UNUSED")
 class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {

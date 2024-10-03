@@ -1,7 +1,10 @@
 package kr.toxicity.hud.configuration
 
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.DATA_FOLDER
+import kr.toxicity.hud.util.ifNull
+import kr.toxicity.hud.util.toYaml
 import java.io.File
 
 enum class PluginConfiguration(

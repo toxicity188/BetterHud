@@ -4,11 +4,11 @@ import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
+import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
-import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import java.util.function.Function
 
 class VaultCompatibility: Compatibility {

@@ -2,7 +2,6 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import net.kyori.adventure.text.format.TextColor

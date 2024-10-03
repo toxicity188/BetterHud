@@ -9,6 +9,7 @@ import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.EquationPairLocation
 import kr.toxicity.hud.image.ImageLocation
@@ -16,9 +17,7 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
-import kr.toxicity.hud.api.yaml.YamlObject
 import java.util.*
-import kotlin.collections.HashMap
 
 class PopupImpl(
     override val path: String,

@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.image.ImageLocation
@@ -17,7 +18,6 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
-import kr.toxicity.hud.api.yaml.YamlObject
 import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.math.*

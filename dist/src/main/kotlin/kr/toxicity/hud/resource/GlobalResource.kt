@@ -4,7 +4,10 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.NAME_SPACE_ENCODED
+import kr.toxicity.hud.util.parseChar
+import kr.toxicity.hud.util.toByteArray
 
 class GlobalResource {
     private val assets = listOf("assets")

@@ -11,11 +11,11 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import net.Indyuce.mmoitems.ItemStats
 import net.Indyuce.mmoitems.stat.data.AbilityData
-import kr.toxicity.hud.api.yaml.YamlObject
 import org.bukkit.inventory.ItemStack
 import java.util.function.Function
 

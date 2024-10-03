@@ -8,10 +8,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
@@ -32,8 +29,9 @@ val DEFAULT_TEXT_DECORATION = TextDecoration.entries.associateWith {
 }
 
 fun String.toLegacySerializer() = when (this) {
-    "ampersand" -> LegacyComponentSerializer.legacyAmpersand()
-    "section" -> LegacyComponentSerializer.legacySection()
+    "ampersand" -> LEGACY_AMPERSAND
+    "section" -> LEGACY_SECTION
+    "both" -> LEGACY_BOTH
     else -> throw RuntimeException("Unknown legacy serializer: $this")
 }
 

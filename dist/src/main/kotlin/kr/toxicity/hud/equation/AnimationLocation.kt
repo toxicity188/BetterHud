@@ -1,8 +1,8 @@
 package kr.toxicity.hud.equation
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
-import kr.toxicity.hud.api.yaml.YamlObject
 
 class AnimationLocation(
     val type: LayoutAnimationType,

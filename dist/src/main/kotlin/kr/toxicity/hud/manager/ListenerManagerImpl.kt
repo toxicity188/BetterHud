@@ -3,10 +3,10 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
-import kr.toxicity.hud.api.yaml.YamlObject
 import java.util.function.Function
 
 object ListenerManagerImpl: BetterHudManager, ListenerManager {

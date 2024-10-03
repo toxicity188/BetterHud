@@ -3,15 +3,12 @@ package kr.toxicity.hud.bootstrap.fabric
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
-import kr.toxicity.hud.bootstrap.fabric.FabricScheduler.TaskType.*
+import kr.toxicity.hud.bootstrap.fabric.FabricScheduler.TaskType.LOOP
+import kr.toxicity.hud.bootstrap.fabric.FabricScheduler.TaskType.REMOVE
 import kr.toxicity.hud.util.removeIfSync
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
+import java.util.*
+import java.util.concurrent.*
 
 
 class FabricScheduler: HudScheduler {

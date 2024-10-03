@@ -7,10 +7,10 @@ import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.HudText
+import kr.toxicity.hud.util.ComponentDeserializer
 import kr.toxicity.hud.util.TEXT_SPACE_KEY_CODEPOINT
 import kr.toxicity.hud.util.parseChar
 import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.text.DecimalFormat
 
 class TextLayout(
@@ -33,7 +33,7 @@ class TextLayout(
     val emojiLocation: ImageLocation,
     val emojiScale: Double,
     val useLegacyFormat: Boolean,
-    val legacySerializer: LegacyComponentSerializer,
+    val legacySerializer: ComponentDeserializer,
     val conditions: ConditionBuilder
 ) {
     fun startJson() = JsonArray().apply {

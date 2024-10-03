@@ -10,7 +10,6 @@ import kr.toxicity.hud.yaml.YamlObjectImpl
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import java.io.File
 import java.text.DecimalFormat
 
@@ -85,7 +84,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     )
         private set
 
-    var legacySerializer = LegacyComponentSerializer.legacyAmpersand()
+    var legacySerializer = LEGACY_AMPERSAND
         private set
 
     override fun start() {
