@@ -80,7 +80,7 @@ class HudImpl(
     }
     init {
         jsonArray?.let { array ->
-            if (spaces.isNotEmpty()) array.add(JsonObject().apply {
+            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array.add(JsonObject().apply {
                 addProperty("type", "space")
                 add("advances", JsonObject().apply {
                     spaces.forEach {

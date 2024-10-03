@@ -10,11 +10,11 @@ import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
-import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
-import kr.toxicity.hud.util.forEachSync
-import kr.toxicity.hud.util.toPixelComponent
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.TextColor
 
 class HeadRenderer(
     private val space: String,
@@ -28,6 +28,25 @@ class HeadRenderer(
     private val cancelIfFollowerNotExists: Boolean,
     private val conditions: ConditionBuilder,
 ) {
+
+    private val pixelGetter: (Int, TextColor) -> ComponentLike = if (!BOOTSTRAP.useLegacyFont()) {
+        { index, next ->
+            Component.text()
+                .content(if (index < 63) buildString {
+                    append(components[index / 8])
+                    append(if (index % 8 == 7) nextPage else space)
+                } else components[index / 8])
+                .color(next)
+        }
+    } else {
+        { index, next ->
+            Component.text()
+                .content(components[index / 8])
+                .color(next)
+                .append((if (index < 63) NEGATIVE_ONE_SPACE_COMPONENT else (-pixel - 1).toSpaceComponent()).component)
+        }
+    }
+
     private val followPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
@@ -54,12 +73,7 @@ class HeadRenderer(
                 var i = 0
                 targetPlayerHead.colors.forEachSync { next ->
                     val index = i++
-                    comp.append(Component.text()
-                        .content(buildString {
-                            append(components[index / 8])
-                            if (index < 63) append(if (index % 8 == 7) nextPage else space)
-                        })
-                        .color(next))
+                    comp.append(pixelGetter(index, next))
                 }
                 WidthComponent(comp, pixel).toPixelComponent(
                     when (align) {

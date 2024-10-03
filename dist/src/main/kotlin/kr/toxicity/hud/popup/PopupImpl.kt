@@ -123,7 +123,7 @@ class PopupImpl(
             }
         }
         array?.let { arr ->
-            if (spaces.isNotEmpty()) arr.add(JsonObject().apply {
+            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) arr.add(JsonObject().apply {
                 addProperty("type", "space")
                 add("advances", JsonObject().apply {
                     spaces.forEach {
