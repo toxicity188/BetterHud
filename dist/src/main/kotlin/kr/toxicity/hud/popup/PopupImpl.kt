@@ -18,6 +18,7 @@ import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.util.*
 import kr.toxicity.hud.api.yaml.YamlObject
 import java.util.*
+import kotlin.collections.HashMap
 
 class PopupImpl(
     override val path: String,
@@ -55,30 +56,36 @@ class PopupImpl(
     var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
+    private val spaces = HashMap<Int, String>()
+    private var imageChar = 0xCE000
+
+    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+        newChar()
+    }
+    fun newChar(): String = (++imageChar).parseChar()
+
     private val sortType = section.get("sort")?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())
     } ?: PopupSortType.LAST
 
     private val layouts = section.get("layouts")?.asObject()?.let {
         val json = array.ifNull("error is occurred.")
-        ArrayList<PopupLayout>().apply {
-            it.forEachSubConfiguration { _, yamlObject ->
-                val layout = yamlObject.get("name")?.asString().ifNull("name value not set.")
-                var loc = GuiLocation(yamlObject)
-                yamlObject.get("gui")?.asObject()?.let {
-                    loc += GuiLocation(it)
-                }
-                add(PopupLayout(
-                    json,
-                    LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
-                    this@PopupImpl,
-                    loc,
-                    yamlObject.get("pixel")?.asObject()?.let {
-                        ImageLocation(it)
-                    } ?: ImageLocation.zero,
-                    file,
-                ))
+        it.mapSubConfiguration { _, yamlObject ->
+            val layout = yamlObject.get("name")?.asString().ifNull("name value not set.")
+            var loc = GuiLocation(yamlObject)
+            yamlObject.get("gui")?.asObject()?.let { gui ->
+                loc += GuiLocation(gui)
             }
+            PopupLayout(
+                json,
+                LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
+                this@PopupImpl,
+                loc,
+                yamlObject.get("pixel")?.asObject()?.let { pixel ->
+                    ImageLocation(pixel)
+                } ?: ImageLocation.zero,
+                file,
+            )
         }
     }.ifNull("layouts configuration not set.").ifEmpty {
         throw RuntimeException("layouts is empty.")
@@ -117,6 +124,14 @@ class PopupImpl(
             }
         }
         array?.let { arr ->
+            if (spaces.isNotEmpty()) arr.add(JsonObject().apply {
+                addProperty("type", "space")
+                add("advances", JsonObject().apply {
+                    spaces.forEach {
+                        addProperty(it.value, it.key)
+                    }
+                })
+            })
             PackGenerator.addTask(ArrayList(file).apply {
                 add("$imageEncoded.json")
             }) {

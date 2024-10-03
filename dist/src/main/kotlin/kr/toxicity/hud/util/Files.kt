@@ -36,3 +36,7 @@ fun YamlObject.forEachSubConfiguration(block: (String, YamlObject) -> Unit) {
         if (v is YamlObject) block(it.key, v)
     }
 }
+fun <T> YamlObject.mapSubConfiguration(block: (String, YamlObject) -> T) = mapNotNull {
+    val v = it.value
+    if (v is YamlObject) block(it.key, v) else null
+}

@@ -35,7 +35,6 @@ class PopupLayout(
     private val globalPixel: ImageLocation,
     private val file: List<String>
 ) {
-    private var imageChar = 0xCE000
     private var textIndex = 0
 
     private val groups = parent.move.locations.map { location ->
@@ -127,7 +126,7 @@ class PopupLayout(
                 val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
                 val component = ImageManager.getImage(shaderGroup) ?: run {
-                    val char = (++imageChar).parseChar()
+                    val char = parent.newChar()
                     HudImpl.createBit(imageShader, ascent) { y ->
                         array.add(JsonObject().apply {
                             addProperty("type", "bitmap")
@@ -147,7 +146,7 @@ class PopupLayout(
 
                 list.add(component.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
-                val char = (++imageChar).parseChar()
+                val char = parent.newChar()
                 array.add(JsonObject().apply {
                     HudImpl.createBit(imageShader, pixel.y) { y ->
                         addProperty("type", "bitmap")
@@ -308,10 +307,12 @@ class PopupLayout(
                 headLayout.outline
             )
             HeadRenderer(
+                parent.getOrCreateSpace(-1),
+                parent.getOrCreateSpace(-(headLayout.head.pixel * 8 + 1)),
                 (0..7).map { i ->
                     val encode = "pixel_${headLayout.head.pixel}".encodeKey()
                     val fileName = "$NAME_SPACE_ENCODED:$encode.png"
-                    val char = (++imageChar).parseChar()
+                    val char = parent.newChar()
                     val ascent = pixel.y + i * headLayout.head.pixel
                     val height = headLayout.head.pixel
                     val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
@@ -328,12 +329,12 @@ class PopupLayout(
                                 })
                             })
                         }
-                        val comp = Component.text(char).font(parent.imageKey)
-                        PlayerHeadManager.setHead(shaderGroup, comp)
-                        comp
+                        PlayerHeadManager.setHead(shaderGroup, char)
+                        char
                     }
                 },
-                headLayout.head.pixel,
+                parent.imageKey,
+                headLayout.head.pixel * 8,
                 pixel.x,
                 headLayout.align,
                 headLayout.follow,

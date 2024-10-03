@@ -26,6 +26,8 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             head.outline
         )
         HeadRenderer(
+            parent.getOrCreateSpace(-1),
+            parent.getOrCreateSpace(-(head.head.pixel * 8 + 1)),
             (0..7).map { i ->
                 val char = (++parent.imageChar).parseChar()
                 val encode = "pixel_${head.head.pixel}".encodeKey()
@@ -47,12 +49,12 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                             })
                         }
                     }
-                    val comp = Component.text(char).font(parent.imageKey)
-                    PlayerHeadManager.setHead(shaderGroup, comp)
-                    comp
+                    PlayerHeadManager.setHead(shaderGroup, char)
+                    char
                 }
             },
-            head.head.pixel,
+            parent.imageKey,
+            head.head.pixel * 8,
             final.x,
             head.align,
             head.follow,

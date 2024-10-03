@@ -11,10 +11,14 @@ import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
 class HeadRenderer(
-    private val components: List<Component>,
+    private val space: String,
+    private val nextPage: String,
+    private val components: List<String>,
+    private val font: Key,
     private val pixel: Int,
     private val x: Int,
     private val align: LayoutAlign,
@@ -27,8 +31,6 @@ class HeadRenderer(
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
-    private val nextPixel = (-pixel * 8).toSpaceComponent() + NEGATIVE_ONE_SPACE_COMPONENT
-
     fun getHead(event: UpdateEvent): (HudPlayer) -> PixelComponent {
         val cond = conditions.build(event)
         val playerPlaceholder = followPlayer?.build(event)
@@ -46,18 +48,22 @@ class HeadRenderer(
                 targetPlayerHead = pair.second
             }
             if (cond(targetPlayer)) {
-                var comp = EMPTY_WIDTH_COMPONENT
+                val comp = Component.text().font(font)
                 var i = 0
                 targetPlayerHead.colors.forEachSync { next ->
                     val index = i++
-                    comp += WidthComponent(Component.text().append(components[index / 8]).color(next), pixel)
-                    comp += if (index < 63 && index % 8 == 7) nextPixel else NEGATIVE_ONE_SPACE_COMPONENT
+                    comp.append(Component.text()
+                        .content(buildString {
+                            append(components[index / 8])
+                            if (index < 63) append(if (index % 8 == 7) nextPage else space)
+                        })
+                        .color(next))
                 }
-                comp.toPixelComponent(
+                WidthComponent(comp, pixel).toPixelComponent(
                     when (align) {
                         LayoutAlign.LEFT -> x
-                        LayoutAlign.CENTER -> x - comp.width / 2
-                        LayoutAlign.RIGHT -> x - comp.width
+                        LayoutAlign.CENTER -> x - pixel / 2
+                        LayoutAlign.RIGHT -> x - pixel
                     }
                 )
             } else EMPTY_PIXEL_COMPONENT

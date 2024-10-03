@@ -42,8 +42,13 @@ class HudImpl(
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
+    private val spaces = HashMap<Int, String>()
     private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getAsBoolean("default", false)
     var textIndex = 0
+
+    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+        (++imageChar).parseChar()
+    }
 
     private val elements = ArrayList<HudAnimation>().apply {
         section.get("layouts")?.asObject().ifNull("layout configuration not set.").forEachSubConfiguration { s, yamlObject ->
@@ -75,6 +80,14 @@ class HudImpl(
     }
     init {
         jsonArray?.let { array ->
+            if (spaces.isNotEmpty()) array.add(JsonObject().apply {
+                addProperty("type", "space")
+                add("advances", JsonObject().apply {
+                    spaces.forEach {
+                        addProperty(it.value, it.key)
+                    }
+                })
+            })
             PackGenerator.addTask(
                 ArrayList(file).apply {
                     add("$imageEncoded.json")

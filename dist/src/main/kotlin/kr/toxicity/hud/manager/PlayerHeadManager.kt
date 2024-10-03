@@ -23,14 +23,14 @@ object PlayerHeadManager : BetterHudManager {
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HudHead>()
 
-    private val headNameComponent = ConcurrentHashMap<ShaderGroup, Component>()
+    private val headNameComponent = ConcurrentHashMap<ShaderGroup, String>()
 
 
     @Synchronized
     fun getHead(group: ShaderGroup) = headNameComponent[group]
     @Synchronized
-    fun setHead(group: ShaderGroup, component: Component) {
-        headNameComponent[group] = component
+    fun setHead(group: ShaderGroup, string: String) {
+        headNameComponent[group] = string
     }
 
     private class CachedHead(
