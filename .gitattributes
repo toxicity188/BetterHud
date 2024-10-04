@@ -5,3 +5,6 @@
 
 *.vsh linguist-language=GLSL
 *.fsh linguist-language=GLSL
+
+resources/*.vsh linguist-vendored=false
+resources/*.fsh linguist-vendored=false
