@@ -1,0 +1,9 @@
+*.java linguist-language=Java
+
+*.kt linguist-language=Kotlin
+*.kts linguist-language=Kotlin
+
+*.glsl linguist-language=GLSL
+*.vert linguist-language=GLSL
+*.frag linguist-language=GLSL
+*.geom linguist-language=GLSL
