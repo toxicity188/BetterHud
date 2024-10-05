@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.fabric.util.armor
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
+import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.bootstrap.velocity.module.Module
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
@@ -215,5 +216,14 @@ class FabricStandardModule: Module {
                     p.fabricPlayer.isFreezing
                 }
             },
+            "has_permission" to object : HudPlaceholder<Boolean> {
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
+                    return Function {
+                        it.fabricPlayer.hasPermission(args[0])
+                    }
+                }
+
+                override fun getRequiredArgsLength(): Int = 1
+            }
         )
 }

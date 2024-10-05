@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.manager.CompassManagerImpl
 import kr.toxicity.hud.manager.HudManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
@@ -29,7 +30,7 @@ class FabricCommand(
         bootstrapImpl.audiences.audience(this).warn(string)
     }
     private fun CommandSourceStack.hasPermission(string: String): Boolean {
-        return entity?.hasPermissions(2) ?: true
+        return (entity as? ServerPlayer)?.hasPermission(string) ?: true
     }
 
     private data class SimpleCommandData(

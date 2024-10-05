@@ -24,6 +24,7 @@ dependencies {
 
     //Other mod dependency
     modCompileOnly(include("eu.pb4:placeholder-api:2.4.1+1.21")!!)
+    modCompileOnly("net.luckperms:api:5.4")
 }
 
 loom {
@@ -58,7 +59,8 @@ fabricModJson {
         }
     )
     suggests = mapOf(
-        "placeholder-api" to listOf("*")
+        "placeholder-api" to listOf("*"),
+        "luckperms" to listOf("*")
     )
 }
 
