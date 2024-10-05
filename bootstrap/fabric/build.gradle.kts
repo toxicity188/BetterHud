@@ -1,8 +1,12 @@
-import net.fabricmc.loom.task.RunGameTask
 import xyz.jpenilla.resourcefactory.fabric.Environment
 
 plugins {
     id("xyz.jpenilla.resource-factory-fabric-convention") version("1.2.0")
+}
+
+repositories {
+    // There might be other repos there too, just add it at the end
+    maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
 }
 
 dependencies {
@@ -17,6 +21,9 @@ dependencies {
         exclude("net.fabricmc")
     }
     modImplementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
+
+    //Other mod dependency
+    modCompileOnly(include("eu.pb4:placeholder-api:2.4.1+1.21")!!)
 }
 
 loom {
@@ -49,6 +56,9 @@ fabricModJson {
         mixin("betterhud.mixins.json") {
             environment = Environment.SERVER
         }
+    )
+    suggests = mapOf(
+        "placeholder-api" to listOf("*")
     )
 }
 

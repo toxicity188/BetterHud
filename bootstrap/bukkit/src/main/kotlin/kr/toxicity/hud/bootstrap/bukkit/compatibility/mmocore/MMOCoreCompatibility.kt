@@ -1,5 +1,6 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.mmocore
 
+import io.lumine.mythic.lib.api.stat.modifier.StatModifier
 import io.lumine.mythic.lib.player.modifier.ModifierSource
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -12,6 +13,7 @@ import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.util.ifNull
 import net.Indyuce.mmocore.MMOCore
 import net.Indyuce.mmocore.api.player.PlayerData
+import net.Indyuce.mmocore.api.player.stats.PlayerStats
 import org.bukkit.entity.Player
 import java.util.function.Function
 
@@ -164,8 +166,19 @@ class MMOCoreCompatibility: Compatibility {
                     args: MutableList<String>,
                     reason: UpdateEvent
                 ): Function<HudPlayer, Number> {
+                    val getter: (PlayerStats) -> Number = if (args.size > 1) {
+                        { stats: PlayerStats ->
+                            stats.map.getInstance(args[0]).getFilteredTotal {
+                                it.key == args[1]
+                            }
+                        }
+                    } else {
+                        { stats: PlayerStats ->
+                            stats.getStat(args[0])
+                        }
+                    }
                     return Function { p ->
-                        (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.getStat(args[0])
+                        getter((p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats)
                     }
                 }
             },
@@ -175,10 +188,17 @@ class MMOCoreCompatibility: Compatibility {
                     args: MutableList<String>,
                     reason: UpdateEvent
                 ): Function<HudPlayer, Number> {
-                    return Function { p ->
-                        (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.map.getInstance(args[0]).getFilteredTotal {
-                            it.source == ModifierSource.OTHER
+                    val predicate: (StatModifier) -> Boolean = if (args.size > 1) {
+                        { stat: StatModifier ->
+                            stat.source == ModifierSource.OTHER && stat.key == args[1]
                         }
+                    } else {
+                        { stat: StatModifier ->
+                            stat.source == ModifierSource.OTHER
+                        }
+                    }
+                    return Function { p ->
+                        (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.map.getInstance(args[0]).getFilteredTotal(predicate)
                     }
                 }
             },

@@ -9,6 +9,7 @@ import kr.toxicity.hud.api.fabric.FabricBootstrap
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
+import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.manager.DatabaseManagerImpl
@@ -104,6 +105,7 @@ class FabricBootstrapImpl: FabricBootstrap, DedicatedServerModInitializer {
                 emptyList()
             }
             ModuleManager.start()
+            CompatibilityManager.start()
             scheduler.asyncTask {
                 logger.info("Mod enabled.")
                 core.reload()
