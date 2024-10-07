@@ -51,7 +51,7 @@ class SkriptCompatibility: Compatibility {
 
         Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
         Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
-        Skript.registerEffect(EffClearPopup::class.java, "clear popup of ` %players%")
+        Skript.registerEffect(EffClearPopup::class.java, "clear popup of %players%")
         Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
         Skript.registerEffect(EffPointAdd::class.java, "point add %location% named %string% [with icon %-string%] to %players%")
         Skript.registerEffect(EffPointRemove::class.java, "point remove %string% to %players%")
