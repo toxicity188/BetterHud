@@ -18,7 +18,7 @@ plugins {
     id("io.github.goooler.shadow") version("8.1.8")
     id("io.papermc.paperweight.userdev") version("1.7.3") apply(false)
     id("xyz.jpenilla.run-paper") version("2.3.1")
-    id("org.jetbrains.dokka") version("1.9.20")
+    id("org.jetbrains.dokka") version("2.0.0-Beta")
     id("io.papermc.hangar-publish-plugin") version("0.1.2")
     id("fabric-loom") version("1.7-SNAPSHOT") apply(false)
     id("com.modrinth.minotaur") version("2.+")
@@ -30,7 +30,7 @@ val adventure = "4.17.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.3.0"
-val bStats = "3.0.3"
+val bStats = "3.1.0"
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -86,6 +86,7 @@ val allNmsVersion = ArrayList<String>().apply {
 allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
+    apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
     version = "1.6" + (System.getenv("BUILD_NUMBER")?.let { ".$it" } ?: "")
@@ -121,6 +122,30 @@ allprojects {
     java {
         toolchain.vendor = JvmVendorSpec.ADOPTIUM
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+dokka {
+    moduleName = "BetterHud docs"
+    dokkaSourceSets.configureEach {
+        displayName = project.name
+    }
+}
+
+subprojects {
+    dokka {
+        val list = mutableListOf(project.name)
+        var parent: Project? = project.parent
+        do {
+            parent?.let {
+                list.add(it.name)
+            }
+            parent = parent?.parent
+        } while (parent != null)
+        moduleName = list.reversed().joinToString("/")
+        dokkaSourceSets.configureEach {
+            displayName = project.name
+        }
     }
 }
 
@@ -212,17 +237,6 @@ allNmsVersion.forEach {
         .dependency(apiBukkit)
 }
 
-fun branch(project: Project) {
-    if (project.subprojects.isNotEmpty()) {
-        project.subprojects.forEach {
-            branch(it)
-        }
-    } else {
-        project.apply(plugin = "org.jetbrains.dokka")
-    }
-}
-branch(project)
-
 scheduler.project("standard").adventure().bukkit().api()
 scheduler.project("folia").folia().api()
 
@@ -289,9 +303,9 @@ val sourceJar by tasks.creating(Jar::class.java) {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 val dokkaJar by tasks.creating(Jar::class.java) {
-    dependsOn(tasks.dokkaHtmlMultiModule)
+    dependsOn(tasks.dokkaGenerate)
     archiveClassifier = "dokka"
-    from(layout.buildDirectory.dir("dokka${File.separatorChar}htmlMultiModule").orNull?.asFile)
+    from(layout.buildDirectory.dir("dokka/html").orNull?.asFile)
 }
 val fabricJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "fabric+$minecraft"
@@ -358,6 +372,16 @@ runPaper {
     disablePluginJarDetection()
 }
 
+dependencies {
+    fun searchAll(target: Project) {
+        val sub = target.subprojects
+        if (sub.isNotEmpty()) sub.forEach {
+            searchAll(it)
+        } else dokka(target)
+    }
+    searchAll(rootProject)
+}
+
 tasks {
     runServer {
         version(minecraft)
@@ -369,6 +393,9 @@ tasks {
         finalizedBy(dokkaJar)
         finalizedBy(pluginJar)
         finalizedBy(fabricJar)
+    }
+    logLinkDokkaGeneratePublicationHtml {
+        enabled = false
     }
 }
 
