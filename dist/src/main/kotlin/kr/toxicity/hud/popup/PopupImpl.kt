@@ -102,7 +102,7 @@ class PopupImpl(
                         else hudPlayer.popupKeyMap.remove(event.key)
                     }
                 }
-                show(event, hudPlayer, event.key)?.let {
+                show(event, hudPlayer)?.let {
                     if (keyMapping) {
                         hudPlayer.popupKeyMap[event.key] = it
                     }
@@ -146,8 +146,8 @@ class PopupImpl(
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
 
     override fun getMaxStack(): Int = move.locations.size
-    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? = show(reason, hudPlayer, reason.key)
-    private fun show(reason: UpdateEvent, hudPlayer: HudPlayer, key: Any): PopupUpdater? {
+    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? {
+        val key = reason.key
         val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl()
         }
