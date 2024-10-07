@@ -146,7 +146,7 @@ class PopupImpl(
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
 
     override fun getMaxStack(): Int = move.locations.size
-    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? = show(reason, hudPlayer, UUID.randomUUID())
+    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? = show(reason, hudPlayer, reason.key)
     private fun show(reason: UpdateEvent, hudPlayer: HudPlayer, key: Any): PopupUpdater? {
         val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl()
