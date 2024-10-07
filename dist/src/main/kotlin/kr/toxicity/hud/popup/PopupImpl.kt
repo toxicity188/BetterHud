@@ -96,19 +96,8 @@ class PopupImpl(
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->
             PlayerManagerImpl.getHudPlayer(uuid)?.let { hudPlayer ->
-                if (keyMapping) {
-                    hudPlayer.popupKeyMap[event.key]?.let {
-                        if (it.update()) return@task true
-                        else hudPlayer.popupKeyMap.remove(event.key)
-                    }
-                }
-                show(event, hudPlayer)?.let {
-                    if (keyMapping) {
-                        hudPlayer.popupKeyMap[event.key] = it
-                    }
-                }
+                show(event, hudPlayer)
             }
-            true
         }
         section.get("triggers")?.asObject()?.forEachSubConfiguration { _, yamlObject ->
             TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
@@ -147,6 +136,19 @@ class PopupImpl(
 
     override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? {
+        if (keyMapping) {
+            hudPlayer.popupKeyMap[reason.key]?.let {
+                if (it.update()) return null
+                else hudPlayer.popupKeyMap.remove(reason.key)
+            }
+        }
+        return show0(reason, hudPlayer)?.apply {
+            if (keyMapping) {
+                hudPlayer.popupKeyMap[reason.key] = this
+            }
+        }
+    }
+    private fun show0(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? {
         val key = reason.key
         val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl()
