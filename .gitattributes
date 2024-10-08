@@ -1,10 +1,9 @@
 *.java linguist-language=Java
-
 *.kt linguist-language=Kotlin
-*.kts linguist-language=Kotlin
-
 *.vsh linguist-language=GLSL
 *.fsh linguist-language=GLSL
 
-resources/*.vsh linguist-vendored=false
-resources/*.fsh linguist-vendored=false
+*.vsh linguist-vendored=false
+*.fsh linguist-vendored=false
+*.vsh linguist-documentation=false
+*.fsh linguist-documentation=false
