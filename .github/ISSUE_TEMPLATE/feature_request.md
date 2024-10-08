@@ -1,19 +1,19 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+title: Any feature
+labels: help wanted
+assignees: toxicity188
 
 ---
 
-**Required**
+**Required**  
 Tell me your feature you want to add.
 
 1. The more accurate your explain is, The better quality will be out.
 2. Remember that i can't accept all of your request and demand.
 
-**Disclaimer**
+**Disclaimer**  
 I do NOT accept any request about that.
 
 - Closed-source mod/plugin support such as Optifine and ItemsAdder
