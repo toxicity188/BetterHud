@@ -271,9 +271,9 @@ class FabricBootstrapImpl: FabricBootstrap, DedicatedServerModInitializer {
 
     override fun loader(): URLClassLoader {
         val loader = javaClass.classLoader
-        return (javaClass.classLoader.javaClass.declaredFields.first {
+        return javaClass.classLoader.javaClass.declaredFields.first {
             URLClassLoader::class.java.isAssignableFrom(it.type)
-        }).apply {
+        }.apply {
             isAccessible = true
         }[loader] as URLClassLoader
     }

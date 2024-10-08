@@ -65,9 +65,9 @@ class MMOCoreCompatibility: Compatibility {
                 return@search {
                     HudListener { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        (mmo.getBoundSkill(slot)?.let {
+                        mmo.getBoundSkill(slot)?.let {
                             (mmo.cooldownMap.getCooldown(it) / it.skill.getModifier("cooldown", mmo.getSkillLevel(it.skill))).coerceAtLeast(0.0)
-                        } ?: 0.0)
+                        } ?: 0.0
                     }
                 }
             },
@@ -221,7 +221,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val i = args[0].toInt()
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.getBoundSkill(i)?.skill?.let {
                             it.getModifier("cooldown", mmo.getSkillLevel(it))
                         } ?: -1
@@ -236,7 +236,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val i = args[0].toInt()
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.getBoundSkill(i)?.skill?.let {
                             it.getModifier("cooldown", mmo.getSkillLevel(it))
                         } ?: -1
@@ -251,7 +251,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.cooldownMap.getCooldown("skill_" + skill.handler.id)
                     }
                 }
@@ -264,7 +264,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         skill.getModifier("mana", mmo.getSkillLevel(skill))
                     }
                 }
@@ -277,7 +277,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         skill.getModifier("stamina", mmo.getSkillLevel(skill))
                     }
                 }
@@ -290,7 +290,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Number> {
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         (0..8).firstOrNull {
                             mmo.getBoundSkill(it)?.skill?.handler?.id == skill.handler.id
                         } ?: -1
@@ -349,7 +349,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, String> {
                     val i = args[0].toInt()
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function "<none>")
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function "<none>"
                         mmo.getBoundSkill(i)?.skill?.name ?: "<none>"
                     }
                 }
@@ -388,7 +388,7 @@ class MMOCoreCompatibility: Compatibility {
         get() = mapOf(
             "is_casting_mode" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function false)
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                     mmo.isCasting
                 }
             },
@@ -399,7 +399,7 @@ class MMOCoreCompatibility: Compatibility {
                     reason: UpdateEvent
                 ): Function<HudPlayer, Boolean> {
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function false)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                         mmo.boundSkills.any {
                             it.value.classSkill.skill.handler.id == args[0]
                         }
@@ -414,7 +414,7 @@ class MMOCoreCompatibility: Compatibility {
                 ): Function<HudPlayer, Boolean> {
                     val i = args[0].toInt()
                     return Function { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@Function false)
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                         mmo.getBoundSkill(i) != null
                     }
                 }

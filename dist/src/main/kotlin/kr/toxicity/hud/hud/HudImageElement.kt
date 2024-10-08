@@ -36,7 +36,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
             val scale = height.toDouble() / pair.image.image.height
-            val ascent = (finalPixel.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
+            val ascent = finalPixel.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
             val shaderGroup = ShaderGroup(shader, fileName, image.scale, ascent)
 
             val component = ImageManager.getImage(shaderGroup) ?: run {
@@ -44,7 +44,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                 val finalWidth = WidthComponent(Component.text()
                     .content(c)
                     .font(parent.imageKey)
-                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round((pair.image.image.width).toDouble() * scale).toInt()) + NEW_LAYER
+                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round(pair.image.image.width.toDouble() * scale).toInt()) + NEW_LAYER
                 parent.jsonArray?.let { array ->
                     HudImpl.createBit(shader, ascent) { y ->
                         array.add(JsonObject().apply {

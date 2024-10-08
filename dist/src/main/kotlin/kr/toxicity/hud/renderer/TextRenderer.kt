@@ -128,7 +128,7 @@ class TextRenderer(
                                 appendCodePoint(i)
                                 width += if (i != SPACE_POINT) widthMap[i]?.let { width ->
                                     width.scaledWidth(scale) + add + 1
-                                } ?: 0 else (4 + add)
+                                } ?: 0 else 4 + add
                                 if (index < codepoint.lastIndex) {
                                     width += space + add
                                     appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
@@ -139,7 +139,7 @@ class TextRenderer(
                         width += codepoint.sumOf {
                             if (it != SPACE_POINT) widthMap[it]?.let { width ->
                                 width.scaledWidth(scale) + add + 1
-                            } ?: 0 else (4 + add)
+                            } ?: 0 else 4 + add
                         }
                     }
                     ret = ret.font(data.word)

@@ -127,11 +127,11 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
                 }
             }
             tickSpeed = yaml.getAsLong("tick-speed", 1)
-            numberFormat = (yaml.get("number-format")?.asString()?.let {
+            numberFormat = yaml.get("number-format")?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to read this number-format: $it") {
                     DecimalFormat(it)
                 }.getOrNull()
-            } ?: DecimalFormat("#,###.#"))
+            } ?: DecimalFormat("#,###.#")
             disableToBedrockPlayer = yaml.getAsBoolean("disable-to-bedrock-player", true)
             yaml.get("build-folder-location")?.asString()?.let {
                 buildFolderLocation = it.replace('/', File.separatorChar)

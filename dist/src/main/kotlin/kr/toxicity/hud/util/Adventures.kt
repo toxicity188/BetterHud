@@ -88,7 +88,7 @@ fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
         WidthComponent(
             Component.text()
                 .font(LEGACY_SPACE_KEY)
-                .content("${((abs / 256 + 255) * i + 0xFFC00).parseChar()}${((abs % 256) * i + 0xFFC00).parseChar()}"),
+                .content("${((abs / 256 + 255) * i + 0xFFC00).parseChar()}${(abs % 256 * i + 0xFFC00).parseChar()}"),
             width
         )
     } else WidthComponent(

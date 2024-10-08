@@ -67,7 +67,7 @@ class CircleCompass(
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
     private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, y: Int): WidthComponent {
-        val char = (center++).parseChar()
+        val char = center++.parseChar()
         val nameEncoded = imageName.encodeKey()
         val maxHeight = (image.height.toDouble() * scale).roundToInt()
         val newHeight = (image.height.toDouble() * scale * scaleMultiplier).roundToInt()
@@ -179,10 +179,10 @@ class CircleCompass(
                 .ifNull("invalid image: $fileName")
                 .image
             val div = ceil(length.toDouble() / 2).toInt()
-            if (applyOpacity) HashMap<CompassData, WidthComponent>().apply {
-                for (i in 0..<div) {
+            if (applyOpacity) {
+                (0..<div).associate { i ->
                     val reverse = div - i
-                    put(CompassData(reverse), getKey(
+                    CompassData(reverse) to getKey(
                         "compass_image_${internalName}_${imageName}_${i + 1}",
                         scaleEquation.evaluate(i.toDouble()).apply {
                             if (this < 0) throw RuntimeException("scale equation returns < 0")
@@ -190,21 +190,18 @@ class CircleCompass(
                         colorEquation.evaluate(i.toDouble()),
                         image.withOpacity(sin(reverse.toDouble() / div.toDouble() * PI / 2) * opacity),
                         location.y,
-                    ))
+                    )
                 }
-            } else HashMap<CompassData, WidthComponent>().apply {
-                for (i in 0..<div) {
-                    val reverse = div - i
-                    put(CompassData(reverse), location.x.toSpaceComponent() + getKey(
-                        "compass_image_${internalName}_${imageName}_${i + 1}",
-                        scaleEquation.evaluate(i.toDouble()).apply {
-                            if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
-                        } * scale,
-                        colorEquation.evaluate(i.toDouble()),
-                        image.withOpacity(opacity),
-                        location.y
-                    ))
-                }
+            } else (0..<div).associate { i ->
+                CompassData(div - i) to location.x.toSpaceComponent() + getKey(
+                    "compass_image_${internalName}_${imageName}_${i + 1}",
+                    scaleEquation.evaluate(i.toDouble()).apply {
+                        if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
+                    } * scale,
+                    colorEquation.evaluate(i.toDouble()),
+                    image.withOpacity(opacity),
+                    location.y
+                )
             }
         }
     }

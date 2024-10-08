@@ -34,10 +34,10 @@ class LayoutComponentContainer(
             }
             comp += (it.pixel + move).toSpaceComponent() + it.component + (-it.pixel - it.component.width - move).toSpaceComponent()
         }
-        return (when (offset) {
+        return when (offset) {
             LayoutOffset.LEFT -> 0
             LayoutOffset.CENTER -> -max / 2
             LayoutOffset.RIGHT -> -max
-        }).toSpaceComponent() + comp
+        }.toSpaceComponent() + comp
     }
 }

@@ -193,8 +193,8 @@ class VelocityCommand {
                 }
                 .then(RequiredArgumentBuilder.argument<CommandSource, Int>("page", IntegerArgumentType.integer())
                     .suggests { _, suggestionsBuilder ->
-                        (1..hud.size).forEach {
-                            suggestionsBuilder.suggest(it)
+                        for (i in 1..hud.size) {
+                            suggestionsBuilder.suggest(i)
                         }
                         suggestionsBuilder.buildFuture()
                     }
@@ -308,8 +308,8 @@ class VelocityCommand {
                 }
                 .then(RequiredArgumentBuilder.argument<CommandSource, Int>("page", IntegerArgumentType.integer())
                     .suggests { _, suggestionsBuilder ->
-                        (1..compass.size).forEach {
-                            suggestionsBuilder.suggest(it)
+                        for (i in 1..compass.size) {
+                            suggestionsBuilder.suggest(i)
                         }
                         suggestionsBuilder.buildFuture()
                     }
@@ -519,8 +519,8 @@ class VelocityCommand {
                 }
                 .then(RequiredArgumentBuilder.argument<CommandSource, Int>("page", IntegerArgumentType.integer())
                     .suggests { _, suggestionsBuilder ->
-                        (1..popup.size).forEach {
-                            suggestionsBuilder.suggest(it)
+                        for (i in 1..popup.size) {
+                            suggestionsBuilder.suggest(i)
                         }
                         suggestionsBuilder.buildFuture()
                     }
@@ -572,8 +572,8 @@ class VelocityCommand {
                 }
                 .then(RequiredArgumentBuilder.argument<CommandSource, Int>("page", IntegerArgumentType.integer())
                     .suggests { _, suggestionsBuilder ->
-                        (1..turn.size).forEach {
-                            suggestionsBuilder.suggest(it)
+                        for (i in 1..turn.size) {
+                            suggestionsBuilder.suggest(i)
                         }
                         suggestionsBuilder.buildFuture()
                     }
@@ -597,8 +597,8 @@ class VelocityCommand {
             }
             .then(RequiredArgumentBuilder.argument<CommandSource, Int>("page", IntegerArgumentType.integer())
                 .suggests { _, suggestionsBuilder ->
-                    (1..main.size).forEach {
-                        suggestionsBuilder.suggest(it)
+                    for (i in 1..main.size) {
+                        suggestionsBuilder.suggest(i)
                     }
                     suggestionsBuilder.buildFuture()
                 }

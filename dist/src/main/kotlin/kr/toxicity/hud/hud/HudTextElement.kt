@@ -38,10 +38,10 @@ class HudTextElement(
             text.outline
         )
         val loc = text.location + pixel
-        val yAxis = (loc.y).coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
+        val yAxis = loc.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
         val group = ShaderGroup(shader, text.text.name, text.scale, yAxis)
         val key = TextManager.getKey(group) ?: run {
-            val index2 = (++parent.textIndex)
+            val index2 = ++parent.textIndex
             val array = text.startJson()
             text.text.array.forEach {
                 HudImpl.createBit(shader, yAxis) { y ->
@@ -59,7 +59,7 @@ class HudTextElement(
             val key = createAdventureKey(textEncoded)
             val imageMap = HashMap<String, WidthComponent>()
             text.text.images.forEach {
-                val result = (textIndex++).parseChar()
+                val result = textIndex++.parseChar()
                 val imageScale = it.value.scale * text.scale
                 val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                 val div = height.toDouble() / it.value.image.image.height
@@ -94,7 +94,7 @@ class HudTextElement(
                 imageMap,
                 text.background?.let {
                     fun getString(image: LoadedImage, file: String): WidthComponent {
-                        val result = (textIndex++).parseChar()
+                        val result = textIndex++.parseChar()
                         val height = (image.image.height.toDouble() * text.backgroundScale).roundToInt()
                         val div = height.toDouble() / image.image.height
                         HudImpl.createBit(HudShader(

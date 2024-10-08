@@ -28,11 +28,11 @@ class HudImpl(
     companion object {
         const val DEFAULT_BIT = 13
         const val MAX_BIT = 23 - DEFAULT_BIT
-        const val ADD_HEIGHT = (1 shl (DEFAULT_BIT - 1)) - 1
+        const val ADD_HEIGHT = (1 shl DEFAULT_BIT - 1) - 1
 
         fun createBit(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
             ShaderManagerImpl.addHudShader(shader) { id ->
-                consumer(-(((id + (1 shl MAX_BIT)) shl DEFAULT_BIT) + ADD_HEIGHT + y))
+                consumer(-((id + (1 shl MAX_BIT) shl DEFAULT_BIT) + ADD_HEIGHT + y))
             }
         }
     }

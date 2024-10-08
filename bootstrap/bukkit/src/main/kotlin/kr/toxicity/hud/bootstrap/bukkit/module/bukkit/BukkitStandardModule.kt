@@ -180,14 +180,14 @@ class BukkitStandardModule: BukkitModule {
             "potion_effect_duration" to object : HudPlaceholder<Number> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    val potion = (runCatching {
+                    val potion = runCatching {
                         NamespacedKey.fromString(args[0])?.let { key ->
                             Registry.EFFECT.get(key)
                         }
                     }.onFailure {
                         @Suppress("DEPRECATION")
                         PotionEffectType.getByName(args[0])
-                    }.getOrNull() ?: throw RuntimeException("this potion effect doesn't exist: ${args[0]}"))
+                    }.getOrNull() ?: throw RuntimeException("this potion effect doesn't exist: ${args[0]}")
                     return Function { p ->
                         p.bukkitPlayer.getPotionEffect(potion)?.duration ?: 0
                     }

@@ -206,7 +206,7 @@ class PopupLayout(
                 val textEncoded = "popup_${parent.name}_text_${index}".encodeKey()
                 val key = createAdventureKey(textEncoded)
                 textLayout.text.images.forEach {
-                    val result = (textIndex++).parseChar()
+                    val result = textIndex++.parseChar()
                     val imageScale = it.value.scale * textLayout.scale
                     val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                     val div = height.toDouble() / it.value.image.image.height
@@ -241,7 +241,7 @@ class PopupLayout(
                     imageMap,
                     textLayout.background?.let {
                         fun getString(image: LoadedImage, file: String): WidthComponent {
-                            val result = (textIndex++).parseChar()
+                            val result = textIndex++.parseChar()
                             val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
                             val div = height.toDouble() / image.image.height
                             HudImpl.createBit(HudShader(

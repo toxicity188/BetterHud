@@ -42,11 +42,11 @@ fun String.decodeKey(): String {
         fun Int.decode(): Int {
             var m = this - 3
             if (m < 0) m += 0xF + 1
-            return (m.inv()) and 0xF
+            return m.inv() and 0xF
         }
 
         val reversed = reversed()
-        for (i in (0..<length / 2)) {
+        for (i in 0..<length / 2) {
             sb.append(
                 ((Character.digit(reversed[t++], 16).decode() shl 4) or
                         Character.digit(reversed[t++], 16).decode()).toChar()

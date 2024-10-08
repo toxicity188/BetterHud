@@ -90,7 +90,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                 constants.clear()
                 runWithExceptionHandling(sender, "Unable to load shader.yml") {
                     fun getReader(name: String): Pair<String, BufferedReader> {
-                        return (name to run {
+                        return name to run {
                             val f = File(DATA_FOLDER, name)
                             if (!f.exists()) BOOTSTRAP.resource(name).ifNull("Unknown resource: $name").buffered().use {
                                 f.outputStream().buffered().use { output ->
@@ -100,7 +100,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                             runCatching {
                                 f.bufferedReader(Charsets.UTF_8)
                             }.getOrNull() ?: throw RuntimeException("plugin jar file has a problem.")
-                        })
+                        }
                     }
 
                     val shaders = listOf(

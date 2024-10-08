@@ -347,7 +347,7 @@ object TextManager: BetterHudManager {
                         val width = image.width / str.length
                         var i2 = 0
                         str.codePoints().forEach { char ->
-                            defaultBitmapImageMap[char] = image.getSubimage(width * (i2++), height * i1, width, height)
+                            defaultBitmapImageMap[char] = image.getSubimage(width * i2++, height * i1, width, height)
                         }
                     }
                 }
@@ -556,7 +556,7 @@ object TextManager: BetterHudManager {
                 }
             }
             if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync {
-                val mul = (scale.toDouble() / it.value.width)
+                val mul = scale.toDouble() / it.value.width
                 val newWidth = (it.value.width * mul).roundToInt()
                 val newHeight = (it.value.height * mul).roundToInt()
                 BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).apply {

@@ -70,11 +70,11 @@ object ImageManager: BetterHudManager {
                     }
 
                     ImageType.LISTENER -> {
-                        val splitType = (yamlObject.get("split-type")?.asString()?.let { splitType ->
+                        val splitType = yamlObject.get("split-type")?.asString()?.let { splitType ->
                             runWithExceptionHandling(sender, "Unable to find that split-type: $splitType") {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
-                        } ?: SplitType.LEFT)
+                        } ?: SplitType.LEFT
                         val getFile = File(
                             assets,
                             yamlObject.get("file")?.asString().ifNull("file value not set.")

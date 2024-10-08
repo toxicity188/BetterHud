@@ -195,7 +195,7 @@ class PopupImpl(
                 old2()
             }
             cond = {
-                (++i < duration) && old()
+                ++i < duration && old()
             }
         }
         val value = index?.invoke(reason)?.invoke(hudPlayer) ?: -1
