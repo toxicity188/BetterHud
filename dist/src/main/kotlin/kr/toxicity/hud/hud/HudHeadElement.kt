@@ -11,9 +11,7 @@ import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
-import kr.toxicity.hud.util.NAME_SPACE_ENCODED
-import kr.toxicity.hud.util.encodeKey
-import kr.toxicity.hud.util.parseChar
+import kr.toxicity.hud.util.*
 
 class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: ImageLocation) {
 
@@ -37,15 +35,13 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 PlayerHeadManager.getHead(shaderGroup) ?: run {
                     parent.jsonArray?.let { array ->
                         HudImpl.createBit(shader, ascent) { y ->
-                            array.add(JsonObject().apply {
-                                addProperty("type", "bitmap")
-                                addProperty("file", fileName)
-                                addProperty("ascent", y)
-                                addProperty("height", height)
-                                add("chars", JsonArray().apply {
-                                    add(char)
-                                })
-                            })
+                            array.add(jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to fileName,
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(char)
+                            ))
                         }
                     }
                     PlayerHeadManager.setHead(shaderGroup, char)

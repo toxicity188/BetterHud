@@ -1,7 +1,6 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.image.ImageLocation
@@ -24,6 +23,7 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 object TextManager: BetterHudManager {
@@ -168,7 +168,7 @@ object TextManager: BetterHudManager {
             }
         }
     }
-    fun getWidth(codepoint: Int) = textWidthMap[codepoint] ?: 3
+    fun getWidth(codepoint: Int) = textWidthMap[codepoint]
 
     fun getText(name: String) = synchronized(textMap) {
         textMap[name]
@@ -186,14 +186,14 @@ object TextManager: BetterHudManager {
         val assetsFolder = DATA_FOLDER.subFolder("assets")
         val fontFolder = DATA_FOLDER.subFolder("fonts")
 
-        val defaultArray = JsonArray().apply {
-            add(JsonObject().apply {
-                addProperty("type", "space")
-                add("advances", JsonObject().apply {
-                    addProperty(" ", 4)
-                })
-            })
-        }
+        val defaultArray = jsonArrayOf(
+            jsonObjectOf(
+                "type" to "space",
+                "advances" to jsonObjectOf(
+                    " " to 4
+                )
+            )
+        )
         val fontConfig = PluginConfiguration.FONT.create()
         val configScale = fontConfig.getAsInt("scale", 16)
         val configHeight = fontConfig.getAsInt("height", 9)
@@ -217,20 +217,16 @@ object TextManager: BetterHudManager {
             textWidthMap[it.key] = (it.value.width.toDouble() * configHeight / it.value.height.toDouble()).roundToInt()
         }
         parseDefault.array.forEach {
-            defaultArray.add(JsonObject().apply {
-                addProperty("type", "bitmap")
-                addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
-                addProperty("ascent", configAscent)
-                addProperty("height", configHeight)
-                add("chars", it.chars)
-            })
+            defaultArray.add(jsonObjectOf(
+                "type" to "bitmap",
+                "file" to "$NAME_SPACE_ENCODED:${it.file}",
+                "ascent" to configAscent,
+                "height" to configHeight,
+                "chars" to it.chars
+            ))
         }
-        PackGenerator.addTask(ArrayList(resource.font).apply {
-            add("${ConfigManagerImpl.key.defaultKey.value()}.json")
-        }) {
-            JsonObject().apply {
-                add("providers", defaultArray)
-            }.toByteArray()
+        PackGenerator.addTask(resource.font + "${ConfigManagerImpl.key.defaultKey.value()}.json") {
+            jsonObjectOf("providers" to defaultArray).toByteArray()
         }
 
         DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
@@ -292,16 +288,13 @@ object TextManager: BetterHudManager {
                                 file.path,
                                 s,
                                 resource.textures,
-                                ArrayList<BitmapData>().apply {
-                                    section.get("chars").ifNull("Unable to find 'chars' array.").asObject().forEach {
-                                        val obj = it.value.asObject()
-                                        add(BitmapData(
-                                            obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
-                                                y.asString()
-                                            },
-                                            obj.get("file").ifNull("file value not set.").asString()
-                                        ))
-                                    }
+                                section.get("chars").ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
+                                    BitmapData(
+                                        obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
+                                            y.asString()
+                                        },
+                                        obj.get("file").ifNull("file value not set.").asString()
+                                    )
                                 },
                                 section.toConditions()
                             )
@@ -489,18 +482,12 @@ object TextManager: BetterHudManager {
                     }
                 }
 
-                PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                    add(name)
-                }) {
+                PackGenerator.addTask(imageSaveFolder + name) {
                     file.toByteArray()
                 }
                 textArray.add(HudTextArray(
                     name,
-                    JsonArray().apply {
-                        d.codepoints.forEach {
-                            add(it)
-                        }
-                    },
+                    jsonArrayOf(*d.codepoints.toTypedArray()),
                     divHeight
                 ))
             }
@@ -590,10 +577,7 @@ object TextManager: BetterHudManager {
             val textList = ArrayList<HudTextArray>()
             var i = 0
             images.forEach {
-                PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                    val encode = "glyph_${it.key}".encodeKey()
-                    add("$encode.png")
-                }) {
+                PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey()}.png") {
                     it.value.image.image.toByteArray()
                 }
             }
@@ -608,9 +592,7 @@ object TextManager: BetterHudManager {
                             pair.codepoint.parseChar()
                         })
                     }
-                    PackGenerator.addTask(ArrayList(imageSaveFolder).apply {
-                        add(name)
-                    }) {
+                    PackGenerator.addTask(imageSaveFolder + name) {
                         BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                             createGraphics().run {
                                 composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)

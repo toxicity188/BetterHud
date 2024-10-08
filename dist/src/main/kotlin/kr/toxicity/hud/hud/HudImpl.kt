@@ -1,7 +1,6 @@
 package kr.toxicity.hud.hud
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.hud.Hud
@@ -50,52 +49,42 @@ class HudImpl(
         (++imageChar).parseChar()
     }
 
-    private val elements = ArrayList<HudAnimation>().apply {
-        section.get("layouts")?.asObject().ifNull("layout configuration not set.").forEachSubConfiguration { s, yamlObject ->
-            val layout = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
-                LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
-            }
-            var gui = GuiLocation(yamlObject)
-            yamlObject.get("gui")?.asObject()?.let {
-                gui += GuiLocation(it)
-            }
-            val pixel = yamlObject.get("pixel")?.asObject()?.let {
-                ImageLocation(it)
-            } ?: ImageLocation.zero
-            add(HudAnimation(
-                layout.animation.type,
-                layout.animation.location.map {
-                    HudElement(
-                        this@HudImpl,
-                        file,
-                        layout,
-                        gui,
-                        ImageLocation(it.x, it.y) + pixel
-                    )
-                }
-            ))
+    private val elements = section.get("layouts")?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
+        val layout = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
+            LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
         }
+        var gui = GuiLocation(yamlObject)
+        yamlObject.get("gui")?.asObject()?.let {
+            gui += GuiLocation(it)
+        }
+        val pixel = yamlObject.get("pixel")?.asObject()?.let {
+            ImageLocation(it)
+        } ?: ImageLocation.zero
+        HudAnimation(
+            layout.animation.type,
+            layout.animation.location.map {
+                HudElement(
+                    this@HudImpl,
+                    file,
+                    layout,
+                    gui,
+                    ImageLocation(it.x, it.y) + pixel
+                )
+            }
+        )
     }.ifEmpty {
         throw RuntimeException("layout is empty.")
     }
     init {
         jsonArray?.let { array ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array.add(JsonObject().apply {
-                addProperty("type", "space")
-                add("advances", JsonObject().apply {
-                    spaces.forEach {
-                        addProperty(it.value, it.key)
-                    }
-                })
-            })
-            PackGenerator.addTask(
-                ArrayList(file).apply {
-                    add("$imageEncoded.json")
-                }
-            ) {
-                JsonObject().apply {
-                    add("providers", array)
-                }.toByteArray()
+            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array.add(jsonObjectOf(
+                "type" to "space",
+                "advances" to jsonObjectOf(*spaces.map {
+                    it.value to it.key
+                }.toTypedArray())
+            ))
+            PackGenerator.addTask(file + "$imageEncoded.json") {
+                jsonObjectOf("providers" to array).toByteArray()
             }
         }
         jsonArray = null

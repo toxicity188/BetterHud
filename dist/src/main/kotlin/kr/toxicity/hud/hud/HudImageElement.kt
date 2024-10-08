@@ -1,7 +1,5 @@
 package kr.toxicity.hud.hud
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
@@ -47,15 +45,13 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                     .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round(pair.image.image.width.toDouble() * scale).toInt()) + NEW_LAYER
                 parent.jsonArray?.let { array ->
                     HudImpl.createBit(shader, ascent) { y ->
-                        array.add(JsonObject().apply {
-                            addProperty("type", "bitmap")
-                            addProperty("file", fileName)
-                            addProperty("ascent", y)
-                            addProperty("height", height)
-                            add("chars", JsonArray().apply {
-                                add(c)
-                            })
-                        })
+                        array.add(jsonObjectOf(
+                            "type" to "bitmap",
+                            "file" to fileName,
+                            "ascent" to y,
+                            "height" to height,
+                            "chars" to jsonArrayOf(c)
+                        ))
                     }
                 }
                 ImageManager.setImage(shaderGroup, finalWidth)

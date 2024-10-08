@@ -129,11 +129,7 @@ object PlayerHeadManager : BetterHudManager {
                 headMap.putSync("head", s) {
                     val head = HudHead(file.path, s, yamlObject)
                     val pixel = head.pixel
-                    val targetFile = ArrayList(resource.textures).apply {
-                        val encode = "pixel_$pixel".encodeKey()
-                        add("$encode.png")
-                    }
-                    PackGenerator.addTask(targetFile) {
+                    PackGenerator.addTask(resource.textures + "${"pixel_$pixel".encodeKey()}.png") {
                         BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {
                             createGraphics().run {
                                 color = Color.WHITE

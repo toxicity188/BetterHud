@@ -84,6 +84,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
     )
         private set
 
+    var useLegacyFormat = true
     var legacySerializer = LEGACY_AMPERSAND
         private set
 
@@ -167,6 +168,7 @@ object ConfigManagerImpl: BetterHudManager, ConfigManager {
             includedMinecraftTextures = yaml.get("included-minecraft-list")?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
+            useLegacyFormat = yaml.getAsBoolean("use-legacy-format", true)
             yaml.get("legacy-serializer")?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
                     legacySerializer = it.toLegacySerializer()

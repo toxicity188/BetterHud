@@ -1,7 +1,6 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.resource.GlobalResource
@@ -37,15 +36,13 @@ object MinecraftManager: BetterHudManager {
         fun toJson(json: JsonArray, char: String, ascent: Int, scale: Double, font: Key): WidthComponent {
             val newHeight = (height.toDouble() * scale).roundToInt()
             val newWidth = (width.toDouble() / height.toDouble() * newHeight).roundToInt()
-            json.add(JsonObject().apply {
-                addProperty("type", "bitmap")
-                addProperty("file", "minecraft:$namespace.png")
-                addProperty("ascent", ascent)
-                addProperty("height", newHeight)
-                add("chars", JsonArray().apply {
-                    add(char)
-                })
-            })
+            json.add(jsonObjectOf(
+                "type" to "bitmap",
+                "file" to "minecraft:$namespace.png",
+                "ascent" to ascent,
+                "height" to newHeight,
+                "chars" to jsonArrayOf(char)
+            ))
             return WidthComponent(Component.text().content(char).font(font).append(NEGATIVE_ONE_SPACE_COMPONENT.component), newWidth)
         }
     }

@@ -1,6 +1,5 @@
 package kr.toxicity.hud.pack
 
-import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
@@ -161,12 +160,12 @@ object PackGenerator {
                         BOOTSTRAP.resource("icon.png")?.buffered()?.use {
                             addEntry(ZipEntry("pack.png"), it.readAllBytes())
                         }
-                        addEntry(ZipEntry("pack.mcmeta"), JsonObject().apply {
-                            add("pack", JsonObject().apply {
-                                addProperty("pack_format", BOOTSTRAP.mcmetaVersion())
-                                addProperty("description", "BetterHud's self host pack.")
-                            })
-                        }.toByteArray())
+                        addEntry(ZipEntry("pack.mcmeta"), jsonObjectOf(
+                            "pack" to jsonObjectOf(
+                                "pack_format" to BOOTSTRAP.mcmetaVersion(),
+                                "description" to "BetterHud's self-host pack."
+                            )
+                        ).toByteArray())
                     }
                     object : Generator {
                         override fun close() {

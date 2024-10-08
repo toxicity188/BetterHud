@@ -32,10 +32,7 @@ object BackgroundManager: BetterHudManager {
                         .toImage()
                         .removeEmptyWidth()
                         .ifNull("this image is empty: $imageName.png in $name").apply {
-                            PackGenerator.addTask(ArrayList(resource.textures).apply {
-                                val encode = "background_${name}_$imageName".encodeKey()
-                                add("$encode.png")
-                            }) {
+                            PackGenerator.addTask(resource.textures + "${"background_${name}_$imageName".encodeKey()}.png") {
                                 image.toByteArray()
                             }
                         }

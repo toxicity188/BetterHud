@@ -78,10 +78,7 @@ val currentNmsVersion = listOf(
     "v1_21_R1"
 )
 
-val allNmsVersion = ArrayList<String>().apply {
-    addAll(legacyNmsVersion)
-    addAll(currentNmsVersion)
-}
+val allNmsVersion = legacyNmsVersion + currentNmsVersion
 
 allprojects {
     apply(plugin = "java")

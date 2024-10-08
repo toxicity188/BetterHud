@@ -1,7 +1,6 @@
 package kr.toxicity.hud.popup
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
@@ -113,20 +112,14 @@ class PopupImpl(
             }
         }
         array?.let { arr ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) arr.add(JsonObject().apply {
-                addProperty("type", "space")
-                add("advances", JsonObject().apply {
-                    spaces.forEach {
-                        addProperty(it.value, it.key)
-                    }
-                })
-            })
-            PackGenerator.addTask(ArrayList(file).apply {
-                add("$imageEncoded.json")
-            }) {
-                JsonObject().apply {
-                    add("providers", arr)
-                }.toByteArray()
+            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) arr.add(jsonObjectOf(
+                "type" to "space",
+                "advances" to jsonObjectOf(*spaces.map {
+                    it.value to it.key
+                }.toTypedArray())
+            ))
+            PackGenerator.addTask(file + "$imageEncoded.json") {
+                jsonObjectOf("providers" to arr).toByteArray()
             }
         }
         array = null

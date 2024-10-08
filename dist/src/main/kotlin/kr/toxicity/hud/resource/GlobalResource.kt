@@ -1,104 +1,66 @@
 package kr.toxicity.hud.resource
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.util.BOOTSTRAP
-import kr.toxicity.hud.util.NAME_SPACE_ENCODED
-import kr.toxicity.hud.util.parseChar
-import kr.toxicity.hud.util.toByteArray
+import kr.toxicity.hud.util.*
 
 class GlobalResource {
     private val assets = listOf("assets")
 
-    private val hud = ArrayList(assets).apply {
-        add(NAME_SPACE_ENCODED)
-    }
+    private val hud = assets + NAME_SPACE_ENCODED
+    private val minecraft = assets + "minecraft"
 
-    private val minecraft = ArrayList(assets).apply {
-        add("minecraft")
-    }
+    val bossBar = minecraft + listOf("textures", "gui")
+    val core = minecraft + listOf("shaders", "core")
 
-    val bossBar = ArrayList(minecraft).apply {
-        add("textures")
-        add("gui")
-    }
-
-    val core = ArrayList(minecraft).apply {
-        add("shaders")
-        add("core")
-    }
-
-    val font = ArrayList(hud).apply {
-        add("font")
-    }
-    val textures = ArrayList(hud).apply {
-        add("textures")
-    }
+    val font = hud + "font"
+    val textures = hud + "textures"
 
     init {
         val key = ConfigManagerImpl.key
         BOOTSTRAP.resource("splitter.png")?.buffered()?.use {
             val read = it.readAllBytes()
-            PackGenerator.addTask(ArrayList(textures).apply {
-                add("${ConfigManagerImpl.key.splitterKey.value()}.png")
-            }) {
+            PackGenerator.addTask(textures + "${ConfigManagerImpl.key.splitterKey.value()}.png") {
                 read
             }
         }
         BOOTSTRAP.resource("spaces.ttf")?.buffered()?.use {
             val read = it.readAllBytes()
-            PackGenerator.addTask(ArrayList(font).apply {
-                add("${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf")
-            }) {
+            PackGenerator.addTask(font + "${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf") {
                 read
             }
         }
-        PackGenerator.addTask(ArrayList(font).apply {
-            add("${ConfigManagerImpl.key.spaceKey.value()}.json")
-        }) {
-            JsonObject().apply {
-                add("providers", JsonArray().apply {
-                    add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        addProperty("file", "${key.splitterKey.asString()}.png")
-                        addProperty("ascent", -9999)
-                        addProperty("height", - 2)
-                        add("chars", JsonArray().apply {
-                            add((0xC0000).parseChar())
-                        })
-                    })
-                    val center = 0xD0000
-                    add(JsonObject().apply {
-                        addProperty("type", "space")
-                        add("advances", JsonObject().apply {
-                            for (i in -8192..8192) {
-                                addProperty((center + i).parseChar(), i)
-                            }
-                        })
-                    })
-                })
-            }.toByteArray()
+        PackGenerator.addTask(font + "${ConfigManagerImpl.key.spaceKey.value()}.json") {
+            val center = 0xD0000
+            jsonObjectOf(
+                "providers" to jsonArrayOf(
+                    jsonObjectOf(
+                        "type" to "bitmap",
+                        "file" to "${key.splitterKey.asString()}.png",
+                        "ascent" to -9999,
+                        "height" to -2,
+                        "chars" to jsonArrayOf(0xC0000.parseChar())
+                    ),
+                    jsonObjectOf(
+                        "type" to "space",
+                        "advances" to jsonObjectOf(*(-8192..8192).map { i ->
+                            (center + i).parseChar() to i
+                        }.toTypedArray())
+                    )
+                )
+            ).toByteArray()
         }
-        PackGenerator.addTask(ArrayList(font).apply {
-            add("${ConfigManagerImpl.key.legacySpaceKey.value()}.json")
-        }) {
-            JsonObject().apply {
-                add("providers", JsonArray().apply {
-                    add(JsonObject().apply {
-                        addProperty("type", "ttf")
-                        addProperty("file", "${key.spacesTtfKey.asString()}.ttf")
-                        addProperty("size", 2.5)
-                        addProperty("oversample", 1.0)
-                        add("shift", JsonArray().apply {
-                            add(0.0)
-                            add(0.0)
-                        })
-                        add("skip", JsonArray())
-                    })
-                })
-            }.toByteArray()
+        PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json") {
+            jsonObjectOf(
+                "providers" to jsonObjectOf(
+                    "type" to "ttf",
+                    "file" to "${key.spacesTtfKey.asString()}.ttf",
+                    "size" to 2.5,
+                    "oversample" to 1.0,
+                    "shift" to jsonArrayOf(0.0, 0.0),
+                    "skip" to jsonArrayOf()
+                )
+            ).toByteArray()
         }
     }
 }

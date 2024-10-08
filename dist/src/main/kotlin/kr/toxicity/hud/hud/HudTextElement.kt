@@ -1,7 +1,5 @@
 package kr.toxicity.hud.hud
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
@@ -45,13 +43,13 @@ class HudTextElement(
             val array = text.startJson()
             text.text.array.forEach {
                 HudImpl.createBit(shader, yAxis) { y ->
-                    array.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
-                        addProperty("ascent", y)
-                        addProperty("height", (it.height * text.scale).roundToInt())
-                        add("chars", it.chars)
-                    })
+                    array.add(jsonObjectOf(
+                        "type" to "bitmap",
+                        "file" to "$NAME_SPACE_ENCODED:${it.file}",
+                        "ascent" to y,
+                        "height" to (it.height * text.scale).roundToInt(),
+                        "chars" to it.chars
+                    ))
                 }
             }
             var textIndex = 0xC0000
@@ -64,16 +62,13 @@ class HudTextElement(
                 val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                 val div = height.toDouble() / it.value.image.image.height
                 HudImpl.createBit(shader, loc.y + it.value.location.y) { y ->
-                    array.add(JsonObject().apply {
-                        addProperty("type", "bitmap")
-                        val encode = "glyph_${it.key}".encodeKey()
-                        addProperty("file", "$NAME_SPACE_ENCODED:$encode.png")
-                        addProperty("ascent", y)
-                        addProperty("height", height)
-                        add("chars", JsonArray().apply {
-                            add(result)
-                        })
-                    })
+                    array.add(jsonObjectOf(
+                        "type" to "bitmap",
+                        "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
+                        "ascent" to y,
+                        "height" to height,
+                        "chars" to jsonArrayOf(result)
+                    ))
                 }
                 imageMap[it.key] = it.value.location.x.toSpaceComponent() + WidthComponent(Component.text()
                     .font(key)
@@ -102,15 +97,13 @@ class HudTextElement(
                             text.layer - 1,
                             false
                         ), loc.y + it.location.y) { y ->
-                            array.add(JsonObject().apply {
-                                addProperty("type", "bitmap")
-                                addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
-                                addProperty("ascent", y)
-                                addProperty("height", height)
-                                add("chars", JsonArray().apply {
-                                    add(result)
-                                })
-                            })
+                            array.add(jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to "$NAME_SPACE_ENCODED:$file.png",
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(result)
+                            ))
                         }
                         return WidthComponent(Component.text()
                             .font(key)
@@ -125,12 +118,8 @@ class HudTextElement(
                     )
                 }
             )
-            PackGenerator.addTask(ArrayList(file).apply {
-                add("$textEncoded.json")
-            }) {
-                JsonObject().apply {
-                    add("providers", array)
-                }.toByteArray()
+            PackGenerator.addTask(file + "$textEncoded.json") {
+                jsonObjectOf("providers" to array).toByteArray()
             }
             TextManager.setKey(group, result)
             result

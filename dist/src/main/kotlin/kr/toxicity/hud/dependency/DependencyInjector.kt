@@ -35,7 +35,9 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         }
     }
 
-    private val dir = dataFolder.subFolder(".libraries")
+    private val dir = dataFolder.apply {
+        mkdirs()
+    }.subFolder(".libraries")
 
     init {
         if (dataFolder.subFile("version.yml").toYaml().get("plugin-version")?.asString() != version) dir.deleteRecursively()

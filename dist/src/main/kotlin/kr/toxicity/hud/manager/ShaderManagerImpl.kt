@@ -121,11 +121,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     fun copy(suffix: String) {
                         BOOTSTRAP.resource("background.png")?.buffered()?.use { input ->
                             val byte = input.readAllBytes()
-                            PackGenerator.addTask(ArrayList(resource.bossBar).apply {
-                                add("sprites")
-                                add("boss_bar")
-                                add("${barColor.name.lowercase()}_$suffix.png")
-                            }) {
+                            PackGenerator.addTask(resource.bossBar + listOf("sprites", "boss_bar", "${barColor.name.lowercase()}_$suffix.png")) {
                                 byte
                             }
                         }
@@ -135,9 +131,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     BOOTSTRAP.resource("bars.png")?.buffered()?.use { target ->
                         val oldImage = target.toImage()
                         val yAxis = 10 * barColor.ordinal
-                        PackGenerator.addTask(ArrayList(resource.bossBar).apply {
-                            add("bars.png")
-                        }) {
+                        PackGenerator.addTask(resource.bossBar + "bars.png") {
                             BufferedImage(oldImage.width, oldImage.height, BufferedImage.TYPE_INT_ARGB).apply {
                                 createGraphics().run {
                                     if (barColor.ordinal > 0) drawImage(
@@ -214,9 +208,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                                 }
                                 writer
                             }.toByteArray()
-                            PackGenerator.addTask(ArrayList(resource.core).apply {
-                                add(shader.first)
-                            }) {
+                            PackGenerator.addTask(resource.core + shader.first) {
                                 byte
                             }
                         }

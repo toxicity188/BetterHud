@@ -1,7 +1,6 @@
 package kr.toxicity.hud.popup
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
@@ -128,15 +127,13 @@ class PopupLayout(
                 val component = ImageManager.getImage(shaderGroup) ?: run {
                     val char = parent.newChar()
                     HudImpl.createBit(imageShader, ascent) { y ->
-                        array.add(JsonObject().apply {
-                            addProperty("type", "bitmap")
-                            addProperty("file", fileName)
-                            addProperty("ascent", y)
-                            addProperty("height", height)
-                            add("chars", JsonArray().apply {
-                                add(char)
-                            })
-                        })
+                        array.add(jsonObjectOf(
+                            "type" to "bitmap",
+                            "file" to fileName,
+                            "ascent" to y,
+                            "height" to height,
+                            "chars" to jsonArrayOf(char)
+                        ))
                     }
                     val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
                     val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
@@ -147,17 +144,15 @@ class PopupLayout(
                 list.add(component.toPixelComponent(pixel.x + xOffset))
             } else hudImage.image[0].let {
                 val char = parent.newChar()
-                array.add(JsonObject().apply {
-                    HudImpl.createBit(imageShader, pixel.y) { y ->
-                        addProperty("type", "bitmap")
-                        addProperty("file", "$NAME_SPACE_ENCODED:${it.name}")
-                        addProperty("ascent", y)
-                        addProperty("height", Math.round(it.image.image.height * target.scale).toInt())
-                        add("chars", JsonArray().apply {
-                            add(char)
-                        })
-                    }
-                })
+                HudImpl.createBit(imageShader, pixel.y) { y ->
+                    array.add(jsonObjectOf(
+                        "type" to "bitmap",
+                        "file" to "$NAME_SPACE_ENCODED:${it.name}",
+                        "ascent" to y,
+                        "height" to (it.image.image.height * target.scale).roundToInt(),
+                        "chars" to jsonArrayOf(char)
+                    ))
+                }
                 val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
                 list.add(comp.toPixelComponent(pixel.x))
             }
@@ -192,13 +187,13 @@ class PopupLayout(
                 val array = textLayout.startJson()
                 HudImpl.createBit(textShader, pixel.y) { y ->
                     textLayout.text.array.forEach {
-                        array.add(JsonObject().apply {
-                            addProperty("type", "bitmap")
-                            addProperty("file", "$NAME_SPACE_ENCODED:${it.file}")
-                            addProperty("ascent", y)
-                            addProperty("height", (it.height * textLayout.scale).roundToInt())
-                            add("chars", it.chars)
-                        })
+                        array.add(jsonObjectOf(
+                            "type" to "bitmap",
+                            "file" to "$NAME_SPACE_ENCODED:${it.file}",
+                            "ascent" to y,
+                            "height" to (it.height * textLayout.scale).roundToInt(),
+                            "chars" to it.chars
+                        ))
                     }
                 }
                 var textIndex = 0xC0000
@@ -211,16 +206,13 @@ class PopupLayout(
                     val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
                     val div = height.toDouble() / it.value.image.image.height
                     HudImpl.createBit(textShader, pixel.y + it.value.location.y) { y ->
-                        array.add(JsonObject().apply {
-                            addProperty("type", "bitmap")
-                            val encode = "glyph_${it.key}".encodeKey()
-                            addProperty("file", "$NAME_SPACE_ENCODED:$encode.png")
-                            addProperty("ascent", y)
-                            addProperty("height", height)
-                            add("chars", JsonArray().apply {
-                                add(result)
-                            })
-                        })
+                        array.add(jsonObjectOf(
+                            "type" to "bitmap",
+                            "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
+                            "ascent" to y,
+                            "height" to height,
+                            "chars" to jsonArrayOf(result)
+                        ))
                     }
                     imageMap[it.key] = it.value.location.x.toSpaceComponent() + WidthComponent(Component.text()
                         .font(key)
@@ -249,15 +241,13 @@ class PopupLayout(
                                 textLayout.layer - 1,
                                 false
                             ), pixel.y + it.location.y) { y ->
-                                array.add(JsonObject().apply {
-                                    addProperty("type", "bitmap")
-                                    addProperty("file", "$NAME_SPACE_ENCODED:$file.png")
-                                    addProperty("ascent", y)
-                                    addProperty("height", height)
-                                    add("chars", JsonArray().apply {
-                                        add(result)
-                                    })
-                                })
+                                array.add(jsonObjectOf(
+                                    "type" to "bitmap",
+                                    "file" to "$NAME_SPACE_ENCODED:$file.png",
+                                    "ascent" to y,
+                                    "height" to height,
+                                    "chars" to jsonArrayOf(result)
+                                ))
                             }
                             return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
                         }
@@ -269,12 +259,8 @@ class PopupLayout(
                         )
                     }
                 )
-                PackGenerator.addTask(ArrayList(file).apply {
-                    add("$textEncoded.json")
-                }) {
-                    JsonObject().apply {
-                        add("providers", array)
-                    }.toByteArray()
+                PackGenerator.addTask(file + "$textEncoded.json") {
+                    jsonObjectOf("providers" to array).toByteArray()
                 }
                 TextManager.setKey(group, result)
                 result
@@ -319,15 +305,13 @@ class PopupLayout(
 
                     PlayerHeadManager.getHead(shaderGroup) ?: run {
                         HudImpl.createBit(shader, ascent) { y ->
-                            array.add(JsonObject().apply {
-                                addProperty("type", "bitmap")
-                                addProperty("file", fileName)
-                                addProperty("ascent", y)
-                                addProperty("height", height)
-                                add("chars", JsonArray().apply {
-                                    add(char)
-                                })
-                            })
+                            array.add(jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to fileName,
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(char)
+                            ))
                         }
                         PlayerHeadManager.setHead(shaderGroup, char)
                         char

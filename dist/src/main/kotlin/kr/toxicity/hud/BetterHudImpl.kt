@@ -190,7 +190,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         info("Plugin disabled.")
     }
 
-    override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint)
+    override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint) ?: 3
 
     override fun loadAssets(prefix: String, dir: File) {
         loadAssets(prefix) { s, i ->

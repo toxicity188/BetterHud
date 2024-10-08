@@ -1,7 +1,6 @@
 package kr.toxicity.hud.compass
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
@@ -74,21 +73,17 @@ class CircleCompass(
         val div = newHeight.toDouble() / image.height.toDouble()
         array?.let { array ->
             HudImpl.createBit(shader, pixel.y + y + (maxHeight - newHeight) / 2) { bit ->
-                array.add(JsonObject().apply {
-                    addProperty("type", "bitmap")
-                    addProperty("file", "$NAME_SPACE_ENCODED:$nameEncoded.png")
-                    addProperty("ascent", bit)
-                    addProperty("height", newHeight)
-                    add("chars", JsonArray().apply {
-                        add(char)
-                    })
-                })
+                array.add(jsonObjectOf(
+                    "type" to "bitmap",
+                    "file" to "$NAME_SPACE_ENCODED:$nameEncoded.png",
+                    "ascent" to bit,
+                    "height" to newHeight,
+                    "chars" to jsonArrayOf(char)
+                ))
             }
         }
         resourceRef?.let {
-            PackGenerator.addTask(ArrayList(it.textures).apply {
-                add("$nameEncoded.png")
-            }) {
+            PackGenerator.addTask(it.textures + "$nameEncoded.png") {
                 image.toByteArray()
             }
         }
@@ -210,12 +205,8 @@ class CircleCompass(
 
     init {
         array?.let {
-            PackGenerator.addTask(ArrayList(resource.font).apply {
-                add("$encode.json")
-            }) {
-                JsonObject().apply {
-                    add("providers", it)
-                }.toByteArray()
+            PackGenerator.addTask(resource.font + "$encode.json") {
+                jsonObjectOf("providers" to it).toByteArray()
             }
         }
     }

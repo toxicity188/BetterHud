@@ -41,6 +41,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-## Minecraft ###
+### Minecraft ###
 /run
 /plugins

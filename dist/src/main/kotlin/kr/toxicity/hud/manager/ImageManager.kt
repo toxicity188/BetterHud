@@ -140,10 +140,7 @@ object ImageManager: BetterHudManager {
                 list.distinctBy {
                     it.name
                 }.forEach {
-                    val file = ArrayList(resource.textures).apply {
-                        add(it.name)
-                    }
-                    PackGenerator.addTask(file) {
+                    PackGenerator.addTask(resource.textures + it.name) {
                         it.image.image.toByteArray()
                     }
                 }
