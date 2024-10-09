@@ -386,10 +386,10 @@ tasks {
         pluginJars(fileTree("plugins"))
     }
     build {
-        finalizedBy(sourceJar)
-        finalizedBy(dokkaJar)
+//        finalizedBy(sourceJar)
+//        finalizedBy(dokkaJar)
         finalizedBy(pluginJar)
-        finalizedBy(fabricJar)
+//        finalizedBy(fabricJar)
     }
     logLinkDokkaGeneratePublicationHtml {
         enabled = false

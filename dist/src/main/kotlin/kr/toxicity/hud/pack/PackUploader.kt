@@ -46,11 +46,15 @@ object PackUploader {
             ((Character.digit(hash.codePointAt(t++), 16) shl 4) or Character.digit(hash.codePointAt(t++), 16)).toByte()
         })
         fun openServer(body: String) {
+            info("opening server...");
             val host = ConfigManagerImpl.selfHostPort
             val url = "http://$body:$host/$string.zip"
             runWithExceptionHandling(CONSOLE, "Unable to open server.") {
+
+                info("ip: " + InetAddress.getLocalHost() + "port: " + host);
+
                 server?.stop()
-                val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
+                val http = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), host), 0).apply {
                     createContext("/") { exec ->
                         exec.use { exchange ->
                             if (exchange.requestURI.path != "/$string.zip") {
