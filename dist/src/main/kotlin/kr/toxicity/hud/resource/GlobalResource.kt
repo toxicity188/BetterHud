@@ -50,7 +50,7 @@ class GlobalResource {
                 )
             ).toByteArray()
         }
-        PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json") {
+        PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json.removed") {
             jsonObjectOf(
                 "providers" to jsonObjectOf(
                     "type" to "ttf",
