@@ -9,7 +9,7 @@ class KeyResource(namespace: String) {
     private fun create(name: String) = Key.key(encodedNamespace, name)
 
     val spaceKey = create("space".encodeKey())
-    val legacySpaceKey = create("legacy_space".encodeKey())
+    val legacySpaceKey = create("legacy_space_removed".encodeKey())
     val defaultKey = create("default".encodeKey())
     val spacesTtfKey = create("spaces".encodeKey())
     val splitterKey = create("splitter".encodeKey())
