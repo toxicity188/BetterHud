@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
     `java-library`
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
     id("io.github.goooler.shadow") version "8.1.8"
     id("io.papermc.paperweight.userdev") version "1.7.3" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
@@ -22,6 +22,7 @@ plugins {
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("fabric-loom") version "1.7-SNAPSHOT" apply false
     id("com.modrinth.minotaur") version "2.+"
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 val minecraft = project.properties["minecraft_version"]!!.toString()
@@ -159,7 +160,7 @@ fun Project.velocity() = also {
         compileOnly("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
         compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
         annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
-        compileOnly("io.netty:netty-all:4.1.112.Final")
+        compileOnly("io.netty:netty-all:5.0.0.Alpha2")
         compileOnly("org.bstats:bstats-velocity:$bStats")
     }
 }
@@ -178,7 +179,7 @@ fun Project.adventure() = also {
 }
 fun Project.library() = also {
     it.dependencies {
-        implementation("org.yaml:snakeyaml:2.2")
+        implementation("org.yaml:snakeyaml:2.3")
         implementation("com.google.code.gson:gson:2.11.0")
         implementation("net.objecthunter:exp4j:0.4.8")
         implementation(rootProject.fileTree("shaded"))
