@@ -21,6 +21,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
 
         val shader = HudShader(
             gui,
+            image.renderScale,
             image.layer,
             image.outline
         )

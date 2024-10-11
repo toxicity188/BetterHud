@@ -11,7 +11,7 @@ import kr.toxicity.hud.bootstrap.bukkit.util.createBukkitTrigger
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import java.util.function.Function
 
-class MythicLibCompatibility: Compatibility {
+class MythicLibCompatibility : Compatibility {
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf(
             "damage" to {

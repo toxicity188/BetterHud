@@ -7,15 +7,32 @@ import kr.toxicity.hud.util.toImage
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
+import java.awt.image.BufferedImage
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.util.*
 
-class HudPlayerHeadImpl(private val colorList: List<TextColor>) : HudPlayerHead {
-
-    private constructor(playerName: String): this(
+class HudPlayerHeadImpl(
+    private val colorList: List<TextColor>,
+    private val hairMap: Map<Int, TextColor?>
+) : HudPlayerHead {
+    private constructor(image: BufferedImage) : this(
+        image.getSubimage(8, 8, 8, 8), image.getSubimage(40, 8, 8, 8)
+    )
+    private constructor(main: BufferedImage, hair: BufferedImage) : this(
+        (0..63).map { i ->
+            TextColor.color(main.getRGB(i % 8, i / 8))
+        },
+        (0..63).associateWith { i ->
+            val rgb = hair.getRGB(i % 8, i / 8)
+            if (rgb ushr 24 > 0) {
+                TextColor.color(rgb)
+            } else null
+        }
+    )
+    private constructor(playerName: String) : this(
         HttpClient.newHttpClient().send(
             HttpRequest.newBuilder()
                 .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
@@ -29,22 +46,18 @@ class HudPlayerHeadImpl(private val colorList: List<TextColor>) : HudPlayerHead 
                 .build(),
             BodyHandlers.ofInputStream()
         ).body().buffered().use {
-            val ready = it.toImage()
-            val image = ready.getSubimage(8, 8, 8, 8)
-            val layer = ready.getSubimage(40, 8, 8, 8)
-            val colors = (0..63).map { i ->
-                val layerColor = layer.getRGB(i % 8, i / 8)
-                val imageColor = image.getRGB(i % 8, i / 8)
-                TextColor.color(if (layerColor ushr 24 != 0) layerColor else imageColor)
-            }
-            colors
+            it.toImage()
         }
     )
+
+    private val flatHead = (0..63).map {
+        hairMap[it] ?: colorList[it]
+    }
 
     companion object {
         val allBlack = HudPlayerHeadImpl((0..63).map {
             NamedTextColor.BLACK
-        })
+        }, emptyMap())
         fun of(playerName: String) = runCatching {
             HudPlayerHeadImpl(playerName)
         }.getOrElse { e ->
@@ -56,5 +69,7 @@ class HudPlayerHeadImpl(private val colorList: List<TextColor>) : HudPlayerHead 
         }
     }
 
-    override fun getColors(): List<TextColor> = colorList
+    override fun flatHead(): List<TextColor> = flatHead
+    override fun mainHead(): List<TextColor> = colorList
+    override fun hairHead(): Map<Int, TextColor?> = hairMap
 }

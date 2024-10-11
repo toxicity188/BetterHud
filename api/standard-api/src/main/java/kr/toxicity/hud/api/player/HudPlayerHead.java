@@ -5,11 +5,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface HudPlayerHead {
     /**
-     * Gets loaded player's head colors.
-     * @return head colors
+     * Gets flat-layered head.
+     * @return text colors
      */
-    @NotNull @Unmodifiable List<TextColor> getColors();
+    @NotNull @Unmodifiable List<TextColor> flatHead();
+    /**
+     * Gets player main head skin.
+     * @return text colors
+     */
+    @NotNull @Unmodifiable List<TextColor> mainHead();
+    /**
+     * Gets player hair skin.
+     * @return text colors
+     */
+    @NotNull @Unmodifiable
+    Map<Integer, TextColor> hairHead();
 }

@@ -6,7 +6,7 @@ import kr.toxicity.hud.api.popup.PopupIteratorGroup
 import kr.toxicity.hud.api.popup.PopupSortType
 import java.util.*
 
-class PopupIteratorGroupImpl: PopupIteratorGroup {
+class PopupIteratorGroupImpl : PopupIteratorGroup {
     private val sourceSet = TreeSet<PopupIterator>()
 
     override fun addIterator(iterator: PopupIterator) {

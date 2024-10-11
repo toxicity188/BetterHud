@@ -21,7 +21,7 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.plugin.Plugin
 import java.util.function.Function
 
-class BukkitItemModule: BukkitModule {
+class BukkitItemModule : BukkitModule {
     init {
         Bukkit.getPluginManager().registerEvents(object : Listener {
             @EventHandler

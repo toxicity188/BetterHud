@@ -8,7 +8,7 @@ import kr.toxicity.hud.manager.PlayerManagerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
-class EffClearPopup: Effect() {
+class EffClearPopup : Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
         return "clear popup of ${expr.toString(p0, p1)}"
     }

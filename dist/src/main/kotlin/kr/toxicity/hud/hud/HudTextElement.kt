@@ -32,6 +32,7 @@ class HudTextElement(
     private val renderer = run {
         val shader = HudShader(
             gui,
+            text.renderScale,
             text.layer,
             text.outline
         )
@@ -94,6 +95,7 @@ class HudTextElement(
                         val div = height.toDouble() / image.image.height
                         HudImpl.createBit(HudShader(
                             gui,
+                            text.renderScale,
                             text.layer - 1,
                             false
                         ), loc.y + it.location.y) { y ->

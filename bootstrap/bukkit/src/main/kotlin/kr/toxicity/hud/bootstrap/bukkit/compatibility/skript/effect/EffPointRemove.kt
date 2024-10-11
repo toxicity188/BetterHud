@@ -8,7 +8,7 @@ import kr.toxicity.hud.manager.PlayerManagerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
-class EffPointRemove: Effect() {
+class EffPointRemove : Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
         return "point remove ${name.toString(p0, p1)} to ${player.toString(p0, p1)}"
     }

@@ -13,7 +13,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
 import java.util.concurrent.ConcurrentHashMap
 
-abstract class HudPlayerImpl: HudPlayer {
+abstract class HudPlayerImpl : HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
     private val objectSet = HashSet<HudObject>()
 

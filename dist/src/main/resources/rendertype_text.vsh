@@ -44,8 +44,8 @@ void main() {
 
     vec3 pos = Position;
 
-    float scale = round((ProjMat[0][0] / 2.0) / (1.0 / ScreenSize.x));
-    vec2 ui = ScreenSize / scale;
+    float scale = ProjMat[0][0]  * ScreenSize.x / 2.0;
+    vec2 ui = ceil(ScreenSize / scale);
 
     vec3 color = Color.xyz;
 

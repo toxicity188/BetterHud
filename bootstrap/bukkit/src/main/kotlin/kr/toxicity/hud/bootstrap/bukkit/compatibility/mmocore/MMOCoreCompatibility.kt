@@ -17,7 +17,7 @@ import net.Indyuce.mmocore.api.player.stats.PlayerStats
 import org.bukkit.entity.Player
 import java.util.function.Function
 
-class MMOCoreCompatibility: Compatibility {
+class MMOCoreCompatibility : Compatibility {
 
     private fun Player.toMMOCore(): PlayerData? {
         return MMOCore.plugin.playerDataManager.getOrNull(uniqueId)

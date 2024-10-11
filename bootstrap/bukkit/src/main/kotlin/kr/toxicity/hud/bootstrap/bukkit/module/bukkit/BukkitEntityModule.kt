@@ -21,7 +21,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import java.util.*
 import java.util.function.Function
 
-class BukkitEntityModule: BukkitModule {
+class BukkitEntityModule : BukkitModule {
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
             "attack" to {

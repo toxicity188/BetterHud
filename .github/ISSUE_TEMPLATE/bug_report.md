@@ -24,8 +24,8 @@ I need some help to provide you correct solution.
 - Server platform(spigot/paper/folia/fabric/etc)
 
 **Disclaimer**  
-I do NOT provide any soultion about that.
+I do NOT provide any solution about that.
 
-- Using informal laucher such as Feather client
+- Using informal launcher such as Feather client
 - Closed-source plugin/mod such as Optifine and ItemsAdder
 - Usage in hybrid bukkit such as ArcLight

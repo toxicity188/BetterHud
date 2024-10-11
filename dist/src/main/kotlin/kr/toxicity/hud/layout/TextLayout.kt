@@ -1,37 +1,51 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.manager.BackgroundManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.manager.TextManager
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.util.*
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import java.text.DecimalFormat
 
 class TextLayout(
-    val pattern: String,
-    val text: HudText,
-    val location: ImageLocation,
-    val scale: Double,
-    val space: Int,
-    val align: LayoutAlign,
-    val color: TextColor,
-    val outline: Boolean,
-    val layer: Int,
-    val numberEquation: TEquation,
-    val numberFormat: DecimalFormat,
-    val disableNumberFormat: Boolean,
-    val background: HudBackground?,
-    val backgroundScale: Double,
-    val follow: String?,
-    val cancelIfFollowerNotExists: Boolean,
-    val emojiLocation: ImageLocation,
-    val emojiScale: Double,
-    val useLegacyFormat: Boolean,
-    val legacySerializer: ComponentDeserializer,
-    val conditions: ConditionBuilder
-) {
+    s: String,
+    yamlObject: YamlObject,
+    loc: ImageLocation
+) : HudLayout(loc, yamlObject) {
+    val pattern: String = yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s")
+    val text: HudText = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
+        TextManager.getText(n).ifNull("this text doesn't exist: $n")
+    }
+    val scale: Double = yamlObject.getAsDouble("scale", 1.0)
+    val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
+    val align: LayoutAlign = yamlObject.get("align")?.asString().toLayoutAlign()
+    val color: TextColor = yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE
+    val numberEquation: TEquation = yamlObject.get("number-equation")?.asString()?.let {
+        TEquation(it)
+    } ?: TEquation.t
+    val numberFormat: DecimalFormat = yamlObject.get("number-format")?.asString()?.let {
+        DecimalFormat(it)
+    } ?: ConfigManagerImpl.numberFormat
+    val disableNumberFormat: Boolean = yamlObject.getAsBoolean("disable-number-format", true)
+    val background: HudBackground? = yamlObject.get("background")?.asString()?.let {
+        BackgroundManager.getBackground(it)
+    }
+    val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
+    val emojiLocation: ImageLocation = yamlObject.get("emoji-pixel")?.asObject()?.let {
+        ImageLocation(it)
+    } ?: ImageLocation.zero
+    val emojiScale: Double = yamlObject.getAsDouble("emoji-scale", 1.0).apply {
+        if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
+    }
+    val useLegacyFormat: Boolean = yamlObject.getAsBoolean("use-legacy-format", ConfigManagerImpl.useLegacyFormat)
+    val legacySerializer: ComponentDeserializer = yamlObject.get("legacy-serializer")?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer
+
     fun startJson() = jsonArrayOf(
         jsonObjectOf(
             "type" to "space",

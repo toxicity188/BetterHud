@@ -1,23 +1,35 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.image.HudImage
 import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.placeholder.ConditionBuilder
+import kr.toxicity.hud.manager.ImageManager
+import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
+import kr.toxicity.hud.util.ifNull
+import kr.toxicity.hud.util.toTextColor
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 
 class ImageLayout(
-    val image: HudImage,
-    val color: TextColor,
-    val location: ImageLocation,
-    val scale: Double,
-    val outline: Boolean,
-    val layer: Int,
-    val space: Int,
-    val stack: PlaceholderBuilder<*>?,
-    val maxStack: PlaceholderBuilder<*>?,
-
-    val follow: String?,
-    val cancelIfFollowerNotExists: Boolean,
-    val conditions: ConditionBuilder
-)
+    s: String,
+    yamlObject: YamlObject,
+    loc: ImageLocation,
+) : HudLayout(loc, yamlObject) {
+    val image: HudImage = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
+        ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
+    }
+    val color: TextColor = yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE
+    val scale: Double = yamlObject.getAsDouble("scale", 1.0)
+    val space: Int = yamlObject.getAsInt("space", 1)
+    val stack: PlaceholderBuilder<*>? = yamlObject.get("stack")?.asString()?.let {
+        PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
+        }
+    }
+    val maxStack: PlaceholderBuilder<*>? = yamlObject.get("max-stack")?.asString()?.let {
+        PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
+        }
+    }
+}

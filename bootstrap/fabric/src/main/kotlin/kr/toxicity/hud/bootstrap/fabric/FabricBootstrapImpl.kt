@@ -48,7 +48,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
-class FabricBootstrapImpl: FabricBootstrap, DedicatedServerModInitializer {
+class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     companion object {
         @JvmStatic

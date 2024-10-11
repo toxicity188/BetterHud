@@ -14,6 +14,7 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.RenderScale
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
@@ -55,12 +56,13 @@ class CircleCompass(
     } ?: defaultColorEquation
     private val space = section.getAsInt("space", 2).coerceAtLeast(0)
 
+    private val pixel = ImageLocation(section.get("pixel")?.asObject().ifNull("pixel value not set.")) + ImageLocation.hotBarHeight
     private val shader = HudShader(
         GuiLocation(section.get("gui")?.asObject().ifNull("gui value not set.")),
+        RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
         section.getAsBoolean("outline", false)
     )
-    private val pixel = ImageLocation(section.get("pixel")?.asObject().ifNull("pixel value not set."))
     private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)

@@ -62,7 +62,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 
 @Suppress("UNUSED")
-class BukkitBootstrapImpl: BukkitBootstrap, JavaPlugin() {
+class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     private val listener = object : Listener {}
 

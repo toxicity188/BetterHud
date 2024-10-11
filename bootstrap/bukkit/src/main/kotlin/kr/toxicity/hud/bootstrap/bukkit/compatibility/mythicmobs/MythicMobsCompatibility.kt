@@ -28,7 +28,7 @@ import org.bukkit.event.entity.EntityEvent
 import org.bukkit.plugin.Plugin
 import java.util.function.Function
 
-class MythicMobsCompatibility: Compatibility {
+class MythicMobsCompatibility : Compatibility {
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

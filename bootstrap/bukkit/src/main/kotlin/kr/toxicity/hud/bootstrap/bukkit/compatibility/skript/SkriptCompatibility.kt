@@ -27,7 +27,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.function.Function
 
-class SkriptCompatibility: Compatibility {
+class SkriptCompatibility : Compatibility {
     init {
         Classes.registerClass(
             ClassInfo(

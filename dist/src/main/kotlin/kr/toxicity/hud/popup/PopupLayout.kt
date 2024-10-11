@@ -15,6 +15,9 @@ import kr.toxicity.hud.layout.LayoutAnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
+import kr.toxicity.hud.player.head.HeadKey
+import kr.toxicity.hud.player.head.HeadRenderType.FANCY
+import kr.toxicity.hud.player.head.HeadRenderType.STANDARD
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
@@ -108,6 +111,7 @@ class PopupLayout(
             val hudImage = target.image
             val imageShader = HudShader(
                 elementGui,
+                target.renderScale,
                 target.layer,
                 target.outline
             )
@@ -178,6 +182,7 @@ class PopupLayout(
             val pixel = elementPixel + pair.pixel + textLayout.location
             val textShader = HudShader(
                 elementGui,
+                textLayout.renderScale,
                 textLayout.layer,
                 textLayout.outline
             )
@@ -238,6 +243,7 @@ class PopupLayout(
                             val div = height.toDouble() / image.image.height
                             HudImpl.createBit(HudShader(
                                 elementGui,
+                                textLayout.renderScale,
                                 textLayout.layer - 1,
                                 false
                             ), pixel.y + it.location.y) { y ->
@@ -289,12 +295,23 @@ class PopupLayout(
             val pixel = elementPixel + pair.pixel + headLayout.location
             val shader = HudShader(
                 elementGui,
+                headLayout.renderScale,
                 headLayout.layer,
                 headLayout.outline
             )
+            val hair = when (headLayout.type) {
+                STANDARD -> shader
+                FANCY -> HudShader(
+                    elementGui,
+                    headLayout.renderScale * 1.125,
+                    headLayout.layer + 1,
+                    true
+                )
+            }
             HeadRenderer(
                 parent.getOrCreateSpace(-1),
                 parent.getOrCreateSpace(-(headLayout.head.pixel * 8 + 1)),
+                parent.getOrCreateSpace(-(headLayout.head.pixel + 1)),
                 (0..7).map { i ->
                     val encode = "pixel_${headLayout.head.pixel}".encodeKey()
                     val fileName = "$NAME_SPACE_ENCODED:$encode.png"
@@ -303,7 +320,7 @@ class PopupLayout(
                     val height = headLayout.head.pixel
                     val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
 
-                    PlayerHeadManager.getHead(shaderGroup) ?: run {
+                    val mainChar = PlayerHeadManager.getHead(shaderGroup) ?: run {
                         HudImpl.createBit(shader, ascent) { y ->
                             array.add(jsonObjectOf(
                                 "type" to "bitmap",
@@ -316,11 +333,35 @@ class PopupLayout(
                         PlayerHeadManager.setHead(shaderGroup, char)
                         char
                     }
+                    when (headLayout.type) {
+                        STANDARD -> HeadKey(mainChar, mainChar)
+                        FANCY -> {
+                            val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - headLayout.head.pixel)
+                            HeadKey(
+                                mainChar,
+                                PlayerHeadManager.getHead(hairShaderGroup) ?: run {
+                                    val twoChar = parent.newChar()
+                                    HudImpl.createBit(hair, ascent - headLayout.head.pixel) { y ->
+                                        array.add(jsonObjectOf(
+                                            "type" to "bitmap",
+                                            "file" to fileName,
+                                            "ascent" to y,
+                                            "height" to height,
+                                            "chars" to jsonArrayOf(twoChar)
+                                        ))
+                                    }
+                                    PlayerHeadManager.setHead(hairShaderGroup, twoChar)
+                                    twoChar
+                                }
+                            )
+                        }
+                    }
                 },
                 parent.imageKey,
                 headLayout.head.pixel * 8,
                 pixel.x,
                 headLayout.align,
+                headLayout.type,
                 headLayout.follow,
                 headLayout.cancelIfFollowerNotExists,
                 headLayout.conditions.and(headLayout.head.conditions)

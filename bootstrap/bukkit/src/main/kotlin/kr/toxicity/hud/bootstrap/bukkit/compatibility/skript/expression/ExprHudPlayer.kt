@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 
-class ExprHudPlayer: SimpleExpression<Player>() {
+class ExprHudPlayer : SimpleExpression<Player>() {
     override fun toString(p0: Event?, p1: Boolean): String = "hud-player"
     override fun init(p0: Array<out Expression<*>>?, p1: Int, p2: Kleenean?, p3: SkriptParser.ParseResult?): Boolean = true
     override fun isSingle(): Boolean = true

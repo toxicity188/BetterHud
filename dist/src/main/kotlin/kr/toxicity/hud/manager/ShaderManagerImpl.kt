@@ -37,6 +37,8 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         val shader = entry.key
                         val id = index + 1
                         add("case ${id}:")
+                        if (shader.renderScale.scale.x != 1.0) add("    pos.x = (pos.x - (${shader.renderScale.relativeOffset.x})) * ${shader.renderScale.scale.x} + (${shader.renderScale.relativeOffset.x});")
+                        if (shader.renderScale.scale.y != 1.0) add("    pos.y = (pos.y - (${shader.renderScale.relativeOffset.y})) * ${shader.renderScale.scale.y} + (${shader.renderScale.relativeOffset.y});")
                         if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
                         if (shader.gui.y != 0.0) add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
                         if (shader.layer != 0) add("    layer = ${shader.layer};")
@@ -109,7 +111,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         getReader("rendertype_text.vsh")
                     )
                     constants += shaderConstants
-                    constants["DEFAULT_OFFSET"] = "${64 + 17 * (ConfigManagerImpl.bossbarLine - 1)}"
+                    constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarLine - 1)}"
                     val replaceList = mutableSetOf<String>()
 
                     val yaml = PluginConfiguration.SHADER.create()

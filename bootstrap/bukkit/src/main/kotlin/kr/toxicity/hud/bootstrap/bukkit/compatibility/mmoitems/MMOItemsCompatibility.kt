@@ -19,7 +19,7 @@ import net.Indyuce.mmoitems.stat.data.AbilityData
 import org.bukkit.inventory.ItemStack
 import java.util.function.Function
 
-class MMOItemsCompatibility: Compatibility {
+class MMOItemsCompatibility : Compatibility {
 
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()

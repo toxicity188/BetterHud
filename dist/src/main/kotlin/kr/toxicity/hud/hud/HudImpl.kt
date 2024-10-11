@@ -59,7 +59,7 @@ class HudImpl(
         }
         val pixel = yamlObject.get("pixel")?.asObject()?.let {
             ImageLocation(it)
-        } ?: ImageLocation.zero
+        }  ?: ImageLocation.zero
         HudAnimation(
             layout.animation.type,
             layout.animation.location.map {

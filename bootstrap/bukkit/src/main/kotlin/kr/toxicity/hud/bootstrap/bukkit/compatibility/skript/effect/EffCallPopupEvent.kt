@@ -10,7 +10,7 @@ import kr.toxicity.hud.bootstrap.bukkit.util.call
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
-class EffCallPopupEvent: Effect() {
+class EffCallPopupEvent : Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
         return "call popup event for ${player.toString(p0, p1)} named ${name.toString(p0, p1)} with variable of ${objects?.toString(p0, p1)} keyed by ${key?.toString(p0, p1)}"
     }

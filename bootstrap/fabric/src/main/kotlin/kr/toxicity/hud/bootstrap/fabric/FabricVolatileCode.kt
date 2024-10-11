@@ -35,7 +35,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class FabricVolatileCode: VolatileCodeHandler {
+class FabricVolatileCode : VolatileCodeHandler {
     companion object {
         private const val INJECT_NAME = BetterHud.DEFAULT_NAMESPACE
         private val bossBarMap = ConcurrentHashMap<UUID, PlayerBossBar>()

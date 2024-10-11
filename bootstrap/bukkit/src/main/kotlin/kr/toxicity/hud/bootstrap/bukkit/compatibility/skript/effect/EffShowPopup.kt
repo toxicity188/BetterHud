@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.*
 
-class EffShowPopup: Effect() {
+class EffShowPopup : Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
         return "show popup ${popup.toString(p0, p1)} to ${player.toString(p0, p1)} with variable of ${objects?.toString(p0, p1)} keyed by ${key?.toString(p0, p1)}"
     }

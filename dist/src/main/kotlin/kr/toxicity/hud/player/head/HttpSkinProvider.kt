@@ -8,7 +8,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class HttpSkinProvider: PlayerSkinProvider {
+class HttpSkinProvider : PlayerSkinProvider {
     override fun provide(player: HudPlayer): String? {
         return provideFromUUID(player.uuid().toString())
     }

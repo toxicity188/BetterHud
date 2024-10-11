@@ -9,7 +9,7 @@ import kr.toxicity.hud.bootstrap.velocity.module.Module
 import kr.toxicity.hud.bootstrap.velocity.util.velocityPlayer
 import java.util.function.Function
 
-class VelocityStandardModule: Module {
+class VelocityStandardModule : Module {
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
         )

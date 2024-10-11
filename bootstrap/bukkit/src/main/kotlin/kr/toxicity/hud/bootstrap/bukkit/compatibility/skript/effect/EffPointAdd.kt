@@ -13,7 +13,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 
-class EffPointAdd: Effect() {
+class EffPointAdd : Effect() {
     override fun toString(p0: Event?, p1: Boolean): String {
         return "point add ${location.toString(p0, p1)} named ${name.toString(p0, p1)} with icon ${icon?.toString(p0, p1) ?: "default"} to ${player.toString(p0, p1)}"
     }

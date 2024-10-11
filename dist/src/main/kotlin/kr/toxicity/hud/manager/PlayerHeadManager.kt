@@ -62,7 +62,7 @@ object PlayerHeadManager : BetterHudManager {
             val image = stream.toImage()
             loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->
                 TextColor.color(image.getRGB(i % 8, i / 8))
-            })
+            }, emptyMap())
         }
         asyncTaskTimer(20, 20) {
             val iterator = headCache.values.iterator()

@@ -11,7 +11,7 @@ import java.util.*
 import java.util.concurrent.*
 
 
-class FabricScheduler: HudScheduler {
+class FabricScheduler : HudScheduler {
 
     private val serverTasks = ConcurrentLinkedQueue<SyncFabricTask>()
     private val worldTasks = ConcurrentHashMap<UUID, MutableCollection<SyncFabricTask>>()

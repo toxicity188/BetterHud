@@ -8,7 +8,7 @@ import kr.toxicity.hud.api.player.PointedLocationSource
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.player.location.GPSWrapper
 
-class GPSLocationProvider: PointedLocationProvider {
+class GPSLocationProvider : PointedLocationProvider {
 
     override fun provide(player: HudPlayer): Collection<PointedLocation> {
         return GPSWrapper.getNearestPoint(player.bukkitPlayer)?.let {

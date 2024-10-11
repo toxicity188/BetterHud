@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 import java.util.*
 import java.util.function.Function
 
-class PartiesCompatibility: Compatibility {
+class PartiesCompatibility : Compatibility {
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

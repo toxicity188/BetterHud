@@ -19,7 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.potion.PotionEffectType
 import java.util.function.Function
 
-class BukkitStandardModule: BukkitModule {
+class BukkitStandardModule : BukkitModule {
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
             "custom" to {

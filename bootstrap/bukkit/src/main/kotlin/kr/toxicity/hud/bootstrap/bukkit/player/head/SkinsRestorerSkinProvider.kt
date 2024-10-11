@@ -6,7 +6,7 @@ import net.skinsrestorer.api.SkinsRestorerProvider
 import org.bukkit.Bukkit
 import java.util.*
 
-class SkinsRestorerSkinProvider: PlayerSkinProvider {
+class SkinsRestorerSkinProvider : PlayerSkinProvider {
     override fun provide(player: HudPlayer): String? {
         return provide(player.uuid())
     }

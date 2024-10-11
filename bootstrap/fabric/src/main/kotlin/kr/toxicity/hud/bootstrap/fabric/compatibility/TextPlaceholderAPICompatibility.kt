@@ -13,7 +13,7 @@ import net.kyori.adventure.platform.fabric.impl.WrappedComponent
 import net.kyori.adventure.text.Component
 import java.util.function.Function
 
-class TextPlaceholderAPICompatibility: Compatibility {
+class TextPlaceholderAPICompatibility : Compatibility {
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

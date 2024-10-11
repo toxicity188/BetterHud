@@ -12,7 +12,7 @@ import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import java.util.function.Function
 
-class WorldGuardCompatibility: Compatibility {
+class WorldGuardCompatibility : Compatibility {
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
