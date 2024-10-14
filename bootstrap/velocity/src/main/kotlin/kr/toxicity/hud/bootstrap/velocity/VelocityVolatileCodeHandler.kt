@@ -164,7 +164,7 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
                             is TranslatableComponent -> BetterHudAPI.inst().translate((player.effectiveLocale ?: Locale.US).toString(), component.key())
                             else -> null
                         }?.codePoints()?.map {
-                            (if (it == ' '.code) 4 else BetterHudAPI.inst().getWidth(it)) + 1 + i
+                            (if (it == ' '.code) 4 else BetterHudAPI.inst().getWidth(it) + 1) + i
                         }?.sum() ?: 0)
                     }
                     hud.additionalComponent = WidthComponent(Component.text().append(applyFont(comp)), getWidth(
