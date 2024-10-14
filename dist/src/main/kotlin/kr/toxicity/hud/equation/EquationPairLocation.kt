@@ -8,10 +8,10 @@ import kr.toxicity.hud.shader.GuiLocation
 class EquationPairLocation(
     duration: Int,
     gui: EquationPair,
-    pixel: EquationPair
+    pixel: EquationTriple
 ) {
     companion object {
-        val zero = EquationPairLocation(1, EquationPair.zero, EquationPair.zero)
+        val zero = EquationPairLocation(1, EquationPair.zero, EquationTriple.zero)
     }
     val locations = (1..duration).map {
         val d = it.toDouble()
@@ -19,7 +19,7 @@ class EquationPairLocation(
         val eval2 = pixel.evaluate(d)
         LocationGroup(
             GuiLocation(eval1.first, eval1.second),
-            ImageLocation(eval2.first.toInt(), eval2.second.toInt())
+            ImageLocation(eval2.first.toInt(), eval2.second.toInt(), eval2.third)
         )
     }
 
@@ -29,7 +29,7 @@ class EquationPairLocation(
             EquationPair(it)
         } ?: EquationPair.zero,
         section.get("pixel")?.asObject()?.let {
-            EquationPair(it)
-        } ?: EquationPair.zero
+            EquationTriple(it)
+        } ?: EquationTriple.zero
     )
 }

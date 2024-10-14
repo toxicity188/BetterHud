@@ -18,19 +18,20 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
 
     private val chars = run {
         val hud = image.image
+        val finalPixel = image.location + pixel
 
         val shader = HudShader(
             gui,
             image.renderScale,
             image.layer,
-            image.outline
+            image.outline,
+            finalPixel.opacity,
         )
 
         val list = ArrayList<PixelComponent>()
         if (hud.listener != null) {
             list.add(EMPTY_PIXEL_COMPONENT)
         }
-        val finalPixel = image.location + pixel
         hud.image.forEach { pair ->
             val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
             val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()

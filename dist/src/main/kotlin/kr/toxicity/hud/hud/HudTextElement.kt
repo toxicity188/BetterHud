@@ -30,13 +30,14 @@ class HudTextElement(
 ) {
 
     private val renderer = run {
+        val loc = text.location + pixel
         val shader = HudShader(
             gui,
             text.renderScale,
             text.layer,
-            text.outline
+            text.outline,
+            loc.opacity
         )
-        val loc = text.location + pixel
         val yAxis = loc.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
         val group = ShaderGroup(shader, text.text.name, text.scale, yAxis)
         val key = TextManager.getKey(group) ?: run {
@@ -89,6 +90,7 @@ class HudTextElement(
                 key,
                 imageMap,
                 text.background?.let {
+                    val backgroundLoc = loc + it.location
                     fun getString(image: LoadedImage, file: String): WidthComponent {
                         val result = textIndex++.parseChar()
                         val height = (image.image.height.toDouble() * text.backgroundScale).roundToInt()
@@ -97,8 +99,9 @@ class HudTextElement(
                             gui,
                             text.renderScale,
                             text.layer - 1,
-                            false
-                        ), loc.y + it.location.y) { y ->
+                            false,
+                            backgroundLoc.opacity
+                        ), backgroundLoc.y) { y ->
                             array.add(jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -113,7 +116,7 @@ class HudTextElement(
                             .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
                     }
                     BackgroundLayout(
-                        it.location.x,
+                        backgroundLoc.x,
                         getString(it.left, "background_${it.name}_left".encodeKey()),
                         getString(it.right, "background_${it.name}_right".encodeKey()),
                         getString(it.body, "background_${it.name}_body".encodeKey())

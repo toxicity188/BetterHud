@@ -68,7 +68,7 @@ class HudImpl(
                     file,
                     layout,
                     gui,
-                    ImageLocation(it.x, it.y) + pixel
+                    it + pixel
                 )
             }
         )

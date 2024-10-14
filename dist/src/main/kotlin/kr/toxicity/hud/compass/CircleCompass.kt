@@ -61,7 +61,8 @@ class CircleCompass(
         GuiLocation(section.get("gui")?.asObject().ifNull("gui value not set.")),
         RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
-        section.getAsBoolean("outline", false)
+        section.getAsBoolean("outline", false),
+        pixel.opacity
     )
     private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)

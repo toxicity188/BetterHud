@@ -37,6 +37,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         val shader = entry.key
                         val id = index + 1
                         add("case ${id}:")
+                        if (shader.opacity < 1.0) add("    opacity = ${shader.opacity.toFloat()};")
                         if (shader.renderScale.scale.x != 1.0) add("    pos.x = (pos.x - (${shader.renderScale.relativeOffset.x})) * ${shader.renderScale.scale.x} + (${shader.renderScale.relativeOffset.x});")
                         if (shader.renderScale.scale.y != 1.0) add("    pos.y = (pos.y - (${shader.renderScale.relativeOffset.y})) * ${shader.renderScale.scale.y} + (${shader.renderScale.relativeOffset.y});")
                         if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")

@@ -7,6 +7,7 @@ import ch.njol.skript.util.LiteralUtils
 import ch.njol.util.Kleenean
 import kr.toxicity.hud.api.bukkit.event.CustomPopupEvent
 import kr.toxicity.hud.api.bukkit.update.BukkitEventUpdateEvent
+import kr.toxicity.hud.bootstrap.bukkit.util.call
 import kr.toxicity.hud.bootstrap.bukkit.util.toHud
 import kr.toxicity.hud.manager.PopupManagerImpl
 import org.bukkit.entity.Player
@@ -44,6 +45,7 @@ class EffShowPopup : Effect() {
                 obj.forEachIndexed { i, s ->
                     variables["skript_${i + 1}"] = s.toString()
                 }
+                call()
             }
             runCatching {
                 popup.show(

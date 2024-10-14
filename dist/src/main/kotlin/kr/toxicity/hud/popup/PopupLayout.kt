@@ -109,13 +109,14 @@ class PopupLayout(
 
         val image = layout.image.map { target ->
             val hudImage = target.image
+            val pixel = elementPixel + pair.pixel + target.location
             val imageShader = HudShader(
                 elementGui,
                 target.renderScale,
                 target.layer,
-                target.outline
+                target.outline,
+                pixel.opacity
             )
-            val pixel = elementPixel + pair.pixel + target.location
             val list = ArrayList<PixelComponent>()
 
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
@@ -184,7 +185,8 @@ class PopupLayout(
                 elementGui,
                 textLayout.renderScale,
                 textLayout.layer,
-                textLayout.outline
+                textLayout.outline,
+                pixel.opacity
             )
             val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y)
             val textKey = TextManager.getKey(group) ?: run {
@@ -237,6 +239,7 @@ class PopupLayout(
                     key,
                     imageMap,
                     textLayout.background?.let {
+                        val backgroundLoc = pixel + it.location
                         fun getString(image: LoadedImage, file: String): WidthComponent {
                             val result = textIndex++.parseChar()
                             val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
@@ -245,8 +248,9 @@ class PopupLayout(
                                 elementGui,
                                 textLayout.renderScale,
                                 textLayout.layer - 1,
-                                false
-                            ), pixel.y + it.location.y) { y ->
+                                false,
+                                backgroundLoc.opacity
+                            ), backgroundLoc.y) { y ->
                                 array.add(jsonObjectOf(
                                     "type" to "bitmap",
                                     "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -258,7 +262,7 @@ class PopupLayout(
                             return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
                         }
                         BackgroundLayout(
-                            it.location.x,
+                            backgroundLoc.x,
                             getString(it.left, "background_${it.name}_left".encodeKey()),
                             getString(it.right, "background_${it.name}_right".encodeKey()),
                             getString(it.body, "background_${it.name}_body".encodeKey())
@@ -297,7 +301,8 @@ class PopupLayout(
                 elementGui,
                 headLayout.renderScale,
                 headLayout.layer,
-                headLayout.outline
+                headLayout.outline,
+                pixel.opacity
             )
             val hair = when (headLayout.type) {
                 STANDARD -> shader
@@ -305,7 +310,8 @@ class PopupLayout(
                     elementGui,
                     headLayout.renderScale * 1.125,
                     headLayout.layer + 1,
-                    true
+                    true,
+                    pixel.opacity
                 )
             }
             HeadRenderer(

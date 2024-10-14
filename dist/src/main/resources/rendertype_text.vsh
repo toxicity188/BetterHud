@@ -66,13 +66,14 @@ void main() {
             float xGui = 0;
             float yGui = 0;
             float layer = 0;
+            float opacity = 1;
             bool outline = false;
 
             switch (id) {
                 #CreateLayout
             }
 
-            vertexColor = ((pos.z == 0 || ceil(pos.z * 100) == 100000) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0);
+            vertexColor = ((pos.z == 0 || ceil(pos.z * 100) == 100000) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
 
             pos.x += xGui;
             pos.y += yGui;

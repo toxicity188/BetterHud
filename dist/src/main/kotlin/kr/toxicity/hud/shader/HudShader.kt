@@ -4,7 +4,8 @@ data class HudShader(
     val gui: GuiLocation,
     val renderScale: RenderScale,
     val layer: Int,
-    val outline: Boolean
+    val outline: Boolean,
+    val opacity: Double
 ): Comparable<HudShader> {
     companion object {
         private val comparator = Comparator.comparing { s: HudShader ->
@@ -15,6 +16,8 @@ data class HudShader(
             s.layer
         }.thenComparing { s: HudShader ->
             s.outline
+        }.thenComparing { s: HudShader ->
+            s.opacity
         }
     }
 

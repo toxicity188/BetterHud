@@ -3,6 +3,7 @@ package kr.toxicity.hud.equation
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.layout.LayoutAnimationType
+import kotlin.math.roundToInt
 
 class AnimationLocation(
     val type: LayoutAnimationType,
@@ -14,14 +15,15 @@ class AnimationLocation(
     constructor(
         type: LayoutAnimationType,
         duration: Int,
-        equationPair: EquationPair
+        imageEquation: EquationTriple
     ): this(
         type,
         (0..<duration).map {
             val d = it.toDouble()
             ImageLocation(
-                Math.round(equationPair.x.evaluate(d)).toInt(),
-                Math.round(equationPair.y.evaluate(d)).toInt()
+                imageEquation.x.evaluate(d).roundToInt(),
+                imageEquation.y.evaluate(d).roundToInt(),
+                imageEquation.opacity.evaluate(d)
             )
         }
     )
@@ -31,6 +33,6 @@ class AnimationLocation(
             LayoutAnimationType.valueOf(it.uppercase())
         } ?: LayoutAnimationType.LOOP,
         section.getAsInt("duration", 20).coerceAtLeast(1),
-        EquationPair(section)
+        EquationTriple(section)
     )
 }
