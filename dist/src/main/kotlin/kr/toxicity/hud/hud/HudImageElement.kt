@@ -26,6 +26,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
             image.layer,
             image.outline,
             finalPixel.opacity,
+            image.property
         )
 
         val list = ArrayList<PixelComponent>()

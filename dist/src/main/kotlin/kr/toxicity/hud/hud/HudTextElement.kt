@@ -10,7 +10,7 @@ import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.MinecraftManager
-import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.GuiLocation
@@ -36,11 +36,12 @@ class HudTextElement(
             text.renderScale,
             text.layer,
             text.outline,
-            loc.opacity
+            loc.opacity,
+            text.property
         )
         val yAxis = loc.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
         val group = ShaderGroup(shader, text.text.name, text.scale, yAxis)
-        val key = TextManager.getKey(group) ?: run {
+        val key = TextManagerImpl.getKey(group) ?: run {
             val index2 = ++parent.textIndex
             val array = text.startJson()
             text.text.array.forEach {
@@ -100,7 +101,8 @@ class HudTextElement(
                             text.renderScale,
                             text.layer - 1,
                             false,
-                            backgroundLoc.opacity
+                            backgroundLoc.opacity,
+                            text.property
                         ), backgroundLoc.y) { y ->
                             array.add(jsonObjectOf(
                                 "type" to "bitmap",
@@ -126,7 +128,7 @@ class HudTextElement(
             PackGenerator.addTask(file + "$textEncoded.json") {
                 jsonObjectOf("providers" to array).toByteArray()
             }
-            TextManager.setKey(group, result)
+            TextManagerImpl.setKey(group, result)
             result
         }
         TextRenderer(

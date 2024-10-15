@@ -10,10 +10,7 @@ import kr.toxicity.hud.dependency.DependencyInjector
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.DEFAULT_KEY
-import kr.toxicity.hud.util.NAME_SPACE_ENCODED
-import kr.toxicity.hud.util.info
-import kr.toxicity.hud.util.runWithExceptionHandling
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import java.io.File
@@ -103,7 +100,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
 
         BackgroundManager,
         ImageManager,
-        TextManager,
+        TextManagerImpl,
         PlayerHeadManager,
         LayoutManager,
         HudManagerImpl,
@@ -186,11 +183,12 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         managers.forEach {
             it.end()
         }
+        BOOTSTRAP.endMetrics()
         DatabaseManagerImpl.currentDatabase.close()
         info("Plugin disabled.")
     }
 
-    override fun getWidth(codepoint: Int): Int = TextManager.getWidth(codepoint) ?: 3
+    override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint) ?: 3
 
     override fun loadAssets(prefix: String, dir: File) {
         loadAssets(prefix) { s, i ->
@@ -233,7 +231,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
     override fun getCompassManager(): CompassManager = CompassManagerImpl
     override fun getConfigManager(): ConfigManager = ConfigManagerImpl
     override fun getPlayerManager(): PlayerManager = PlayerManagerImpl
+    override fun getTextManager(): TextManager = TextManagerImpl
     override fun isOnReload(): Boolean = onReload
     override fun getDefaultKey(): Key = DEFAULT_KEY
-    override fun translate(locale: String, key: String): String? = TextManager.translate(locale, key)
+    override fun translate(locale: String, key: String): String? = TextManagerImpl.translate(locale, key)
 }

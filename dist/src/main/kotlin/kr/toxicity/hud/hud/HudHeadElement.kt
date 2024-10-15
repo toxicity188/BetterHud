@@ -22,7 +22,8 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             head.renderScale,
             head.layer,
             head.outline,
-            final.opacity
+            final.opacity,
+            head.property
         )
         val hair = when (head.type) {
             STANDARD -> shader
@@ -32,6 +33,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 head.layer + 1,
                 true,
                 final.opacity,
+                head.property
             )
         }
         HeadRenderer(

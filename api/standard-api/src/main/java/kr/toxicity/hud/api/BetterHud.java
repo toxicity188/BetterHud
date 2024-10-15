@@ -128,10 +128,15 @@ public interface BetterHud {
      */
     @NotNull ShaderManager getShaderManager();
     /**
-     * Gets HudPlayer manager.
-     * @return HudPlayer manager
+     * Gets player manager.
+     * @return player manager
      */
     @NotNull PlayerManager getPlayerManager();
+    /**
+     * Gets text manager.
+     * @return text manager
+     */
+    @NotNull TextManager getTextManager();
 
     /**
      * Returns this plugin is currently on reload.

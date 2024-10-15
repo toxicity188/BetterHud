@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 public interface NMS extends VolatileCodeHandler {
     /**
      * Gets an instance that allows async access to getHandle()
-     * @param player target HudPlayer
-     * @return adapted HudPlayer
+     * @param player target player
+     * @return adapted player
      */
     @NotNull
     Player getFoliaAdaptedPlayer(@NotNull Player player);

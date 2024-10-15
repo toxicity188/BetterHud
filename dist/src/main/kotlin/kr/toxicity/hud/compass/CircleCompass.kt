@@ -15,6 +15,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.RenderScale
+import kr.toxicity.hud.shader.ShaderProperty
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
@@ -62,7 +63,8 @@ class CircleCompass(
         RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
         section.getAsBoolean("outline", false),
-        pixel.opacity
+        pixel.opacity,
+        ShaderProperty.properties(section.get("properties")?.asArray())
     )
     private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)

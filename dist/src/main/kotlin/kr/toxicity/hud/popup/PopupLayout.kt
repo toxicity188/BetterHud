@@ -115,7 +115,8 @@ class PopupLayout(
                 target.renderScale,
                 target.layer,
                 target.outline,
-                pixel.opacity
+                pixel.opacity,
+                target.property
             )
             val list = ArrayList<PixelComponent>()
 
@@ -186,10 +187,11 @@ class PopupLayout(
                 textLayout.renderScale,
                 textLayout.layer,
                 textLayout.outline,
-                pixel.opacity
+                pixel.opacity,
+                textLayout.property
             )
             val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y)
-            val textKey = TextManager.getKey(group) ?: run {
+            val textKey = TextManagerImpl.getKey(group) ?: run {
                 val index = ++textIndex
                 val array = textLayout.startJson()
                 HudImpl.createBit(textShader, pixel.y) { y ->
@@ -249,7 +251,8 @@ class PopupLayout(
                                 textLayout.renderScale,
                                 textLayout.layer - 1,
                                 false,
-                                backgroundLoc.opacity
+                                backgroundLoc.opacity,
+                                textLayout.property
                             ), backgroundLoc.y) { y ->
                                 array.add(jsonObjectOf(
                                     "type" to "bitmap",
@@ -272,7 +275,7 @@ class PopupLayout(
                 PackGenerator.addTask(file + "$textEncoded.json") {
                     jsonObjectOf("providers" to array).toByteArray()
                 }
-                TextManager.setKey(group, result)
+                TextManagerImpl.setKey(group, result)
                 result
             }
             TextRenderer(
@@ -302,7 +305,8 @@ class PopupLayout(
                 headLayout.renderScale,
                 headLayout.layer,
                 headLayout.outline,
-                pixel.opacity
+                pixel.opacity,
+                headLayout.property
             )
             val hair = when (headLayout.type) {
                 STANDARD -> shader
@@ -311,7 +315,8 @@ class PopupLayout(
                     headLayout.renderScale * 1.125,
                     headLayout.layer + 1,
                     true,
-                    pixel.opacity
+                    pixel.opacity,
+                    headLayout.property
                 )
             }
             HeadRenderer(

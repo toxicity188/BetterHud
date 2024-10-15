@@ -6,7 +6,7 @@ import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.manager.BackgroundManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
-import kr.toxicity.hud.manager.TextManager
+import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.text.HudText
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
@@ -20,7 +20,7 @@ class TextLayout(
 ) : HudLayout(loc, yamlObject) {
     val pattern: String = yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s")
     val text: HudText = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
-        TextManager.getText(n).ifNull("this text doesn't exist: $n")
+        TextManagerImpl.getText(n).ifNull("this text doesn't exist: $n")
     }
     val scale: Double = yamlObject.getAsDouble("scale", 1.0)
     val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)

@@ -37,6 +37,7 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                         val shader = entry.key
                         val id = index + 1
                         add("case ${id}:")
+                        if (shader.property > 0) add("    property = ${shader.property};")
                         if (shader.opacity < 1.0) add("    opacity = ${shader.opacity.toFloat()};")
                         if (shader.renderScale.scale.x != 1.0) add("    pos.x = (pos.x - (${shader.renderScale.relativeOffset.x})) * ${shader.renderScale.scale.x} + (${shader.renderScale.relativeOffset.x});")
                         if (shader.renderScale.scale.y != 1.0) add("    pos.y = (pos.y - (${shader.renderScale.relativeOffset.y})) * ${shader.renderScale.scale.y} + (${shader.renderScale.relativeOffset.y});")
@@ -160,7 +161,6 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
                     }
 
                     if (yaml.getAsBoolean("disable-level-text", false)) replaceList.add("HideExp")
-                    if (yaml.getAsBoolean("disable-item-name", false)) replaceList.add("HideItemName")
 
                     yaml.get("hotbar")?.asObject()?.let {
                         if (it.getAsBoolean("disable", false)) {
@@ -190,26 +190,33 @@ object ShaderManagerImpl: BetterHudManager, ShaderManager {
 
                     shaders.forEach { shader ->
                         shader.second.use { reader ->
-                            val byte = ByteArrayOutputStream().use { writer ->
+                            val byte = buildString {
                                 reader.readLines().forEach write@{ string ->
                                     var s = string
                                     val deactivateMatcher = deactivatePattern.matcher(s)
-                                    if (deactivateMatcher.find() && replaceList.contains(deactivateMatcher.group("name"))) {
-                                        s = deactivateMatcher.replaceAll("")
+                                    if (deactivateMatcher.find()) {
+                                        if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
+                                        else return@write
                                     }
+                                    if (s.isEmpty()) return@write
                                     val tagMatcher = tagPattern.matcher(s)
                                     if (tagMatcher.find()) {
                                         tagBuilders[tagMatcher.group("name")]?.let {
-                                            val space = "".padStart(s.count { it == ' ' }, ' ')
                                             it().forEach { methodString ->
-                                                writer.write((space + methodString + "\n").toByteArray())
+                                                val appendEnter = methodString.first() == '#'
+                                                if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
+                                                append(methodString.replace("  ", ""))
+                                                if (appendEnter) append('\n')
                                             }
                                             return@write
                                         }
                                     }
-                                    writer.write((s + "\n").toByteArray())
+                                    if (s.first() == '#') {
+                                        if (isEmpty() || last() != '\n') s = '\n' + s
+                                        s += '\n'
+                                    }
+                                    append(s.replace("  ", ""))
                                 }
-                                writer
                             }.toByteArray()
                             PackGenerator.addTask(resource.core + shader.first) {
                                 byte

@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
+import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.image.ImageLocation
 import kr.toxicity.hud.image.LocatedImage
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
-object TextManager: BetterHudManager {
+object TextManagerImpl: BetterHudManager, TextManager {
 
 
     private class TextCache(
@@ -629,4 +630,10 @@ object TextManager: BetterHudManager {
 
     override fun end() {
     }
+
+    override fun getWidth(textName: String, scale: Double, text: String): Int = textMap[textName]?.let {
+        text.codePoints().map { i ->
+            if (i == ' '.code) 4 else (it.charWidth[i]?.scaledWidth(scale) ?: 0) + 1
+        }.sum()
+    } ?: 0
 }

@@ -14,6 +14,7 @@ uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform int FogShape;
 uniform vec2 ScreenSize;
+uniform float GameTime;
 
 out float vertexDistance;
 out vec4 vertexColor;
@@ -68,12 +69,43 @@ void main() {
             float layer = 0;
             float opacity = 1;
             bool outline = false;
+            int property = 0;
 
             switch (id) {
                 #CreateLayout
             }
 
             vertexColor = ((pos.z == 0 || ceil(pos.z * 100) == 100000) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
+
+            //Wave
+            if ((property & 1) > 0) {
+                pos.y += 4 * sin((GameTime * 1200 + pos.x / ui.x) * 3.1415 * 2);
+            }
+            //Rainbow
+            if ((property & 2) > 0) {
+                int hash = int(pos.x) * int(pos.y);
+                float time = GameTime * 1200;
+                hash = 31 * (hash + int(vertexColor.x + time));
+                float r = float(hash % 224 + 32) / 255;
+                hash = 31 * (hash + int(vertexColor.y + time));
+                float g = float(hash % 224 + 32) / 255;
+                hash = 31 * (hash + int(vertexColor.z + time));
+                float b = float(hash % 224 + 32) / 255;
+                float maxValue = max(max(r, g), b);
+                vertexColor = vec4(pow(r / maxValue, 3), pow(g / maxValue, 3), pow(b / maxValue, 3), vertexColor.w);
+            }
+            //Tiny rainbow
+            if ((property & 4) > 0) {
+                int hash = int(pos.x) * int(pos.y);
+                float time = GameTime * 1200;
+                hash = 31 * (hash + int(vertexColor.x + time));
+                float r = vertexColor.x + float(hash % 64) / 255;
+                hash = 31 * (hash + int(vertexColor.y + time));
+                float g = vertexColor.y + float(hash % 64) / 255;
+                hash = 31 * (hash + int(vertexColor.z + time));
+                float b = vertexColor.z + float(hash % 64) / 255;
+                vertexColor = vec4(r, g, b, vertexColor.w);
+            }
 
             pos.x += xGui;
             pos.y += yGui;
@@ -85,9 +117,6 @@ void main() {
 //HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && ((more(color, exp / 256.0) && less(color , exp / 254.0)) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
-//HideItemName        if ((int(pos.z) == 0 || int(pos.z) == 400) && pos.y >= ui.y - 60 && pos.y <= ui.y - 35 && ProjMat[3].x == -1 && pos.x >= 0.5 * ui.x - 100 && pos.x <= 0.5 * ui.x + 100) {
-//HideItemName            vertexColor = vec4(0);
-//HideItemName        }
 //RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
 //RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && scr.y - pos.y <= 20) {
 //RemapHotBar            float hotbarX = 0;
