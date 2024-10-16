@@ -8,7 +8,7 @@ class HudHead(
     override val path: String,
     val name: String,
     section: YamlObject
-): HudConfiguration {
+) : HudConfiguration {
     val pixel = section.getAsInt("pixel", 1).coerceAtLeast(1)
     val conditions = section.toConditions()
 }

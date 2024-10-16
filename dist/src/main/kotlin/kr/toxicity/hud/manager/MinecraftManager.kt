@@ -18,7 +18,7 @@ import java.util.*
 import java.util.jar.JarFile
 import kotlin.math.roundToInt
 
-object MinecraftManager: BetterHudManager {
+object MinecraftManager : BetterHudManager {
 
     private const val ASSETS_LOCATION = "assets/minecraft/textures/"
 

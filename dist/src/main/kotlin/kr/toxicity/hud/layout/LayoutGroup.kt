@@ -11,7 +11,7 @@ class LayoutGroup(
     override val path: String,
     sender: Audience,
     section: YamlObject
-): HudConfiguration {
+) : HudConfiguration {
 
     private val loc = ImageLocation(section)
 

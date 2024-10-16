@@ -20,7 +20,7 @@ class PopupIteratorImpl(
     private var value: Int,
     private val condition: () -> Boolean,
     private val removeTask: () -> Unit,
-): PopupIterator {
+) : PopupIterator {
     private var tick = 0
     private var i = -1
     private var removal = false

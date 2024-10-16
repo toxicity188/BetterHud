@@ -12,13 +12,12 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
-object ShaderManagerImpl: BetterHudManager, ShaderManager {
+object ShaderManagerImpl : BetterHudManager, ShaderManager {
     var barColor = BossBar.Color.YELLOW
         private set
 

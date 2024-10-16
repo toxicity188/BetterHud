@@ -1,4 +1,4 @@
-package kr.toxicity.hud.bootstrap.velocity.module
+package kr.toxicity.hud.bootstrap.fabric.module
 
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder

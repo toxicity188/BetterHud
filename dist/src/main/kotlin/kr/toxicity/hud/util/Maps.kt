@@ -2,7 +2,7 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.configuration.HudConfiguration
 
-fun <V: HudConfiguration> MutableMap<String, V>.putSync(name: String, k: String, v: () -> V) {
+fun <V : HudConfiguration> MutableMap<String, V>.putSync(name: String, k: String, v: () -> V) {
     val get = v()
     synchronized(this) {
         putIfAbsent(k, get)?.let {

@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.util.*
 
-object HudManagerImpl: BetterHudManager, HudManager {
+object HudManagerImpl : BetterHudManager, HudManager {
 
     private val hudMap = HashMap<String, HudImpl>()
 

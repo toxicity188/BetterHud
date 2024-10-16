@@ -457,7 +457,7 @@ class NMSImpl : NMS {
             }
         }
     }
-    private class HudByteBuf(private val source: ByteBuf): RegistryFriendlyByteBuf(source, RegistryAccess.EMPTY) {
+    private class HudByteBuf(private val source: ByteBuf) : RegistryFriendlyByteBuf(source, RegistryAccess.EMPTY) {
         override fun unwrap(): ByteBuf {
             return Unpooled.copiedBuffer(source)
         }

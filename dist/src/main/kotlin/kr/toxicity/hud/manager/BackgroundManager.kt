@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.io.File
 
-object BackgroundManager: BetterHudManager {
+object BackgroundManager : BetterHudManager {
 
     private val backgroundMap = HashMap<String, HudBackground>()
 

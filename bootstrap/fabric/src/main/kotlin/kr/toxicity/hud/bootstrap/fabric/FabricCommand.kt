@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
-import kr.toxicity.hud.api.plugin.ReloadState
+import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.manager.CompassManagerImpl
@@ -82,13 +82,6 @@ class FabricCommand(
         SimpleCommandData("turn off", "Turns off your hud."),
         SimpleCommandData("turn help", "Help command."),
     )
-    private val pointer = arrayOf(
-        SimpleCommandData("pointer set <player> <name> <world> <x,y,z> [icon]", "Sets the compass pointer location of some player."),
-        SimpleCommandData("pointer clear <player>", "Clears the compass pointer location of some player."),
-        SimpleCommandData("pointer remove <player> <name>", "Removes the compass pointer location of some player."),
-        SimpleCommandData("pointer help", "Help command."),
-    )
-
 
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(brigadier("betterhud"))
@@ -104,17 +97,16 @@ class FabricCommand(
                 runCatching {
                     it.source.info("Trying to reload. please wait...")
                     CompletableFuture.runAsync {
-                        val reload = PLUGIN.reload()
-                        when (reload.state) {
-                            ReloadState.STILL_ON_RELOAD -> {
+                        when (val reload = PLUGIN.reload()) {
+                            is OnReload -> {
                                 it.source.warn("The plugin is still reloading!")
                             }
-                            ReloadState.SUCCESS -> {
+                            is Success -> {
                                 it.source.info("Reload successful! (${reload.time} ms)")
                             }
-                            ReloadState.FAIL -> {
+                            is Failure -> {
                                 it.source.info("Reload failed.")
-                                it.source.info("Check your server log to find the problem.")
+                                it.source.info("Cause: ${reload.throwable.javaClass.simpleName}: ${reload.throwable.message}")
                             }
                         }
                     }

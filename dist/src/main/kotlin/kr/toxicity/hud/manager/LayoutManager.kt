@@ -5,7 +5,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 
-object LayoutManager: BetterHudManager {
+object LayoutManager : BetterHudManager {
 
     private val layoutMap = HashMap<String, LayoutGroup>()
 

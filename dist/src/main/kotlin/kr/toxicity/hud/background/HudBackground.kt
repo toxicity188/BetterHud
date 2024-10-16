@@ -13,4 +13,4 @@ class HudBackground(
     val body: LoadedImage,
 
     val location: ImageLocation,
-): HudConfiguration
+) : HudConfiguration

@@ -17,22 +17,16 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         private const val CENTERAL = "https://repo1.maven.org/maven2"
     }
 
-    private val addUrl: (URL) -> Unit = runCatching {
+    private fun interface UrlProcessor : (URL) -> Unit
+
+    private val addUrl: UrlProcessor = runCatching {
         val method = URLClassLoader::class.java.getDeclaredMethod("addURL", URL::class.java).apply {
             isAccessible = true
         }
-        object : (URL) -> Unit {
-            override fun invoke(p1: URL) {
-                method(classLoader, p1)
-            }
-        }
+        UrlProcessor { p1 -> method(classLoader, p1) }
     }.getOrElse {
         val unsafe = UnsafeURLClassLoader(classLoader)
-        object : (URL) -> Unit {
-            override fun invoke(p1: URL) {
-                unsafe.addURL(p1)
-            }
-        }
+        UrlProcessor { p1 -> unsafe.addURL(p1) }
     }
 
     private val dir = dataFolder.apply {

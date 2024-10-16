@@ -8,7 +8,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 
-object CompassManagerImpl: BetterHudManager, CompassManager {
+object CompassManagerImpl : BetterHudManager, CompassManager {
 
     private val compassMap = HashMap<String, CompassImpl>()
 

@@ -206,7 +206,8 @@ class CircleCompass(
         }
     }
 
-    data class CompassData(val opacity: Int)
+    @JvmInline
+    value class CompassData(val opacity: Int)
 
     init {
         array?.let {

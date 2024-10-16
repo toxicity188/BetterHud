@@ -9,8 +9,6 @@ data class GuiLocation(val x: Double, val y: Double) : Comparable<GuiLocation> {
         }.thenComparing { gui: GuiLocation ->
             gui.y
         }
-
-        val one = GuiLocation(1.0, 1.0)
     }
 
     constructor(section: YamlObject): this(

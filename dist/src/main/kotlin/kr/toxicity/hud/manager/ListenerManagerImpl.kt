@@ -9,7 +9,7 @@ import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
 import java.util.function.Function
 
-object ListenerManagerImpl: BetterHudManager, ListenerManager {
+object ListenerManagerImpl : BetterHudManager, ListenerManager {
 
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->

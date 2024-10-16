@@ -213,5 +213,5 @@ object PackGenerator {
         }
     }
 
-    private interface Generator: (PackFile) -> Unit, AutoCloseable
+    private interface Generator : (PackFile) -> Unit, AutoCloseable
 }

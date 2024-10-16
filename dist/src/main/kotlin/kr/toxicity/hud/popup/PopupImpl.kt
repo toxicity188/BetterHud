@@ -23,7 +23,7 @@ class PopupImpl(
     file: List<String>,
     val internalName: String,
     section: YamlObject
-): Popup, HudConfiguration {
+) : Popup, HudConfiguration {
     val gui = GuiLocation(section)
     val move = section.get("move")?.asObject()?.let {
         EquationPairLocation(it)

@@ -14,7 +14,7 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
-object ImageManager: BetterHudManager {
+object ImageManager : BetterHudManager {
 
     private val imageMap = HashMap<String, HudImage>()
     private val emptySetting = YamlObjectImpl("", mutableMapOf<String, Any>())

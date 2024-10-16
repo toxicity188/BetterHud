@@ -1,7 +1,7 @@
 package kr.toxicity.hud.api;
 
 import kr.toxicity.hud.api.manager.*;
-import kr.toxicity.hud.api.plugin.ReloadResult;
+import kr.toxicity.hud.api.plugin.ReloadState;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 /**
  * Represents the main class of BetterHud.
  */
+@SuppressWarnings("unused")
 public interface BetterHud {
 
     String DEFAULT_NAMESPACE = "betterhud";
@@ -38,7 +39,7 @@ public interface BetterHud {
      * Executes reload.
      * @return result of reload.
      */
-    default @NotNull ReloadResult reload() {
+    default @NotNull ReloadState reload() {
         return reload(bootstrap().console());
     }
 
@@ -53,7 +54,7 @@ public interface BetterHud {
      * @param sender log handler.
      * @return result of reload.
      */
-    @NotNull ReloadResult reload(@NotNull Audience sender);
+    @NotNull ReloadState reload(@NotNull Audience sender);
 
 
     /**
@@ -175,5 +176,5 @@ public interface BetterHud {
      * Adds some task when reload is ended.
      * @param runnable reload end task
      */
-    void addReloadEndTask(@NotNull Consumer<ReloadResult> runnable);
+    void addReloadEndTask(@NotNull Consumer<ReloadState> runnable);
 }

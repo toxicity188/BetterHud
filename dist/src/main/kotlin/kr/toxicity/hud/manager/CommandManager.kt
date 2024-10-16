@@ -5,7 +5,9 @@ import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationSource
-import kr.toxicity.hud.api.plugin.ReloadState
+import kr.toxicity.hud.api.plugin.ReloadState.Failure
+import kr.toxicity.hud.api.plugin.ReloadState.OnReload
+import kr.toxicity.hud.api.plugin.ReloadState.Success
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.CommandModule
 import kr.toxicity.hud.resource.GlobalResource
@@ -13,7 +15,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.util.concurrent.CompletableFuture
 
-object CommandManager: BetterHudManager {
+object CommandManager : BetterHudManager {
 
     val command = CommandModule("hud")
         .addCommand("reload") {
@@ -24,17 +26,16 @@ object CommandManager: BetterHudManager {
             executer = { s, _ ->
                 s.audience().info("Trying to reload. please wait...")
                 CompletableFuture.runAsync {
-                    val reload = PLUGIN.reload()
-                    when (reload.state) {
-                        ReloadState.STILL_ON_RELOAD -> {
+                    when (val reload = PLUGIN.reload()) {
+                        is OnReload -> {
                             s.audience().warn("The plugin is still reloading!")
                         }
-                        ReloadState.SUCCESS -> {
+                        is Success -> {
                             s.audience().info("Reload successful! (${reload.time} ms)")
                         }
-                        ReloadState.FAIL -> {
+                        is Failure -> {
                             s.audience().info("Reload failed.")
-                            s.audience().info("Check your server log to find the problem.")
+                            s.audience().info("Cause: ${reload.throwable.javaClass.simpleName}: ${reload.throwable.message}")
                         }
                     }
                 }

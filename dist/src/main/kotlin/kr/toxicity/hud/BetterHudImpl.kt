@@ -3,8 +3,9 @@ package kr.toxicity.hud
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudBootstrap
 import kr.toxicity.hud.api.manager.*
-import kr.toxicity.hud.api.plugin.ReloadResult
 import kr.toxicity.hud.api.plugin.ReloadState
+import kr.toxicity.hud.api.plugin.ReloadState.Failure
+import kr.toxicity.hud.api.plugin.ReloadState.Success
 import kr.toxicity.hud.dependency.Dependency
 import kr.toxicity.hud.dependency.DependencyInjector
 import kr.toxicity.hud.manager.*
@@ -118,7 +119,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
     }
 
     private val reloadStartTask = ArrayList<() -> Unit>()
-    private val reloadEndTask = ArrayList<(ReloadResult) -> Unit>()
+    private val reloadEndTask = ArrayList<(ReloadState) -> Unit>()
 
     override fun addReloadStartTask(runnable: Runnable) {
         reloadStartTask.add {
@@ -126,7 +127,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         }
     }
 
-    override fun addReloadEndTask(runnable: Consumer<ReloadResult>) {
+    override fun addReloadEndTask(runnable: Consumer<ReloadState>) {
         reloadEndTask.add {
             runnable.accept(it)
         }
@@ -135,10 +136,10 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
     @Volatile
     private var onReload = false
 
-    override fun reload(sender: Audience): ReloadResult {
+    override fun reload(sender: Audience): ReloadState {
         synchronized(this) {
             if (onReload) {
-                return ReloadResult(ReloadState.STILL_ON_RELOAD, 0)
+                return ReloadState.ON_RELOAD
             }
             onReload = true
         }
@@ -161,9 +162,9 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                     it.postReload()
                 }
                 PackGenerator.generate(sender)
-                ReloadResult(ReloadState.SUCCESS, System.currentTimeMillis() - time)
+                Success(System.currentTimeMillis() - time)
             }.getOrElse {
-                ReloadResult(ReloadState.FAIL, System.currentTimeMillis() - time)
+                Failure(it)
             }
             reloadEndTask.forEach {
                 it(result)

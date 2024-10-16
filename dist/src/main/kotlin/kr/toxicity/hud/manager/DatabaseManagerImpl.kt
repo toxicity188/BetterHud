@@ -14,7 +14,7 @@ import java.io.File
 import java.sql.DriverManager
 import java.util.concurrent.CompletableFuture
 
-object DatabaseManagerImpl: BetterHudManager, DatabaseManager {
+object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
 
     private val defaultConnector = HudDatabaseConnector {

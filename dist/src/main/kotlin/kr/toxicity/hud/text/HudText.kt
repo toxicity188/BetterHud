@@ -11,4 +11,4 @@ class HudText(
     val images: Map<String, LocatedImage>,
     val charWidth: Map<Int, CharWidth>,
     val conditions: ConditionBuilder
-): HudConfiguration
+) : HudConfiguration

@@ -1,7 +1,5 @@
 package kr.toxicity.hud.placeholder
 
-import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.util.forEachSubConfiguration
@@ -40,14 +38,12 @@ object Conditions {
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")
 
         val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer.")).map[section.get("operation")?.asString().ifNull(operationValue)].ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
-        return object : ConditionBuilder {
-            override fun build(updateEvent: UpdateEvent): (HudPlayer) -> Boolean {
-                val o1 = first.build(updateEvent)
-                val o2 = second.build(updateEvent)
-                return { p ->
-                    operation(o1.value(p), o2.value(p))
-                }
-            }
+        return ConditionBuilder { updateEvent ->
+            val o1 = first.build(updateEvent)
+            val o2 = second.build(updateEvent)
+            ({ p ->
+                operation(o1.value(p), o2.value(p))
+            })
         }
     }
 }

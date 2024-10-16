@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import java.io.File
 import java.text.DecimalFormat
 
-object ConfigManagerImpl: BetterHudManager, ConfigManager {
+object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var key = KeyResource(NAME_SPACE)
         private set
 

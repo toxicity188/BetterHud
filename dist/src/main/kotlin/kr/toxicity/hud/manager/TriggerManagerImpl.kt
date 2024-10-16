@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
 import java.util.function.Function
 
-object TriggerManagerImpl: BetterHudManager, TriggerManager {
+object TriggerManagerImpl : BetterHudManager, TriggerManager {
 
     private val map = mutableMapOf<String, (YamlObject) -> HudTrigger<*>>()
 

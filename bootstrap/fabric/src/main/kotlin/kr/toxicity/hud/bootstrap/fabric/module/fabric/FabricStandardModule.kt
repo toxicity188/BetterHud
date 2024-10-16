@@ -9,7 +9,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.fabric.util.armor
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
-import kr.toxicity.hud.bootstrap.velocity.module.Module
+import kr.toxicity.hud.bootstrap.fabric.module.Module
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes

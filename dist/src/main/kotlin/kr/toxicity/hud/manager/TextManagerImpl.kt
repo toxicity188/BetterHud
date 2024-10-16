@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
-object TextManagerImpl: BetterHudManager, TextManager {
+object TextManagerImpl : BetterHudManager, TextManager {
 
 
     private class TextCache(

@@ -10,7 +10,7 @@ import net.kyori.adventure.audience.Audience
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object PlayerManagerImpl: BetterHudManager, PlayerManager {
+object PlayerManagerImpl : BetterHudManager, PlayerManager {
 
     private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
     private val stringPlayer = ConcurrentHashMap<String, HudPlayer>()

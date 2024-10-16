@@ -8,7 +8,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.util.*
 
-object PopupManagerImpl: BetterHudManager, PopupManager {
+object PopupManagerImpl : BetterHudManager, PopupManager {
     private val popupMap = HashMap<String, PopupImpl>()
     override fun start() {
 
