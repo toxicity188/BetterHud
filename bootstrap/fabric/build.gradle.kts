@@ -67,6 +67,9 @@ fabricModJson {
 tasks {
     shadowJar {
         exclude("META-INF")
+        dependencies {
+            exclude(dependency("org.jetbrains:annotations:13.0"))
+        }
         configurations = listOf(project.configurations.modImplementation.get())
     }
     remapJar {

@@ -1,7 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.background.HudBackground
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -43,7 +43,7 @@ object BackgroundManager : BetterHudManager {
                             getImage("left"),
                             getImage("right"),
                             getImage("body"),
-                            ImageLocation(yaml)
+                            PixelLocation(yaml)
                         )
                     }
                 }

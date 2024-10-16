@@ -4,7 +4,7 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
@@ -13,7 +13,7 @@ import kr.toxicity.hud.manager.MinecraftManager
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudTextData
@@ -26,7 +26,7 @@ class HudTextElement(
     file: List<String>,
     private val text: TextLayout,
     gui: GuiLocation,
-    pixel: ImageLocation
+    pixel: PixelLocation
 ) {
 
     private val renderer = run {

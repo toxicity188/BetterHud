@@ -5,8 +5,8 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationProvider
 import kr.toxicity.hud.api.player.PointedLocationSource
+import kr.toxicity.hud.bootstrap.bukkit.compatibility.gps.GPSWrapper
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
-import kr.toxicity.hud.player.location.GPSWrapper
 
 class GPSLocationProvider : PointedLocationProvider {
 

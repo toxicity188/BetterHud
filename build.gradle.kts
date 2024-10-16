@@ -395,6 +395,11 @@ tasks {
     logLinkDokkaGeneratePublicationHtml {
         enabled = false
     }
+    shadowJar {
+        dependencies {
+            exclude(dependency("org.jetbrains:annotations:13.0"))
+        }
+    }
 }
 
 tasks.modrinth {

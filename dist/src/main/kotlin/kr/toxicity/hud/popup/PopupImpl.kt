@@ -11,10 +11,10 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.equation.EquationPairLocation
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.util.*
 import java.util.*
 
@@ -81,8 +81,8 @@ class PopupImpl(
                 this@PopupImpl,
                 loc,
                 yamlObject.get("pixel")?.asObject()?.let { pixel ->
-                    ImageLocation(pixel)
-                } ?: ImageLocation.zero,
+                    PixelLocation(pixel)
+                } ?: PixelLocation.zero,
                 file,
             )
         }

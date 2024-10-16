@@ -1,4 +1,4 @@
-package kr.toxicity.hud.shader
+package kr.toxicity.hud.location
 
 import kr.toxicity.hud.api.yaml.YamlObject
 

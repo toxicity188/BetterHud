@@ -5,7 +5,7 @@ class OverridableSet<K, V>(
     mapCreator: () -> MutableMap<K, V> = {
         HashMap()
     }
-): MutableSet<V> {
+) : MutableSet<V> {
     private val map = mapCreator()
 
     override fun add(element: V): Boolean {

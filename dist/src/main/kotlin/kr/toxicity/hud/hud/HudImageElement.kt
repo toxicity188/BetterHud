@@ -4,17 +4,17 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.renderer.ImageRenderer
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 
-class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: ImageLocation) {
+class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val chars = run {
         val hud = image.image

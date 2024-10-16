@@ -2,8 +2,8 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
-import kr.toxicity.hud.equation.AnimationLocation
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.AnimationLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 
@@ -13,7 +13,7 @@ class LayoutGroup(
     section: YamlObject
 ) : HudConfiguration {
 
-    private val loc = ImageLocation(section)
+    private val loc = PixelLocation(section)
 
     val align = section.get("align")?.asString()?.let {
         runWithExceptionHandling(sender, "Unable to find that align: $it") {

@@ -4,7 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.configuration.PluginConfiguration
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.placeholder.ConditionBuilder
@@ -270,7 +270,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                                     .toImage()
                                                     .removeEmptyWidth()
                                                     .ifNull("invalid image: $key"),
-                                                ImageLocation(yamlObject),
+                                                PixelLocation(yamlObject),
                                                 yamlObject.getAsDouble("scale", 1.0).apply {
                                                     if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
                                                 }

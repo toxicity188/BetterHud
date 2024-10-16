@@ -1,10 +1,10 @@
 package kr.toxicity.hud.shader
 
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 
 class RenderScale(
-    val relativeOffset: ImageLocation,
+    val relativeOffset: PixelLocation,
     val scale: Scale
 ) : Comparable<RenderScale> {
     companion object {
@@ -21,7 +21,7 @@ class RenderScale(
 
         private val scaleOne = Scale(1.0, 1.0)
 
-        fun fromConfig(offset: ImageLocation, yamlObject: YamlObject) = RenderScale(
+        fun fromConfig(offset: PixelLocation, yamlObject: YamlObject) = RenderScale(
             offset,
             yamlObject.get("render-scale")?.asObject()?.let {
                 Scale(it.getAsDouble("x", 1.0), it.getAsDouble("y", 1.0))

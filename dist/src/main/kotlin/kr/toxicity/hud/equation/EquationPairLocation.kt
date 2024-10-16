@@ -1,9 +1,9 @@
 package kr.toxicity.hud.equation
 
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LocationGroup
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 
 class EquationPairLocation(
     duration: Int,
@@ -19,7 +19,7 @@ class EquationPairLocation(
         val eval2 = pixel.evaluate(d)
         LocationGroup(
             GuiLocation(eval1.first, eval1.second),
-            ImageLocation(eval2.first.toInt(), eval2.second.toInt(), eval2.third)
+            PixelLocation(eval2.first.toInt(), eval2.second.toInt(), eval2.third)
         )
     }
 

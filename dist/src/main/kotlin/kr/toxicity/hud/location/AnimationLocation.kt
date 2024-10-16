@@ -1,26 +1,25 @@
-package kr.toxicity.hud.equation
+package kr.toxicity.hud.location
 
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.layout.LayoutAnimationType
+import kr.toxicity.hud.equation.EquationTriple
 import kotlin.math.roundToInt
 
 class AnimationLocation(
-    val type: LayoutAnimationType,
-    val location: List<ImageLocation>
+    val type: AnimationType,
+    val location: List<PixelLocation>
 ) {
     companion object {
-        val zero = AnimationLocation(LayoutAnimationType.LOOP, listOf(ImageLocation.zero))
+        val zero = AnimationLocation(AnimationType.LOOP, listOf(PixelLocation.zero))
     }
     constructor(
-        type: LayoutAnimationType,
+        type: AnimationType,
         duration: Int,
         imageEquation: EquationTriple
     ): this(
         type,
         (0..<duration).map {
             val d = it.toDouble()
-            ImageLocation(
+            PixelLocation(
                 imageEquation.x.evaluate(d).roundToInt(),
                 imageEquation.y.evaluate(d).roundToInt(),
                 imageEquation.opacity.evaluate(d)
@@ -30,8 +29,8 @@ class AnimationLocation(
 
     constructor(section: YamlObject): this(
         section.get("type")?.asString()?.let {
-            LayoutAnimationType.valueOf(it.uppercase())
-        } ?: LayoutAnimationType.LOOP,
+            AnimationType.valueOf(it.uppercase())
+        } ?: AnimationType.LOOP,
         section.getAsInt("duration", 20).coerceAtLeast(1),
         EquationTriple(section)
     )

@@ -7,6 +7,7 @@ import kr.toxicity.hud.compass.CompassType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
+import java.util.Collections
 
 object CompassManagerImpl : BetterHudManager, CompassManager {
 
@@ -36,9 +37,9 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
     override fun getCompass(name: String): Compass? = synchronized(compassMap) {
         compassMap[name]
     }
-    override fun getAllNames(): MutableSet<String> = compassMap.keys
+    override fun getAllNames(): Set<String> = Collections.unmodifiableSet(compassMap.keys)
 
-    override fun getDefaultCompasses(): MutableSet<Compass> = compassMap.values.filter {
+    override fun getDefaultCompasses(): Set<Compass> = compassMap.values.filter {
         it.isDefault
-    }.toMutableSet()
+    }.toSet()
 }

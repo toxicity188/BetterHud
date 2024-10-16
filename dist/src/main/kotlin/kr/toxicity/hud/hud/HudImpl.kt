@@ -8,13 +8,13 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
-import kr.toxicity.hud.image.ImageLocation
-import kr.toxicity.hud.layout.LayoutAnimationType
+import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.location.AnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 
@@ -58,8 +58,8 @@ class HudImpl(
             gui += GuiLocation(it)
         }
         val pixel = yamlObject.get("pixel")?.asObject()?.let {
-            ImageLocation(it)
-        }  ?: ImageLocation.zero
+            PixelLocation(it)
+        }  ?: PixelLocation.zero
         HudAnimation(
             layout.animation.type,
             layout.animation.location.map {
@@ -102,8 +102,8 @@ class HudImpl(
         return elements.map {
             val elements = it.elements
             elements[when (it.animationType) {
-                LayoutAnimationType.LOOP -> (hudPlayer.tick % elements.size).toInt()
-                LayoutAnimationType.PLAY_ONCE -> hudPlayer.tick.toInt().coerceAtMost(elements.lastIndex)
+                AnimationType.LOOP -> (hudPlayer.tick % elements.size).toInt()
+                AnimationType.PLAY_ONCE -> hudPlayer.tick.toInt().coerceAtMost(elements.lastIndex)
             }].getComponent(hudPlayer)
         }
     }
@@ -125,7 +125,7 @@ class HudImpl(
     override fun isDefault(): Boolean = default
 
     private class HudAnimation(
-        val animationType: LayoutAnimationType,
+        val animationType: AnimationType,
         val elements: List<HudElement>
     )
 }

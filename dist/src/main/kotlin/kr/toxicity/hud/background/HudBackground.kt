@@ -1,7 +1,7 @@
 package kr.toxicity.hud.background
 
 import kr.toxicity.hud.configuration.HudConfiguration
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LoadedImage
 
 class HudBackground(
@@ -12,5 +12,5 @@ class HudBackground(
     val right: LoadedImage,
     val body: LoadedImage,
 
-    val location: ImageLocation,
+    val location: PixelLocation,
 ) : HudConfiguration

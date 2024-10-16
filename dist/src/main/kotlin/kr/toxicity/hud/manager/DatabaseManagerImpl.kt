@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.database.HudDatabase
 import kr.toxicity.hud.api.database.HudDatabaseConnector
 import kr.toxicity.hud.api.manager.DatabaseManager
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -53,6 +54,11 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     add("compasses") {
                         CompassManagerImpl.getCompass(it)
                     }
+                    yaml.get("locations")?.asArray()?.forEach {
+                        runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
+                            player.pointers().add(PointedLocation.deserialize(it.asObject()))
+                        }
+                    }
                 }
             }
 
@@ -74,6 +80,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     save("compasses") {
                         player.compasses
                     }
+                    put("locations", player.pointers().map {
+                        it.serialize()
+                    })
                 }.saveToYaml(getFile(player))
                 return true
             }
@@ -83,6 +92,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
     private val connectionMap = mutableMapOf(
         "yml" to defaultConnector,
         "mysql" to HudDatabaseConnector {
+            Class.forName("com.mysql.cj.jdbc.Driver")
             val host = it.get("host")?.asString().ifNull("unable to find the host value.")
             val database = it.get("database")?.asString().ifNull("unable to find the database value.")
             val name = it.get("name")?.asString().ifNull("unable to find the name value.")
@@ -91,6 +101,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
             val mysql = DriverManager.getConnection("jdbc:mysql://$host/$database?autoReconnect=true&useSSL=false&cmaxReconnets=5&initialTimeout=1", name, password).apply {
                 createStatement().use { s ->
                     s.execute("CREATE TABLE IF NOT EXISTS enabled_hud(uuid CHAR(36) NOT NULL, type VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL);")
+                    s.execute("CREATE TABLE IF NOT EXISTS enabled_pointed_location(uuid CHAR(36), name VARCHAR(255), value TEXT NOT NULL, PRIMARY KEY(uuid, name));")
                 }
             }
             object: HudDatabase {
@@ -120,6 +131,16 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                                 }
                             }
                         }
+                        mysql.prepareStatement("SELECT value FROM enabled_pointed_location WHERE uuid = '$uuid';").use { s ->
+                            val result = s.executeQuery()
+                            while (result.next()) {
+                                runWithExceptionHandling(CONSOLE, "unable to load ${hudPlayer.name()}'s location.") {
+                                    hudPlayer.pointers().add(PointedLocation.deserialize(result.getString("value")
+                                        .toBase64Json()
+                                        .asJsonObject))
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -127,6 +148,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     val uuid = player.uuid().toString()
                     mysql.run {
                         prepareStatement("DELETE FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
+                            s.executeUpdate()
+                        }
+                        prepareStatement("DELETE FROM enabled_pointed_location WHERE uuid = '$uuid';").use { s ->
                             s.executeUpdate()
                         }
                         fun save(name: String, supplier: () -> Set<HudObject>) {
@@ -149,6 +173,14 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                         }
                         save("compass") {
                             player.compasses
+                        }
+                        player.pointers().forEach {
+                            prepareStatement("INSERT INTO enabled_pointed_location(uuid, name, value) VALUES(?, ?, ?);").use { s ->
+                                s.setString(1, uuid)
+                                s.setString(2, it.name)
+                                s.setString(3, it.serialize().toJsonElement().toBase64String())
+                                s.executeUpdate()
+                            }
                         }
                     }
                     return true

@@ -1,19 +1,14 @@
 package kr.toxicity.hud.util
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
+import com.google.gson.*
 import com.google.gson.stream.JsonWriter
 import java.io.File
-import java.io.FileWriter
-import java.nio.charset.StandardCharsets
+import java.util.*
 
 val GSON: Gson = GsonBuilder().disableHtmlEscaping().create()
 
 fun JsonElement.save(file: File) {
-    JsonWriter(FileWriter(file, StandardCharsets.UTF_8).buffered()).use {
+    JsonWriter(file.bufferedWriter()).use {
         GSON.toJson(this, it)
     }
 }
@@ -23,34 +18,44 @@ fun JsonElement.toByteArray(): ByteArray {
     return sb.toString().toByteArray(Charsets.UTF_8)
 }
 
-fun buildJsonArray(block: JsonArray.() -> Unit) = JsonArray().apply(block)
+fun buildJsonArray(capacity: Int = 10, block: JsonArray.() -> Unit) = JsonArray(capacity).apply(block)
 fun buildJsonObject(block: JsonObject.() -> Unit) = JsonObject().apply(block)
 
 fun jsonArrayOf(vararg element: Any) = buildJsonArray {
     element.forEach {
-        when (it) {
-            is String -> add(it)
-            is Char -> add(it)
-            is Number -> add(it)
-            is Boolean -> add(it)
-            is JsonElement -> add(it)
-            else -> throw RuntimeException("Unsupported type. ${it.javaClass.name}")
-        }
+        add(it.toJsonElement())
     }
 }
 
 fun jsonObjectOf(vararg element: Pair<String, Any>) = buildJsonObject {
     element.forEach {
-        addElementToJsonObject(it.first, it.second)
+        add(it.first, it.second.toJsonElement())
     }
 }
-private fun JsonObject.addElementToJsonObject(key: String, any: Any) {
-    when (any) {
-        is String -> addProperty(key, any)
-        is Char -> addProperty(key, any)
-        is Number -> addProperty(key, any)
-        is Boolean -> addProperty(key, any)
-        is JsonElement -> add(key, any)
-        else -> throw RuntimeException("Unsupported type: ${any.javaClass.name}")
+
+fun Any.toJsonElement(): JsonElement = when (this) {
+    is String -> JsonPrimitive(this)
+    is Char -> JsonPrimitive(this)
+    is Number -> JsonPrimitive(this)
+    is Boolean -> JsonPrimitive(this)
+    is JsonElement -> this
+    is List<*> -> run {
+        val map = mapNotNull {
+            it?.toJsonElement()
+        }
+        buildJsonArray(map.size) {
+            map.forEach {
+                add(it)
+            }
+        }
     }
+    is Map<*, *> -> buildJsonObject {
+        forEach {
+            add(it.key?.toString() ?: return@forEach, it.value?.toJsonElement() ?: return@forEach)
+        }
+    }
+    else -> throw RuntimeException("Unsupported type: ${javaClass.name}")
 }
+
+fun JsonElement.toBase64String(): String = Base64.getEncoder().encodeToString(GSON.toJson(this).toByteArray())
+fun String.toBase64Json(): JsonElement = JsonParser.parseString(Base64.getDecoder().decode(this).toString(Charsets.UTF_8))

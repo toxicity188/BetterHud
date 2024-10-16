@@ -7,11 +7,11 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.layout.BackgroundLayout
-import kr.toxicity.hud.layout.LayoutAnimationType
+import kr.toxicity.hud.location.AnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
@@ -21,7 +21,7 @@ import kr.toxicity.hud.player.head.HeadRenderType.STANDARD
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.HudTextData
@@ -34,7 +34,7 @@ class PopupLayout(
     private val layout: LayoutGroup,
     private val parent: PopupImpl,
     private val globalLocation: GuiLocation,
-    private val globalPixel: ImageLocation,
+    private val globalPixel: PixelLocation,
     private val file: List<String>
 ) {
     private var textIndex = 0
@@ -55,8 +55,8 @@ class PopupLayout(
                 } else {
                     val get = map[index](hudPlayer, frame)
                     get[when (layout.animation.type) {
-                        LayoutAnimationType.LOOP -> frame % get.size
-                        LayoutAnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
+                        AnimationType.LOOP -> frame % get.size
+                        AnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
                     }]
                 }
             } else EMPTY_WIDTH_COMPONENT
@@ -78,7 +78,7 @@ class PopupLayout(
             }
         }
     }
-    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: ImageLocation) {
+    private inner class PopupElement(pair: LocationGroup, val array: JsonArray, location: PixelLocation) {
         private val elementGui = pair.gui + parent.gui + globalLocation
         private val elementPixel = globalPixel + location
 

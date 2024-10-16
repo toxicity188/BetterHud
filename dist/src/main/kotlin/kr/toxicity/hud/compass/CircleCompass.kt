@@ -8,11 +8,11 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.hud.HudImpl
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.RenderScale
 import kr.toxicity.hud.shader.ShaderProperty
@@ -57,7 +57,7 @@ class CircleCompass(
     } ?: defaultColorEquation
     private val space = section.getAsInt("space", 2).coerceAtLeast(0)
 
-    private val pixel = ImageLocation(section.get("pixel")?.asObject().ifNull("pixel value not set.")) + ImageLocation.hotBarHeight
+    private val pixel = PixelLocation(section.get("pixel")?.asObject().ifNull("pixel value not set.")) + PixelLocation.hotBarHeight
     private val shader = HudShader(
         GuiLocation(section.get("gui")?.asObject().ifNull("gui value not set.")),
         RenderScale.fromConfig(pixel, section),
@@ -168,7 +168,7 @@ class CircleCompass(
             val scale = section.getAsDouble("scale", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0")
             }
-            val location = ImageLocation(section)
+            val location = PixelLocation(section)
             val opacity = section.getAsDouble("opacity", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("opacity cannot be <= 0.0")
             }

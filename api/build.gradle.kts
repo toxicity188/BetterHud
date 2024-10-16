@@ -13,17 +13,24 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
     }
 
-    java {
-        withSourcesJar()
-        withJavadocJar()
+    val sourcesJar by tasks.creating(Jar::class.java) {
+        from(sourceSets.main.get().allJava)
+        archiveClassifier = "sources"
+    }
+    val javadocJar by tasks.creating(Jar::class.java) {
+        dependsOn(tasks.javadoc)
+        archiveClassifier = "javadoc"
+        from(tasks.javadoc.get().destinationDir)
     }
 
     publishing {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
-                artifact(tasks["sourcesJar"])
-                artifact(tasks["javadocJar"])
+                afterEvaluate {
+                    artifact(javadocJar)
+                    artifact(sourcesJar)
+                }
             }
         }
     }

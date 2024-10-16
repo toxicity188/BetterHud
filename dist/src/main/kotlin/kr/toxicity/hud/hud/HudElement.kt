@@ -3,9 +3,9 @@ package kr.toxicity.hud.hud
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.LayoutGroup
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 
 class HudElement(
@@ -13,7 +13,7 @@ class HudElement(
     file: List<String>,
     private val layout: LayoutGroup,
     gui: GuiLocation,
-    pixel: ImageLocation
+    pixel: PixelLocation
 ) {
     private val imageElement = layout.image.map { image ->
         HudImageElement(hud, image, gui, pixel)

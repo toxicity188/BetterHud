@@ -1,5 +1,7 @@
 package kr.toxicity.hud.shader
 
+import kr.toxicity.hud.location.GuiLocation
+
 data class HudShader(
     val gui: GuiLocation,
     val renderScale: RenderScale,

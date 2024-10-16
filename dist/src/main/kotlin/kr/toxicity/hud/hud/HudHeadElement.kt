@@ -2,18 +2,18 @@ package kr.toxicity.hud.hud
 
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.HeadLayout
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.player.head.HeadKey
 import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.renderer.HeadRenderer
-import kr.toxicity.hud.shader.GuiLocation
+import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 
-class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: ImageLocation) {
+class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val renderer = run {
         val final = head.location + pixel

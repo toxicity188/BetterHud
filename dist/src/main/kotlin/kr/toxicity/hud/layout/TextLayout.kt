@@ -3,7 +3,7 @@ package kr.toxicity.hud.layout
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.BackgroundManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.TextManagerImpl
@@ -16,7 +16,7 @@ import java.text.DecimalFormat
 class TextLayout(
     s: String,
     yamlObject: YamlObject,
-    loc: ImageLocation
+    loc: PixelLocation
 ) : HudLayout(loc, yamlObject) {
     val pattern: String = yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s")
     val text: HudText = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
@@ -37,9 +37,9 @@ class TextLayout(
         BackgroundManager.getBackground(it)
     }
     val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
-    val emojiLocation: ImageLocation = yamlObject.get("emoji-pixel")?.asObject()?.let {
-        ImageLocation(it)
-    } ?: ImageLocation.zero
+    val emojiLocation: PixelLocation = yamlObject.get("emoji-pixel")?.asObject()?.let {
+        PixelLocation(it)
+    } ?: PixelLocation.zero
     val emojiScale: Double = yamlObject.getAsDouble("emoji-scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
     }

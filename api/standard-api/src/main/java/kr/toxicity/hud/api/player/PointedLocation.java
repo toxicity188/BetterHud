@@ -1,10 +1,17 @@
 package kr.toxicity.hud.api.player;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import kr.toxicity.hud.api.adapter.LocationWrapper;
+import kr.toxicity.hud.api.yaml.YamlElement;
+import kr.toxicity.hud.api.yaml.YamlObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Location with source and name.
@@ -30,5 +37,29 @@ public record PointedLocation(
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    public static @NotNull PointedLocation deserialize(@NotNull YamlObject data) {
+        return new PointedLocation(
+                PointedLocationSource.INTERNAL,
+                data.getAsString("name", "unknown"),
+                Optional.ofNullable(data.get("icon")).map(YamlElement::asString).orElse(null),
+                LocationWrapper.deserialize(Objects.requireNonNull(data.get("location"), "location").asObject())
+        );
+    }
+    public static @NotNull PointedLocation deserialize(@NotNull JsonObject data) {
+        return new PointedLocation(
+                PointedLocationSource.INTERNAL,
+                Optional.ofNullable(data.getAsJsonPrimitive("name")).map(JsonPrimitive::getAsString).orElse("unknown"),
+                Optional.ofNullable(data.getAsJsonPrimitive("icon")).map(JsonPrimitive::getAsString).orElse(null),
+                LocationWrapper.deserialize(Objects.requireNonNull(data.getAsJsonObject("location"), "location"))
+        );
+    }
+    public @NotNull Map<String, Object> serialize() {
+        var map = new LinkedHashMap<String, Object>();
+        map.put("name", name);
+        if (icon != null) map.put("icon", icon);
+        map.put("location", location.serialize());
+        return map;
     }
 }

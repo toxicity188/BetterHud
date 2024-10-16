@@ -2,7 +2,7 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.image.HudImage
-import kr.toxicity.hud.image.ImageLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.TextColor
 class ImageLayout(
     s: String,
     yamlObject: YamlObject,
-    loc: ImageLocation,
+    loc: PixelLocation,
 ) : HudLayout(loc, yamlObject) {
     val image: HudImage = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
         ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
