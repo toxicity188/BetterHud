@@ -13,10 +13,17 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
     }
 
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
     publishing {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
+                artifact(tasks["sourcesJar"])
+                artifact(tasks["javadocJar"])
             }
         }
     }
