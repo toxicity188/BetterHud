@@ -1,8 +1,8 @@
 package kr.toxicity.hud.player.head
 
-import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.manager.PlayerHeadManager
+import kr.toxicity.hud.util.parseJson
 import kr.toxicity.hud.util.toImage
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.text.format.NamedTextColor
@@ -35,7 +35,8 @@ class HudPlayerHeadImpl(
     private constructor(playerName: String) : this(
         HttpClient.newHttpClient().send(
             HttpRequest.newBuilder()
-                .uri(URI.create(JsonParser.parseString(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
+                .uri(URI.create(
+                    parseJson(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
                     .asJsonObject
                     .getAsJsonObject("textures")
                     .getAsJsonObject("SKIN")

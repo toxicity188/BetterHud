@@ -1,8 +1,11 @@
 package kr.toxicity.hud.util
 
 import com.google.gson.*
+import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import java.io.File
+import java.io.Reader
+import java.io.StringReader
 import java.util.*
 
 val GSON: Gson = GsonBuilder().disableHtmlEscaping().create()
@@ -33,6 +36,16 @@ fun jsonObjectOf(vararg element: Pair<String, Any>) = buildJsonObject {
     }
 }
 
+@Suppress("DEPRECATION")
+fun parseJson(reader: Reader): JsonElement = JsonReader(reader).use {
+    runCatching {
+        JsonParser.parseReader(it)
+    }.getOrElse { _ ->
+        JsonParser().parse(it)
+    }
+}
+fun parseJson(string: String) = parseJson(StringReader(string).buffered())
+
 fun Any.toJsonElement(): JsonElement = when (this) {
     is String -> JsonPrimitive(this)
     is Char -> JsonPrimitive(this)
@@ -58,4 +71,4 @@ fun Any.toJsonElement(): JsonElement = when (this) {
 }
 
 fun JsonElement.toBase64String(): String = Base64.getEncoder().encodeToString(GSON.toJson(this).toByteArray())
-fun String.toBase64Json(): JsonElement = JsonParser.parseString(Base64.getDecoder().decode(this).toString(Charsets.UTF_8))
+fun String.toBase64Json(): JsonElement = parseJson(Base64.getDecoder().decode(this).toString(Charsets.UTF_8))

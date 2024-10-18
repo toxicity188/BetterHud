@@ -1,7 +1,6 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonParser
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -60,7 +59,7 @@ object MinecraftManager : BetterHudManager {
                     .uri(URI.create("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
                     .GET()
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
-                    JsonParser.parseReader(it)
+                    parseJson(it)
                 }.asJsonObject
                 val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
                 info("Current minecraft version: $current")
@@ -77,7 +76,7 @@ object MinecraftManager : BetterHudManager {
                                 }.getAsJsonPrimitive("url").asString))
                                 .GET()
                                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
-                                JsonParser.parseReader(it)
+                                parseJson(it)
                             }.asJsonObject
                                 .getAsJsonObject("downloads")
                                 .getAsJsonObject("client")

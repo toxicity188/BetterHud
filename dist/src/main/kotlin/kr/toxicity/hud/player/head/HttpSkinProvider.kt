@@ -1,7 +1,7 @@
 package kr.toxicity.hud.player.head
 
-import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.util.parseJson
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.http.HttpClient
@@ -26,7 +26,7 @@ class HttpSkinProvider : PlayerSkinProvider {
                 .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/$playerName?at=${System.currentTimeMillis() / 1000}"))
                 .GET()
                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
-                JsonParser.parseReader(it)
+                parseJson(it)
             }.asJsonObject.getAsJsonPrimitive("id").asString
         }.getOrNull()
     }
@@ -37,7 +37,7 @@ class HttpSkinProvider : PlayerSkinProvider {
                 .uri(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/$uuid"))
                 .GET()
                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
-                JsonParser.parseReader(it)
+                parseJson(it)
             }.asJsonObject
                 .getAsJsonArray("properties")
                 .get(0)

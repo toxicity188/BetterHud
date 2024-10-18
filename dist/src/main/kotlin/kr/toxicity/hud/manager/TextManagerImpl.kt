@@ -1,7 +1,6 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonParser
 import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.location.PixelLocation
@@ -160,7 +159,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             }
         }
         InputStreamReader(BOOTSTRAP.resource("translatable.json").ifNull("translatable.json not found.")).buffered().use {
-            JsonParser.parseReader(it).asJsonObject.entrySet().forEach { e ->
+            parseJson(it).asJsonObject.entrySet().forEach { e ->
                 val map = HashMap<String, String>()
                 e.value.asJsonObject.entrySet().forEach { se ->
                     map[se.key] = se.value.asString
@@ -313,7 +312,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         BOOTSTRAP.resource("minecraft_default.json")?.let {
             runCatching {
                 InputStreamReader(it).buffered().use { reader ->
-                    JsonParser.parseReader(reader)
+                    parseJson(reader)
                 }.asJsonObject.getAsJsonArray("providers").forEachIndexed { debugIndex, element ->
                     val obj = element.asJsonObject
                     val imageName = (obj.getAsJsonPrimitive("file") ?: run {

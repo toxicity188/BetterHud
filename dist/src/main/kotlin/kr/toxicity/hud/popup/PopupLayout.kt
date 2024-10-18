@@ -241,7 +241,6 @@ class PopupLayout(
                     key,
                     imageMap,
                     textLayout.background?.let {
-                        val backgroundLoc = pixel + it.location
                         fun getString(image: LoadedImage, file: String): WidthComponent {
                             val result = textIndex++.parseChar()
                             val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
@@ -251,9 +250,9 @@ class PopupLayout(
                                 textLayout.renderScale,
                                 textLayout.layer - 1,
                                 false,
-                                backgroundLoc.opacity,
+                                pixel.opacity + it.location.opacity,
                                 textLayout.property
-                            ), backgroundLoc.y) { y ->
+                            ), pixel.y + it.location.y) { y ->
                                 array.add(jsonObjectOf(
                                     "type" to "bitmap",
                                     "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -265,7 +264,7 @@ class PopupLayout(
                             return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
                         }
                         BackgroundLayout(
-                            backgroundLoc.x,
+                            it.location.x,
                             getString(it.left, "background_${it.name}_left".encodeKey()),
                             getString(it.right, "background_${it.name}_right".encodeKey()),
                             getString(it.body, "background_${it.name}_body".encodeKey())

@@ -1,7 +1,7 @@
 package kr.toxicity.hud.player.head
 
-import com.google.gson.JsonParser
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.util.parseJson
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.http.HttpClient
@@ -29,7 +29,7 @@ class MineToolsProvider : PlayerSkinProvider {
                         .build(), HttpResponse.BodyHandlers.ofInputStream()
                 ).body()
             ).buffered().use {
-                JsonParser.parseReader(it)
+                parseJson(it)
             }.asJsonObject.getAsJsonPrimitive("id").asString
         }.getOrNull()
     }
@@ -44,7 +44,7 @@ class MineToolsProvider : PlayerSkinProvider {
                         .build(), HttpResponse.BodyHandlers.ofInputStream()
                 ).body()
             ).buffered().use {
-                JsonParser.parseReader(it)
+                parseJson(it)
             }.asJsonObject
                 .getAsJsonObject("raw")
                 .getAsJsonArray("properties")
