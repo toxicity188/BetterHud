@@ -7,8 +7,11 @@ import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
 import net.kyori.adventure.audience.Audience
+import org.bukkit.Bukkit
+import org.bukkit.boss.BossBar
 import org.bukkit.entity.Player
 import java.util.*
+import kotlin.collections.ArrayList
 
 class HudPlayerBukkit(
     private val player: Player,
@@ -24,6 +27,7 @@ class HudPlayerBukkit(
     )
 
     override fun location(): LocationWrapper {
+
         val loc = player.location
         return LocationWrapper(
             world(),
@@ -40,7 +44,19 @@ class HudPlayerBukkit(
     }
 
     init {
+        val bars = ArrayList<BossBar>()
+        for (bossBar in Bukkit.getBossBars()) {
+            if (bossBar.players.any {
+                it.uniqueId == player.uniqueId
+            }) {
+                bossBar.removePlayer(player)
+                bars.add(bossBar)
+            }
+        }
         inject()
+        bars.forEach {
+            it.addPlayer(player)
+        }
     }
 
     override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)

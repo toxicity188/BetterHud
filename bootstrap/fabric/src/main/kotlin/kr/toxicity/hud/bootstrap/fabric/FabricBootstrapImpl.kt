@@ -159,7 +159,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     private fun register(player: ServerPlayer) {
         PlayerManagerImpl.addHudPlayer(player.uuid) {
             CompletableFuture.supplyAsync {
-                val impl = HudPlayerFabric(player, audiences.audience(player))
+                val impl = HudPlayerFabric(server, player, audiences.audience(player))
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
                     taskLater(20) {

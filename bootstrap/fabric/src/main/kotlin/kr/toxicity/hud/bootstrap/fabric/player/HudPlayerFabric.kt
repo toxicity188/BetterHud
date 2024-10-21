@@ -7,16 +7,32 @@ import kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
 import net.kyori.adventure.audience.Audience
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.bossevents.CustomBossEvent
 import net.minecraft.server.level.ServerPlayer
 import java.util.*
+import kotlin.collections.ArrayList
 
 class HudPlayerFabric(
+    server: MinecraftServer,
     private val player: ServerPlayer,
     private val audience: Audience
 ): HudPlayerImpl() {
 
     init {
+        val event = ArrayList<CustomBossEvent>()
+        server.customBossEvents.events.forEach {
+            if (it.players.any { p ->
+                p.uuid == player.uuid
+            }) {
+                it.removePlayer(player)
+                event.add(it)
+            }
+        }
         inject()
+        event.forEach {
+            it.addPlayer(player)
+        }
     }
 
     override fun updatePlaceholder() {
