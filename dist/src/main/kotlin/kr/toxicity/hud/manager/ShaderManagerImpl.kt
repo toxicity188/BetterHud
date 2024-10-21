@@ -201,7 +201,8 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                                     val tagMatcher = tagPattern.matcher(s)
                                     if (tagMatcher.find()) {
                                         tagBuilders[tagMatcher.group("name")]?.let {
-                                            it().forEach { methodString ->
+                                            it().forEach apply@ { methodString ->
+                                                if (methodString.isEmpty()) return@apply
                                                 val appendEnter = methodString.first() == '#'
                                                 if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
                                                 append(methodString.replace("  ", ""))
