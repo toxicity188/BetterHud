@@ -21,6 +21,9 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
     private var line = 1
 
+    var bossbarResourcePackLine = line
+        private set
+
     private var needToUpdateConfig = false
 
     var defaultHud = emptyList<String>()
@@ -137,9 +140,13 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             yaml.get("build-folder-location")?.asString()?.let {
                 buildFolderLocation = it.replace('/', File.separatorChar)
             }
-            val newLine = yaml.getAsInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
-            if (line != newLine) {
-                line = newLine
+            line = yaml.getAsInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
+            var newLine = yaml.getAsInt("bossbar-resource-pack-line", 0)
+            if (newLine < 1) {
+                newLine = line
+            }
+            if (bossbarResourcePackLine != newLine) {
+                bossbarResourcePackLine = newLine
                 needToUpdatePack = true
             }
             versionCheck = yaml.getAsBoolean("version-check", false)

@@ -6,6 +6,7 @@ tick-speed: 1
 namespace: "betterhud"
 default-font-name: "font.ttf"
 bossbar-line: 1
+bossbar-resource-pack-line: 0
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"

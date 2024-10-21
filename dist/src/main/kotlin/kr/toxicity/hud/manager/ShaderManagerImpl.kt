@@ -112,7 +112,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         getReader("rendertype_text.vsh")
                     )
                     constants += shaderConstants
-                    constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarLine - 1)}"
+                    constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarResourcePackLine - 1)}"
                     val replaceList = mutableSetOf<String>()
 
                     val yaml = PluginConfiguration.SHADER.create()

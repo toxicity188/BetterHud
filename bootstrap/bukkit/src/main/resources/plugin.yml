@@ -18,8 +18,8 @@ softdepend:
   - Geyser-Spigot
   - Skript
   - SkBee
-    skript-placeholders
-    skript-reflect
+  - skript-placeholders
+  - skript-reflect
   - SkinsRestorer
   - Parties
   - GPS
