@@ -11,6 +11,7 @@ import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import net.kyori.adventure.audience.Audience
 import java.text.DecimalFormat
+import java.util.Collections
 import java.util.function.Function
 import java.util.regex.Pattern
 
@@ -34,7 +35,15 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                 Function {
                     it.tick
                 }
-            }
+            },
+            "number" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return Function { p ->
+                        p.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
+                    }
+                }
+            },
         ), {
             it.toDoubleOrNull()
         }, {
@@ -45,7 +54,14 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         java.lang.String::class.java,
         "<none>",
         mapOf(
-
+            "string" to object : HudPlaceholder<String> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                    return Function { p ->
+                        p.variableMap[args[0]] ?: "<none>"
+                    }
+                }
+            },
         ), {
             val matcher = stringPattern.matcher(it)
             if (matcher.find()) matcher.group("content") else null
@@ -104,6 +120,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         override fun addPlaceholder(name: String, placeholder: HudPlaceholder<T>) {
             map[name] = placeholder
         }
+
+        override fun getAllPlaceholders(): Map<String, HudPlaceholder<*>> = Collections.unmodifiableMap(map)
     }
 
     fun find(target: String): PlaceholderBuilder<*> {

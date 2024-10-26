@@ -29,7 +29,6 @@ import kr.toxicity.hud.bootstrap.velocity.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.velocity.player.HudPlayerVelocity
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
@@ -132,7 +131,8 @@ class VelocityBootstrapImpl @Inject constructor(
 
     @Subscribe
     fun enable(e: ProxyInitializeEvent) {
-        runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
+        if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
+        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
@@ -146,9 +146,6 @@ class VelocityBootstrapImpl @Inject constructor(
                     warn("Download: https://www.spigotmc.org/resources/115559")
                 }
             }
-        }
-        ShaderManagerImpl.addTagBuilder("CreateOtherShader") {
-            emptyList()
         }
         proxyServer.allPlayers.forEach {
             register(it)
@@ -249,8 +246,8 @@ class VelocityBootstrapImpl @Inject constructor(
         }
     }
 
-    override fun minecraftVersion(): String = "1.21.1"
-    override fun mcmetaVersion(): Int = 34
+    override fun minecraftVersion(): String = "1.21.3"
+    override fun mcmetaVersion(): Int = 42
     override fun useLegacyFont(): Boolean = false
 
     override fun world(name: String): WorldWrapper? = null

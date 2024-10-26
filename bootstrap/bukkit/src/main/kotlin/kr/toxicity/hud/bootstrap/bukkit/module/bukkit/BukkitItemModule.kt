@@ -22,7 +22,7 @@ import org.bukkit.plugin.Plugin
 import java.util.function.Function
 
 class BukkitItemModule : BukkitModule {
-    init {
+    override fun start() {
         Bukkit.getPluginManager().registerEvents(object : Listener {
             @EventHandler
             fun drop(e: PlayerDropItemEvent) {

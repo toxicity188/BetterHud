@@ -14,7 +14,6 @@ import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.util.*
 import net.fabricmc.api.DedicatedServerModInitializer
@@ -101,15 +100,13 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             volatileCode = FabricVolatileCode()
 
             core.start()
-            ShaderManagerImpl.addTagBuilder("CreateOtherShader") {
-                emptyList()
-            }
             ModuleManager.start()
             CompatibilityManager.start()
             scheduler.asyncTask {
-                logger.info("Mod enabled.")
                 core.reload()
-                runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
+                logger.info("Mod enabled.")
+                if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
+                else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
                     HttpClient.newHttpClient().sendAsync(
                         HttpRequest.newBuilder()
                             .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
@@ -127,8 +124,8 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             }
         }
         ServerLifecycleEvents.SERVER_STOPPED.register {
+            core.end()
             scheduler.stopAll()
-            audiences.close()
             logger.info("Mod disabled.")
         }
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
@@ -138,7 +135,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             val player = handler.player
             latestVersion?.let { latest ->
                 if (version() != latest) {
-                    val audience = audiences.audience(player)
+                    val audience = audiences.audience(listOf(player))
                     audience.info("New BetterHud version found: $latest")
                     audience.info(
                         Component.text("Download: https://modrinth.com/plugin/betterhud2")
@@ -159,7 +156,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     private fun register(player: ServerPlayer) {
         PlayerManagerImpl.addHudPlayer(player.uuid) {
             CompletableFuture.supplyAsync {
-                val impl = HudPlayerFabric(server, player, audiences.audience(player))
+                val impl = HudPlayerFabric(server, player, audiences.audience(listOf(player)))
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
                     taskLater(20) {
@@ -235,9 +232,9 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     }
 
 
-    override fun minecraftVersion(): String = "1.21.1"
+    override fun minecraftVersion(): String = "1.21.3"
 
-    override fun mcmetaVersion(): Int = 34
+    override fun mcmetaVersion(): Int = 42
 
     private val uuidMap = ConcurrentHashMap<String, UUID>()
 

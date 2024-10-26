@@ -1,9 +1,10 @@
 repositories {
-    maven("https://maven.enginehub.org/repo/")
-    maven("https://repo.skriptlang.org/releases")
-    maven("https://repo.alessiodp.com/releases/")
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://mvn.lumine.io/repository/maven/")
+    maven("https://maven.enginehub.org/repo/") //WorldEdit, WorldGuard
+    maven("https://nexus.phoenixdevt.fr/repository/maven-public/") //MMOItems, MMOCore, MythicLib
+    maven("https://repo.skriptlang.org/releases") //Skript
+    maven("https://repo.alessiodp.com/releases/") //Parties
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
+    maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
 }
 
 dependencies {

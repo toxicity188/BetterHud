@@ -61,8 +61,8 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 No
 
 ### Version
-Plugin: 1.17-1.21.1  
-Fabric mod: server 1.12.1
+Plugin: 1.17-1.21.3  
+Fabric mod: server 1.12.3
 
 ### Build
 Requires Java 17, 21 Eclipse Adoptium.

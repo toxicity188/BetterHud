@@ -14,6 +14,9 @@ import net.kyori.adventure.text.Component
 import java.util.function.Function
 
 class TextPlaceholderAPICompatibility : Compatibility {
+
+    override val website: String = "https://modrinth.com/mod/placeholder-api"
+
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

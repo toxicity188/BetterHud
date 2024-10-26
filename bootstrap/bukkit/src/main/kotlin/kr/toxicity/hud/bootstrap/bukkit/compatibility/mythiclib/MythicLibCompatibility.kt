@@ -12,6 +12,9 @@ import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import java.util.function.Function
 
 class MythicLibCompatibility : Compatibility {
+
+    override val website: String = "https://www.spigotmc.org/resources/90306/"
+
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf(
             "damage" to {

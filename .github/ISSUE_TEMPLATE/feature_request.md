@@ -17,10 +17,12 @@ Tell me your feature you want to add.
 I do NOT accept any request about that.
 
 - Closed-source mod/plugin support such as Optifine and ItemsAdder
+- Modified client such as Feather
 - Hybrid bukkit such as Arclight
 - Very legacy version such as 1.16.5 or lower
 - Bedrock platform
-- A function can cause some significant performance issue.
-- Your personal issue
-- A function that impossible to implement in server-side such as 144 fps hud.
+- Very old CPU
+- A function can cause some significant performance issue
+- Your personal issue (ex. How can remove minecraft default hotbar texture?)
+- A function that impossible to implement in server-side such as 144 fps hud
 - Inaccurate explanation.

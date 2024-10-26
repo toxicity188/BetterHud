@@ -13,6 +13,8 @@ import java.util.function.Function
 
 class VaultCompatibility : Compatibility {
 
+    override val website: String = "https://www.spigotmc.org/resources/34315/"
+
     private val money = runCatching {
         Bukkit.getServicesManager().getRegistration(Economy::class.java)?.provider
     }.getOrNull()

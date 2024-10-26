@@ -170,6 +170,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onEnable() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (MinecraftVersion.current) {
+            MinecraftVersion.version1_21_2, MinecraftVersion.version1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
             MinecraftVersion.version1_21, MinecraftVersion.version1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
             MinecraftVersion.version1_20_5, MinecraftVersion.version1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
             MinecraftVersion.version1_20_3, MinecraftVersion.version1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
@@ -230,17 +231,13 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
             })
         }
-        ShaderManagerImpl.addTagBuilder("CreateOtherShader") {
-            CreateShaderEvent().apply {
-                call()
-            }.lines
-        }
         ModuleManager.start()
         CompatibilityManager.start()
         Bukkit.getOnlinePlayers().forEach {
             register(it)
         }
-        runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
+        if (isDevVersion) warn("This build is dev version - be careful to use it!")
+        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))

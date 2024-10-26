@@ -13,14 +13,14 @@ fun interface ConditionBuilder {
     }
     fun build(updateEvent: UpdateEvent): (HudPlayer) -> Boolean
 
-    fun and(other: ConditionBuilder) = ConditionBuilder result@ { updateEvent ->
+    infix fun and(other: ConditionBuilder) = ConditionBuilder result@ { updateEvent ->
         val build1 = this@ConditionBuilder.build(updateEvent)
         val build2 = other.build(updateEvent)
         ({ p ->
             build1(p) && build2(p)
         })
     }
-    fun or(other: ConditionBuilder) = ConditionBuilder result@ { updateEvent ->
+    infix fun or(other: ConditionBuilder) = ConditionBuilder result@ { updateEvent ->
         val build1 = this@ConditionBuilder.build(updateEvent)
         val build2 = other.build(updateEvent)
         ({ p ->

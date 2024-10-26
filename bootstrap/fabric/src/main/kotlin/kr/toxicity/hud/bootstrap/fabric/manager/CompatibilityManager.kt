@@ -11,7 +11,7 @@ import java.util.function.Function
 
 object CompatibilityManager {
 
-    private val compatibilities: Map<String, () -> Compatibility> = mapOf(
+    val compatibilities: Map<String, () -> Compatibility> = mapOf(
         "placeholder-api" to {
             TextPlaceholderAPICompatibility()
         }
@@ -20,8 +20,8 @@ object CompatibilityManager {
     fun start() {
         compatibilities.forEach {
             if (FabricLoader.getInstance().isModLoaded(it.key)) {
-                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support.") {
-                    val obj = it.value()
+                val obj = it.value()
+                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support. check this: ${obj.website}") {
                     val namespace = it.key.lowercase().replace('-', '_')
                     obj.listeners.forEach { entry ->
                         PLUGIN.listenerManager.addListener("${namespace}_${entry.key}") { c ->

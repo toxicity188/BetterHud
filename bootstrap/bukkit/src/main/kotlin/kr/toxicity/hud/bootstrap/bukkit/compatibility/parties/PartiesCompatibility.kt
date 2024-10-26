@@ -15,6 +15,9 @@ import java.util.*
 import java.util.function.Function
 
 class PartiesCompatibility : Compatibility {
+
+    override val website: String = "https://www.spigotmc.org/resources/3709/"
+
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
@@ -54,10 +57,14 @@ class PartiesCompatibility : Compatibility {
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf()
 
-    private val parties = Class.forName("com.alessiodp.parties.core.bukkit.bootstrap.ADPBukkitBootstrap").getDeclaredField("plugin").run {
-        isAccessible = true
-        get(Bukkit.getPluginManager().getPlugin("Parties"))
-    } as BukkitPartiesPlugin
+    override fun start() {
+        parties = Class.forName("com.alessiodp.parties.core.bukkit.bootstrap.ADPBukkitBootstrap").getDeclaredField("plugin").run {
+            isAccessible = true
+            get(Bukkit.getPluginManager().getPlugin("Parties"))
+        } as BukkitPartiesPlugin
+    }
+
+    private lateinit var parties: BukkitPartiesPlugin
 
     private fun getPlayerPartyMember(uuid: UUID): Set<Player> {
         return parties.playerManager.getPlayer(uuid)?.partyId?.let {

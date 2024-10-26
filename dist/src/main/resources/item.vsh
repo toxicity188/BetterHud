@@ -39,6 +39,8 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
     }
 }
 
+#GenerateOtherDefinedMethod
+
 void main() {
     vec3 pos = Position;
 //RemapHotBar    float scale = ProjMat[0][0]  * ScreenSize.x / 2.0;

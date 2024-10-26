@@ -7,9 +7,14 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 
 interface Compatibility {
+
+    val website: String
+
     val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
     val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
     val numbers: Map<String, HudPlaceholder<Number>>
     val strings: Map<String, HudPlaceholder<String>>
     val booleans: Map<String, HudPlaceholder<Boolean>>
+
+    fun start() {}
 }

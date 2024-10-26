@@ -13,7 +13,6 @@ import java.net.URLClassLoader
 
 class DependencyInjector(version: String, dataFolder: File, private val logger: BetterHudLogger, classLoader: URLClassLoader) {
     companion object {
-
         private const val CENTERAL = "https://repo1.maven.org/maven2"
     }
 

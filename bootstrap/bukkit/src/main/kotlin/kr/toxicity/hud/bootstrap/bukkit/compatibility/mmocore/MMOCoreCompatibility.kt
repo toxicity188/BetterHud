@@ -19,6 +19,8 @@ import java.util.function.Function
 
 class MMOCoreCompatibility : Compatibility {
 
+    override val website: String = "https://www.spigotmc.org/resources/70575/"
+
     private fun Player.toMMOCore(): PlayerData? {
         return MMOCore.plugin.playerDataManager.getOrNull(uniqueId)
     }

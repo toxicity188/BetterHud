@@ -12,6 +12,7 @@ object ModuleManager {
         MODULE_BUKKIT.forEach { module ->
             runCatching {
                 val value = module.value()
+                value.start()
                 fun String.key(tag: String) = if (this == "standard") tag else "${this}_$tag"
                 value.triggers.forEach { trigger ->
                     TriggerManagerImpl.addTrigger(module.key.key(trigger.key), trigger.value)

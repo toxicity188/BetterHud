@@ -17,7 +17,7 @@ import java.util.function.Function
 
 object CompatibilityManager {
 
-    private val compatibilities = mapOf(
+    val compatibilities = mapOf(
         "MMOCore" to {
             MMOCoreCompatibility()
         },
@@ -47,8 +47,9 @@ object CompatibilityManager {
     fun start() {
         compatibilities.forEach {
             if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
-                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support.") {
-                    val obj = it.value()
+                val obj = it.value()
+                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support. checks this: ${obj.website}") {
+                    obj.start()
                     val namespace = it.key.lowercase()
                     obj.listeners.forEach { entry ->
                         PLUGIN.listenerManager.addListener("${namespace}_${entry.key}") { c ->

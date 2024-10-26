@@ -4,7 +4,9 @@ import kr.toxicity.hud.api.listener.HudListener;
 import kr.toxicity.hud.api.update.UpdateEvent;
 import kr.toxicity.hud.api.yaml.YamlObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -17,4 +19,8 @@ public interface ListenerManager {
      * @param listenerFunction builder
      */
     void addListener(@NotNull String name, @NotNull Function<YamlObject, Function<UpdateEvent, HudListener>> listenerFunction);
+
+    @NotNull
+    @Unmodifiable
+    Set<String> getAllListenerKeys();
 }

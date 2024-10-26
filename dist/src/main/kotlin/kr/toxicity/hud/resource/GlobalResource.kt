@@ -11,7 +11,8 @@ class GlobalResource {
     private val minecraft = assets + "minecraft"
 
     val bossBar = minecraft + listOf("textures", "gui")
-    val core = minecraft + listOf("shaders", "core")
+    val shaders = minecraft +  "shaders"
+    val core = shaders + "core"
 
     val font = hud + "font"
     val textures = hud + "textures"

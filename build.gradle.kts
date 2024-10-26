@@ -16,7 +16,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.0.21"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "1.7.3" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.4" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0-Beta"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
@@ -57,7 +57,9 @@ val supportedMinecraftVersions = listOf(
     "1.20.6",
     //1.21
     "1.21",
-    "1.21.1"
+    "1.21.1",
+    "1.21.2",
+    "1.21.3"
 )
 val supportedVelocityVersions = listOf(
     "3.3"
@@ -73,11 +75,16 @@ val legacyNmsVersion = listOf(
     "v1_20_R1",
     "v1_20_R2",
     "v1_20_R3",
-)
+).map {
+    project("nms:$it")
+}
 val currentNmsVersion = listOf(
     "v1_20_R4",
-    "v1_21_R1"
-)
+    "v1_21_R1",
+    "v1_21_R2",
+).map {
+    project("nms:$it")
+}
 
 val allNmsVersion = legacyNmsVersion + currentNmsVersion
 
@@ -87,16 +94,15 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.6" + (System.getenv("BUILD_NUMBER")?.let { ".$it" } ?: "")
+    version = "1.7" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
 
     repositories {
         mavenCentral()
         maven("https://jitpack.io")
-        maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
+        maven("https://repo.papermc.io/repository/maven-public/") //Paper
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.codemc.org/repository/maven-public/")
-        maven("https://maven.fabricmc.net/")
+        maven("https://maven.fabricmc.net/") //Fabric
     }
 
     dependencies {
@@ -148,35 +154,37 @@ subprojects {
 }
 
 
-fun Project.bukkit() = also {
-    it.dependencies {
-        compileOnly("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
-        compileOnly("org.bstats:bstats-bukkit:$bStats")
-        compileOnly(rootProject.fileTree("shaded"))
+fun Project.dependency(any: Any) = also {
+    if (any is Collection<*>) {
+        any.forEach { element ->
+            val get = element ?: return@forEach
+            it.dependencies {
+                compileOnly(get)
+                testImplementation(get)
+            }
+        }
+    } else {
+        it.dependencies {
+            compileOnly(any)
+            testImplementation(any)
+        }
     }
 }
+fun Project.bukkit() = dependency("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
+    .dependency("org.bstats:bstats-bukkit:$bStats")
+    .dependency(rootProject.fileTree("shaded"))
 fun Project.velocity() = also {
-    it.dependencies {
-        compileOnly("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
-        compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
-        annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
-        compileOnly("io.netty:netty-all:5.0.0.Alpha2")
-        compileOnly("org.bstats:bstats-velocity:$bStats")
-    }
+    it.dependency("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
+        .dependency("io.netty:netty-all:5.0.0.Alpha2")
+        .dependency("org.bstats:bstats-velocity:$bStats")
+    it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
+    it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
 }
-fun Project.folia() = also {
-    it.dependencies {
-        compileOnly("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
-    }
-}
-fun Project.adventure() = also {
-    it.dependencies {
-        compileOnly("net.kyori:adventure-api:$adventure")
-        compileOnly("net.kyori:adventure-text-minimessage:$adventure")
-        compileOnly("net.kyori:adventure-text-serializer-legacy:$adventure")
-        compileOnly("net.kyori:adventure-text-serializer-gson:$adventure")
-    }
-}
+fun Project.folia() = dependency("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
+fun Project.adventure() = dependency("net.kyori:adventure-api:$adventure")
+    .dependency("net.kyori:adventure-text-minimessage:$adventure")
+    .dependency("net.kyori:adventure-text-serializer-legacy:$adventure")
+    .dependency("net.kyori:adventure-text-serializer-gson:$adventure")
 fun Project.library() = also {
     it.dependencies {
         implementation("org.yaml:snakeyaml:2.3")
@@ -185,18 +193,11 @@ fun Project.library() = also {
         implementation(rootProject.fileTree("shaded"))
     }
 }
-fun Project.bukkitAudience() = also {
-    it.dependencies {
-        compileOnly("net.kyori:adventure-platform-bukkit:$platform")
-    }
-}
+fun Project.bukkitAudience() = dependency("net.kyori:adventure-platform-bukkit:$platform")
 fun Project.legacy() = also {
     it.java {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
-}
-fun Project.dependency(any: Any) = also {
-    it.dependencies.compileOnly(any)
 }
 
 val apiShare = project("api:standard-api").adventure().legacy()
@@ -211,38 +212,25 @@ val api = listOf(
     apiFabric
 )
 
-fun Project.api() = also {
-    it.dependencies {
-        api.forEach { p ->
-            compileOnly(p)
-        }
-    }
-}
+fun Project.api() = dependency(api)
 
 val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
 val bedrock = project("bedrock")
 
-legacyNmsVersion.map {
-    project("nms:$it")
-}.forEach {
+legacyNmsVersion.forEach {
     it.legacy()
 }
 
 allNmsVersion.forEach {
-    project("nms:$it")
-        .dependency(apiShare)
+    it.dependency(apiShare)
         .dependency(apiBukkit)
 }
 
 scheduler.project("standard").adventure().bukkit().api()
 scheduler.project("folia").folia().api()
 
-dist.dependencies {
-    allNmsVersion.forEach {
-        compileOnly(project(":nms:$it"))
-    }
-}
+dist.dependency(allNmsVersion)
 
 val bukkitBootstrap = project("bootstrap:bukkit")
     .adventure()
@@ -250,19 +238,10 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .api()
     .dependency(dist)
     .bukkitAudience()
-    .also {
-        it.dependencies {
-            scheduler.subprojects.forEach { p ->
-                compileOnly(p)
-            }
-            bedrock.subprojects.forEach { p ->
-                compileOnly(p)
-            }
-            allNmsVersion.forEach { p ->
-                compileOnly(project(":nms:$p"))
-            }
-        }
-    }
+    .dependency(scheduler.subprojects)
+    .dependency(bedrock.subprojects)
+    .dependency(allNmsVersion)
+
 val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
 val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventure().also {
     it.apply(plugin = "io.github.goooler.shadow")
@@ -274,7 +253,7 @@ val bootstrap = listOf(
     velocityBootstrap
 )
 
-project(":nms").subprojects.forEach {
+allNmsVersion.forEach {
     it.apply(plugin = "io.papermc.paperweight.userdev")
 }
 
@@ -336,7 +315,7 @@ val pluginJar by tasks.creating(Jar::class.java) {
         }))
     }
     allNmsVersion.forEach {
-        from(zipTree(project("nms:$it").tasks.named("reobfJar").map { t ->
+        from(zipTree(it.tasks.named("reobfJar").map { t ->
             (t as RemapJar).outputJar
         }))
     }

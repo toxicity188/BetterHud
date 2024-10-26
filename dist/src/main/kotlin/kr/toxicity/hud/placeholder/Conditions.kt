@@ -13,8 +13,8 @@ object Conditions {
             runCatching {
                 val new = parse0(yamlObject)
                 value = when (val gate = yamlObject.get("gate")?.asString() ?: "and") {
-                    "and" -> value.and(new)
-                    "or" -> value.or(new)
+                    "and" -> value and new
+                    "or" -> value or new
                     else -> {
                         throw RuntimeException("this gate doesn't exist: $gate")
                     }

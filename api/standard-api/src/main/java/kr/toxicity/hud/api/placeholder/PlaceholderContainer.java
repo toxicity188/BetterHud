@@ -1,6 +1,9 @@
 package kr.toxicity.hud.api.placeholder;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.Map;
 
 /**
  * Represents placeholder group.
@@ -13,4 +16,8 @@ public interface PlaceholderContainer<T> {
      * @param placeholder placeholder
      */
     void addPlaceholder(@NotNull String name, @NotNull HudPlaceholder<T> placeholder);
+
+    @NotNull
+    @Unmodifiable
+    Map<String, HudPlaceholder<?>> getAllPlaceholders();
 }

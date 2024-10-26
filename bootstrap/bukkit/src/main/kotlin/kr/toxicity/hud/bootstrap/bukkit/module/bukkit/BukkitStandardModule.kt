@@ -169,14 +169,6 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.inventory.heldItemSlot
                 }
             },
-            "number" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
-                        p.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
-                    }
-                }
-            },
             "potion_effect_duration" to object : HudPlaceholder<Number> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
@@ -237,14 +229,6 @@ class BukkitStandardModule : BukkitModule {
             "gamemode" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.gameMode.name
-                }
-            },
-            "string" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    return Function { p ->
-                        p.variableMap[args[0]] ?: "<none>"
-                    }
                 }
             },
             "custom_variable" to object : HudPlaceholder<String> {

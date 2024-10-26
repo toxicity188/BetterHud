@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
+import java.util.Collections
 import java.util.function.Function
 
 object ListenerManagerImpl : BetterHudManager, ListenerManager {
@@ -32,6 +33,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     override fun start() {
 
     }
+
+    override fun getAllListenerKeys(): Set<String> = Collections.unmodifiableSet(listenerMap.keys)
 
     fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
         val clazz = section.get("class")?.asString().ifNull("class value not set.")

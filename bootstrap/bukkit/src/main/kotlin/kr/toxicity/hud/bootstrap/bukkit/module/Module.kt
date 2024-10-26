@@ -15,6 +15,8 @@ interface Module {
     val strings: Map<String, HudPlaceholder<String>>
     val booleans: Map<String, HudPlaceholder<Boolean>>
 
+    fun start() {}
+
     operator fun plus(other: Module): Module {
         val l2 = listeners + other.listeners
         val t2 = triggers + other.triggers

@@ -28,7 +28,10 @@ import org.bukkit.event.Event
 import java.util.function.Function
 
 class SkriptCompatibility : Compatibility {
-    init {
+
+    override val website: String = "https://www.spigotmc.org/resources/114544/"
+
+    override fun start() {
         Classes.registerClass(
             ClassInfo(
             Hud::class.java,

@@ -186,7 +186,6 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         }
         BOOTSTRAP.endMetrics()
         DatabaseManagerImpl.currentDatabase.close()
-        info("Plugin disabled.")
     }
 
     override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint) ?: 3

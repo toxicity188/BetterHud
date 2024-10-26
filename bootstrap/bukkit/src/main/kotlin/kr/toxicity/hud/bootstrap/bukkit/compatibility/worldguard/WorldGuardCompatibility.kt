@@ -13,6 +13,9 @@ import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import java.util.function.Function
 
 class WorldGuardCompatibility : Compatibility {
+
+    override val website: String = "https://modrinth.com/plugin/worldguard"
+
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

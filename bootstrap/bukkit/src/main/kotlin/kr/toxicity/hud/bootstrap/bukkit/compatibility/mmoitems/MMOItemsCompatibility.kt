@@ -21,6 +21,8 @@ import java.util.function.Function
 
 class MMOItemsCompatibility : Compatibility {
 
+    override val website: String = "https://www.spigotmc.org/resources/39267/"
+
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

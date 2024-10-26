@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
+import java.util.Collections
 import java.util.function.Function
 
 object TriggerManagerImpl : BetterHudManager, TriggerManager {
@@ -28,6 +29,7 @@ object TriggerManagerImpl : BetterHudManager, TriggerManager {
         return builder(yamlObject)
     }
 
+    override fun getAllTriggerKeys(): Set<String> = Collections.unmodifiableSet(map.keys)
 
     override fun reload(sender: Audience, resource: GlobalResource) {
     }

@@ -41,6 +41,8 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
     }
 }
 
+#GenerateOtherDefinedMethod
+
 void main() {
 
     vec3 pos = Position;
@@ -181,7 +183,7 @@ void main() {
 //RemapHotBar        }
     }
 
-#CreateOtherShader
+#GenerateOtherMainMethod
 
     vertexDistance = getDistance(ModelViewMat, pos, FogShape);
     texCoord0 = UV0;

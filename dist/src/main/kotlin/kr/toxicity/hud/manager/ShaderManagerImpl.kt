@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.manager.ShaderManager
+import kr.toxicity.hud.api.manager.ShaderManager.*
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.pack.PackGenerator
@@ -11,10 +12,9 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
-import java.io.BufferedReader
-import java.io.File
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object ShaderManagerImpl : BetterHudManager, ShaderManager {
@@ -57,10 +57,8 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
     private val hudShaders = TreeMap<HudShader, MutableList<(Int) -> Unit>>()
 
+    private val tagSupplierMap = ConcurrentHashMap<ShaderType, ShaderTagSupplier>()
 
-    fun addTagBuilder(key: String, valueBuilder: () -> List<String>) {
-        tagBuilders[key] = valueBuilder
-    }
 
     @Synchronized
     fun addHudShader(shader: HudShader, consumer: (Int) -> Unit) {
@@ -69,6 +67,12 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 ArrayList()
             }.add(consumer)
         }
+    }
+
+    override fun addTagSupplier(type: ShaderType, supplier: ShaderTagSupplier) {
+        tagSupplierMap[type] = tagSupplierMap[type]?.let {
+            it + supplier
+        } ?: supplier
     }
 
     private val constants = mutableMapOf<String, String>()
@@ -84,7 +88,9 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
     }
 
     override fun start() {
-
+        ShaderType.entries.forEach {
+            addTagSupplier(it, EMPTY_SUPPLIER)
+        }
     }
 
     override fun reload(sender: Audience, resource: GlobalResource) {
@@ -92,25 +98,9 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             synchronized(this) {
                 constants.clear()
                 runWithExceptionHandling(sender, "Unable to load shader.yml") {
-                    fun getReader(name: String): Pair<String, BufferedReader> {
-                        return name to run {
-                            val f = File(DATA_FOLDER, name)
-                            if (!f.exists()) BOOTSTRAP.resource(name).ifNull("Unknown resource: $name").buffered().use {
-                                f.outputStream().buffered().use { output ->
-                                    output.write(it.readAllBytes())
-                                }
-                            }
-                            runCatching {
-                                f.bufferedReader(Charsets.UTF_8)
-                            }.getOrNull() ?: throw RuntimeException("plugin jar file has a problem.")
-                        }
+                    val shaders = ShaderType.entries.map {
+                        it to it.lines()
                     }
-
-                    val shaders = listOf(
-                        getReader("rendertype_entity_cutout.vsh"),
-                        getReader("rendertype_entity_translucent_cull.vsh"),
-                        getReader("rendertype_text.vsh")
-                    )
                     constants += shaderConstants
                     constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarResourcePackLine - 1)}"
                     val replaceList = mutableSetOf<String>()
@@ -188,39 +178,43 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     }
 
                     shaders.forEach { shader ->
-                        shader.second.use { reader ->
-                            val byte = buildString {
-                                reader.readLines().forEach write@{ string ->
-                                    var s = string
-                                    val deactivateMatcher = deactivatePattern.matcher(s)
-                                    if (deactivateMatcher.find()) {
-                                        if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
-                                        else return@write
-                                    }
-                                    if (s.isEmpty()) return@write
-                                    val tagMatcher = tagPattern.matcher(s)
-                                    if (tagMatcher.find()) {
-                                        tagBuilders[tagMatcher.group("name")]?.let {
-                                            it().forEach apply@ { methodString ->
-                                                if (methodString.isEmpty()) return@apply
-                                                val appendEnter = methodString.first() == '#'
-                                                if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
-                                                append(methodString.replace("  ", ""))
-                                                if (appendEnter) append('\n')
-                                            }
-                                            return@write
-                                        }
-                                    }
-                                    if (s.first() == '#') {
-                                        if (isEmpty() || last() != '\n') s = '\n' + s
-                                        s += '\n'
-                                    }
-                                    append(s.replace("  ", ""))
+                        val tagSupplier = (tagSupplierMap[shader.first] ?: EMPTY_SUPPLIER).get()
+                        val byte = buildString {
+                            shader.second.forEach write@{ string ->
+                                var s = string
+                                val deactivateMatcher = deactivatePattern.matcher(s)
+                                if (deactivateMatcher.find()) {
+                                    if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
+                                    else return@write
                                 }
-                            }.toByteArray()
-                            PackGenerator.addTask(resource.core + shader.first) {
-                                byte
+                                if (s.isEmpty()) return@write
+                                val tagMatcher = tagPattern.matcher(s)
+                                if (tagMatcher.find()) {
+                                    val group = tagMatcher.group("name")
+                                    (tagBuilders[group]?.invoke() ?: tagSupplier[group])?.let {
+                                        it.forEach apply@ { methodString ->
+                                            if (methodString.isEmpty()) return@apply
+                                            val appendEnter = methodString.first() == '#'
+                                            if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
+                                            append(methodString.replace("  ", ""))
+                                            if (appendEnter) append('\n')
+                                        }
+                                        return@write
+                                    }
+                                }
+                                if (s.first() == '#') {
+                                    if (isEmpty() || last() != '\n') s = '\n' + s
+                                    s += '\n'
+                                }
+                                append(s.replace("  ", ""))
                             }
+                        }.toByteArray()
+                        PackGenerator.addTask(resource.core + shader.first.fileName) {
+                            byte
+                        }
+                        //+1.21.2
+                        PackGenerator.addTask(resource.shaders + shader.first.fileName) {
+                            byte
                         }
                     }
                 }

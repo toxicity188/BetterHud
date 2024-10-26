@@ -162,4 +162,12 @@ public interface BetterHudBootstrap {
     @NotNull
     @Unmodifiable
     List<WorldWrapper> worlds();
+
+    /**
+     * Checks whether this build is dev version.
+     * @return whether this build is dev version
+     */
+    default boolean isDevVersion() {
+        return version().contains("DEV");
+    }
 }
