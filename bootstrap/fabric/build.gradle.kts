@@ -1,3 +1,4 @@
+import io.papermc.paperweight.util.unzip
 import xyz.jpenilla.resourcefactory.fabric.Environment
 
 plugins {
@@ -5,9 +6,16 @@ plugins {
 }
 
 repositories {
-    // There might be other repos there too, just add it at the end
+    //placeholderapi
     maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
+    //kyori
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+        name = "sonatype-oss-snapshots1"
+        mavenContent { snapshotsOnly() }
+    }
 }
+
+configurations.create("merge")
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
@@ -17,19 +25,25 @@ dependencies {
     })
     modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation("net.kyori:adventure-platform-fabric:5.14.2") {
+    modImplementation("net.kyori:adventure-platform-mod-shared-fabric-repack:6.0.1") {
+        exclude("net.kyori", "adventure-api")
         exclude("net.fabricmc")
     }
-    modImplementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    modImplementation("net.kyori:adventure-platform-fabric:6.1.0-SNAPSHOT") {
+        exclude("net.kyori", "adventure-api")
+        exclude("net.fabricmc")
+    }
+    "merge"("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    "merge"("net.kyori:adventure-api:4.17.0")
 
     //Other mod dependency
-    modCompileOnly(include("eu.pb4:placeholder-api:2.4.1+1.21")!!)
+    modCompileOnly(include("eu.pb4:placeholder-api:2.5.0+1.21.2")!!)
     modCompileOnly("net.luckperms:api:5.4")
 }
 
 loom {
-    mixin {
-        add(sourceSets.main.get(), "adventure-platform-fabric-refmap.json")
+    decompilerOptions.named("vineflower") {
+        options.put("win", "0")
     }
 }
 
@@ -44,8 +58,10 @@ fabricModJson {
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
+        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.AdventureFabricCommon"),
+        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.compat.permissions.PermissionsApiIntegration"),
+        entrypoint("adventure-internal:sidedproxy/server", "net.kyori.adventure.platform.modcommon.impl.server.DedicatedServerProxy"),
         serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl"),
-        entrypoint("adventure-internal:sidedproxy/server", "net.kyori.adventure.platform.fabric.impl.server.DedicatedServerProxy")
     )
     depends = mapOf(
         "fabricloader" to listOf(">=${project.properties["loader_version"]}"),
@@ -54,8 +70,17 @@ fabricModJson {
         "fabric-api" to listOf("*")
     )
     mixins = listOf(
-        mixin("betterhud.mixins.json") {
-            environment = Environment.SERVER
+        mixin("adventure-platform-fabric.accessor.mixins.json") {
+            environment = Environment.ANY
+        },
+        mixin("adventure-platform-fabric.mixins.json") {
+            environment = Environment.ANY
+        },
+        mixin("adventure-platform-mod-shared.accessor.mixins.json") {
+            environment = Environment.ANY
+        },
+        mixin("adventure-platform-mod-shared.mixins.json") {
+            environment = Environment.ANY
         }
     )
     suggests = mapOf(
@@ -64,18 +89,30 @@ fabricModJson {
     )
 }
 
-tasks {
-    shadowJar {
-        exclude("META-INF")
-        dependencies {
-            exclude(dependency("org.jetbrains:annotations:13.0"))
+val addedJar by tasks.creating(Jar::class.java) {
+    from(sourceSets.main.get().output)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations.modImplementation.map {
+        it.resolve()
+    }.get().forEach {
+        from(zipTree(it)) {
+            exclude("META-INF/*.SF")
+            exclude("META-INF/*.DSA")
+            exclude("META-INF/*.RSA")
         }
-        configurations = listOf(project.configurations.modImplementation.get())
     }
+}
+
+tasks {
     remapJar {
-        inputFile = shadowJar.map {
-            it.archiveFile
-        }.get()
+        inputFile = addedJar.archiveFile
+        archiveClassifier = "remapped"
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.getByName("merge").forEach {
+            from(zipTree(it)) {
+                exclude("META-INF/**")
+            }
+        }
     }
     runServer {
         enabled = false

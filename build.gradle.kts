@@ -20,7 +20,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0-Beta"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
-    id("fabric-loom") version "1.7-SNAPSHOT" apply false
+    id("fabric-loom") version "1.8-SNAPSHOT" apply false
     id("com.modrinth.minotaur") version "2.+"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
@@ -62,7 +62,8 @@ val supportedMinecraftVersions = listOf(
     "1.21.3"
 )
 val supportedVelocityVersions = listOf(
-    "3.3"
+    "3.3",
+    "3.4"
 )
 
 val legacyNmsVersion = listOf(
@@ -244,7 +245,6 @@ val bukkitBootstrap = project("bootstrap:bukkit")
 
 val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
 val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventure().also {
-    it.apply(plugin = "io.github.goooler.shadow")
     it.apply(plugin = "fabric-loom")
 }
 
@@ -289,7 +289,9 @@ val fabricJar by tasks.creating(Jar::class.java) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
-    }))
+    })) {
+        exclude("META-INF/jars/**")
+    }
     from(zipTree(tasks.shadowJar.map {
         it.archiveFile
     }))
