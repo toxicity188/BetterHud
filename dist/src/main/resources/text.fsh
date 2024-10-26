@@ -18,7 +18,8 @@ out vec4 fragColor;
 #GenerateOtherDefinedMethod
 
 void main() {
-    vec4 color = texture(Sampler0, texCoord0) * vertexColor * ColorModulator;
+    vec4 texColor = texture(Sampler0, texCoord0);
+    vec4 color = texColor * vertexColor * ColorModulator;
 
 #GenerateOtherMainMethod
 
