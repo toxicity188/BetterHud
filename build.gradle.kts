@@ -30,7 +30,7 @@ val folia = "1.20.6" // TODO bumps version to 1.21.1
 val adventure = "4.17.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
-val velocity = "3.3.0"
+val velocity = "3.4.0"
 val bStats = "3.1.0"
 
 val supportedMinecraftVersions = listOf(

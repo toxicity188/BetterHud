@@ -1,4 +1,3 @@
-import io.papermc.paperweight.util.unzip
 import xyz.jpenilla.resourcefactory.fabric.Environment
 
 plugins {
@@ -8,11 +7,11 @@ plugins {
 repositories {
     //placeholderapi
     maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
-    //kyori
-    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-        name = "sonatype-oss-snapshots1"
-        mavenContent { snapshotsOnly() }
-    }
+    //kyori snapshot
+//    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+//        name = "sonatype-oss-snapshots1"
+//        mavenContent { snapshotsOnly() }
+//    }
 }
 
 configurations.create("merge")
@@ -23,22 +22,26 @@ dependencies {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-1.21:2024.07.28")
     })
-    modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation("net.kyori:adventure-platform-mod-shared-fabric-repack:6.0.1") {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.fabricmc")
-    }
-    modImplementation("net.kyori:adventure-platform-fabric:6.1.0-SNAPSHOT") {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.fabricmc")
-    }
-    "merge"("net.kyori:adventure-text-serializer-legacy:4.17.0")
-    "merge"("net.kyori:adventure-api:4.17.0")
-
     //Other mod dependency
+    modCompileOnly("net.kyori:adventure-api:4.17.0")
     modCompileOnly(include("eu.pb4:placeholder-api:2.5.0+1.21.2")!!)
     modCompileOnly("net.luckperms:api:5.4")
+
+    //Kyori
+    modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
+    modImplementation("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0") {
+        exclude("net.kyori", "adventure-api")
+        exclude("net.fabricmc")
+    }
+    modImplementation("net.kyori:adventure-platform-fabric:6.1.0") {
+        exclude("net.kyori", "adventure-api")
+        exclude("net.fabricmc")
+    }
+
+    //Shadow
+    "merge"("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    "merge"("net.kyori:adventure-api:4.17.0")
 }
 
 loom {
@@ -70,18 +73,10 @@ fabricModJson {
         "fabric-api" to listOf("*")
     )
     mixins = listOf(
-        mixin("adventure-platform-fabric.accessor.mixins.json") {
-            environment = Environment.ANY
-        },
-        mixin("adventure-platform-fabric.mixins.json") {
-            environment = Environment.ANY
-        },
-        mixin("adventure-platform-mod-shared.accessor.mixins.json") {
-            environment = Environment.ANY
-        },
-        mixin("adventure-platform-mod-shared.mixins.json") {
-            environment = Environment.ANY
-        }
+        mixin("adventure-platform-fabric.accessor.mixins.json"),
+        mixin("adventure-platform-fabric.mixins.json"),
+        mixin("adventure-platform-mod-shared.accessor.mixins.json"),
+        mixin("adventure-platform-mod-shared.mixins.json")
     )
     suggests = mapOf(
         "placeholder-api" to listOf("*"),
