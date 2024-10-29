@@ -100,6 +100,7 @@ allprojects {
     repositories {
         mavenCentral()
         maven("https://jitpack.io")
+        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
         maven("https://repo.papermc.io/repository/maven-public/") //Paper
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.codemc.org/repository/maven-public/")
@@ -195,15 +196,10 @@ fun Project.library() = also {
     }
 }
 fun Project.bukkitAudience() = dependency("net.kyori:adventure-platform-bukkit:$platform")
-fun Project.legacy() = also {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 
-val apiShare = project("api:standard-api").adventure().legacy()
-val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
-val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
+val apiShare = project("api:standard-api").adventure()
+val apiBukkit = project("api:bukkit-api").adventure().dependency(apiShare).bukkit()
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare)
 val apiFabric = project("api:fabric-api").adventure().dependency(apiShare)
 
 val api = listOf(
@@ -218,10 +214,6 @@ fun Project.api() = dependency(api)
 val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
 val bedrock = project("bedrock")
-
-legacyNmsVersion.forEach {
-    it.legacy()
-}
 
 allNmsVersion.forEach {
     it.dependency(apiShare)

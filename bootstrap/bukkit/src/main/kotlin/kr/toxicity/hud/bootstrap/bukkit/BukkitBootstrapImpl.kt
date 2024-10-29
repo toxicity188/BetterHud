@@ -349,7 +349,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun sendResourcePack(hudPlayer: HudPlayer) {
         PackUploader.server?.let {
             if (nms.version >= NMSVersion.V1_20_R3) {
-                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
+                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null as? String, false)
             } else {
                 (hudPlayer.handle() as Player).setResourcePack(it.url, it.digest, null, false)
             }

@@ -6,11 +6,11 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.module.BukkitModule
+import kr.toxicity.hud.bootstrap.bukkit.util.ATTRIBUTE_MAX_HEALTH
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.createBukkitTrigger
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
 import org.bukkit.Material
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -22,6 +22,7 @@ import java.util.*
 import java.util.function.Function
 
 class BukkitEntityModule : BukkitModule {
+
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
             "attack" to {
@@ -61,7 +62,7 @@ class BukkitEntityModule : BukkitModule {
                 { event ->
                     event.unwrap ref@ { target: EntityEvent ->
                         val entity = target.entity as? LivingEntity ?: return@ref HudListener.EMPTY
-                        entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value?.let { maxHealth ->
+                        entity.getAttribute(ATTRIBUTE_MAX_HEALTH)?.value?.let { maxHealth ->
                             HudListener {
                                 entity.health / maxHealth
                             }
@@ -82,7 +83,7 @@ class BukkitEntityModule : BukkitModule {
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
-                        (e.entity as? LivingEntity)?.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0
+                        (e.entity as? LivingEntity)?.getAttribute(ATTRIBUTE_MAX_HEALTH)?.value ?: 0.0
                     }
                 }
             },
