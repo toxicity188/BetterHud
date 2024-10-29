@@ -215,6 +215,10 @@ val api = listOf(
     apiFabric
 )
 
+legacyNmsVersion.forEach {
+    it.legacy()
+}
+
 fun Project.api() = dependency(api)
 
 val dist = project("dist").adventure().library().api()
