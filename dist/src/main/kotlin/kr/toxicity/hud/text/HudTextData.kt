@@ -1,12 +1,9 @@
 package kr.toxicity.hud.text
 
-import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.layout.BackgroundLayout
-import net.kyori.adventure.key.Key
+import kr.toxicity.hud.renderer.BackgroundRenderer
 
 class HudTextData(
-    val word: Key,
-
-    val images: Map<String, WidthComponent>,
-    val background: BackgroundLayout?
+    val font: List<HudTextFont>,
+    val splitWidth: Int,
+    val background: BackgroundRenderer?
 )

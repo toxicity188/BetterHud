@@ -2,7 +2,8 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.component.WidthComponent
 
-class BackgroundLayout(
+@Deprecated(message = "Rewrite new background")
+class LegacyBackgroundLayout(
     val x: Int,
 
     val left: WidthComponent,

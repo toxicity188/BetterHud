@@ -10,7 +10,7 @@ import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.LocationGroup
-import kr.toxicity.hud.layout.BackgroundLayout
+import kr.toxicity.hud.layout.LegacyBackgroundLayout
 import kr.toxicity.hud.location.AnimationType
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.manager.*
@@ -240,36 +240,37 @@ class PopupLayout(
                 val result = HudTextData(
                     key,
                     imageMap,
-                    textLayout.background?.let {
-                        fun getString(image: LoadedImage, file: String): WidthComponent {
-                            val result = textIndex++.parseChar()
-                            val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
-                            val div = height.toDouble() / image.image.height
-                            HudImpl.createBit(HudShader(
-                                elementGui,
-                                textLayout.renderScale,
-                                textLayout.layer - 1,
-                                false,
-                                pixel.opacity + it.location.opacity,
-                                textLayout.property
-                            ), pixel.y + it.location.y) { y ->
-                                array.add(jsonObjectOf(
-                                    "type" to "bitmap",
-                                    "file" to "$NAME_SPACE_ENCODED:$file.png",
-                                    "ascent" to y,
-                                    "height" to height,
-                                    "chars" to jsonArrayOf(result)
-                                ))
-                            }
-                            return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
-                        }
-                        BackgroundLayout(
-                            it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey()),
-                            getString(it.right, "background_${it.name}_right".encodeKey()),
-                            getString(it.body, "background_${it.name}_body".encodeKey())
-                        )
-                    }
+                    null
+//                    textLayout.background?.let {
+//                        fun getString(image: LoadedImage, file: String): WidthComponent {
+//                            val result = textIndex++.parseChar()
+//                            val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
+//                            val div = height.toDouble() / image.image.height
+//                            HudImpl.createBit(HudShader(
+//                                elementGui,
+//                                textLayout.renderScale,
+//                                textLayout.layer - 1,
+//                                false,
+//                                pixel.opacity + it.location.opacity,
+//                                textLayout.property
+//                            ), pixel.y + it.location.y) { y ->
+//                                array.add(jsonObjectOf(
+//                                    "type" to "bitmap",
+//                                    "file" to "$NAME_SPACE_ENCODED:$file.png",
+//                                    "ascent" to y,
+//                                    "height" to height,
+//                                    "chars" to jsonArrayOf(result)
+//                                ))
+//                            }
+//                            return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+//                        }
+//                        LegacyBackgroundLayout(
+//                            it.location.x,
+//                            getString(it.left, "background_${it.name}_left".encodeKey()),
+//                            getString(it.right, "background_${it.name}_right".encodeKey()),
+//                            getString(it.body, "background_${it.name}_body".encodeKey())
+//                        )
+//                    }
                 )
                 PackGenerator.addTask(file + "$textEncoded.json") {
                     jsonObjectOf("providers" to array).toByteArray()

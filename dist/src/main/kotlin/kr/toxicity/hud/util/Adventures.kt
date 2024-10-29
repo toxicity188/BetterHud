@@ -5,9 +5,13 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import kotlin.math.abs
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
@@ -45,10 +49,13 @@ val EMPTY_PIXEL_COMPONENT
 val NEW_LAYER
     get() = if (BOOTSTRAP.useLegacyFont()) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
 
+const val LEGACY_CENTER_SPACE_CODEPOINT = 0xFFC00
+const val CURRENT_CENTER_SPACE_CODEPOINT = 0xD0000
+
 private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((0xFFC00 - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+    get() = WidthComponent(Component.text().content((LEGACY_CENTER_SPACE_CODEPOINT - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
 private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((0xD0000 - 1).parseChar()).font(SPACE_KEY), 0)
+    get() = WidthComponent(Component.text().content((CURRENT_CENTER_SPACE_CODEPOINT - 1).parseChar()).font(SPACE_KEY), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
     get() = if (BOOTSTRAP.useLegacyFont()) {
         LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
@@ -104,4 +111,76 @@ fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
             .content((this + 0xD0000).parseChar()),
         width
     )
+}
+
+private class SplitBuilder(
+    private val chain: (Component) -> Unit
+) {
+    private var builder = Component.text()
+    var isClean = true
+        private set
+    fun accept(block: TextComponent.Builder.() -> Unit = {}) {
+        val build = builder.apply(block).build()
+        builder = Component.text()
+        isClean = true
+        chain(build)
+    }
+    fun build(block: TextComponent.Builder.() -> Unit = {}): Component {
+        val build = builder.apply(block).build()
+        builder = Component.text()
+        isClean = true
+        return build
+    }
+    fun append(like: ComponentLike) {
+        builder.append(like)
+        isClean = false
+    }
+    fun then(firstChain: (SplitBuilder, Component) -> Unit) = SplitBuilder other@ {
+        firstChain(this, it)
+        accept()
+    }
+}
+
+fun Component.split(endWidth: Int, charWidth: (Pair<Style, Int>) -> Int?): List<Component> {
+    var i = 0
+    val list = ArrayList<Component>()
+    val topBuilder = SplitBuilder {
+        i = 0
+        list.add(it)
+    }
+    fun Component.parse(target: SplitBuilder) {
+        if (this is TextComponent) {
+            val style = style()
+            if (style.font() == null) {
+                val subBuilder = target.then { b, c ->
+                    b.append(c)
+                }
+                val sb = StringBuilder()
+                for (codepoint in content().codePoints()) {
+                    sb.appendCodePoint(codepoint)
+                    i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
+                    if (i >= endWidth) {
+                        subBuilder.accept {
+                            style(style).content(sb.toString())
+                        }
+                        sb.setLength(0)
+                    }
+                }
+                if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
+                    style(style).content(sb.toString())
+                })
+                for (child in children()) {
+                    child.parse(subBuilder)
+                }
+                if (!subBuilder.isClean) target.append(subBuilder.build {
+                    style(style)
+                })
+            } else {
+                target.append(Component.text().content(content()).style(style))
+            }
+        }
+    }
+    parse(topBuilder)
+    if (!topBuilder.isClean) list.add(topBuilder.build())
+    return list
 }
