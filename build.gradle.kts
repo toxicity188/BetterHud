@@ -197,9 +197,15 @@ fun Project.library() = also {
 }
 fun Project.bukkitAudience() = dependency("net.kyori:adventure-platform-bukkit:$platform")
 
-val apiShare = project("api:standard-api").adventure()
-val apiBukkit = project("api:bukkit-api").adventure().dependency(apiShare).bukkit()
-val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare)
+fun Project.legacy() = also {
+    it.java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+val apiShare = project("api:standard-api").adventure().legacy()
+val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
 val apiFabric = project("api:fabric-api").adventure().dependency(apiShare)
 
 val api = listOf(
