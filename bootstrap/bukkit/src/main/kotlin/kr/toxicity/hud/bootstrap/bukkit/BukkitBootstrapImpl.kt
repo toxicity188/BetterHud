@@ -7,7 +7,10 @@ import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.bukkit.BukkitBootstrap
 import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
-import kr.toxicity.hud.api.bukkit.event.*
+import kr.toxicity.hud.api.bukkit.event.HudPlayerJoinEvent
+import kr.toxicity.hud.api.bukkit.event.HudPlayerQuitEvent
+import kr.toxicity.hud.api.bukkit.event.PluginReloadStartEvent
+import kr.toxicity.hud.api.bukkit.event.PluginReloadedEvent
 import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -38,10 +41,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
-import org.bukkit.command.ConsoleCommandSender
-import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -57,7 +56,6 @@ import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 
 @Suppress("UNUSED")
@@ -267,32 +265,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
             }
         }
-        getCommand("betterhud")?.setExecutor(object : TabExecutor {
-            override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<String>): Boolean {
-                CommandManager.command.execute(p0.toWrapper() ?: return false, p3.toList())
-                return true
-            }
-
-            private fun CommandSender.toWrapper() = when (this) {
-                is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
-                is ConsoleCommandSender -> object {
-                    override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
-                    override fun audience(): Audience = this@BukkitBootstrapImpl.console()
-                    override fun isOp(): Boolean = true
-                    override fun hasPermission(perm: String): Boolean = true
-                }
-                else -> null
-            }
-
-            override fun onTabComplete(
-                p0: CommandSender,
-                p1: Command,
-                p2: String,
-                p3: Array<String>
-            ): List<String>? {
-                return CommandManager.command.tabComplete(p0.toWrapper() ?: return null, p3.toList())
-            }
-        })
+        nms.registerCommand(CommandManager.module)
         core.start()
         scheduler.asyncTask {
             core.reload()
@@ -314,17 +287,16 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         if (ConfigManagerImpl.disableToBedrockPlayer && bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
         PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
-            CompletableFuture.supplyAsync {
-                val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
+            val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
+            asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
-                    taskLater(20) {
-                        sendResourcePack(impl)
-                    }
+                    sendResourcePack(impl)
+                    nms.syncCommands(player)
                     HudPlayerJoinEvent(impl).call()
                 }
-                impl
-            }.join()
+            }
+            impl
         }
     }
 
@@ -348,7 +320,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun sendResourcePack(hudPlayer: HudPlayer) {
         PackUploader.server?.let {
             if (nms.version >= NMSVersion.V1_20_R3) {
-                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null as? String, false)
+                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
             } else {
                 (hudPlayer.handle() as Player).setResourcePack(it.url, it.digest, null, false)
             }

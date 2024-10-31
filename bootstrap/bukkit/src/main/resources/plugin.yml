@@ -5,6 +5,7 @@ api-version: 1.17
 author: toxicity
 description: Make a hud in minecraft!
 folia-supported: true
+load: STARTUP
 website: "https://www.spigotmc.org/resources/115559"
 softdepend:
   - MythicLib
@@ -23,12 +24,6 @@ softdepend:
   - SkinsRestorer
   - Parties
   - GPS
-commands:
-  betterhud:
-    aliases:
-      - hud
-    description: BetterHud's command.
-    usage: /<command>
 permissions:
   hud.help:
     description: Access to help command.
@@ -40,28 +35,24 @@ permissions:
     description: Access to hud command.
     default: op
     children:
-      hud.hud.help: true
       hud.hud.add: true
       hud.hud.remove: true
   hud.compass:
     description: Access to compass command.
     default: op
     children:
-      hud.compass.help: true
       hud.compass.add: true
       hud.compass.remove: true
   hud.turn:
     description: Access to turn command.
     default: op
     children:
-      hud.turn.help: true
       hud.turn.on: true
       hud.turn.off: true
   hud.pointer:
     description: Access to pointer command.
     default: op
     children:
-      hud.pointer.help: true
       hud.pointer.set: true
       hud.pointer.clear: true
       hud.pointer.remove: true
@@ -69,7 +60,6 @@ permissions:
     description: Access to popup command.
     default: op
     children:
-      hud.popup.help: true
       hud.popup.add: true
       hud.popup.remove: true
       hud.popup.show: true

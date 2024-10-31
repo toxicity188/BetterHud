@@ -1,7 +1,6 @@
 package kr.toxicity.hud.api;
 
 import kr.toxicity.command.BetterCommandSource;
-import kr.toxicity.command.CommandModule;
 import kr.toxicity.command.SenderType;
 import kr.toxicity.hud.api.adapter.WorldWrapper;
 import kr.toxicity.hud.api.player.HudPlayer;
@@ -199,6 +198,4 @@ public interface BetterHudBootstrap {
             }
         };
     }
-
-    void registerCommand(@NotNull CommandModule<BetterCommandSource> module);
 }

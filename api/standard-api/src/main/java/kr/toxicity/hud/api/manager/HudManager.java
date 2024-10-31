@@ -29,4 +29,10 @@ public interface HudManager {
      * @return default hud
      */
     @NotNull @Unmodifiable Set<Hud> getDefaultHuds();
+
+    /**
+     * Gets all hud.
+     * @return all hud
+     */
+    @NotNull @Unmodifiable Set<Hud> getAllHuds();
 }

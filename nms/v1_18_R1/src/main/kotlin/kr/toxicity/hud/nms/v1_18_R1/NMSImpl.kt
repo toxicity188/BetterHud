@@ -111,8 +111,11 @@ class NMSImpl : NMS {
         return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
+    override fun syncCommands(player: Player) {
+        (Bukkit.getServer() as CraftServer).server.commands.sendCommands((player as CraftPlayer).handle)
+    }
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
-        val dispatcher = (Bukkit.getServer() as CraftServer).handle.server.commands.dispatcher
+        val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
         module.build { s: CommandSourceStack ->
             when (val sender = s.bukkitSender) {
                 is ConsoleCommandSender -> BetterHudAPI.inst().bootstrap().consoleSource()

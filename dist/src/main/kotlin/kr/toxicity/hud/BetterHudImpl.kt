@@ -89,30 +89,31 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         }
     }
 
-    private val managers = listOf(
-        ConfigManagerImpl,
-        MinecraftManager,
-        CommandManager,
-        DatabaseManagerImpl,
-
-        ListenerManagerImpl,
-        PlaceholderManagerImpl,
-        TriggerManagerImpl,
-
-        BackgroundManager,
-        ImageManager,
-        TextManagerImpl,
-        PlayerHeadManager,
-        LayoutManager,
-        HudManagerImpl,
-        PopupManagerImpl,
-        CompassManagerImpl,
-
-        ShaderManagerImpl,
-        PlayerManagerImpl,
-    )
+    private var managers: List<BetterHudManager> = emptyList()
 
     fun start() {
+        managers = listOf(
+            ConfigManagerImpl,
+            MinecraftManager,
+            CommandManager,
+            DatabaseManagerImpl,
+
+            ListenerManagerImpl,
+            PlaceholderManagerImpl,
+            TriggerManagerImpl,
+
+            BackgroundManager,
+            ImageManager,
+            TextManagerImpl,
+            PlayerHeadManager,
+            LayoutManager,
+            HudManagerImpl,
+            PopupManagerImpl,
+            CompassManagerImpl,
+
+            ShaderManagerImpl,
+            PlayerManagerImpl,
+        )
         managers.forEach {
             it.start()
         }

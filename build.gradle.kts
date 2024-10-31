@@ -32,6 +32,7 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
+val betterCommand = "52e73bee1c"
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -154,7 +155,7 @@ subprojects {
         }
     }
     dependencies {
-        compileOnly("com.github.toxicity188:BetterCommand:2fb608429a")
+        compileOnly("com.github.toxicity188:BetterCommand:$betterCommand")
     }
 }
 
@@ -267,7 +268,7 @@ dependencies {
         implementation(it)
     }
     implementation(dist)
-    implementation("com.github.toxicity188:BetterCommand:2fb608429a")
+    implementation("com.github.toxicity188:BetterCommand:$betterCommand")
     implementation("org.bstats:bstats-bukkit:$bStats")
     implementation("org.bstats:bstats-velocity:$bStats")
 }
