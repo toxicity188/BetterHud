@@ -351,7 +351,7 @@ object CommandManager : BetterHudManager {
                                         val map = mapOf(
                                             "player" to Component.text(player.name()),
                                             "popup" to Component.text(popup.name),
-                                            "cause" to Component.text(e.message ?: e.javaClass.simpleName)
+                                            "cause" to Component.text("${e.javaClass.simpleName}: ${e.message}")
                                         )
                                         show_error1.send(me, map)
                                         show_error2.send(me, map)
@@ -390,7 +390,7 @@ object CommandManager : BetterHudManager {
                                         val map = mapOf(
                                             "player" to Component.text(player.name()),
                                             "popup" to Component.text(popup.name),
-                                            "cause" to Component.text(e.message ?: e.javaClass.simpleName)
+                                            "cause" to Component.text("${e.javaClass.simpleName}: ${e.message}")
                                         )
                                         hide_error1.send(me, map)
                                         hide_error2.send(me, map)
