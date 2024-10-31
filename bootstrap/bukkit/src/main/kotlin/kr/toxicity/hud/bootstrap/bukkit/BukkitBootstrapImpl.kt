@@ -4,7 +4,6 @@ import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.bukkit.BukkitBootstrap
 import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
@@ -276,7 +275,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
             private fun CommandSender.toWrapper() = when (this) {
                 is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
-                is ConsoleCommandSender -> object : CommandSourceWrapper {
+                is ConsoleCommandSender -> object {
                     override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
                     override fun audience(): Audience = this@BukkitBootstrapImpl.console()
                     override fun isOp(): Boolean = true

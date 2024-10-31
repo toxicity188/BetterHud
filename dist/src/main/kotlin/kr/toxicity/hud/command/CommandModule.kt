@@ -1,6 +1,5 @@
 package kr.toxicity.hud.command
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.util.NAME_SPACE
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.toComponent

@@ -1,7 +1,6 @@
 package kr.toxicity.hud.bootstrap.velocity.player
 
 import com.velocitypowered.api.proxy.Player
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.manager.PlayerManagerImpl
@@ -35,7 +34,7 @@ class HudPlayerVelocity(
         inject()
     }
 
+    override fun locale(): Locale = player.effectiveLocale ?: Locale.US
+
     override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)
-    override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.PLAYER
-    override fun isOp(): Boolean = player.hasPermission("betterhud.admin")
 }

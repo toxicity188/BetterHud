@@ -1,6 +1,5 @@
 package kr.toxicity.hud.bootstrap.bukkit.player
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
@@ -25,6 +24,11 @@ class HudPlayerBukkit(
         player.world.name,
         player.world.uid
     )
+
+    override fun locale(): Locale = player.locale.let {
+        val split = it.split('_')
+        if (split.size == 1) Locale.of(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
+    }
 
     override fun location(): LocationWrapper {
 
@@ -60,6 +64,4 @@ class HudPlayerBukkit(
     }
 
     override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)
-    override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.PLAYER
-    override fun isOp(): Boolean = player.isOp
 }

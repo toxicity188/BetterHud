@@ -1,17 +1,6 @@
 package kr.toxicity.hud.api;
 
-import org.jetbrains.annotations.NotNull;
+import kr.toxicity.command.CommandLogger;
 
-public interface BetterHudLogger {
-    /**
-     * Logs info level log.
-     * @param message message
-     */
-    void info(@NotNull String... message);
-
-    /**
-     * Logs warn level log.
-     * @param message message
-     */
-    void warn(@NotNull String... message);
+public interface BetterHudLogger extends CommandLogger {
 }

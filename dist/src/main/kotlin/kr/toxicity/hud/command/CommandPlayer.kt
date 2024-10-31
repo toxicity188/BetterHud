@@ -1,6 +1,5 @@
 package kr.toxicity.hud.command
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import net.kyori.adventure.text.Component
 
 interface CommandPlayer {

@@ -1,6 +1,5 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
@@ -17,6 +16,7 @@ import java.util.concurrent.CompletableFuture
 
 object CommandManager : BetterHudManager {
 
+    /*
     val command = CommandModule("hud")
         .addCommand("reload") {
             aliases = listOf("re", "rl", "리로드")
@@ -444,6 +444,7 @@ object CommandManager : BetterHudManager {
                 }
             }
         }
+     */
 
     override fun start() {
     }

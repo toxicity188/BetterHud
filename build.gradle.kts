@@ -153,6 +153,9 @@ subprojects {
             displayName = project.name
         }
     }
+    dependencies {
+        compileOnly("com.github.toxicity188:BetterCommand:2fb608429a")
+    }
 }
 
 
@@ -264,6 +267,7 @@ dependencies {
         implementation(it)
     }
     implementation(dist)
+    implementation("com.github.toxicity188:BetterCommand:2fb608429a")
     implementation("org.bstats:bstats-bukkit:$bStats")
     implementation("org.bstats:bstats-velocity:$bStats")
 }

@@ -1,5 +1,7 @@
 package kr.toxicity.hud.bootstrap.fabric
 
+import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.command.CommandModule
 import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
@@ -273,5 +275,8 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }.apply {
             isAccessible = true
         }[loader] as URLClassLoader
+    }
+
+    override fun registerCommand(module: CommandModule<BetterCommandSource>) {
     }
 }

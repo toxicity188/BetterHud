@@ -1,6 +1,7 @@
 package kr.toxicity.hud.bootstrap.velocity
 
 import com.google.inject.Inject
+import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PostLoginEvent
@@ -13,11 +14,12 @@ import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.scheduler.ScheduledTask
+import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.command.CommandModule
 import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
@@ -199,17 +201,6 @@ class VelocityBootstrapImpl @Inject constructor(
         }
     }
 
-    private fun CommandSource.toWrapper() = when (this) {
-        is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
-        is ConsoleCommandSource -> object : CommandSourceWrapper {
-            override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
-            override fun audience(): Audience = this@toWrapper
-            override fun isOp(): Boolean = true
-            override fun hasPermission(perm: String): Boolean = true
-        }
-        else -> null
-    }
-
     override fun logger(): BetterHudLogger = log
     override fun dataFolder(): File = File(dataFolder.toFile().parentFile, "BetterHud")
 
@@ -256,5 +247,24 @@ class VelocityBootstrapImpl @Inject constructor(
 
     override fun loader(): URLClassLoader {
         return javaClass.classLoader as URLClassLoader
+    }
+
+    override fun registerCommand(module: CommandModule<BetterCommandSource>) {
+        module.build { s: CommandSource ->
+            when (s) {
+                is ConsoleCommandSource -> BetterHudAPI.inst().bootstrap().consoleSource()
+                is Player -> BetterHudAPI.inst().playerManager.getHudPlayer(s.uniqueId)
+                else -> null
+            }
+        }.forEach {
+            BrigadierCommand(it).add()
+        }
+    }
+
+    private fun BrigadierCommand.add() {
+        proxyServer.commandManager.register(
+            proxyServer.commandManager.metaBuilder(this).build(),
+            this
+        )
     }
 }
