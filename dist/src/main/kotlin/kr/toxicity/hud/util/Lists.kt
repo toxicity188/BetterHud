@@ -1,6 +1,8 @@
 package kr.toxicity.hud.util
 
-import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()
@@ -25,16 +27,6 @@ fun <T> Collection<T>.forEachAsync(block: (T) -> Unit) {
     toList().forEachAsync(block)
 }
 
-fun <T> List<T>.forEachSync(block: (T) -> Unit) {
-    synchronized(this) {
-        val iterator = iterator()
-        synchronized(iterator) {
-            while (iterator.hasNext()) {
-                block(iterator.next())
-            }
-        }
-    }
-}
 fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
     synchronized(this) {
         val iterator = iterator()
@@ -50,14 +42,14 @@ fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
     if (isNotEmpty()) {
         val available = Runtime.getRuntime().availableProcessors()
-        val queue = if (available >= size) {
-            LinkedList(map {
+        val tasks = if (available >= size) {
+            map {
                 {
                     block(it)
                 }
-            })
+            }
         } else {
-            val queue = LinkedList<() -> Unit>()
+            val queue = ArrayList<() -> Unit>()
             var i = 0
             val add = (size.toDouble() / available).toInt()
             while (i <= size) {
@@ -71,29 +63,13 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
             }
             queue
         }
-        var i = 0
-        object : Thread() {
-            private val index = TaskIndex(queue.size)
-            override fun run() {
-                while (!isInterrupted) {
-                    queue.poll()?.let {
-                        val task = i++
-                        Thread {
-                            runWithExceptionHandling(CONSOLE, "Fail to run thread $task.") {
-                                it()
-                            }
-                            synchronized(index) {
-                                if (++index.current == index.max) {
-                                    interrupt()
-                                }
-                            }
-                        }.start()
-                    }
-                }
-            }
-        }.run {
-            start()
-            join()
-        }
+        val pool = Executors.newFixedThreadPool(tasks.size)
+        CompletableFuture.allOf(
+            *tasks.map {
+                CompletableFuture.runAsync({
+                    it()
+                }, pool)
+            }.toTypedArray()
+        ).join()
     }
 }

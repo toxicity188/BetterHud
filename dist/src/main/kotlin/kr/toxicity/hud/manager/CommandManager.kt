@@ -30,7 +30,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.File
 import java.text.DecimalFormat
-import java.util.concurrent.CompletableFuture
 
 object CommandManager : BetterHudManager {
 
@@ -128,7 +127,7 @@ object CommandManager : BetterHudManager {
             @Permission("hud.reload")
             fun reload(@Source me: BetterCommandSource) {
                 reload_tryReload.send(me)
-                CompletableFuture.runAsync {
+                asyncTask {
                     when (val reload = PLUGIN.reload()) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
@@ -151,7 +150,7 @@ object CommandManager : BetterHudManager {
             @Permission("hud.generate")
             fun generate(@Source me: BetterCommandSource) {
                 generate_tryGenerate.send(me)
-                CompletableFuture.runAsync {
+                asyncTask {
                     val locale = me.locale()
                     val localeString = mapOf("name" to Component.text(locale.toString()))
                     if (library.generateDefaultLang(locale)) generate_success.send(me, localeString)
