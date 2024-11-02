@@ -448,16 +448,10 @@ fabricBootstrap.modrinthPublish(
 )
 
 tasks.create("modrinthPublish") {
-    val list = mutableListOf(
-        tasks.shadowJar,
-        sourceJar,
-        dokkaJar,
-        tasks.modrinthSyncBody
-    )
-    bootstrap.forEach {
-        list.add(it.tasks.modrinth)
-    }
-    dependsOn(*list.toTypedArray())
+    dependsOn(*bootstrap.map {
+        it.tasks.modrinth
+    }.toTypedArray())
+    dependsOn(tasks.modrinthSyncBody)
 }
 
 hangarPublish {
