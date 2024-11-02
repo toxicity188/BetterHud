@@ -108,6 +108,12 @@ object CommandManager : BetterHudManager {
             .nullMessage(CommandMessage("betterhud.null.vector", Component.text("Invalid vector: [value]")))
             .build()
         )
+        .addSerializer(CompassIcon::class.java, ClassSerializer.builder { _, s -> CompassIcon(s) }
+            .name("icon")
+            .suggests { if (it is HudPlayer) it.pointers().map { s -> s.name } else emptyList() }
+            .nullMessage(CommandMessage("betterhud.null.icon", Component.text("Unable to find this icon: [icon]")))
+            .build()
+        )
 
     @Suppress("UNUSED")
     val module = library.module<BetterCommandSource>("hud")
@@ -411,8 +417,8 @@ object CommandManager : BetterHudManager {
                     @Description(key = "betterhud.turn.on.description", defaultValue = "Turns on your HUD.")
                     @Permission("hud.turn.on")
                     @Sender(type = [SenderType.PLAYER])
-                    fun on(@Source me: BetterCommandSource) {
-                        (me as HudPlayer).isHudEnabled = true
+                    fun on(@Source me: HudPlayer) {
+                        me.isHudEnabled = true
                         on_success.send(me)
                     }
                     //Turn on
@@ -423,8 +429,8 @@ object CommandManager : BetterHudManager {
                     @Description(key = "betterhud.turn.off.description", defaultValue = "Turns off your HUD.")
                     @Permission("hud.turn.off")
                     @Sender(type = [SenderType.PLAYER])
-                    fun off(@Source me: BetterCommandSource) {
-                        (me as HudPlayer).isHudEnabled = false
+                    fun off(@Source me: HudPlayer) {
+                        me.isHudEnabled = false
                         off_success.send(me)
                     }
                     //Turn off
@@ -439,11 +445,11 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.pointer.set.description", defaultValue = "Sets the compass pointer location of some player.")
                     @Permission("hud.pointer.set")
-                    fun set(@Source me: BetterCommandSource, players: HudPlayerStack, name: String, world: WorldWrapper, vector: Vec3, @Option icon: String?) {
+                    fun set(@Source me: BetterCommandSource, players: HudPlayerStack, name: String, world: WorldWrapper, vector: Vec3, @Option icon: CompassIcon?) {
                         val loc = PointedLocation(
                             PointedLocationSource.INTERNAL,
                             name,
-                            icon,
+                            icon?.string,
                             LocationWrapper(
                                 world,
                                 vector.x,

@@ -435,5 +435,5 @@ modrinth {
     )
     gameVersions = supportedMinecraftVersions
     loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
-    syncBodyFrom = rootProject.file("README.md").readText()
+    syncBodyFrom = rootProject.file("BANNER.md").readText()
 }

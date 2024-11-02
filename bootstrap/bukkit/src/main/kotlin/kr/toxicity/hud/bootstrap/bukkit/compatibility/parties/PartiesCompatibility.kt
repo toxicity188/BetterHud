@@ -55,7 +55,16 @@ class PartiesCompatibility : Compatibility {
             }
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
-        get() = mapOf()
+        get() = mapOf(
+            "is_leader" to HudPlaceholder.of { _, _ ->
+                Function get@ { p ->
+                    val uuid = p.bukkitPlayer.uniqueId
+                    val player = parties.playerManager.getPlayer(uuid) ?: return@get false
+                    val party = parties.partyManager.getPartyOfPlayer(player) ?: return@get false
+                    party.leader == player.playerUUID
+                }
+            }
+        )
 
     override fun start() {
         parties = Class.forName("com.alessiodp.parties.core.bukkit.bootstrap.ADPBukkitBootstrap").getDeclaredField("plugin").run {
