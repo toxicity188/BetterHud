@@ -412,6 +412,7 @@ tasks {
         enabled = false
     }
     shadowJar {
+        archiveClassifier = ""
         dependencies {
             exclude(dependency("org.jetbrains:annotations:13.0"))
         }
@@ -468,5 +469,7 @@ hangarPublish {
 }
 
 modrinth {
+    token = System.getenv("MODRINTH_API_TOKEN")
+    projectId = "betterhud2"
     syncBodyFrom = rootProject.file("BANNER.md").readText()
 }
