@@ -206,7 +206,7 @@ fun Project.legacy() = also {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
-fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versioList: List<String>) {
+fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
     tasks.modrinth {
         dependsOn(
@@ -223,7 +223,7 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         additionalFiles = additionalJar.map {
             it.archiveFile
         }
-        gameVersions = versioList
+        gameVersions = versionList
         loaders = loadersList
     }
 }
@@ -460,11 +460,11 @@ hangarPublish {
         changelog = System.getenv("COMMIT_MESSAGE")
         platforms {
             register(Platforms.PAPER) {
-                jar = file("build/libs/${project.name}-${project.version}.jar")
+                jar = pluginJar.archiveFile
                 platformVersions = supportedMinecraftVersions
             }
             register(Platforms.VELOCITY) {
-                jar = file("build/libs/${project.name}-${project.version}.jar")
+                jar = velocityJar.archiveFile
                 platformVersions = supportedVelocityVersions
             }
         }
