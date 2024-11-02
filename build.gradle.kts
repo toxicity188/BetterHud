@@ -218,7 +218,7 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         projectId = "betterhud2"
         versionType = "alpha"
         changelog = System.getenv("COMMIT_MESSAGE")
-        versionName = "BetterHud ${project.version} for ${depend.archiveClassifier}"
+        versionName = "${project.version}-${depend.archiveClassifier}"
         versionNumber = project.version as String
         uploadFile.set(depend.archiveFile)
         additionalFiles = additionalJar.map {
