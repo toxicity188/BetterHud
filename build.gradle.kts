@@ -218,7 +218,7 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         projectId = "betterhud2"
         versionType = "alpha"
         changelog = System.getenv("COMMIT_MESSAGE")
-        versionName = "${project.version}-${depend.archiveClassifier}"
+        versionName = "BetterHud ${project.version} for ${depend.archiveClassifier.get()}"
         versionNumber = project.version as String
         uploadFile.set(depend.archiveFile)
         additionalFiles = additionalJar.map {
@@ -447,15 +447,16 @@ fabricBootstrap.modrinthPublish(
 )
 
 tasks.create("modrinthPublish") {
-    dependsOn(
+    val list = mutableListOf(
         tasks.shadowJar,
         sourceJar,
         dokkaJar,
         tasks.modrinthSyncBody
     )
     bootstrap.forEach {
-        dependsOn(it.tasks.modrinth)
+        list.add(it.tasks.modrinth)
     }
+    dependsOn(*list.toTypedArray())
 }
 
 hangarPublish {
