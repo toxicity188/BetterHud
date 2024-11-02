@@ -1,4 +1,4 @@
-<div align="center">  
+<div style="text-align: center;">
 
 ![-0001-export](https://github.com/toxicity188/BetterHud/assets/114675706/ccbf4bd3-9133-44ee-b277-985eae4349ae)
 
@@ -47,7 +47,8 @@ This project implements a server-side HUD.
 Requires Java 17, 21 Eclipse Adoptium.
 
 - Build all available jar: ./gradlew build  
-- Build Bukkit plugin: ./gradlew pluginJar  
+- Build Bukkit plugin: ./gradlew pluginJar
+- Build Velocity plugin: ./gradlew velocityJar
 - Build Fabric server side mod: ./gradlew fabricJar  
 - Build source code jar: ./gradlew sourceJar  
 - Build dokka-based docs jar: ./gradlew dokkaJar

@@ -206,6 +206,27 @@ fun Project.legacy() = also {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
+fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, supports: List<String>) {
+    apply(plugin = "com.modrinth.minotaur")
+    tasks.modrinth {
+        dependsOn(
+            depend
+        )
+    }
+    modrinth {
+        token = System.getenv("MODRINTH_API_TOKEN")
+        projectId = "betterhud2"
+        versionType = "alpha"
+        changelog = System.getenv("COMMIT_MESSAGE")
+        versionNumber = project.version as String
+        uploadFile.set(depend.archiveFile)
+        additionalFiles = additionalJar.map {
+            it.archiveFile
+        }
+        gameVersions = supportedMinecraftVersions
+        loaders = supports
+    }
+}
 
 val apiShare = project("api:standard-api").adventure().legacy()
 val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
@@ -307,9 +328,7 @@ val fabricJar by tasks.creating(Jar::class.java) {
     }
 }
 val pluginJar by tasks.creating(Jar::class.java) {
-    from(zipTree(velocityBootstrap.tasks.jar.map {
-        it.archiveFile
-    }))
+    archiveClassifier = "bukkit"
     from(zipTree(bukkitBootstrap.tasks.jar.map {
         it.archiveFile
     }))
@@ -334,6 +353,18 @@ val pluginJar by tasks.creating(Jar::class.java) {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
+    doLast {
+        relocateAll()
+    }
+}
+val velocityJar by tasks.creating(Jar::class.java) {
+    archiveClassifier = "velocity"
+    from(zipTree(velocityBootstrap.tasks.jar.map {
+        it.archiveFile
+    }))
+    from(zipTree(tasks.shadowJar.map {
+        it.archiveFile
+    }))
     doLast {
         relocateAll()
     }
@@ -375,10 +406,7 @@ tasks {
         pluginJars(fileTree("plugins"))
     }
     build {
-        finalizedBy(sourceJar)
-        finalizedBy(dokkaJar)
-        finalizedBy(pluginJar)
-        finalizedBy(fabricJar)
+        finalizedBy(sourceJar, dokkaJar, pluginJar, velocityJar, fabricJar)
     }
     logLinkDokkaGeneratePublicationHtml {
         enabled = false
@@ -390,15 +418,33 @@ tasks {
     }
 }
 
-tasks.modrinth {
+bukkitBootstrap.modrinthPublish(
+    pluginJar,
+    listOf(sourceJar, dokkaJar),
+    listOf("bukkit", "spigot", "paper", "purpur", "folia")
+)
+
+velocityBootstrap.modrinthPublish(
+    velocityJar,
+    listOf(sourceJar, dokkaJar),
+    listOf("velocity")
+)
+fabricBootstrap.modrinthPublish(
+    fabricJar,
+    listOf(sourceJar, dokkaJar),
+    listOf("fabric", "qulit")
+)
+
+tasks.create("modrinthPublish") {
     dependsOn(
         tasks.shadowJar,
         sourceJar,
         dokkaJar,
-        pluginJar,
-        fabricJar,
         tasks.modrinthSyncBody
     )
+    bootstrap.forEach {
+        dependsOn(it.modrinth)
+    }
 }
 
 hangarPublish {
@@ -422,18 +468,5 @@ hangarPublish {
 }
 
 modrinth {
-    token = System.getenv("MODRINTH_API_TOKEN")
-    projectId = "betterhud2"
-    versionType = "alpha"
-    changelog = System.getenv("COMMIT_MESSAGE")
-    versionNumber = project.version as String
-    uploadFile.set(file("build/libs/${project.name}-${project.version}.jar"))
-    additionalFiles = listOf(
-        file("build/libs/${project.name}-${project.version}-dokka.jar"),
-        file("build/libs/${project.name}-${project.version}-source.jar"),
-        file("build/libs/${project.name}-${project.version}-fabric+$minecraft.jar")
-    )
-    gameVersions = supportedMinecraftVersions
-    loaders = listOf("bukkit", "spigot", "paper", "purpur", "folia", "velocity")
     syncBodyFrom = rootProject.file("BANNER.md").readText()
 }

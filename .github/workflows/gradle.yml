@@ -27,6 +27,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Publish to Modrinth
-      run: ./gradlew modrinth --stacktrace
+      run: ./gradlew modrinthPublish --stacktrace
     - name: Publish to Hangar
       run: ./gradlew publishPluginPublicationToHangar --stacktrace
