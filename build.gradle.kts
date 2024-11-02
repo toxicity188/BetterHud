@@ -218,7 +218,8 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         projectId = "betterhud2"
         versionType = "alpha"
         changelog = System.getenv("COMMIT_MESSAGE")
-        versionNumber = "${depend.archiveClassifier}-${project.version}"
+        versionNumber = "${project.version} for ${depend.archiveClassifier}"
+        versionName = project.version as String
         uploadFile.set(depend.archiveFile)
         additionalFiles = additionalJar.map {
             it.archiveFile
@@ -435,7 +436,7 @@ velocityBootstrap.modrinthPublish(
 fabricBootstrap.modrinthPublish(
     fabricJar,
     listOf(sourceJar, dokkaJar),
-    listOf("fabric", "qulit"),
+    listOf("fabric", "quilt"),
     listOf(minecraft)
 )
 
