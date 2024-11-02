@@ -124,7 +124,7 @@ object CommandManager : BetterHudManager {
             //Reload
             private val reload_tryReload = library.registerKey(CommandMessage("betterhud.reload.message.try_reload", Component.text("Trying to reload. please wait...")))
             private val reload_onReload = library.registerKey(CommandMessage("betterhud.reload.message.on_reload", Component.text("The plugin is still reloading!")))
-            private val reload_success = library.registerKey(CommandMessage("betterhud.reload.message.success", Component.text("Reload successful! [time] ms)")))
+            private val reload_success = library.registerKey(CommandMessage("betterhud.reload.message.success", Component.text("Reload successful! ([time] ms)")))
             private val reload_failure1 = library.registerKey(CommandMessage("betterhud.reload.message.failure.1", Component.text("Reload failed.")))
             private val reload_failure2 = library.registerKey(CommandMessage("betterhud.reload.message.failure.2", Component.text("Cause: [cause]")))
             @Command

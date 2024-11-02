@@ -96,7 +96,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.7" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
+    version = "1.8" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -209,10 +209,16 @@ fun Project.legacy() = also {
 fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
     modrinth {
+        val log = System.getenv("COMMIT_MESSAGE")
+        if (log != null) {
+            versionType = "alpha"
+            changelog = log
+        } else {
+            versionType = "release"
+            changelog = rootProject.file("changelog/${project.version}.md").readText()
+        }
         token = System.getenv("MODRINTH_API_TOKEN")
         projectId = "betterhud2"
-        versionType = "alpha"
-        changelog = System.getenv("COMMIT_MESSAGE")
         versionName = "BetterHud ${project.version} for ${depend.archiveClassifier.get()}"
         versionNumber = project.version as String
         uploadFile.set(depend.archiveFile)
@@ -452,10 +458,16 @@ tasks.create("modrinthPublish") {
 hangarPublish {
     publications.register("plugin") {
         version = project.version as String
-        channel = "Snapshot"
         id = "BetterHud"
         apiKey = System.getenv("HANGAR_API_TOKEN")
-        changelog = System.getenv("COMMIT_MESSAGE")
+        val log = System.getenv("COMMIT_MESSAGE")
+        if (log != null) {
+            changelog = log
+            channel = "Snapshot"
+        } else {
+            changelog = rootProject.file("changelog/${project.version}.md").readText()
+            channel = "Release"
+        }
         platforms {
             register(Platforms.PAPER) {
                 jar = file("build/libs/${project.name}-${project.version}-bukkit.jar")
