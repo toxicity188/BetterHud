@@ -443,7 +443,7 @@ tasks.create("modrinthPublish") {
         tasks.modrinthSyncBody
     )
     bootstrap.forEach {
-        dependsOn(it.modrinth)
+        dependsOn(it.tasks.modrinth)
     }
 }
 
