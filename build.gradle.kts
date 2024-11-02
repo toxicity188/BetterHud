@@ -206,7 +206,7 @@ fun Project.legacy() = also {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
-fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>) {
+fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
     tasks.modrinth {
         dependsOn(
@@ -218,14 +218,17 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         projectId = "betterhud2"
         versionType = "alpha"
         changelog = System.getenv("COMMIT_MESSAGE")
-        versionNumber = "${project.version} for ${depend.archiveClassifier}"
-        versionName = project.version as String
+        versionName = "BetterHud ${project.version} for ${depend.archiveClassifier}"
+        versionNumber = project.version as String
         uploadFile.set(depend.archiveFile)
         additionalFiles = additionalJar.map {
             it.archiveFile
         }
         gameVersions = versionList
         loaders = loadersList
+        requiredDependency.forEach {
+            required.project(it)
+        }
     }
 }
 
@@ -425,19 +428,22 @@ bukkitBootstrap.modrinthPublish(
     listOf(sourceJar, dokkaJar),
     listOf("bukkit", "spigot", "paper", "purpur", "folia"),
     supportedMinecraftVersions,
+    listOf()
 )
 
 velocityBootstrap.modrinthPublish(
     velocityJar,
     listOf(sourceJar, dokkaJar),
     listOf("velocity"),
-    supportedMinecraftVersions
+    supportedMinecraftVersions,
+    listOf()
 )
 fabricBootstrap.modrinthPublish(
     fabricJar,
     listOf(sourceJar, dokkaJar),
     listOf("fabric", "quilt"),
-    listOf(minecraft)
+    listOf(minecraft),
+    listOf("fabric-api")
 )
 
 tasks.create("modrinthPublish") {
