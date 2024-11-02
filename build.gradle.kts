@@ -208,11 +208,6 @@ fun Project.legacy() = also {
 }
 fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
-    tasks.modrinth {
-        dependsOn(
-            depend
-        )
-    }
     modrinth {
         token = System.getenv("MODRINTH_API_TOKEN")
         projectId = "betterhud2"
@@ -463,11 +458,11 @@ hangarPublish {
         changelog = System.getenv("COMMIT_MESSAGE")
         platforms {
             register(Platforms.PAPER) {
-                jar = pluginJar.archiveFile
+                jar = file("build/libs/${project.name}-${project.version}-bukkit.jar")
                 platformVersions = supportedMinecraftVersions
             }
             register(Platforms.VELOCITY) {
-                jar = velocityJar.archiveFile
+                jar = file("build/libs/${project.name}-${project.version}-velocity.jar")
                 platformVersions = supportedVelocityVersions
             }
         }
