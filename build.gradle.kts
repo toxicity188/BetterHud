@@ -281,7 +281,8 @@ val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventu
 
 val bootstrap = listOf(
     bukkitBootstrap,
-    velocityBootstrap
+    velocityBootstrap,
+    fabricBootstrap
 )
 
 allNmsVersion.forEach {
