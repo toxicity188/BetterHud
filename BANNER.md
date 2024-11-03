@@ -61,5 +61,5 @@ This plugin utilizes a boss bar, but you can still use the first boss bar.
 No
 
 ### Version
-Plugin: 1.17-1.21.3  
+Plugin: 1.18.2-1.21.3  
 Fabric mod: server 1.21.3

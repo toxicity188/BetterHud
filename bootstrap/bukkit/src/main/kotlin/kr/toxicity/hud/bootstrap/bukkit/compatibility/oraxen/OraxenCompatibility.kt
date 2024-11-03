@@ -1,24 +1,17 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.oraxen
 
-import io.th0rgal.oraxen.api.events.OraxenPackGeneratedEvent
-import io.th0rgal.oraxen.utils.VirtualFile
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.plugin.ReloadState.Failure
-import kr.toxicity.hud.api.plugin.ReloadState.OnReload
-import kr.toxicity.hud.api.plugin.ReloadState.Success
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
-import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
-import kr.toxicity.hud.manager.ConfigManagerImpl
-import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.BOOTSTRAP
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import java.io.ByteArrayInputStream
+import org.bukkit.Bukkit
+import org.bukkit.plugin.Plugin
 
 class OraxenCompatibility : Compatibility {
     override val website: String = "https://www.spigotmc.org/resources/72448/"
@@ -34,36 +27,24 @@ class OraxenCompatibility : Compatibility {
         get() = mapOf()
 
     override fun start() {
-        registerListener(object : Listener {
-            @EventHandler
-            fun generate(event: OraxenPackGeneratedEvent) {
-                when (val state = PLUGIN.reload()) {
-                    is Success -> {
-                        val output = event.output
-                        state.resourcePack.forEach {
-                            output.add(
-                                VirtualFile(
-                                    it.key.substringBeforeLast('/'),
-                                    it.key.substringAfterLast('/'),
-                                    ByteArrayInputStream(it.value).buffered()
-                                )
-                            )
-                        }
-                        info("Successfully merged with Oraxen: (${state.time} ms)")
-                    }
-                    is Failure -> {
-                        val reason = mutableListOf(
-                            "Fail to merge the resource pack with Oraxen.",
-                            "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
-                        )
-                        if (ConfigManagerImpl.debug) {
-                            reason.add(state.throwable.stackTraceToString())
-                        }
-                        warn(*reason.toTypedArray())
-                    }
-                    is OnReload -> warn("This plugin is still on reload!")
-                }
+        (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
+        val version = (Bukkit.getPluginManager().getPlugin("Oraxen") ?: return)
+            .description
+            .version
+        when (version
+            .substringBefore('.')
+            .toInt()
+        ) {
+            1 -> {
+                (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
+                OraxenR1Handler().handle(BOOTSTRAP as Plugin)
             }
-        })
+            2 -> {
+                (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
+                OraxenR2Handler().handle(BOOTSTRAP as Plugin)
+            }
+            else -> warn("Unknown Oraxen Version.")
+        }
+        info("Successfully handle Oraxen $version.")
     }
 }

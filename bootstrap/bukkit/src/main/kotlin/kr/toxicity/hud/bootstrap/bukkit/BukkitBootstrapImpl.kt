@@ -164,6 +164,9 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun core(): BetterHud = core
     override fun version(): String = description.version
 
+    @Volatile
+    var skipInitialReload = false
+
     override fun onEnable() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (MinecraftVersion.current) {
@@ -177,8 +180,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
             MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
             MinecraftVersion.version1_18_2 -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
-            MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
-            MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
+            //MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
+            //MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                 pluginManager.disablePlugin(this)
@@ -268,7 +271,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         nms.registerCommand(CommandManager.module)
         core.start()
         scheduler.asyncTask {
-            core.reload()
+            if (!skipInitialReload) core.reload()
             log.info(
                 "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
                 "Plugin enabled."

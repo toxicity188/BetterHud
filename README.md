@@ -23,7 +23,7 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(including Folia) 1.17-1.21.3
+- Bukkit(including Folia) 1.18.2-1.21.3
 - Velocity 3.3-3.4
 - Fabric server 1.21.3
 

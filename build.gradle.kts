@@ -36,11 +36,11 @@ val betterCommand = "1.0"
 
 val supportedMinecraftVersions = listOf(
     //1.17
-    "1.17",
-    "1.17.1",
+    //"1.17",
+    //"1.17.1",
     //1.18
-    "1.18",
-    "1.18.1",
+    //"1.18",
+    //"1.18.1",
     "1.18.2",
     //1.19
     "1.19",
@@ -68,8 +68,8 @@ val supportedVelocityVersions = listOf(
 )
 
 val legacyNmsVersion = listOf(
-    "v1_17_R1",
-    "v1_18_R1",
+    //"v1_17_R1",
+    //"v1_18_R1",
     "v1_18_R2",
     "v1_19_R1",
     "v1_19_R2",
@@ -256,6 +256,7 @@ fun Project.api() = dependency(api)
 
 val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
+val oraxen = project("oraxen")
 val bedrock = project("bedrock")
 
 allNmsVersion.forEach {
@@ -266,6 +267,9 @@ allNmsVersion.forEach {
 scheduler.project("standard").adventure().bukkit().api()
 scheduler.project("folia").folia().api()
 
+oraxen.project("1.0").bukkit().api()
+oraxen.project("2.0").bukkit().api()
+
 dist.dependency(allNmsVersion)
 
 val bukkitBootstrap = project("bootstrap:bukkit")
@@ -275,6 +279,7 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .dependency(dist)
     .bukkitAudience()
     .dependency(scheduler.subprojects)
+    .dependency(oraxen.subprojects)
     .dependency(bedrock.subprojects)
     .dependency(allNmsVersion)
 
@@ -347,6 +352,11 @@ val pluginJar by tasks.creating(Jar::class.java) {
         }))
     }
     bedrock.subprojects.forEach {
+        from(zipTree(it.tasks.jar.map { t ->
+            t.archiveFile
+        }))
+    }
+    oraxen.subprojects.forEach {
         from(zipTree(it.tasks.jar.map { t ->
             t.archiveFile
         }))
