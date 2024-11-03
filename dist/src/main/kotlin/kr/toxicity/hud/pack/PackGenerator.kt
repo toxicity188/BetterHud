@@ -25,24 +25,25 @@ object PackGenerator {
         return "${decimal.format(BigDecimal("${long}.000") / BigDecimal("1048576.000"))}MB"
     }
 
+    private open class Builder {
+        @Volatile
+        var byte = 0L
+        val byteArrayMap = WeakHashMap<String, ByteArray>()
+    }
     private class ZipBuilder(
         val zip: ZipOutputStream
-    ) {
-        @Volatile
-        var byte = 0L
-    }
+    ) : Builder()
     private class FileTreeBuilder(
         private val build: File
-    ) {
+    ) : Builder() {
         val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
-        @Volatile
-        var byte = 0L
 
         fun save(packFile: PackFile) {
             val replace = packFile.path.replace('/', File.separatorChar)
             val arr = packFile.array()
             synchronized(this) {
                 byte += arr.size
+                byteArrayMap[packFile.path] = arr
             }
             (synchronized(locationMap) {
                 locationMap.remove(replace)
@@ -72,8 +73,8 @@ object PackGenerator {
         }
     }
 
-    fun generate(sender: Audience) {
-        runWithExceptionHandling(sender, "Unable to make a resource pack.") {
+    fun generate(sender: Audience): Map<String, ByteArray> {
+        val resourcePack = runWithExceptionHandling(sender, "Unable to make a resource pack.") {
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
@@ -93,6 +94,24 @@ object PackGenerator {
                 }
             }
             val saveTask: Generator = when (ConfigManagerImpl.packType) {
+                PackType.NONE -> {
+                    val builder = Builder()
+                    object : Generator {
+                        override val resourcePack: Map<String, ByteArray>
+                            get() = Collections.unmodifiableMap(builder.byteArrayMap)
+
+                        override fun close() {
+                        }
+
+                        override fun invoke(p1: PackFile) {
+                            val byte = p1.array()
+                            synchronized(builder) {
+                                builder.byte += byte.size
+                                builder.byteArrayMap[p1.path] = byte
+                            }
+                        }
+                    }
+                }
                 PackType.FOLDER -> {
                     val build = DATA_FOLDER.parentFile.subFolder(ConfigManagerImpl.buildFolderLocation)
                     val pathLength = build.path.length + 1
@@ -117,6 +136,9 @@ object PackGenerator {
                         }
                     }
                     object : Generator {
+                        override val resourcePack: Map<String, ByteArray>
+                            get() = Collections.unmodifiableMap(builder.byteArrayMap)
+
                         override fun close() {
                             builder.close()
                         }
@@ -146,6 +168,7 @@ object PackGenerator {
                     })
                     fun addEntry(entry: ZipEntry, byte: ByteArray) {
                         synchronized(zip) {
+                            zip.byteArrayMap[entry.name] = byte
                             zip.byte += byte.size
                             zip.zip.putNextEntry(entry)
                             zip.zip.write(byte)
@@ -168,6 +191,9 @@ object PackGenerator {
                         ).toByteArray())
                     }
                     object : Generator {
+                        override val resourcePack: Map<String, ByteArray>
+                            get() = Collections.unmodifiableMap(zip.byteArrayMap)
+
                         override fun close() {
                             synchronized(zip) {
                                 zip.zip.close()
@@ -200,8 +226,12 @@ object PackGenerator {
                 saveTask.close()
             }
             tasks.clear()
+            saveTask.resourcePack
+        }.getOrElse {
+            emptyMap()
         }
         tasks.clear()
+        return resourcePack
     }
 
     fun addTask(dir: Iterable<String>, byteArray: () -> ByteArray) {
@@ -213,5 +243,7 @@ object PackGenerator {
         }
     }
 
-    private interface Generator : (PackFile) -> Unit, AutoCloseable
+    private interface Generator : (PackFile) -> Unit, AutoCloseable {
+        val resourcePack: Map<String, ByteArray>
+    }
 }

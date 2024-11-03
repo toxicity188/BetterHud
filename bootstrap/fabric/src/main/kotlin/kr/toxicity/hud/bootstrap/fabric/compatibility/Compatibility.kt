@@ -15,4 +15,6 @@ interface Compatibility {
     val numbers: Map<String, HudPlaceholder<Number>>
     val strings: Map<String, HudPlaceholder<String>>
     val booleans: Map<String, HudPlaceholder<Boolean>>
+
+    fun start() {}
 }

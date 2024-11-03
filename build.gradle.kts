@@ -206,7 +206,7 @@ fun Project.legacy() = also {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
-fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>) {
+fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>, softDependency: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
     modrinth {
         val log = System.getenv("COMMIT_MESSAGE")
@@ -229,6 +229,9 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
         loaders = loadersList
         requiredDependency.forEach {
             required.project(it)
+        }
+        softDependency.forEach {
+            optional.project(it)
         }
     }
 }
@@ -430,6 +433,7 @@ bukkitBootstrap.modrinthPublish(
     listOf(sourceJar, dokkaJar),
     listOf("bukkit", "spigot", "paper", "purpur", "folia"),
     supportedMinecraftVersions,
+    listOf(),
     listOf()
 )
 
@@ -438,6 +442,7 @@ velocityBootstrap.modrinthPublish(
     listOf(sourceJar, dokkaJar),
     listOf("velocity"),
     supportedMinecraftVersions,
+    listOf(),
     listOf()
 )
 fabricBootstrap.modrinthPublish(
@@ -445,7 +450,8 @@ fabricBootstrap.modrinthPublish(
     listOf(sourceJar, dokkaJar),
     listOf("fabric", "quilt"),
     listOf(minecraft),
-    listOf("fabric-api")
+    listOf("fabric-api"),
+    listOf("placeholder-api", "polymer")
 )
 
 tasks.create("modrinthPublish") {

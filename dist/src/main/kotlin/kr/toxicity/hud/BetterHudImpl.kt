@@ -162,8 +162,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
                 managers.forEach {
                     it.postReload()
                 }
-                PackGenerator.generate(sender)
-                Success(System.currentTimeMillis() - time)
+                Success(System.currentTimeMillis() - time, PackGenerator.generate(sender))
             }.getOrElse {
                 Failure(it)
             }
