@@ -3,10 +3,11 @@ package kr.toxicity.hud.bootstrap.fabric.compatibility
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.plugin.ReloadState.Success
+import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
@@ -35,7 +36,17 @@ class PolymerResourcePackCompatibility : Compatibility {
                     }
                     info("Polymer generation detected - reload completed: (${state.time} ms)")
                 }
-                else -> warn("Unable to merge the resource pack with Polymer.")
+                is Failure -> {
+                    val reason = mutableListOf(
+                        "Fail to merge the resource pack with Polymer.",
+                        "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
+                    )
+                    if (ConfigManagerImpl.debug) {
+                        reason.add(state.throwable.stackTraceToString())
+                    }
+                    warn(*reason.toTypedArray())
+                }
+                is OnReload -> warn("This mod is still on reload!")
             }
         }
     }

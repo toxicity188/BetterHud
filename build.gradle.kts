@@ -451,7 +451,7 @@ fabricBootstrap.modrinthPublish(
     listOf("fabric", "quilt"),
     listOf(minecraft),
     listOf("fabric-api"),
-    listOf("placeholder-api", "polymer")
+    listOf("luckperms", "placeholder-api", "polymer")
 )
 
 tasks.create("modrinthPublish") {

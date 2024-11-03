@@ -5,9 +5,11 @@ repositories {
     maven("https://repo.alessiodp.com/releases/") //Parties
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
     maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
+    maven("https://repo.oraxen.com/releases") //Oraxen
 }
 
 dependencies {
+    compileOnly("io.th0rgal:oraxen:1.183.0")
     compileOnly("io.lumine:Mythic-Dist:5.7.2")
     compileOnly("io.lumine:MythicLib-dist:1.7.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")

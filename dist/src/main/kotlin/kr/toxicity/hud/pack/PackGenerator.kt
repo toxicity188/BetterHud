@@ -127,14 +127,6 @@ object PackGenerator {
                     build.forEach {
                         getAllLocation(it, pathLength)
                     }
-                    PLUGIN.loadAssets("pack") { a, i ->
-                        val replace = a.replace(NAME_SPACE, NAME_SPACE_ENCODED).replace('/', File.separatorChar)
-                        (builder.locationMap.remove(replace) ?: File(build, replace).apply {
-                            parentFile.mkdirs()
-                        }).outputStream().buffered().use { os ->
-                            i.copyTo(os)
-                        }
-                    }
                     object : Generator {
                         override val resourcePack: Map<String, ByteArray>
                             get() = Collections.unmodifiableMap(builder.byteArrayMap)
@@ -160,11 +152,6 @@ object PackGenerator {
                     } ?: stream).apply {
                         setComment("BetterHud resource pack.")
                         setLevel(Deflater.BEST_COMPRESSION)
-                        PLUGIN.loadAssets("pack") { s, i ->
-                            putNextEntry(ZipEntry(s.replace(NAME_SPACE, NAME_SPACE_ENCODED).replace(File.separatorChar,'/')))
-                            write(i.readAllBytes())
-                            closeEntry()
-                        }
                     })
                     fun addEntry(entry: ZipEntry, byte: ByteArray) {
                         synchronized(zip) {

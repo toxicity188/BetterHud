@@ -106,6 +106,12 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
                 }
             }
         }
+        PLUGIN.loadAssets("pack") { n, i ->
+            val read = i.readAllBytes()
+            PackGenerator.addTask(n.split('/')) {
+                read
+            }
+        }
     }
 
     override fun preReload() {
