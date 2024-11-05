@@ -23,7 +23,7 @@ class ValueViewer<K, V> : (K) -> V? {
     }
 
     override fun invoke(p1: K): V? {
-        return refs.firstNotNullOfOrNull {
+        return if (refs.size == 1) refs[0](p1) else refs.firstNotNullOfOrNull {
             it(p1)
         }
     }

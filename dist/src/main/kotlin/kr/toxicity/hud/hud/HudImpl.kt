@@ -15,13 +15,14 @@ import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 
 class HudImpl(
     override val path: String,
     private val internalName: String,
-    file: List<String>,
+    resource: GlobalResource,
     section: YamlObject
 ): Hud, HudConfiguration {
     companion object {
@@ -65,7 +66,7 @@ class HudImpl(
             layout.animation.location.map {
                 HudElement(
                     this@HudImpl,
-                    file,
+                    resource,
                     layout,
                     gui,
                     it + pixel
@@ -83,7 +84,7 @@ class HudImpl(
                     it.value to it.key
                 }.toTypedArray())
             ))
-            PackGenerator.addTask(file + "$imageEncoded.json") {
+            PackGenerator.addTask(resource.font + "$imageEncoded.json") {
                 jsonObjectOf("providers" to array).toByteArray()
             }
         }

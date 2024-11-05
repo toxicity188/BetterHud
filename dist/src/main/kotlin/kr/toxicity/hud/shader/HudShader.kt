@@ -29,4 +29,13 @@ data class HudShader(
     override fun compareTo(other: HudShader): Int {
         return comparator.compare(this, other)
     }
+
+    fun toBackground() = HudShader(
+        gui,
+        renderScale,
+        layer - 1,
+        false,
+        opacity,
+        property
+    )
 }

@@ -13,6 +13,7 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
+import kotlin.math.roundToInt
 
 class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
 
@@ -45,7 +46,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                 val finalWidth = WidthComponent(Component.text()
                     .content(c)
                     .font(parent.imageKey)
-                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), Math.round(pair.image.image.width.toDouble() * scale).toInt()) + NEW_LAYER
+                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (pair.image.image.width.toDouble() * scale).roundToInt())
                 parent.jsonArray?.let { array ->
                     HudImpl.createBit(shader, ascent) { y ->
                         array.add(jsonObjectOf(

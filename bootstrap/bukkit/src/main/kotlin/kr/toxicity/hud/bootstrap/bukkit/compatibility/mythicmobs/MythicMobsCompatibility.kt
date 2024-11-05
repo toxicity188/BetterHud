@@ -92,6 +92,78 @@ class MythicMobsCompatibility : Compatibility {
                         } ?: 0
                     }
                 }
+            },
+            // entity
+            "entity_current_cooldown" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return reason.unwrap { event: EntityEvent ->
+                        val skill = MythicBukkit.inst().skillManager.getSkill(args[0]).orElseThrow {
+                            RuntimeException("this skill doesn't exist: ${args[0]}")
+                        } as AbstractSkill
+                        Function {
+                            skill.getCooldown(object : SkillCaster {
+                                override fun getEntity(): AbstractEntity = BukkitAdapter.adapt(event.entity)
+                                override fun setUsingDamageSkill(p0: Boolean) {}
+                                override fun isUsingDamageSkill(): Boolean = false
+                            })
+                        }
+                    }
+                }
+            },
+            "entity_aura_stack" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return reason.unwrap { event: EntityEvent ->
+                        Function {
+                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
+                                it.getAuraStacks(args[0])
+                            }.orElse(-1)
+                        }
+                    }
+                }
+            },
+            "entity_aura_max_duration" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return reason.unwrap { event: EntityEvent ->
+                        Function {
+                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
+                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                    aura.startDuration
+                                } ?: 0
+                            }.orElse(-1)
+                        }
+                    }
+                }
+            },
+            "entity_aura_duration" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return reason.unwrap { event: EntityEvent ->
+                        Function {
+                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
+                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                    aura.ticksRemaining
+                                } ?: 0
+                            }.orElse(-1)
+                        }
+                    }
+                }
+            },
+            "entity_aura_duration_reversed" to object : HudPlaceholder<Number> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                    return reason.unwrap { event: EntityEvent ->
+                        Function {
+                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
+                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                    aura.startDuration - aura.ticksRemaining
+                                } ?: 0
+                            }.orElse(-1)
+                        }
+                    }
+                }
             }
         )
     override val strings: Map<String, HudPlaceholder<String>>
@@ -148,6 +220,18 @@ class MythicMobsCompatibility : Compatibility {
                 u.unwrap { e: EntityEvent ->
                     Function {
                         MythicBukkit.inst().mobManager.isMythicMob(e.entity)
+                    }
+                }
+            },
+            "entity_has_aura" to object : HudPlaceholder<Boolean> {
+                override fun getRequiredArgsLength(): Int = 1
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
+                    return reason.unwrap { event: EntityEvent ->
+                        Function { _ ->
+                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
+                                it.auraRegistry.hasAura(args[0])
+                            }.orElse(false)
+                        }
                     }
                 }
             }

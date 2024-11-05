@@ -11,12 +11,12 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import kotlin.math.abs
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
 const val TEXT_SPACE_KEY_CODEPOINT = 0xC0000
+const val TEXT_IMAGE_START_CODEPOINT = 0xC0000
 
 val CONSOLE
     get() = BOOTSTRAP.console()
@@ -46,8 +46,6 @@ val EMPTY_WIDTH_COMPONENT
     get() = WidthComponent(Component.text().color(NamedTextColor.WHITE), 0)
 val EMPTY_PIXEL_COMPONENT
     get() = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
-val NEW_LAYER
-    get() = if (BOOTSTRAP.useLegacyFont()) EMPTY_WIDTH_COMPONENT else WidthComponent(Component.text().content(0xC0000.parseChar()).font(SPACE_KEY), 0)
 
 const val LEGACY_CENTER_SPACE_CODEPOINT = 0xFFC00
 const val CURRENT_CENTER_SPACE_CODEPOINT = 0xD0000
@@ -114,19 +112,19 @@ fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
 }
 
 private class SplitBuilder(
-    private val chain: (Component) -> Unit
+    private val chain: (TextComponent.Builder) -> Unit
 ) {
     private var builder = Component.text()
     var isClean = true
         private set
     fun accept(block: TextComponent.Builder.() -> Unit = {}) {
-        val build = builder.apply(block).build()
+        val build = builder.apply(block)
         builder = Component.text()
         isClean = true
         chain(build)
     }
-    fun build(block: TextComponent.Builder.() -> Unit = {}): Component {
-        val build = builder.apply(block).build()
+    fun build(block: TextComponent.Builder.() -> Unit = {}): TextComponent.Builder {
+        val build = builder.apply(block)
         builder = Component.text()
         isClean = true
         return build
@@ -135,52 +133,70 @@ private class SplitBuilder(
         builder.append(like)
         isClean = false
     }
-    fun then(firstChain: (SplitBuilder, Component) -> Unit) = SplitBuilder other@ {
+    fun then(firstChain: (SplitBuilder, TextComponent.Builder) -> Unit) = SplitBuilder other@ {
         firstChain(this, it)
         accept()
     }
 }
 
-fun Component.split(endWidth: Int, charWidth: (Pair<Style, Int>) -> Int?): List<Component> {
+private fun Style.parseDecoration(decoration: TextDecoration, default: Boolean): Boolean = when (decoration(decoration)) {
+    TextDecoration.State.NOT_SET -> default
+    TextDecoration.State.FALSE -> false
+    TextDecoration.State.TRUE -> true
+}
+
+fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
     var i = 0
-    val list = ArrayList<Component>()
+    val list = ArrayList<WidthComponent>()
     val topBuilder = SplitBuilder {
+        list.add(WidthComponent(it, i))
         i = 0
-        list.add(it)
     }
-    fun Component.parse(target: SplitBuilder) {
+    fun Component.parse(target: SplitBuilder, bold: Boolean, italic: Boolean) {
         if (this is TextComponent) {
-            val style = style()
-            if (style.font() == null) {
-                val subBuilder = target.then { b, c ->
-                    b.append(c)
-                }
-                val sb = StringBuilder()
-                for (codepoint in content().codePoints()) {
-                    sb.appendCodePoint(codepoint)
-                    i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
-                    if (i >= endWidth) {
-                        subBuilder.accept {
-                            style(style).content(sb.toString())
-                        }
-                        sb.setLength(0)
-                    }
-                }
-                if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
-                    style(style).content(sb.toString())
-                })
-                for (child in children()) {
-                    child.parse(subBuilder)
-                }
-                if (!subBuilder.isClean) target.append(subBuilder.build {
-                    style(style)
-                })
-            } else {
-                target.append(Component.text().content(content()).style(style))
+            var style = style()
+            var add = 0
+            val subBold = style.parseDecoration(TextDecoration.BOLD, bold)
+            val subItalic = style.parseDecoration(TextDecoration.ITALIC, italic)
+            style = style.decorations(mapOf(
+                TextDecoration.BOLD to if (subBold) TextDecoration.State.TRUE else TextDecoration.State.FALSE,
+                TextDecoration.ITALIC to if (subItalic) TextDecoration.State.TRUE else TextDecoration.State.FALSE
+            ))
+            if (subBold) add++
+            if (subItalic) add++
+            val subBuilder = target.then { b, c ->
+                b.append(c)
             }
+            val sb = StringBuilder()
+            for (codepoint in content().codePoints()) {
+                sb.appendCodePoint(codepoint)
+                i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
+                i += add
+                if (space > 0) {
+                    if (BOOTSTRAP.useLegacyFont()) subBuilder.append(space.toSpaceComponent().component)
+                    else sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
+                    i += space + add
+                }
+                if (i >= endWidth) {
+                    subBuilder.accept {
+                        style(style).content(sb.toString())
+                    }
+                    sb.setLength(0)
+                }
+            }
+            if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
+                style(style).content(sb.toString())
+            })
+            for (child in children()) {
+                child.parse(subBuilder, subBold, subItalic)
+            }
+            if (!subBuilder.isClean) target.append(subBuilder.build {
+                style(style)
+            })
         }
     }
-    parse(topBuilder)
-    if (!topBuilder.isClean) list.add(topBuilder.build())
+    val style = style()
+    parse(topBuilder, style.parseDecoration(TextDecoration.BOLD, false), style.parseDecoration(TextDecoration.ITALIC, false))
+    if (!topBuilder.isClean) list.add(WidthComponent(topBuilder.build(), i))
     return list
 }

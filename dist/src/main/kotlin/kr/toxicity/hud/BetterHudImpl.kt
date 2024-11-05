@@ -102,7 +102,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
             PlaceholderManagerImpl,
             TriggerManagerImpl,
 
-            BackgroundManager,
+            //BackgroundManager, //TODO Fix this
             ImageManager,
             TextManagerImpl,
             PlayerHeadManager,

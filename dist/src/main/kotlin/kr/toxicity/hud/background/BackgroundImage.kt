@@ -6,6 +6,7 @@ import kr.toxicity.hud.util.removeEmptySide
 import kr.toxicity.hud.util.removeEmptyWidth
 import java.awt.image.BufferedImage
 
+//TODO Fix this
 class BackgroundImage(
     val first: LoadedImage,
     val second: LoadedImage,
@@ -26,28 +27,7 @@ class BackgroundImage(
             val widthMod = width % widthSplit
             val heightMod = height % heightSplit
 
-            var bh = 0
-            return (0..2).map { l ->
-                var h = heightSplit
-                if (l == 1) h += heightMod
-                var bw = 0
-                fun loadImage(wl: Int): LoadedImage {
-                    var w = widthSplit
-                    if (wl == 1) w += widthMod
-                    val target = load.getSubimage(bw, bh, w, h)
-                        .removeEmptyWidth()
-                        .ifNull("Unsupported image.")
-                    bw += w
-                    return target
-                }
-                val ground = BackgroundImage(
-                    loadImage(0),
-                    loadImage(1),
-                    loadImage(2)
-                )
-                bh += h
-                ground
-            }
+            return listOf()
         }
     }
 }

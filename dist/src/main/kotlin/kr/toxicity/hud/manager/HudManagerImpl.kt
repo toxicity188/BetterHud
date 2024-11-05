@@ -23,7 +23,7 @@ object HudManagerImpl : BetterHudManager, HudManager {
         DATA_FOLDER.subFolder("huds").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this hud: $s in ${file.name}") {
                 hudMap.putSync("hud", s) {
-                    HudImpl(file.path, s, resource.font, yamlObject)
+                    HudImpl(file.path, s, resource, yamlObject)
                 }
             }
         }

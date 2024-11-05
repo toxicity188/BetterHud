@@ -3,8 +3,8 @@ package kr.toxicity.hud.manager
 import com.google.gson.JsonArray
 import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.configuration.PluginConfiguration
-import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LocatedImage
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
@@ -12,6 +12,7 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.key.Key
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.font.FontRenderContext
@@ -20,7 +21,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
@@ -60,7 +60,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val textCacheMap = HashMap<TextCache, HudText>()
 
     private val textWidthMap = HashMap<Int, Int>()
-    private val textKeyMap = ConcurrentHashMap<ShaderGroup, HudTextFont>()
+    private val textKeyMap = ConcurrentHashMap<ShaderGroup, Key>()
 
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
@@ -130,7 +130,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     @Synchronized
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
     @Synchronized
-    fun setKey(shaderGroup: ShaderGroup, key: HudTextFont) {
+    fun setKey(shaderGroup: ShaderGroup, key: Key) {
         textKeyMap[shaderGroup] = key
     }
 
@@ -254,7 +254,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                 provider,
                                 scale,
                                 resource.textures,
-                                HashMap<String, LocatedImage>().apply {
+                                TreeMap<String, LocatedImage>().apply {
                                     section.get("images")?.asObject()
                                         ?.forEachSubConfiguration { key, yamlObject ->
                                             put(key, LocatedImage(
@@ -435,7 +435,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     ): HudText {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
-                HudText(path, saveName, old.array, old.images, old.charWidth, old.conditions)
+                HudText(path, saveName, old.array, old.charWidth, old.imageCharWidth, old.conditions)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
@@ -492,8 +492,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 path,
                 saveName,
                 textArray,
-                mapOf(),
                 charWidthMap,
+                mapOf(),
                 condition
             )
         }
@@ -517,7 +517,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     ): HudText {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
-                HudText(path, saveName, old.array, old.images, old.charWidth, old.conditions)
+                HudText(path, saveName, old.array, old.charWidth, old.imageCharWidth, old.conditions)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
@@ -573,7 +573,15 @@ object TextManagerImpl : BetterHudManager, TextManager {
             }
             val textList = ArrayList<HudTextArray>()
             var i = 0
+            var imageStart = TEXT_IMAGE_START_CODEPOINT
+            val imageCharWidthMap = HashMap<Int, ImageCharWidth>()
             images.forEach {
+                imageCharWidthMap[++imageStart] = ImageCharWidth(
+                    it.key,
+                    it.value.location,
+                    it.value.image.image.width,
+                    (it.value.image.image.height.toDouble() * it.value.scale).roundToInt()
+                )
                 PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey()}.png") {
                     it.value.image.image.toByteArray()
                 }
@@ -612,7 +620,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                 }
             }
-            val result = HudText(path, saveName, textList, images, charWidthMap, condition)
+            val result = HudText(path, saveName, textList, charWidthMap, imageCharWidthMap, condition)
             synchronized(textCacheMap) {
                 textCacheMap[TextCache(saveName, images.keys)] = result
             }
