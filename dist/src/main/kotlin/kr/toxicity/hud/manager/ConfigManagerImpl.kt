@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.configuration.PluginConfiguration
+import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
@@ -90,12 +91,27 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var useLegacyFormat = true
     var legacySerializer = LEGACY_AMPERSAND
         private set
+    private var removeDefaultHotbar = false
 
     override fun start() {
     }
 
     override fun getBossbarLine(): Int = line
     override fun reload(sender: Audience, resource: GlobalResource) {
+        if (removeDefaultHotbar) {
+            PLUGIN.loadAssets("empty") { n, i ->
+                val read = i.readAllBytes()
+                PackGenerator.addTask(n.split('/')) {
+                    read
+                }
+            }
+        }
+        PLUGIN.loadAssets("pack") { n, i ->
+            val read = i.readAllBytes()
+            PackGenerator.addTask(n.split('/')) {
+                read
+            }
+        }
     }
 
     override fun preReload() {
@@ -183,6 +199,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             }
             key = KeyResource(yaml.get("namespace")?.asString() ?: NAME_SPACE)
             minecraftJarVersion = yaml.get("minecraft-jar-version")?.asString() ?: "bukkit"
+            removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

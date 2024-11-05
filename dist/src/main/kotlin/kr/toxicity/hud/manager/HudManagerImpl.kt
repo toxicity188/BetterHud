@@ -41,6 +41,10 @@ object HudManagerImpl : BetterHudManager, HudManager {
         it.isDefault
     }.toSet()
 
+    override fun getAllHuds(): Set<Hud> {
+        return hudMap.values.toSet()
+    }
+
     override fun end() {
     }
 }

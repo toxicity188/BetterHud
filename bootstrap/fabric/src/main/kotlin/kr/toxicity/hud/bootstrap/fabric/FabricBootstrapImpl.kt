@@ -6,18 +6,19 @@ import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.fabric.FabricBootstrap
+import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
+import kr.toxicity.hud.manager.CommandManager
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.util.*
 import net.fabricmc.api.DedicatedServerModInitializer
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
@@ -27,6 +28,7 @@ import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
+import net.minecraft.commands.CommandSourceStack
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -44,7 +46,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
@@ -78,8 +79,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private lateinit var server: MinecraftServer
     private lateinit var dataFolder: File
-    lateinit var audiences: MinecraftServerAudiences
-        private set
+    private lateinit var audiences: MinecraftServerAudiences
     private lateinit var volatileCode: FabricVolatileCode
     private lateinit var version: String
     private lateinit var core: BetterHudImpl
@@ -95,10 +95,26 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             }.orElse("unknown")
             core = BetterHudImpl(this).apply {
                 BetterHudAPI.inst(this)
+                addReloadStartTask {
+                    FabricBootstrap.PRE_RELOAD_EVENT.call(EventRegistry.UNIT)
+                }
+                addReloadEndTask { state ->
+                    FabricBootstrap.POST_RELOAD_EVENT.call(state)
+                }
             }
             audiences = MinecraftServerAudiences.builder(it).build()
             volatileCode = FabricVolatileCode()
 
+            val dispatcher = it.commands.dispatcher
+            CommandManager.module.build { s: CommandSourceStack ->
+                when (val e = s.entity) {
+                    is ServerPlayer -> BetterHudAPI.inst().playerManager.getHudPlayer(e.uuid)
+                    null -> BetterHudAPI.inst().bootstrap().consoleSource()
+                    else -> null
+                }
+            }.forEach { node ->
+                dispatcher.register(node)
+            }
             core.start()
             ModuleManager.start()
             CompatibilityManager.start()
@@ -128,9 +144,6 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             scheduler.stopAll()
             logger.info("Mod disabled.")
         }
-        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
-            FabricCommand(this).register(dispatcher)
-        }
         ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler, _, _ ->
             val player = handler.player
             latestVersion?.let { latest ->
@@ -155,16 +168,14 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private fun register(player: ServerPlayer) {
         PlayerManagerImpl.addHudPlayer(player.uuid) {
-            CompletableFuture.supplyAsync {
-                val impl = HudPlayerFabric(server, player, audiences.audience(listOf(player)))
+            val impl = HudPlayerFabric(server, player, audiences.audience(listOf(player)))
+            asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
-                    taskLater(20) {
-                        sendResourcePack(impl)
-                    }
+                    sendResourcePack(impl)
                 }
-                impl
-            }.join()
+            }
+            impl
         }
     }
     private fun disconnect(player: ServerPlayer) {

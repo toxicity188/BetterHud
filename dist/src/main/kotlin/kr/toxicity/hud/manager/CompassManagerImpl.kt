@@ -42,4 +42,6 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
     override fun getDefaultCompasses(): Set<Compass> = compassMap.values.filter {
         it.isDefault
     }.toSet()
+
+    override fun getAllCompasses(): Set<Compass> = compassMap.values.toSet()
 }

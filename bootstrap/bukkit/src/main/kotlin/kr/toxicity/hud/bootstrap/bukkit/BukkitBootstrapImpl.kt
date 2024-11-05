@@ -4,11 +4,13 @@ import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.bukkit.BukkitBootstrap
 import kr.toxicity.hud.api.bukkit.bedrock.BedrockAdapter
-import kr.toxicity.hud.api.bukkit.event.*
+import kr.toxicity.hud.api.bukkit.event.HudPlayerJoinEvent
+import kr.toxicity.hud.api.bukkit.event.HudPlayerQuitEvent
+import kr.toxicity.hud.api.bukkit.event.PluginReloadStartEvent
+import kr.toxicity.hud.api.bukkit.event.PluginReloadedEvent
 import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -39,10 +41,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
-import org.bukkit.command.ConsoleCommandSender
-import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -58,7 +56,6 @@ import java.net.URLClassLoader
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 
 @Suppress("UNUSED")
@@ -167,6 +164,9 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun core(): BetterHud = core
     override fun version(): String = description.version
 
+    @Volatile
+    var skipInitialReload = false
+
     override fun onEnable() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (MinecraftVersion.current) {
@@ -180,8 +180,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
             MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
             MinecraftVersion.version1_18_2 -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
-            MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
-            MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
+            //MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
+            //MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                 pluginManager.disablePlugin(this)
@@ -268,35 +268,10 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
             }
         }
-        getCommand("betterhud")?.setExecutor(object : TabExecutor {
-            override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<String>): Boolean {
-                CommandManager.command.execute(p0.toWrapper() ?: return false, p3.toList())
-                return true
-            }
-
-            private fun CommandSender.toWrapper() = when (this) {
-                is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
-                is ConsoleCommandSender -> object : CommandSourceWrapper {
-                    override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
-                    override fun audience(): Audience = this@BukkitBootstrapImpl.console()
-                    override fun isOp(): Boolean = true
-                    override fun hasPermission(perm: String): Boolean = true
-                }
-                else -> null
-            }
-
-            override fun onTabComplete(
-                p0: CommandSender,
-                p1: Command,
-                p2: String,
-                p3: Array<String>
-            ): List<String>? {
-                return CommandManager.command.tabComplete(p0.toWrapper() ?: return null, p3.toList())
-            }
-        })
+        nms.registerCommand(CommandManager.module)
         core.start()
         scheduler.asyncTask {
-            core.reload()
+            if (!skipInitialReload) core.reload()
             log.info(
                 "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
                 "Plugin enabled."
@@ -315,17 +290,16 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         if (ConfigManagerImpl.disableToBedrockPlayer && bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
         PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
-            CompletableFuture.supplyAsync {
-                val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
+            val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
+            asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
-                    taskLater(20) {
-                        sendResourcePack(impl)
-                    }
+                    sendResourcePack(impl)
+                    nms.syncCommands(player)
                     HudPlayerJoinEvent(impl).call()
                 }
-                impl
-            }.join()
+            }
+            impl
         }
     }
 

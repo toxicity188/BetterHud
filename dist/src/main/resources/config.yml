@@ -10,7 +10,7 @@ bossbar-resource-pack-line: 0
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"
-pack-type: folder #folder, zip
+pack-type: folder #folder, zip, none
 enable-protection: false
 enable-self-host: false
 force-update: false
@@ -31,3 +31,4 @@ clear-build-folder: true #If you use Oraxen, set this to false.
 use-legacy-format: true
 legacy-serializer: ampersand #section, ampersand, both
 minecraft-jar-version: bukkit #1.21, 1.20.4, etc.
+remove-default-hotbar: false

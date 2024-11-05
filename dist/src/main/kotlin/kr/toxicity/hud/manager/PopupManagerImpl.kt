@@ -41,6 +41,7 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
     override fun getDefaultPopups(): Set<Popup> = popupMap.values.filter {
         it.isDefault
     }.toSet()
+    override fun getAllPopups(): Set<Popup> = popupMap.values.toSet()
     override fun end() {
     }
 }

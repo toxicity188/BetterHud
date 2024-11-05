@@ -1,5 +1,7 @@
 package kr.toxicity.hud.api;
 
+import kr.toxicity.command.BetterCommandSource;
+import kr.toxicity.command.SenderType;
 import kr.toxicity.hud.api.adapter.WorldWrapper;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.scheduler.HudScheduler;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Locale;
 
 public interface BetterHudBootstrap {
     /**
@@ -163,11 +166,41 @@ public interface BetterHudBootstrap {
     @Unmodifiable
     List<WorldWrapper> worlds();
 
+
     /**
      * Checks whether this build is dev version.
      * @return whether this build is dev version
      */
     default boolean isDevVersion() {
         return version().contains("DEV");
+    }
+
+    /**
+     * Gets a command source based on console.
+     * @return console command source.
+     */
+    default @NotNull BetterCommandSource consoleSource() {
+        var console = console();
+        return new BetterCommandSource() {
+            @Override
+            public @NotNull Audience audience() {
+                return console;
+            }
+
+            @Override
+            public @NotNull Locale locale() {
+                return Locale.getDefault();
+            }
+
+            @Override
+            public boolean hasPermission(@NotNull String s) {
+                return true;
+            }
+
+            @Override
+            public @NotNull SenderType type() {
+                return SenderType.CONSOLE;
+            }
+        };
     }
 }

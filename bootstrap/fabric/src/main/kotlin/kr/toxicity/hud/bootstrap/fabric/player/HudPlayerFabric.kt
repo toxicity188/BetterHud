@@ -1,9 +1,9 @@
 package kr.toxicity.hud.bootstrap.fabric.player
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl
+import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
 import net.kyori.adventure.audience.Audience
@@ -40,13 +40,12 @@ class HudPlayerFabric(
 
     override fun audience(): Audience = audience
 
-    override fun type(): CommandSourceWrapper.Type {
-        return CommandSourceWrapper.Type.PLAYER
+    override fun locale(): Locale {
+        val split = player.clientInformation().language.split('_')
+        return if (split.size == 1) Locale.of(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
     }
 
-    override fun hasPermission(perm: String): Boolean = isOp
-
-    override fun isOp(): Boolean = player.hasPermissions(2)
+    override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)
 
     override fun uuid(): UUID = player.uuid
     override fun name(): String = player.scoreboardName

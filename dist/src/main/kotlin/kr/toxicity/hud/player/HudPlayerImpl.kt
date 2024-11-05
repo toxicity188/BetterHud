@@ -1,5 +1,6 @@
 package kr.toxicity.hud.player
 
+import kr.toxicity.command.SenderType
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObject
 import kr.toxicity.hud.api.player.HudPlayer
@@ -178,6 +179,8 @@ abstract class HudPlayerImpl : HudPlayer {
         autoSave.cancel()
         locationProvide.cancel()
     }
+
+    override fun type(): SenderType = SenderType.PLAYER
 
     override fun pointers(): MutableSet<PointedLocation> = pointers
 }

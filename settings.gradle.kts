@@ -21,8 +21,8 @@ include(
     "api:fabric-api",
 
     "dist",
-    "nms:v1_17_R1",
-    "nms:v1_18_R1",
+    //"nms:v1_17_R1",
+    //"nms:v1_18_R1",
     "nms:v1_18_R2",
     "nms:v1_19_R1",
     "nms:v1_19_R2",
@@ -36,6 +36,9 @@ include(
 
     "scheduler:standard",
     "scheduler:folia",
+
+    "oraxen:1.0",
+    "oraxen:2.0",
 
     "bedrock:geyser",
     "bedrock:floodgate",

@@ -53,13 +53,15 @@ class GlobalResource {
         }
         PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json") {
             jsonObjectOf(
-                "providers" to jsonObjectOf(
-                    "type" to "ttf",
-                    "file" to "${key.spacesTtfKey.asString()}.ttf",
-                    "size" to 2.5,
-                    "oversample" to 1.0,
-                    "shift" to jsonArrayOf(0.0, 0.0),
-                    "skip" to jsonArrayOf()
+                "providers" to jsonArrayOf(
+                    jsonObjectOf(
+                        "type" to "ttf",
+                        "file" to "${key.spacesTtfKey.asString()}.ttf",
+                        "size" to 2.5,
+                        "oversample" to 1.0,
+                        "shift" to jsonArrayOf(0.0, 0.0),
+                        "skip" to jsonArrayOf()
+                    )
                 )
             ).toByteArray()
         }

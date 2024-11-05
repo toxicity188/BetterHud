@@ -28,4 +28,9 @@ public interface CompassManager {
      * @return default compass
      */
     @NotNull @Unmodifiable Set<Compass> getDefaultCompasses();
+    /**
+     * Gets all compass.
+     * @return all compass
+     */
+    @NotNull @Unmodifiable Set<Compass> getAllCompasses();
 }

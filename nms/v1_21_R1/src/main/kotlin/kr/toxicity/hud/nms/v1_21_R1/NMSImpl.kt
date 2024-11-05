@@ -5,6 +5,8 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.command.CommandModule
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.bukkit.nms.NMS
@@ -18,6 +20,7 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.minecraft.commands.CommandSourceStack
 import net.minecraft.core.RegistryAccess
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtOps
@@ -25,6 +28,7 @@ import net.minecraft.network.Connection
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerGamePacketListenerImpl
@@ -32,6 +36,7 @@ import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.WorldBorder
+import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer
@@ -114,6 +119,21 @@ class NMSImpl : NMS {
         return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
+    override fun syncCommands(player: Player) {
+        MinecraftServer.getServer().commands.sendCommands((player as CraftPlayer).handle)
+    }
+    override fun registerCommand(module: CommandModule<BetterCommandSource>) {
+        val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
+        module.build { s: CommandSourceStack ->
+            when (val sender = s.bukkitSender) {
+                is ConsoleCommandSender -> BetterHudAPI.inst().bootstrap().consoleSource()
+                is Player -> BetterHudAPI.inst().playerManager.getHudPlayer(sender.uniqueId)
+                else -> null
+            }
+        }.forEach {
+            dispatcher.register(it)
+        }
+    }
     override fun getFoliaAdaptedPlayer(player: Player): Player {
         val handle = (player as CraftPlayer).handle
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {

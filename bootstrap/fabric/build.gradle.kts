@@ -24,6 +24,7 @@ dependencies {
     })
     //Other mod dependency
     modCompileOnly("net.kyori:adventure-api:4.17.0")
+    modCompileOnly(include("eu.pb4:polymer-resource-pack:0.10.2+1.21.3")!!)
     modCompileOnly(include("eu.pb4:placeholder-api:2.5.0+1.21.2")!!)
     modCompileOnly("net.luckperms:api:5.4")
 
@@ -80,7 +81,8 @@ fabricModJson {
     )
     suggests = mapOf(
         "placeholder-api" to listOf("*"),
-        "luckperms" to listOf("*")
+        "luckperms" to listOf("*"),
+        "polymer-resource-pack" to listOf("*")
     )
 }
 

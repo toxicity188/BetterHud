@@ -9,21 +9,19 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.module.BukkitModule
 import kr.toxicity.hud.bootstrap.bukkit.util.call
 import kr.toxicity.hud.bootstrap.bukkit.util.createBukkitTrigger
+import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
 import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
-import kr.toxicity.hud.util.BOOTSTRAP
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.inventory.meta.Damageable
-import org.bukkit.plugin.Plugin
 import java.util.function.Function
 
 class BukkitItemModule : BukkitModule {
     override fun start() {
-        Bukkit.getPluginManager().registerEvents(object : Listener {
+        registerListener(object : Listener {
             @EventHandler
             fun drop(e: PlayerDropItemEvent) {
                 UpdateItemEvent(e.player, e.itemDrop.itemStack, e).call()
@@ -37,7 +35,7 @@ class BukkitItemModule : BukkitModule {
                     e
                 ).call()
             }
-        }, BOOTSTRAP as Plugin)
+        })
     }
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(

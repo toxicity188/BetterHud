@@ -1,6 +1,6 @@
 package kr.toxicity.hud.api.player;
 
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper;
+import kr.toxicity.command.BetterCommandSource;
 import kr.toxicity.hud.api.adapter.LocationWrapper;
 import kr.toxicity.hud.api.adapter.WorldWrapper;
 import kr.toxicity.hud.api.compass.Compass;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * Represents player data.
  */
-public interface HudPlayer extends CommandSourceWrapper {
+public interface HudPlayer extends BetterCommandSource {
     @NotNull
     UUID uuid();
     @NotNull

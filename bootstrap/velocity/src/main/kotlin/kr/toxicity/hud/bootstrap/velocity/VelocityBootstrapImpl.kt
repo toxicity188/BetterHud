@@ -1,6 +1,7 @@
 package kr.toxicity.hud.bootstrap.velocity
 
 import com.google.inject.Inject
+import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PostLoginEvent
@@ -17,7 +18,6 @@ import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
-import kr.toxicity.hud.api.adapter.CommandSourceWrapper
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
@@ -27,6 +27,7 @@ import kr.toxicity.hud.api.velocity.VelocityBootstrap
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.velocity.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.velocity.player.HudPlayerVelocity
+import kr.toxicity.hud.manager.CommandManager
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackUploader
@@ -45,7 +46,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @Suppress("UNUSED")
@@ -151,7 +151,7 @@ class VelocityBootstrapImpl @Inject constructor(
             register(it)
         }
         ModuleManager.start()
-        VelocityCommand().register(proxyServer)
+        registerCommand()
         core.start()
         scheduler.task {
             core.reload()
@@ -186,28 +186,15 @@ class VelocityBootstrapImpl @Inject constructor(
 
     private fun register(player: Player) {
         PlayerManagerImpl.addHudPlayer(player.uniqueId) {
-            CompletableFuture.supplyAsync {
-                val impl = HudPlayerVelocity(player)
+            val impl = HudPlayerVelocity(player)
+            asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
-                    taskLater(20) {
-                        sendResourcePack(impl)
-                    }
+                    sendResourcePack(impl)
                 }
-                impl
-            }.join()
+            }
+            impl
         }
-    }
-
-    private fun CommandSource.toWrapper() = when (this) {
-        is Player -> PlayerManagerImpl.getHudPlayer(uniqueId)
-        is ConsoleCommandSource -> object : CommandSourceWrapper {
-            override fun type(): CommandSourceWrapper.Type = CommandSourceWrapper.Type.CONSOLE
-            override fun audience(): Audience = this@toWrapper
-            override fun isOp(): Boolean = true
-            override fun hasPermission(perm: String): Boolean = true
-        }
-        else -> null
     }
 
     override fun logger(): BetterHudLogger = log
@@ -256,5 +243,24 @@ class VelocityBootstrapImpl @Inject constructor(
 
     override fun loader(): URLClassLoader {
         return javaClass.classLoader as URLClassLoader
+    }
+
+    private fun registerCommand() {
+        CommandManager.module.build { s: CommandSource ->
+            when (s) {
+                is ConsoleCommandSource -> BetterHudAPI.inst().bootstrap().consoleSource()
+                is Player -> BetterHudAPI.inst().playerManager.getHudPlayer(s.uniqueId)
+                else -> null
+            }
+        }.forEach {
+            BrigadierCommand(it).add()
+        }
+    }
+
+    private fun BrigadierCommand.add() {
+        proxyServer.commandManager.register(
+            proxyServer.commandManager.metaBuilder(this).build(),
+            this
+        )
     }
 }
