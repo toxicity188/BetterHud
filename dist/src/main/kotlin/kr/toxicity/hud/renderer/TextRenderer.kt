@@ -30,7 +30,9 @@ class TextRenderer(
     private val data: HudTextData,
     pattern: String,
     private val align: LayoutAlign,
+    private val lineAlign: LayoutAlign,
     private val scale: Double,
+    private val emojiScale: Double,
     private val x: Int,
 
     private val numberEquation: TEquation,
@@ -67,7 +69,7 @@ class TextRenderer(
                     LEGACY_SPACE_KEY -> it.second - LEGACY_CENTER_SPACE_CODEPOINT
                     null -> when (it.second) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> (widthMap[it.second] ?: imageWidthMap[it.second])?.let { c -> c.scaledWidth(scale) + 1 }
+                        else -> (widthMap[it.second]?.scaledWidth(scale) ?: imageWidthMap[it.second]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
                     }
                     else -> null
                 }
@@ -97,6 +99,9 @@ class TextRenderer(
             val compList = buildPattern(targetHudPlayer)
                 .parseToComponent()
                 .split(data.splitWidth, space, widthViewer)
+            val max = compList.maxOf {
+                it.width
+            }
             compList.forEachIndexed { index, comp ->
                 if (data.font.lastIndex < index) return@forEachIndexed
                 comp.component.font(data.font[index])
@@ -104,13 +109,13 @@ class TextRenderer(
             }
             widthComp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
-                LayoutAlign.CENTER -> x - widthComp.width / 2
-                LayoutAlign.RIGHT -> x - widthComp.width
+                LayoutAlign.CENTER -> x - max / 2
+                LayoutAlign.RIGHT -> x - max
             })
         }
     }
 
-    private infix fun WidthComponent.plusWithAlign(other: WidthComponent) = plusWithAlign(LayoutAlign.CENTER, other)
+    private infix fun WidthComponent.plusWithAlign(other: WidthComponent) = plusWithAlign(lineAlign, other)
     private fun WidthComponent.plusWithAlign(align: LayoutAlign, other: WidthComponent) = when (align) {
         LayoutAlign.LEFT -> this + (-width).toSpaceComponent() + other
         LayoutAlign.CENTER -> {

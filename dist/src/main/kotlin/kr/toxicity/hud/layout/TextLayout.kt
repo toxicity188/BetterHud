@@ -23,6 +23,7 @@ class TextLayout(
     val scale: Double = yamlObject.getAsDouble("scale", 1.0)
     val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
     val align: LayoutAlign = yamlObject.get("align")?.asString().toLayoutAlign()
+    val lineAlign: LayoutAlign = yamlObject.get("line-align")?.asString().toLayoutAlign()
     val color: TextColor = yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE
     val numberEquation: TEquation = yamlObject.get("number-equation")?.asString()?.let {
         TEquation(it)

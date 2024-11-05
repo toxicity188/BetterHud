@@ -115,10 +115,8 @@ class MythicMobsCompatibility : Compatibility {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     return reason.unwrap { event: EntityEvent ->
-                        Function {
-                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
-                                it.getAuraStacks(args[0])
-                            }.orElse(-1)
+                        Function get@ {
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).getAuraStacks(args[0])
                         }
                     }
                 }
@@ -127,12 +125,10 @@ class MythicMobsCompatibility : Compatibility {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     return reason.unwrap { event: EntityEvent ->
-                        Function {
-                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
-                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
-                                    aura.startDuration
-                                } ?: 0
-                            }.orElse(-1)
+                        Function get@ {
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                aura.startDuration
+                            } ?: 0
                         }
                     }
                 }
@@ -141,12 +137,10 @@ class MythicMobsCompatibility : Compatibility {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     return reason.unwrap { event: EntityEvent ->
-                        Function {
-                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
-                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
-                                    aura.ticksRemaining
-                                } ?: 0
-                            }.orElse(-1)
+                        Function get@ {
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                aura.ticksRemaining
+                            } ?: 0
                         }
                     }
                 }
@@ -155,12 +149,10 @@ class MythicMobsCompatibility : Compatibility {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
                     return reason.unwrap { event: EntityEvent ->
-                        Function {
-                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
-                                it.auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
-                                    aura.startDuration - aura.ticksRemaining
-                                } ?: 0
-                            }.orElse(-1)
+                        Function get@ {
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
+                                aura.startDuration - aura.ticksRemaining
+                            } ?: 0
                         }
                     }
                 }
@@ -227,10 +219,8 @@ class MythicMobsCompatibility : Compatibility {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
                     return reason.unwrap { event: EntityEvent ->
-                        Function { _ ->
-                            MythicBukkit.inst().playerManager.getProfile(event.entity.uniqueId).map {
-                                it.auraRegistry.hasAura(args[0])
-                            }.orElse(false)
+                        Function get@ { _ ->
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get false).auraRegistry.hasAura(args[0])
                         }
                     }
                 }

@@ -168,7 +168,19 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                 b.append(c)
             }
             val sb = StringBuilder()
+
+            fun end() {
+                subBuilder.accept {
+                    style(style).content(sb.toString())
+                }
+                sb.setLength(0)
+            }
+
             for (codepoint in content().codePoints()) {
+                if ('\n'.code == codepoint) {
+                    end()
+                    continue
+                }
                 sb.appendCodePoint(codepoint)
                 i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
                 i += add
@@ -177,12 +189,7 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                     else sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
                     i += space + add
                 }
-                if (i >= endWidth) {
-                    subBuilder.accept {
-                        style(style).content(sb.toString())
-                    }
-                    sb.setLength(0)
-                }
+                if (i >= endWidth) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
                 style(style).content(sb.toString())

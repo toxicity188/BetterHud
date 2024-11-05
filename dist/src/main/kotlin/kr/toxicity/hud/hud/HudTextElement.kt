@@ -62,7 +62,7 @@ class HudTextElement(
                 val imageMap = HashMap<String, WidthComponent>()
                 val key = createAdventureKey(textEncoded)
                 text.text.imageCharWidth.forEach {
-                    val height = (it.value.height.toDouble() * text.scale).roundToInt()
+                    val height = (it.value.height.toDouble() * text.scale * text.emojiScale).roundToInt()
                     HudImpl.createBit(shader, loc.y + it.value.location.y + lineIndex * text.lineWidth) { y ->
                         array.add(
                             jsonObjectOf(
@@ -103,7 +103,9 @@ class HudTextElement(
             ),
             text.pattern,
             text.align,
+            text.lineAlign,
             text.scale,
+            text.emojiScale,
             loc.x,
             text.numberEquation,
             text.numberFormat,

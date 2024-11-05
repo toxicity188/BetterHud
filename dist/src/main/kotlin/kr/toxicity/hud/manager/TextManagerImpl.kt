@@ -576,11 +576,13 @@ object TextManagerImpl : BetterHudManager, TextManager {
             var imageStart = TEXT_IMAGE_START_CODEPOINT
             val imageCharWidthMap = HashMap<Int, ImageCharWidth>()
             images.forEach {
+                val h = (it.value.image.image.height.toDouble() * it.value.scale).roundToInt()
+                val div = h / it.value.image.image.height.toDouble()
                 imageCharWidthMap[++imageStart] = ImageCharWidth(
                     it.key,
                     it.value.location,
-                    it.value.image.image.width,
-                    (it.value.image.image.height.toDouble() * it.value.scale).roundToInt()
+                    (it.value.image.image.width * div).roundToInt(),
+                    h
                 )
                 PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey()}.png") {
                     it.value.image.image.toByteArray()
