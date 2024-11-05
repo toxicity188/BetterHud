@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.fabric.FabricBootstrap
+import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
@@ -94,6 +95,12 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             }.orElse("unknown")
             core = BetterHudImpl(this).apply {
                 BetterHudAPI.inst(this)
+                addReloadStartTask {
+                    FabricBootstrap.PRE_RELOAD_EVENT.call(EventRegistry.UNIT)
+                }
+                addReloadEndTask { state ->
+                    FabricBootstrap.POST_RELOAD_EVENT.call(state)
+                }
             }
             audiences = MinecraftServerAudiences.builder(it).build()
             volatileCode = FabricVolatileCode()

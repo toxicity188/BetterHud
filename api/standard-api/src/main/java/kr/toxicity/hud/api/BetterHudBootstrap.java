@@ -166,6 +166,7 @@ public interface BetterHudBootstrap {
     @Unmodifiable
     List<WorldWrapper> worlds();
 
+
     /**
      * Checks whether this build is dev version.
      * @return whether this build is dev version
@@ -174,6 +175,10 @@ public interface BetterHudBootstrap {
         return version().contains("DEV");
     }
 
+    /**
+     * Gets a command source based on console.
+     * @return console command source.
+     */
     default @NotNull BetterCommandSource consoleSource() {
         var console = console();
         return new BetterCommandSource() {
@@ -184,7 +189,7 @@ public interface BetterHudBootstrap {
 
             @Override
             public @NotNull Locale locale() {
-                return Locale.US;
+                return Locale.getDefault();
             }
 
             @Override
