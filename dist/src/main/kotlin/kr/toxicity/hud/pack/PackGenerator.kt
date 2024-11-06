@@ -101,6 +101,7 @@ object PackGenerator {
                             get() = Collections.unmodifiableMap(builder.byteArrayMap)
 
                         override fun close() {
+                            if (PackUploader.stop()) info("Resource pack host is stopped.")
                         }
 
                         override fun invoke(p1: PackFile) {
@@ -132,6 +133,7 @@ object PackGenerator {
                             get() = Collections.unmodifiableMap(builder.byteArrayMap)
 
                         override fun close() {
+                            if (PackUploader.stop()) info("Resource pack host is stopped.")
                             builder.close()
                         }
                         override fun invoke(p1: PackFile) {

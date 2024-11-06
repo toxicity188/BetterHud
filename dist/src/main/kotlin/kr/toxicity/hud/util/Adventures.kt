@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 fun createAdventureKey(value: String) = Key.key(NAME_SPACE_ENCODED, value)
 
@@ -175,7 +176,6 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                 }
                 sb.setLength(0)
             }
-
             for (codepoint in content().codePoints()) {
                 if ('\n'.code == codepoint) {
                     end()
@@ -189,7 +189,7 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                     else sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
                     i += space + add
                 }
-                if (i >= endWidth) end()
+                if (i >= endWidth && (i >= (1.25 * endWidth).roundToInt() || ' '.code == codepoint)) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
                 style(style).content(sb.toString())

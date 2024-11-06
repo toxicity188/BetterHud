@@ -636,10 +636,4 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
     override fun end() {
     }
-
-    override fun getWidth(textName: String, scale: Double, text: String): Int = textMap[textName]?.let {
-        text.codePoints().map { i ->
-            if (i == ' '.code) 4 else (it.charWidth[i]?.scaledWidth(scale) ?: 0) + 1
-        }.sum()
-    } ?: 0
 }
