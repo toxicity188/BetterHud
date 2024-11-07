@@ -48,7 +48,7 @@ class TextLayout(
     val line = yamlObject.getAsInt("line", 1).apply {
         if (this < 1) throw RuntimeException("line cannot be < 1: $s")
     }
-    val splitWidth = yamlObject.getAsInt("split-width", 200).apply {
+    val splitWidth = if (line == 1) Int.MAX_VALUE else yamlObject.getAsInt("split-width", 200).apply {
         if (this < 1) throw RuntimeException("split-width cannot be < 1: $s")
     }
     val lineWidth = yamlObject.getAsInt("line-width", 10)
