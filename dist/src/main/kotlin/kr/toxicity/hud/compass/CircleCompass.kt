@@ -259,7 +259,8 @@ class CircleCompass(
 
             selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
                 val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
-                comp += (value - pointComponent.width / 2).toSpaceComponent() + pointComponent + (-value).toSpaceComponent()
+                val halfPoint = pointComponent.width.toDouble() / 2
+                comp += (value - floor(halfPoint).toInt()).toSpaceComponent() + pointComponent + (-value - ceil(halfPoint).toInt()).toSpaceComponent()
             }
         }
         return (-comp.width / 2).toSpaceComponent() + comp

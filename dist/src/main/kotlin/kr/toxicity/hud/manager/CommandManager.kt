@@ -210,8 +210,8 @@ object CommandManager : BetterHudManager {
                                         "player" to Component.text(player.name()),
                                         "hud" to Component.text(hud.name)
                                     )
-                                    if (success) add_success.send(me, map)
-                                    else add_failure.send(me, map)
+                                    if (success) remove_success.send(me, map)
+                                    else remove_failure.send(me, map)
                                 }
                             }
                         }
@@ -265,8 +265,8 @@ object CommandManager : BetterHudManager {
                                         "player" to Component.text(player.name()),
                                         "compass" to Component.text(compass.name)
                                     )
-                                    if (success) add_success.send(me, map)
-                                    else add_failure.send(me, map)
+                                    if (success) remove_success.send(me, map)
+                                    else remove_failure.send(me, map)
                                 }
                             }
                         }
@@ -320,8 +320,8 @@ object CommandManager : BetterHudManager {
                                         "player" to Component.text(player.name()),
                                         "popup" to Component.text(popup.name)
                                     )
-                                    if (success) add_success.send(me, map)
-                                    else add_failure.send(me, map)
+                                    if (success) remove_success.send(me, map)
+                                    else remove_failure.send(me, map)
                                 }
                             }
                         }
