@@ -222,10 +222,11 @@ class CircleCompass(
         val yaw =  player.location().yaw.toDouble()
         var degree = yaw
         if (degree < 0) degree += 360.0
-        val div = (degree / 90 * length).roundToInt()
+        val quarterDegree = degree / 90 * length
+        val div = quarterDegree.toInt()
         var comp = EMPTY_WIDTH_COMPONENT
         val lengthDiv = length / 2
-        val mod = (degree.toInt() % length).toDouble() / length
+        val mod = quarterDegree - div - 0.5
         val loc = player.location()
         val world = player.world()
         for (i in 1..<length) {
@@ -240,8 +241,8 @@ class CircleCompass(
                 0, length * 4 -> images.s
                 else -> images.chain
             }?.map?.get(CompassData(if (i > lengthDiv) length - i else i))?.let {
-                val glyphWidth = ((it.width + space) * (mod - 0.5)).roundToInt()
-                (glyphWidth + space).toSpaceComponent() + it + (-glyphWidth + space).toSpaceComponent()
+                val move = (mod * (space * 2 + it.width)).roundToInt()
+                (space + move).toSpaceComponent() + it + (space - move).toSpaceComponent()
             } ?: (space * 2).toSpaceComponent()
         }
         player.pointedLocation.forEach {
