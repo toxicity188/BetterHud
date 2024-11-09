@@ -28,7 +28,6 @@ import net.minecraft.network.Connection
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerGamePacketListenerImpl
@@ -119,9 +118,6 @@ class NMSImpl : NMS {
         return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
-    override fun syncCommands(player: Player) {
-        MinecraftServer.getServer().commands.sendCommands((player as CraftPlayer).handle)
-    }
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
         val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
         module.build { s: CommandSourceStack ->

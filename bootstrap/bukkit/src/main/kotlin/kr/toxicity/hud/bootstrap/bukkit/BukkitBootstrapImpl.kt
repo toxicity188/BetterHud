@@ -167,7 +167,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     @Volatile
     var skipInitialReload = false
 
-    override fun onEnable() {
+    override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (MinecraftVersion.current) {
             MinecraftVersion.version1_21_2, MinecraftVersion.version1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
@@ -188,6 +188,11 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 return
             }
         }
+        nms.registerCommand(CommandManager.module)
+    }
+
+    override fun onEnable() {
+        val pluginManager = Bukkit.getPluginManager()
         bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
             GeyserAdapter()
         } else if (pluginManager.isPluginEnabled("floodgate")) {
@@ -268,7 +273,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
             }
         }
-        nms.registerCommand(CommandManager.module)
         core.start()
         scheduler.asyncTask {
             if (!skipInitialReload) core.reload()
@@ -295,7 +299,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
                     sendResourcePack(impl)
-                    nms.syncCommands(player)
+                    player.updateCommands()
                     HudPlayerJoinEvent(impl).call()
                 }
             }
