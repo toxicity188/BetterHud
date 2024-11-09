@@ -26,13 +26,12 @@ plugins {
 }
 
 val minecraft = project.properties["minecraft_version"]!!.toString()
-val folia = "1.20.6" // TODO bumps version to 1.21.1
 val adventure = "4.17.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.0"
+val betterCommand = "168d199954"
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -122,7 +121,7 @@ allprojects {
         }
         compileKotlin {
             compilerOptions {
-                freeCompilerArgs.addAll(listOf("-jvm-target", "17"))
+                freeCompilerArgs.addAll(listOf("-jvm-target", "17", "-java-parameters"))
             }
         }
     }
@@ -186,7 +185,7 @@ fun Project.velocity() = also {
     it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
     it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
 }
-fun Project.folia() = dependency("dev.folia:folia-api:$folia-R0.1-SNAPSHOT")
+fun Project.folia() = dependency("io.papermc.paper:paper-api:$minecraft-R0.1-SNAPSHOT")
 fun Project.adventure() = dependency("net.kyori:adventure-api:$adventure")
     .dependency("net.kyori:adventure-text-minimessage:$adventure")
     .dependency("net.kyori:adventure-text-serializer-legacy:$adventure")

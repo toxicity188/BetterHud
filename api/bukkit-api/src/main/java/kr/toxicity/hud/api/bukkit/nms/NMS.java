@@ -25,5 +25,4 @@ public interface NMS extends VolatileCodeHandler {
     @NotNull NMSVersion getVersion();
 
     void registerCommand(@NotNull CommandModule<BetterCommandSource> module);
-    void syncCommands(@NotNull Player player);
 }
