@@ -25,8 +25,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var bossbarResourcePackLine = line
         private set
 
-    private var needToUpdateConfig = false
-
     var defaultHud = emptyList<String>()
         private set
     var defaultPopup = emptyList<String>()
@@ -116,15 +114,9 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
 
     override fun preReload() {
         runCatching {
-            File(DATA_FOLDER, "version.yml").apply {
-                if (!exists()) createNewFile()
-            }.run {
-                val yaml = toYaml() as YamlObjectImpl
-                needToUpdateConfig = yaml.get("plugin-version")?.asString() != BOOTSTRAP.version()
-                yaml.put("plugin-version", BOOTSTRAP.version())
-                yaml.save(this)
+            File(DATA_FOLDER, "version.txt").bufferedWriter().use {
+                it.write(BOOTSTRAP.version())
             }
-
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getAsBoolean("debug", false)

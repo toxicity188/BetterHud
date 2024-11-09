@@ -2,11 +2,11 @@ package kr.toxicity.hud
 
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudBootstrap
+import kr.toxicity.hud.api.BetterHudDependency
 import kr.toxicity.hud.api.manager.*
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.plugin.ReloadState.Failure
 import kr.toxicity.hud.api.plugin.ReloadState.Success
-import kr.toxicity.hud.dependency.Dependency
 import kr.toxicity.hud.dependency.DependencyInjector
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
@@ -29,63 +29,10 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
             mkdir()
         })
         val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), bootstrap.loader())
-        if (!bootstrap.isVelocity && !bootstrap.isFabric) {
-            if (!bootstrap.isPaper) {
-                listOf(
-                    "adventure-api",
-                    "adventure-key",
-                    "adventure-text-logger-slf4j",
-                    "adventure-text-serializer-ansi",
-                    "adventure-text-serializer-gson",
-                    "adventure-text-serializer-plain",
-                    "adventure-text-serializer-legacy",
-                    "adventure-text-serializer-json",
-                    "adventure-text-minimessage",
-                ).forEach {
-                    injector.load(Dependency(
-                        "net{}kyori",
-                        it,
-                        BetterHud.ADVENTURE_VERSION
-                    ))
-                }
-                listOf(
-                    "examination-api",
-                    "examination-string"
-                ).forEach {
-                    injector.load(Dependency(
-                        "net{}kyori",
-                        it,
-                        BetterHud.EXAMINATION_VERSION
-                    ))
-                }
-                injector.load(Dependency(
-                    "net{}kyori",
-                    "option",
-                    "1.0.0",
-                ))
-            }
-            listOf(
-                "adventure-nbt",
-                "adventure-text-serializer-gson-legacy-impl",
-                "adventure-text-serializer-json-legacy-impl"
-            ).forEach {
-                injector.load(Dependency(
-                    "net{}kyori",
-                    it,
-                    BetterHud.ADVENTURE_VERSION
-                ))
-            }
-            listOf(
-                "adventure-platform-bukkit",
-                "adventure-platform-api",
-                "adventure-platform-facet",
-            ).forEach {
-                injector.load(Dependency(
-                    "net{}kyori",
-                    it,
-                    BetterHud.PLATFORM_VERSION
-                ))
-            }
+        BetterHudDependency.dependencies().forEach {
+            if (it.platforms.any { p ->
+                p.match(bootstrap)
+            }) injector.load(it)
         }
     }
 

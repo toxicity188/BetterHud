@@ -137,6 +137,26 @@ class CircleCompass(
         val customIcon = section.get("custom-icon")?.asObject()?.associate {
             it.key to CompassImageMap(assets, "custom_icon_${it.key}", it.value.asObject())
         } ?: emptyMap()
+
+        val max = max(
+            listOf(
+                n,
+                e,
+                s,
+                w,
+                nw,
+                ne,
+                sw,
+                se,
+                chain,
+                point
+            ).maxOfOrNull max@ {
+                (it ?: return@max 0).max
+            } ?: 0,
+            customIcon.values.maxOfOrNull {
+                it.max
+            } ?: 0
+        )
     }
     private class ColorEquation(
         val r: TEquation,
@@ -204,6 +224,9 @@ class CircleCompass(
                 )
             }
         }
+        val max = map.values.maxOfOrNull {
+            it.width
+        } ?: 0
     }
 
     @JvmInline
@@ -223,24 +246,27 @@ class CircleCompass(
         var degree = yaw
         if (degree < 0) degree += 360.0
         val quarterDegree = degree / 90 * length
-        val div = quarterDegree.toInt()
-        var comp = EMPTY_WIDTH_COMPONENT
+        val div = ceil(quarterDegree).toInt()
         val lengthDiv = length / 2
-        val mod = quarterDegree - div - 0.5
+        val mod = quarterDegree - div + 0.5
         val loc = player.location()
         val world = player.world()
+
+        fun getKey(index: Int) = when (div - index + lengthDiv) {
+            (length * 0.5).roundToInt() -> images.sw
+            length * 1 -> images.w
+            (length * 1.5).roundToInt() -> images.nw
+            length * 2 -> images.n
+            (length * 2.5).roundToInt() -> images.ne
+            length * 3 -> images.e
+            (length * 3.5).roundToInt() -> images.se
+            0, length * 4 -> images.s
+            else -> images.chain
+        }?.map?.get(CompassData(if (index > lengthDiv) length - index else index))
+        //var comp = (-((getKey(length / 2)?.width ?: 0) + space)).toSpaceComponent()
+        var comp = (-(images.max / 2 + space)).toSpaceComponent()
         for (i in 1..<length) {
-            comp += when (div - i + lengthDiv) {
-                (length * 0.5).roundToInt() -> images.sw
-                length * 1 -> images.w
-                (length * 1.5).roundToInt() -> images.nw
-                length * 2 -> images.n
-                (length * 2.5).roundToInt() -> images.ne
-                length * 3 -> images.e
-                (length * 3.5).roundToInt() -> images.se
-                0, length * 4 -> images.s
-                else -> images.chain
-            }?.map?.get(CompassData(if (i > lengthDiv) length - i else i))?.let {
+            comp += getKey(i)?.let {
                 val move = (mod * (space * 2 + it.width)).roundToInt()
                 (space + move).toSpaceComponent() + it + (space - move).toSpaceComponent()
             } ?: (space * 2).toSpaceComponent()
