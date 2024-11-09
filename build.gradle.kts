@@ -192,9 +192,12 @@ fun Project.adventure() = dependency("net.kyori:adventure-api:$adventure")
     .dependency("net.kyori:adventure-text-serializer-gson:$adventure")
 fun Project.library() = also {
     it.dependencies {
-        implementation("org.yaml:snakeyaml:2.3")
-        implementation("com.google.code.gson:gson:2.11.0")
-        implementation("net.objecthunter:exp4j:0.4.8")
+        compileOnly("org.yaml:snakeyaml:2.3")
+        compileOnly("com.google.code.gson:gson:2.11.0")
+        compileOnly("net.objecthunter:exp4j:0.4.8")
+        implementation("me.lucko:jar-relocator:1.7") {
+            exclude("org.ow2.asm")
+        }
         implementation(rootProject.fileTree("shaded"))
     }
 }
@@ -396,7 +399,12 @@ fun Jar.relocateAll() {
     JarRelocator(
         tempFile,
         file,
-        listOf("kotlin","net.objecthunter.exp4j","org.bstats","org.yaml.snakeyaml").map {
+        listOf(
+            "kotlin",
+            "net.objecthunter.exp4j",
+            "org.bstats",
+            "me.lucko.jarrelocator"
+        ).map {
             Relocation(it, "${project.group}.shaded.$it")
         }
     ).run()

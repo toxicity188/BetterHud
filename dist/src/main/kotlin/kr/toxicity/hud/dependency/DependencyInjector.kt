@@ -1,9 +1,12 @@
 package kr.toxicity.hud.dependency
 
+import kr.toxicity.hud.api.BetterHudDependency
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.util.subFile
 import kr.toxicity.hud.util.subFolder
 import kr.toxicity.hud.util.toYaml
+import me.lucko.jarrelocator.JarRelocator
+import me.lucko.jarrelocator.Relocation
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URI
@@ -33,10 +36,10 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
     }.subFolder(".libraries")
 
     init {
-        if (dataFolder.subFile("version.yml").toYaml().get("plugin-version")?.asString() != version) dir.deleteRecursively()
+        if (dataFolder.subFile("version.txt").readText() != version) dir.deleteRecursively()
     }
 
-    fun load(dependency: Dependency) {
+    fun load(dependency: BetterHudDependency) {
         val file = File(dir, dependency.toPath().replace('/', File.separatorChar)).apply {
             parentFile.mkdirs()
         }
@@ -45,8 +48,23 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
             val connection = URI.create("$CENTERAL/${dependency.toPath()}").toURL().openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.inputStream.buffered().use { input ->
-                file.outputStream().buffered().use { output ->
-                    input.copyTo(output)
+                if (dependency.isRelocate) {
+                    val tempFile = File.createTempFile(file.name, System.currentTimeMillis().toString()).apply {
+                        outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    val target = dependency.group.replace("{}", "/")
+                    JarRelocator(
+                        tempFile,
+                        file,
+                        listOf(Relocation(target, "kr.toxicity.hud.shaded.$target"))
+                    ).run()
+                    tempFile.delete()
+                } else {
+                    file.outputStream().buffered().use { output ->
+                        input.copyTo(output)
+                    }
                 }
             }
             connection.disconnect()
@@ -83,6 +101,6 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
     }
 
 
-    private fun Dependency.toPath(): String = "${group.replace("{}", "/")}/$name/$version/$name-$version.jar"
+    private fun BetterHudDependency.toPath(): String = "${group.replace("{}", "/")}/$name/$version/$name-$version.jar"
 
 }
