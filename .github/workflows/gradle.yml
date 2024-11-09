@@ -3,8 +3,6 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
 
 permissions:
   contents: read
@@ -26,7 +24,7 @@ jobs:
         distribution: 'temurin'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build all file.
+    - name: Build all file
       run: ./gradlew build --stacktrace
     - name: Publish to Modrinth
       run: ./gradlew modrinthPublish --stacktrace
