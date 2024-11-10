@@ -1,8 +1,11 @@
 package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.manager.BackgroundManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.text.HudText
@@ -32,10 +35,10 @@ class TextLayout(
         DecimalFormat(it)
     } ?: ConfigManagerImpl.numberFormat
     val disableNumberFormat: Boolean = yamlObject.getAsBoolean("disable-number-format", true)
-//    val background: HudBackground? = yamlObject.get("background")?.asString()?.let {
-//        BackgroundManager.getBackground(it)
-//    }
-//    val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
+    val background: HudBackground? = yamlObject.get("background")?.asString()?.let {
+        BackgroundManager.getBackground(it)
+    }
+    val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
     val emojiLocation: PixelLocation = yamlObject.get("emoji-pixel")?.asObject()?.let {
         PixelLocation(it)
     } ?: PixelLocation.zero

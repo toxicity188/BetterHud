@@ -5,7 +5,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
-import kr.toxicity.hud.layout.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
@@ -99,13 +99,26 @@ class TextRenderer(
             val compList = buildPattern(targetHudPlayer)
                 .parseToComponent()
                 .split(data.splitWidth, space, widthViewer)
-            val max = compList.maxOf {
-                it.width
-            }
+            var max = 0
             compList.forEachIndexed { index, comp ->
                 if (data.font.lastIndex < index) return@forEachIndexed
-                comp.component.font(data.font[index])
-                widthComp = if (widthComp.width == 0) comp else widthComp plusWithAlign comp
+                val backgroundKey = data.font[index]
+                var finalComp = comp
+                finalComp.component.font(backgroundKey.key)
+                //TODO replace it to proper background in the future.
+                backgroundKey.background?.let {
+                    val builder = Component.text().append(it.left.component)
+                    var length = 0
+                    while (length < comp.width) {
+                        builder.append(it.body.component)
+                        length += it.body.width
+                    }
+                    val total = it.left.width + length + it.right.width
+                    val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
+                    finalComp = it.x.toSpaceComponent() + WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + finalComp
+                }
+                if (finalComp.width > max) max = finalComp.width
+                widthComp = if (widthComp.width == 0) finalComp else widthComp plusWithAlign finalComp
             }
             widthComp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x

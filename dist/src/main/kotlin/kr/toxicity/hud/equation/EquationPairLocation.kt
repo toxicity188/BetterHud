@@ -2,7 +2,7 @@ package kr.toxicity.hud.equation
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.image.LocationGroup
+import kr.toxicity.hud.location.LocationGroup
 import kr.toxicity.hud.location.GuiLocation
 
 class EquationPairLocation(

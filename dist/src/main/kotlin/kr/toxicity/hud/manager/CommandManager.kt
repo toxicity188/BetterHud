@@ -44,6 +44,14 @@ object CommandManager : BetterHudManager {
             }
         }
     }, MiniMessage.miniMessage(), BOOTSTRAP.logger())
+        .exceptionHandler {
+            if (ConfigManagerImpl.debug) {
+                warn(
+                    "Stack trace:",
+                    it.stackTraceToString()
+                )
+            }
+        }
         .addSerializer(HudPlayerStack::class.java, ClassSerializer.builder { _, s ->
             if (s == "all") HudPlayerStack(PlayerManagerImpl.allHudPlayer)
             else PlayerManagerImpl.getHudPlayer(s)?.let {

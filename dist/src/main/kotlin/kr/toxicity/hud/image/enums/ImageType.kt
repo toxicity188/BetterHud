@@ -1,4 +1,4 @@
-package kr.toxicity.hud.image
+package kr.toxicity.hud.image.enums
 
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.listener.HudListener

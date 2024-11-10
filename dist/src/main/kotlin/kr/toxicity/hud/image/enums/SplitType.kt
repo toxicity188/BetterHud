@@ -1,5 +1,7 @@
-package kr.toxicity.hud.image
+package kr.toxicity.hud.image.enums
 
+import kr.toxicity.hud.image.LoadedImage
+import kr.toxicity.hud.image.NamedLoadedImage
 import kr.toxicity.hud.util.circleCut
 import kr.toxicity.hud.util.removeEmptyWidth
 import java.awt.AlphaComposite

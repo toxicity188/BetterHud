@@ -12,7 +12,6 @@ import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.key.Key
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.font.FontRenderContext
@@ -60,7 +59,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val textCacheMap = HashMap<TextCache, HudText>()
 
     private val textWidthMap = HashMap<Int, Int>()
-    private val textKeyMap = ConcurrentHashMap<ShaderGroup, Key>()
+    private val textKeyMap = ConcurrentHashMap<ShaderGroup, BackgroundKey>()
 
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
@@ -130,7 +129,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     @Synchronized
     fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
     @Synchronized
-    fun setKey(shaderGroup: ShaderGroup, key: Key) {
+    fun setKey(shaderGroup: ShaderGroup, key: BackgroundKey) {
         textKeyMap[shaderGroup] = key
     }
 

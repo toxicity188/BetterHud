@@ -2,7 +2,9 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
-import kr.toxicity.hud.location.AnimationLocation
+import kr.toxicity.hud.layout.enums.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutOffset
+import kr.toxicity.hud.location.animation.AnimationLocation
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience

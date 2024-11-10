@@ -1,4 +1,4 @@
-package kr.toxicity.hud.layout
+package kr.toxicity.hud.layout.enums
 
 enum class LayoutOffset {
     LEFT,

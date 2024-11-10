@@ -1,7 +1,7 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.equation.TEquation
-import kr.toxicity.hud.layout.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.audience.Audience
 

@@ -31,7 +31,7 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.1"
+val betterCommand = "1.2"
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -95,7 +95,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.8" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
+    version = "1.9" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
 
     repositories {
         mavenCentral()

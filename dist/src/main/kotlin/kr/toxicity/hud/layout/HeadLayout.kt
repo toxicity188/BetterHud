@@ -1,6 +1,7 @@
 package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.player.head.HeadRenderType

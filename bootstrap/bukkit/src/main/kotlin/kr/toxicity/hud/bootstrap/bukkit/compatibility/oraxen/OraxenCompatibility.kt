@@ -45,6 +45,9 @@ class OraxenCompatibility : Compatibility {
             }
             else -> warn("Unknown Oraxen Version.")
         }
-        info("Successfully handle Oraxen $version.")
+        info(
+            "BetterHud hooks Oraxen $version.",
+            "Be sure to set 'pack-type' to 'none' in your config."
+        )
     }
 }

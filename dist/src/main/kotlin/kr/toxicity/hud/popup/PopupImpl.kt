@@ -77,7 +77,6 @@ class PopupImpl(
                 loc += GuiLocation(gui)
             }
             PopupLayout(
-                resource,
                 json,
                 LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                 this@PopupImpl,
