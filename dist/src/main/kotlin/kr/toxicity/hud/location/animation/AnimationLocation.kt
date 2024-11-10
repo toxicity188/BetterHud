@@ -1,7 +1,8 @@
-package kr.toxicity.hud.location
+package kr.toxicity.hud.location.animation
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.EquationTriple
+import kr.toxicity.hud.location.PixelLocation
 import kotlin.math.roundToInt
 
 class AnimationLocation(

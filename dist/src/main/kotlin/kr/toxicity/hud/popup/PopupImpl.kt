@@ -15,12 +15,13 @@ import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import java.util.*
 
 class PopupImpl(
     override val path: String,
-    file: List<String>,
+    resource: GlobalResource,
     val internalName: String,
     section: YamlObject
 ) : Popup, HudConfiguration {
@@ -83,7 +84,7 @@ class PopupImpl(
                 yamlObject.get("pixel")?.asObject()?.let { pixel ->
                     PixelLocation(pixel)
                 } ?: PixelLocation.zero,
-                file,
+                resource.font,
             )
         }
     }.ifNull("layouts configuration not set.").ifEmpty {
@@ -118,7 +119,7 @@ class PopupImpl(
                     it.value to it.key
                 }.toTypedArray())
             ))
-            PackGenerator.addTask(file + "$imageEncoded.json") {
+            PackGenerator.addTask(resource.font + "$imageEncoded.json") {
                 jsonObjectOf("providers" to arr).toByteArray()
             }
         }

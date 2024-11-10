@@ -7,12 +7,13 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
-import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.image.LoadedImage
-import kr.toxicity.hud.image.LocationGroup
 import kr.toxicity.hud.layout.BackgroundLayout
-import kr.toxicity.hud.location.AnimationType
+import kr.toxicity.hud.location.LocationGroup
 import kr.toxicity.hud.layout.LayoutGroup
+import kr.toxicity.hud.location.animation.AnimationType
+import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.HeadKey
@@ -21,9 +22,9 @@ import kr.toxicity.hud.player.head.HeadRenderType.STANDARD
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
-import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
+import kr.toxicity.hud.text.BackgroundKey
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
@@ -141,8 +142,8 @@ class PopupLayout(
                             "chars" to jsonArrayOf(char)
                         ))
                     }
-                    val xWidth = Math.round(it.image.image.width.toDouble() * scale).toInt()
-                    val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                    val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
+                    val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT
                     ImageManager.setImage(shaderGroup, comp)
                     comp
                 }
@@ -159,7 +160,7 @@ class PopupLayout(
                         "chars" to jsonArrayOf(char)
                     ))
                 }
-                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT + NEW_LAYER
+                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT
                 list.add(comp.toPixelComponent(pixel.x))
             }
 
@@ -191,99 +192,111 @@ class PopupLayout(
                 textLayout.property
             )
             val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y)
-            val textKey = TextManagerImpl.getKey(group) ?: run {
-                val index = ++textIndex
-                val array = textLayout.startJson()
-                HudImpl.createBit(textShader, pixel.y) { y ->
-                    textLayout.text.array.forEach {
-                        array.add(jsonObjectOf(
-                            "type" to "bitmap",
-                            "file" to "$NAME_SPACE_ENCODED:${it.file}",
-                            "ascent" to y,
-                            "height" to (it.height * textLayout.scale).roundToInt(),
-                            "chars" to it.chars
-                        ))
-                    }
-                }
-                var textIndex = 0xC0000
-                val imageMap = HashMap<String, WidthComponent>()
-                val textEncoded = "popup_${parent.name}_text_${index}".encodeKey()
-                val key = createAdventureKey(textEncoded)
-                textLayout.text.images.forEach {
-                    val result = textIndex++.parseChar()
-                    val imageScale = it.value.scale * textLayout.scale
-                    val height = (it.value.image.image.height.toDouble() * imageScale).roundToInt()
-                    val div = height.toDouble() / it.value.image.image.height
-                    HudImpl.createBit(textShader, pixel.y + it.value.location.y) { y ->
-                        array.add(jsonObjectOf(
-                            "type" to "bitmap",
-                            "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
-                            "ascent" to y,
-                            "height" to height,
-                            "chars" to jsonArrayOf(result)
-                        ))
-                    }
-                    imageMap[it.key] = it.value.location.x.toSpaceComponent() + WidthComponent(Component.text()
-                        .font(key)
-                        .content(result)
-                        .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (it.value.image.image.width.toDouble() * div).roundToInt())
-                }
-                if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-                    HudImpl.createBit(textShader, textLayout.emojiLocation.y) { y ->
-                        MinecraftManager.applyAll(array, y, textLayout.emojiScale, key) {
-                            textIndex++
-                        }.forEach {
-                            imageMap[it.key] = textLayout.emojiLocation.x.toSpaceComponent() + it.value
+            val imageCodepointMap = textLayout.text.imageCharWidth.map {
+                it.value.name to it.key
+            }.toMap()
+            val index = ++textIndex
+            val keys = (0..<textLayout.line).map { lineIndex ->
+                TextManagerImpl.getKey(group) ?: run {
+                    val array = textLayout.startJson()
+                    HudImpl.createBit(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
+                        textLayout.text.array.forEach {
+                            array.add(
+                                jsonObjectOf(
+                                    "type" to "bitmap",
+                                    "file" to "$NAME_SPACE_ENCODED:${it.file}",
+                                    "ascent" to y,
+                                    "height" to (it.height * textLayout.scale).roundToInt(),
+                                    "chars" to it.chars
+                                )
+                            )
                         }
                     }
-                }
-                val result = HudTextData(
-                    key,
-                    imageMap,
-                    textLayout.background?.let {
-                        fun getString(image: LoadedImage, file: String): WidthComponent {
-                            val result = textIndex++.parseChar()
-                            val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
-                            val div = height.toDouble() / image.image.height
-                            HudImpl.createBit(HudShader(
-                                elementGui,
-                                textLayout.renderScale,
-                                textLayout.layer - 1,
-                                false,
-                                pixel.opacity + it.location.opacity,
-                                textLayout.property
-                            ), pixel.y + it.location.y) { y ->
-                                array.add(jsonObjectOf(
+                    val imageMap = HashMap<String, WidthComponent>()
+                    val textEncoded = "popup_${parent.name}_text_${index}".encodeKey()
+                    val key = createAdventureKey(textEncoded)
+                    var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.text.imageCharWidth.size
+                    textLayout.text.imageCharWidth.forEach {
+                        val height = (it.value.height.toDouble() * textLayout.scale).roundToInt()
+                        HudImpl.createBit(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
+                            array.add(
+                                jsonObjectOf(
                                     "type" to "bitmap",
-                                    "file" to "$NAME_SPACE_ENCODED:$file.png",
+                                    "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.value.name}".encodeKey()}.png",
                                     "ascent" to y,
                                     "height" to height,
-                                    "chars" to jsonArrayOf(result)
-                                ))
-                            }
-                            return WidthComponent(Component.text().font(key).content(result).append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                                    "chars" to jsonArrayOf(it.key.parseChar())
+                                )
+                            )
                         }
-                        BackgroundLayout(
-                            it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey()),
-                            getString(it.right, "background_${it.name}_right".encodeKey()),
-                            getString(it.body, "background_${it.name}_body".encodeKey())
-                        )
                     }
-                )
-                PackGenerator.addTask(file + "$textEncoded.json") {
-                    jsonObjectOf("providers" to array).toByteArray()
+                    if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
+                        HudImpl.createBit(textShader, pixel.y + textLayout.emojiLocation.y + lineIndex * textLayout.lineWidth) { y ->
+                            MinecraftManager.applyAll(array, y, textLayout.emojiScale, key) {
+                                ++imageTextIndex
+                            }.forEach {
+                                imageMap[it.key] = textLayout.emojiLocation.x.toSpaceComponent() + it.value
+                            }
+                        }
+                    }
+                    PackGenerator.addTask(file + "$textEncoded.json") {
+                        jsonObjectOf("providers" to array).toByteArray()
+                    }
+                    BackgroundKey(
+                        key,
+                        //TODO replace it to proper background in the future.
+                        textLayout.background?.let {
+                            fun getString(image: LoadedImage, file: String): WidthComponent {
+                                val result = (++imageTextIndex).parseChar()
+                                val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
+                                val div = height.toDouble() / image.image.height
+                                HudImpl.createBit(HudShader(
+                                    elementGui,
+                                    textLayout.renderScale,
+                                    textLayout.layer - 1,
+                                    false,
+                                    pixel.opacity * it.location.opacity,
+                                    textLayout.property
+                                ), pixel.y + it.location.y + lineIndex * textLayout.lineWidth) { y ->
+                                    array.add(jsonObjectOf(
+                                        "type" to "bitmap",
+                                        "file" to "$NAME_SPACE_ENCODED:$file.png",
+                                        "ascent" to y,
+                                        "height" to height,
+                                        "chars" to jsonArrayOf(result)
+                                    ))
+                                }
+                                return WidthComponent(Component.text()
+                                    .font(key)
+                                    .content(result)
+                                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                            }
+                            BackgroundLayout(
+                                it.location.x,
+                                getString(it.left, "background_${it.name}_left".encodeKey()),
+                                getString(it.right, "background_${it.name}_right".encodeKey()),
+                                getString(it.body, "background_${it.name}_body".encodeKey())
+                            )
+                        }
+                    ).apply {
+                        TextManagerImpl.setKey(group, this)
+                    }
                 }
-                TextManagerImpl.setKey(group, result)
-                result
             }
             TextRenderer(
                 textLayout.text.charWidth,
+                textLayout.text.imageCharWidth,
                 textLayout.color,
-                textKey,
+                HudTextData(
+                    keys,
+                    imageCodepointMap,
+                    textLayout.splitWidth
+                ),
                 textLayout.pattern,
                 textLayout.align,
+                textLayout.lineAlign,
                 textLayout.scale,
+                textLayout.emojiScale,
                 pixel.x,
                 textLayout.numberEquation,
                 textLayout.numberFormat,
@@ -293,7 +306,7 @@ class PopupLayout(
                 textLayout.useLegacyFormat,
                 textLayout.legacySerializer,
                 textLayout.space,
-                textLayout.conditions.and(textLayout.text.conditions)
+                textLayout.conditions and textLayout.text.conditions
             )
         }
 
@@ -374,7 +387,7 @@ class PopupLayout(
                 headLayout.type,
                 headLayout.follow,
                 headLayout.cancelIfFollowerNotExists,
-                headLayout.conditions.and(headLayout.head.conditions)
+                headLayout.conditions and headLayout.head.conditions
             )
         }
     }

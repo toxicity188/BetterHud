@@ -1,4 +1,4 @@
-package kr.toxicity.hud.location
+package kr.toxicity.hud.location.animation
 
 enum class AnimationType {
     LOOP,

@@ -8,8 +8,8 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.io.File
 
+//TODO replace it to proper background in the future.
 object BackgroundManager : BetterHudManager {
-
     private val backgroundMap = HashMap<String, HudBackground>()
 
     override fun start() {

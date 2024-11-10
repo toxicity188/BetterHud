@@ -2,8 +2,8 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.image.HudImage
-import kr.toxicity.hud.image.ImageType
-import kr.toxicity.hud.image.SplitType
+import kr.toxicity.hud.image.enums.ImageType
+import kr.toxicity.hud.image.enums.SplitType
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup

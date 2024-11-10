@@ -49,5 +49,9 @@ class PolymerResourcePackCompatibility : Compatibility {
                 is OnReload -> warn("This mod is still on reload!")
             }
         }
+        info(
+            "BetterHud hooks Polymer resource pack.",
+            "Be sure to set 'pack-type' to 'none' in your config."
+        )
     }
 }

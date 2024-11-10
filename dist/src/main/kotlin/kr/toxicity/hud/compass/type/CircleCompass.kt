@@ -1,4 +1,4 @@
-package kr.toxicity.hud.compass
+package kr.toxicity.hud.compass.type
 
 import com.google.gson.JsonArray
 import kr.toxicity.hud.api.component.WidthComponent
@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.compass.CompassImpl
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.location.PixelLocation

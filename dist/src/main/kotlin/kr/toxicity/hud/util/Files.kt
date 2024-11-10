@@ -14,6 +14,9 @@ fun File.subFile(name: String) = File(this, name).apply {
 fun File.ifNotExist(message: String) = apply {
     if (!exists()) throw RuntimeException(message)
 }
+fun File.ifNotExist(messageCreator: File.() -> String) = apply {
+    if (!exists()) throw RuntimeException(messageCreator())
+}
 
 fun File.forEach(block: (File) -> Unit) {
     listFiles()?.sortedBy {

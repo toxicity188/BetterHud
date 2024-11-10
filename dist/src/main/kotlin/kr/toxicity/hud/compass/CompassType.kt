@@ -1,6 +1,7 @@
 package kr.toxicity.hud.compass
 
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.compass.type.CircleCompass
 import kr.toxicity.hud.resource.GlobalResource
 import java.io.File
 

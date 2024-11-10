@@ -5,29 +5,34 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.equation.TEquation
-import kr.toxicity.hud.layout.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.text.CharWidth
 import kr.toxicity.hud.text.HudTextData
+import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.TextReplacementConfig
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.text.DecimalFormat
 import java.util.regex.Pattern
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class TextRenderer(
     private val widthMap: Map<Int, CharWidth>,
+    private val imageWidthMap: Map<Int, ImageCharWidth>,
     private val defaultColor: TextColor,
     private val data: HudTextData,
     pattern: String,
     private val align: LayoutAlign,
+    private val lineAlign: LayoutAlign,
     private val scale: Double,
+    private val emojiScale: Double,
     private val x: Int,
 
     private val numberEquation: TEquation,
@@ -43,7 +48,6 @@ class TextRenderer(
     private val condition: ConditionBuilder
 ) {
     companion object {
-        private const val SPACE_POINT = ' '.code
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
         private val imagePattern = Pattern.compile("<(?<type>(image|space)):(?<name>(([a-zA-Z]|[0-9]|-)+))>")
@@ -56,6 +60,22 @@ class TextRenderer(
     }
 
     private val parsedPatter = PlaceholderManagerImpl.parse(pattern)
+
+    private val widthViewer = ValueViewer<Pair<Style, Int>, Int>()
+        .addFunction(
+            {
+                when (it.first.font()) {
+                    SPACE_KEY -> it.second - CURRENT_CENTER_SPACE_CODEPOINT
+                    LEGACY_SPACE_KEY -> it.second - LEGACY_CENTER_SPACE_CODEPOINT
+                    null -> when (it.second) {
+                        TEXT_SPACE_KEY_CODEPOINT -> space
+                        else -> (widthMap[it.second]?.scaledWidth(scale) ?: imageWidthMap[it.second]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
+                    }
+                    else -> null
+                }
+            }
+        )
+
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
         val buildPattern = parsedPatter(reason)
@@ -73,108 +93,94 @@ class TextRenderer(
                 }
             }
             if (!cond(targetHudPlayer)) return@build EMPTY_PIXEL_COMPONENT
-            var width = 0
-            val patternResult = buildPattern(targetHudPlayer)
-            var targetString = (if (useLegacyFormat) legacySerializer(patternResult) else Component.text(patternResult))
-                .color(defaultColor)
-                .replaceText(TextReplacementConfig.builder()
-                    .match(imagePattern)
-                    .replacement { r, _ ->
-                        when (r.group(1)) {
-                            "image" -> data.images[r.group(3)]?.let {
-                                width += it.width
-                                it.component.build()
-                            } ?: Component.empty()
-                            "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.let {
-                                width += it.width
-                                it.component
-                            } ?: Component.empty()
-                            else -> Component.empty()
-                        }
-                    }
-                    .build())
-                .replaceText(TextReplacementConfig.builder()
-                    .match(allPattern)
-                    .replacement { r, _ ->
-                        MiniMessage.miniMessage().deserialize(r.group())
-                    }
-                    .build())
-            if (!disableNumberFormat) {
-                targetString = targetString.replaceText(TextReplacementConfig.builder()
-                    .match(decimalPattern)
-                    .replacement { r, _ ->
-                        val g = r.group()
-                        Component.text(runCatching {
-                            numberPattern.format(numberEquation.evaluate(g.toDouble()))
-                        }.getOrDefault(g))
-                    }
-                    .build())
-            }
-            fun hasDecoration(parent: Boolean, state: TextDecoration.State) = when (state) {
-                TextDecoration.State.TRUE -> true
-                TextDecoration.State.NOT_SET -> parent
-                TextDecoration.State.FALSE -> false
-            }
-            fun applyDecoration(component: Component, bold: Boolean, italic: Boolean): Component {
-                var ret = component
-                if (ret is TextComponent && ret.font() == null) {
-                    val codepoint = ret.content().codePoints().toArray()
-                    var add = 0
-                    if (bold) add++
-                    if (italic) add++
-                    if (space != 0) {
-                        ret = ret.content(buildString {
-                            codepoint.forEachIndexed { index, i ->
-                                appendCodePoint(i)
-                                width += if (i != SPACE_POINT) widthMap[i]?.let { width ->
-                                    width.scaledWidth(scale) + add + 1
-                                } ?: 0 else 4 + add
-                                if (index < codepoint.lastIndex) {
-                                    width += space + add
-                                    appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
-                                }
-                            }
-                        })
-                    } else {
-                        width += codepoint.sumOf {
-                            if (it != SPACE_POINT) widthMap[it]?.let { width ->
-                                width.scaledWidth(scale) + add + 1
-                            } ?: 0 else 4 + add
-                        }
-                    }
-                    ret = ret.font(data.word)
-                }
-                return ret.children(ret.children().map {
-                    applyDecoration(
-                        it,
-                        hasDecoration(bold, it.decoration(TextDecoration.BOLD)),
-                        hasDecoration(italic, it.decoration(TextDecoration.ITALIC)),
-                    )
-                })
-            }
-            val finalComp = Component.text().append(applyDecoration(
-                targetString,
-                hasDecoration(false, targetString.decoration(TextDecoration.BOLD)),
-                hasDecoration(false, targetString.decoration(TextDecoration.ITALIC))
-            ))
-            var comp = WidthComponent(finalComp, width)
 
-            data.background?.let {
-                val builder = Component.text().append(it.left.component)
-                var length = 0
-                while (length < comp.width) {
-                    builder.append(it.body.component)
-                    length += it.body.width
+            var widthComp = EMPTY_WIDTH_COMPONENT
+
+            val compList = buildPattern(targetHudPlayer)
+                .parseToComponent()
+                .split(data.splitWidth, space, widthViewer)
+            var max = 0
+            compList.forEachIndexed { index, comp ->
+                if (data.font.lastIndex < index) return@forEachIndexed
+                val backgroundKey = data.font[index]
+                var finalComp = comp
+                finalComp.component.font(backgroundKey.key)
+                //TODO replace it to proper background in the future.
+                backgroundKey.background?.let {
+                    val builder = Component.text().append(it.left.component)
+                    var length = 0
+                    while (length < comp.width) {
+                        builder.append(it.body.component)
+                        length += it.body.width
+                    }
+                    val total = it.left.width + length + it.right.width
+                    val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
+                    finalComp = it.x.toSpaceComponent() + WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + finalComp
                 }
-                val total = it.left.width + length + it.right.width
-                val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
-                comp = it.x.toSpaceComponent() + WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + comp
+                if (finalComp.width > max) max = finalComp.width
+                widthComp = if (widthComp.width == 0) finalComp else widthComp plusWithAlign finalComp
             }
-            comp.toPixelComponent(when (align) {
+            widthComp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
-                LayoutAlign.CENTER -> x - comp.width / 2
-                LayoutAlign.RIGHT -> x - comp.width
+                LayoutAlign.CENTER -> x - max / 2
+                LayoutAlign.RIGHT -> x - max
             })
         }
+    }
+
+    private infix fun WidthComponent.plusWithAlign(other: WidthComponent) = plusWithAlign(lineAlign, other)
+    private fun WidthComponent.plusWithAlign(align: LayoutAlign, other: WidthComponent) = when (align) {
+        LayoutAlign.LEFT -> this + (-width).toSpaceComponent() + other
+        LayoutAlign.CENTER -> {
+            if (width > other.width) {
+                val div = (width - other.width).toDouble() / 2
+                this + floor(-width + div).toInt().toSpaceComponent() + other + ceil(div).toInt().toSpaceComponent()
+            } else {
+                val div = floor((other.width - width).toDouble() / 2).toInt()
+                div.toSpaceComponent() + this + (-width - div).toSpaceComponent() + other
+            }
+        }
+        LayoutAlign.RIGHT -> {
+            if (width > other.width) {
+                val div = width - other.width
+                this + (-width + div).toSpaceComponent() + other
+            } else {
+                val div = other.width - width
+                div.toSpaceComponent() + this + (-width - div).toSpaceComponent() + other
+            }
+        }
+    }
+
+    private fun String.parseToComponent(): Component {
+        var targetString = (if (useLegacyFormat) legacySerializer(this) else Component.text(this))
+            .color(defaultColor)
+            .replaceText(TextReplacementConfig.builder()
+                .match(imagePattern)
+                .replacement { r, _ ->
+                    when (r.group(1)) {
+                        "image" -> data.imageCodepoint[r.group(3)]?.let { Component.text(it.parseChar()) } ?: Component.empty()
+                        "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.component ?: Component.empty()
+                        else -> Component.empty()
+                    }
+                }
+                .build())
+            .replaceText(TextReplacementConfig.builder()
+                .match(allPattern)
+                .replacement { r, _ ->
+                    MiniMessage.miniMessage().deserialize(r.group())
+                }
+                .build())
+        if (!disableNumberFormat) {
+            targetString = targetString.replaceText(TextReplacementConfig.builder()
+                .match(decimalPattern)
+                .replacement { r, _ ->
+                    val g = r.group()
+                    Component.text(runCatching {
+                        numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                    }.getOrDefault(g))
+                }
+                .build())
+        }
+        return targetString
     }
 }

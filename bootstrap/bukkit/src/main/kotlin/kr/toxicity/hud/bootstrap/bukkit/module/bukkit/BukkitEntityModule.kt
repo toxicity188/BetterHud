@@ -6,11 +6,7 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.module.BukkitModule
-import kr.toxicity.hud.bootstrap.bukkit.util.ATTRIBUTE_MAX_HEALTH
-import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
-import kr.toxicity.hud.bootstrap.bukkit.util.createBukkitTrigger
-import kr.toxicity.hud.bootstrap.bukkit.util.unwrap
-import org.bukkit.Material
+import kr.toxicity.hud.bootstrap.bukkit.util.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -83,7 +79,15 @@ class BukkitEntityModule : BukkitModule {
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
-                        (e.entity as? LivingEntity)?.getAttribute(ATTRIBUTE_MAX_HEALTH)?.value ?: 0.0
+                        (e.entity as? LivingEntity)?.maximumHealth ?: 0.0
+                    }
+                }
+            },
+            "health_percentage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function get@ {
+                        val entity = e.entity as? LivingEntity ?: return@get 0.0
+                        entity.health / entity.maximumHealth
                     }
                 }
             },
@@ -120,17 +124,7 @@ class BukkitEntityModule : BukkitModule {
                         e.entity.isDead
                     }
                 }
-            },
-            "has_off_hand" to HudPlaceholder.of { _, _ ->
-                Function {
-                    it.bukkitPlayer.inventory.itemInOffHand.type != Material.AIR
-                }
-            },
-            "has_main_hand" to HudPlaceholder.of { _, _ ->
-                Function {
-                    it.bukkitPlayer.inventory.itemInMainHand.type != Material.AIR
-                }
-            },
+            }
         )
 
 }

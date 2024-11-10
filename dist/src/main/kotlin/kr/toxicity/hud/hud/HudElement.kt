@@ -6,11 +6,12 @@ import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 
 class HudElement(
     hud: HudImpl,
-    file: List<String>,
+    resource: GlobalResource,
     private val layout: LayoutGroup,
     gui: GuiLocation,
     pixel: PixelLocation
@@ -19,7 +20,7 @@ class HudElement(
         HudImageElement(hud, image, gui, pixel)
     }
     private val textElement = layout.text.map { textLayout ->
-        HudTextElement(hud, file, textLayout, gui, pixel)
+        HudTextElement(hud, resource, textLayout, gui, pixel)
     }
     private val headElement = layout.head.map { image ->
         HudHeadElement(hud, image, gui, pixel)

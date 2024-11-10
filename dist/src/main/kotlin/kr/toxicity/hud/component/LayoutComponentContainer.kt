@@ -2,8 +2,8 @@ package kr.toxicity.hud.component
 
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.layout.LayoutAlign
-import kr.toxicity.hud.layout.LayoutOffset
+import kr.toxicity.hud.layout.enums.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutOffset
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.toSpaceComponent
 

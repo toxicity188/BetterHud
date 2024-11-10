@@ -3,6 +3,7 @@ package kr.toxicity.hud.layout
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.BackgroundManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
@@ -25,6 +26,7 @@ class TextLayout(
     val scale: Double = yamlObject.getAsDouble("scale", 1.0)
     val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
     val align: LayoutAlign = yamlObject.get("align")?.asString().toLayoutAlign()
+    val lineAlign: LayoutAlign = yamlObject.get("line-align")?.asString().toLayoutAlign()
     val color: TextColor = yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE
     val numberEquation: TEquation = yamlObject.get("number-equation")?.asString()?.let {
         TEquation(it)
@@ -45,6 +47,14 @@ class TextLayout(
     }
     val useLegacyFormat: Boolean = yamlObject.getAsBoolean("use-legacy-format", ConfigManagerImpl.useLegacyFormat)
     val legacySerializer: ComponentDeserializer = yamlObject.get("legacy-serializer")?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer
+
+    val line = yamlObject.getAsInt("line", 1).apply {
+        if (this < 1) throw RuntimeException("line cannot be < 1: $s")
+    }
+    val splitWidth = if (line == 1) Int.MAX_VALUE else yamlObject.getAsInt("split-width", 200).apply {
+        if (this < 1) throw RuntimeException("split-width cannot be < 1: $s")
+    }
+    val lineWidth = yamlObject.getAsInt("line-width", 10)
 
     fun startJson() = jsonArrayOf(
         jsonObjectOf(

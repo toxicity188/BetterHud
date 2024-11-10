@@ -38,7 +38,7 @@ class BukkitStandardModule : BukkitModule {
             "health" to { _ ->
                 {
                     HudListener { p ->
-                        p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value
+                        p.bukkitPlayer.health / p.bukkitPlayer.maximumHealth
                     }
                 }
             },
@@ -46,7 +46,7 @@ class BukkitStandardModule : BukkitModule {
                 {
                     HudListener { p ->
                         (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
-                            entity.health / entity.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value
+                            entity.health / entity.maximumHealth
                         } ?: 0.0
                     }
                 }
@@ -82,7 +82,7 @@ class BukkitStandardModule : BukkitModule {
             "absorption" to { _ ->
                 {
                     HudListener { p ->
-                        p.bukkitPlayer.absorptionAmount / p.bukkitPlayer.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value
+                        p.bukkitPlayer.absorptionAmount / p.bukkitPlayer.maximumHealth
                     }
                 }
             },
@@ -121,35 +121,36 @@ class BukkitStandardModule : BukkitModule {
             },
             "max_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.bukkitPlayer.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value
+                    p.bukkitPlayer.maximumHealth
+                }
+            },
+            "health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    val bukkit = p.bukkitPlayer
+                    bukkit.health / bukkit.maximumHealth
                 }
             },
             "vehicle_max_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.bukkitPlayer.vehicle as? LivingEntity)?.getAttribute(ATTRIBUTE_MAX_HEALTH)?.value ?: 0.0
+                    (p.bukkitPlayer.vehicle as? LivingEntity)?.maximumHealth ?: 0.0
                 }
             },
             "max_health_with_absorption" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.bukkitPlayer.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value + p.bukkitPlayer.absorptionAmount
+                    p.bukkitPlayer.maximumHealth + p.bukkitPlayer.absorptionAmount
                 }
             },
             "vehicle_max_health_with_absorption" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
-                        entity.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value + entity.absorptionAmount
+                        entity.maximumHealth + entity.absorptionAmount
                     } ?: 0.0
-                }
-            },
-            "health_percentage" to HudPlaceholder.of { _, _ ->
-                Function { p ->
-                    p.bukkitPlayer.health / p.bukkitPlayer.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value * 100.0
                 }
             },
             "vehicle_health_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.vehicle as? LivingEntity)?.let { entity ->
-                        entity.health / entity.getAttribute(ATTRIBUTE_MAX_HEALTH)!!.value * 100.0
+                        entity.health / entity.maximumHealth * 100.0
                     } ?: 0.0
                 }
             },
@@ -252,6 +253,16 @@ class BukkitStandardModule : BukkitModule {
             "frozen" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.isFrozen
+                }
+            },
+            "has_off_hand" to HudPlaceholder.of { _, _ ->
+                Function {
+                    it.bukkitPlayer.inventory.itemInOffHand.type != Material.AIR
+                }
+            },
+            "has_main_hand" to HudPlaceholder.of { _, _ ->
+                Function {
+                    it.bukkitPlayer.inventory.itemInMainHand.type != Material.AIR
                 }
             },
             "has_permission" to object : HudPlaceholder<Boolean> {

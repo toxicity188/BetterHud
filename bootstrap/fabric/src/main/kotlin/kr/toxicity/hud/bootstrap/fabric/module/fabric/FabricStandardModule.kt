@@ -13,6 +13,7 @@ import kr.toxicity.hud.bootstrap.fabric.module.Module
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.item.ItemStack
 import java.util.function.Function
 
 class FabricStandardModule : Module {
@@ -206,8 +207,17 @@ class FabricStandardModule : Module {
                         it.fabricPlayer.hasPermission(args[0])
                     }
                 }
-
                 override fun getRequiredArgsLength(): Int = 1
-            }
+            },
+            "has_main_hand" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    !p.fabricPlayer.mainHandItem.`is`(ItemStack.EMPTY.item)
+                }
+            },
+            "has_off_hand" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    !p.fabricPlayer.offhandItem.`is`(ItemStack.EMPTY.item)
+                }
+            },
         )
 }
