@@ -9,8 +9,6 @@ import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.manager.ConfigManagerImpl
-import kr.toxicity.hud.manager.MinecraftManager
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
@@ -41,7 +39,7 @@ class HudTextElement(
             loc.opacity,
             text.property
         )
-        val imageCodepointMap = text.text.imageCharWidth.map {
+        val imageCodepointMap = text.imageCharMap.map {
             it.value.name to it.key
         }.toMap()
         val index2 = ++parent.textIndex
@@ -61,31 +59,21 @@ class HudTextElement(
                         ))
                     }
                 }
-                var textIndex = TEXT_IMAGE_START_CODEPOINT + text.text.imageCharWidth.size
+                var textIndex = TEXT_IMAGE_START_CODEPOINT + text.imageCharMap.size
                 val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey()
-                val imageMap = HashMap<String, WidthComponent>()
                 val key = createAdventureKey(textEncoded)
-                text.text.imageCharWidth.forEach {
+                text.imageCharMap.forEach {
                     val height = (it.value.height.toDouble() * text.scale * text.emojiScale).roundToInt()
                     HudImpl.createBit(shader, loc.y + it.value.location.y + lineIndex * text.lineWidth) { y ->
                         array.add(
                             jsonObjectOf(
                                 "type" to "bitmap",
-                                "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.value.name}".encodeKey()}.png",
+                                "file" to it.value.fileName,
                                 "ascent" to y,
                                 "height" to height,
                                 "chars" to jsonArrayOf(it.key.parseChar())
                             )
                         )
-                    }
-                }
-                if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-                    HudImpl.createBit(shader, loc.y + text.emojiLocation.y + lineIndex * text.lineWidth) { y ->
-                        MinecraftManager.applyAll(array, y, text.emojiScale, key) {
-                            ++textIndex
-                        }.forEach {
-                            imageMap[it.key] = text.emojiLocation.x.toSpaceComponent() + it.value
-                        }
                     }
                 }
                 PackGenerator.addTask(resource.font + "$textEncoded.json") {
@@ -134,7 +122,7 @@ class HudTextElement(
         }
         TextRenderer(
             text.text.charWidth,
-            text.text.imageCharWidth,
+            text.imageCharMap,
             text.color,
             HudTextData(
                 keys,

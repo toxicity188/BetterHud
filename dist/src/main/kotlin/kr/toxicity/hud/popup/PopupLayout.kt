@@ -191,7 +191,7 @@ class PopupLayout(
                 pixel.opacity,
                 textLayout.property
             )
-            val imageCodepointMap = textLayout.text.imageCharWidth.map {
+            val imageCodepointMap = textLayout.imageCharMap.map {
                 it.value.name to it.key
             }.toMap()
             val index = ++textIndex
@@ -212,31 +212,21 @@ class PopupLayout(
                             )
                         }
                     }
-                    val imageMap = HashMap<String, WidthComponent>()
                     val textEncoded = "popup_${parent.name}_text_${index}_${lineIndex + 1}".encodeKey()
                     val key = createAdventureKey(textEncoded)
-                    var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.text.imageCharWidth.size
-                    textLayout.text.imageCharWidth.forEach {
+                    var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
+                    textLayout.imageCharMap.forEach {
                         val height = (it.value.height.toDouble() * textLayout.scale).roundToInt()
                         HudImpl.createBit(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
                             array.add(
                                 jsonObjectOf(
                                     "type" to "bitmap",
-                                    "file" to "$NAME_SPACE_ENCODED:${"glyph_${it.value.name}".encodeKey()}.png",
+                                    "file" to it.value.fileName,
                                     "ascent" to y,
                                     "height" to height,
                                     "chars" to jsonArrayOf(it.key.parseChar())
                                 )
                             )
-                        }
-                    }
-                    if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-                        HudImpl.createBit(textShader, pixel.y + textLayout.emojiLocation.y + lineIndex * textLayout.lineWidth) { y ->
-                            MinecraftManager.applyAll(array, y, textLayout.emojiScale, key) {
-                                ++imageTextIndex
-                            }.forEach {
-                                imageMap[it.key] = textLayout.emojiLocation.x.toSpaceComponent() + it.value
-                            }
                         }
                     }
                     PackGenerator.addTask(file + "$textEncoded.json") {
@@ -285,7 +275,7 @@ class PopupLayout(
             }
             TextRenderer(
                 textLayout.text.charWidth,
-                textLayout.text.imageCharWidth,
+                textLayout.imageCharMap,
                 textLayout.color,
                 HudTextData(
                     keys,

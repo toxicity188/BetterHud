@@ -1,12 +1,10 @@
 package kr.toxicity.hud.manager
 
-import com.google.gson.JsonArray
-import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
@@ -15,7 +13,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 import java.util.jar.JarFile
-import kotlin.math.roundToInt
 
 object MinecraftManager : BetterHudManager {
 
@@ -23,26 +20,23 @@ object MinecraftManager : BetterHudManager {
 
     private val assetsMap = Collections.synchronizedSet(HashSet<MinecraftAsset>())
 
-    fun applyAll(json: JsonArray, ascent: Int, scale: Double, font: Key, intGetter: () -> Int): Map<String, WidthComponent> {
-        val map = HashMap<String, WidthComponent>()
+    fun applyAll(layout: TextLayout, intGetter: () -> Int): Map<Int, ImageCharWidth> {
+        val map = HashMap<Int, ImageCharWidth>()
         assetsMap.forEach {
-            map[it.namespace.replace('/', '_')] = it.toJson(json, intGetter().parseChar(), ascent, scale, font)
+            map[intGetter()] = it.toCharWidth(layout)
         }
         return map
     }
 
     private data class MinecraftAsset(val namespace: String, val width: Int, val height: Int) {
-        fun toJson(json: JsonArray, char: String, ascent: Int, scale: Double, font: Key): WidthComponent {
-            val newHeight = (height.toDouble() * scale).roundToInt()
-            val newWidth = (width.toDouble() / height.toDouble() * newHeight).roundToInt()
-            json.add(jsonObjectOf(
-                "type" to "bitmap",
-                "file" to "minecraft:$namespace.png",
-                "ascent" to ascent,
-                "height" to newHeight,
-                "chars" to jsonArrayOf(char)
-            ))
-            return WidthComponent(Component.text().content(char).font(font).append(NEGATIVE_ONE_SPACE_COMPONENT.component), newWidth)
+        fun toCharWidth(layout: TextLayout): ImageCharWidth {
+            return ImageCharWidth(
+                namespace.replace('/', '_'),
+                "minecraft:$namespace.png",
+                layout.emojiLocation,
+                width,
+                height
+            )
         }
     }
 
@@ -54,7 +48,7 @@ object MinecraftManager : BetterHudManager {
     override fun reload(sender: Audience, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
-            if (previous != current) {
+            if (assetsMap.isEmpty() || previous != current) {
                 previous = current
             } else return
             assetsMap.clear()
@@ -119,7 +113,7 @@ object MinecraftManager : BetterHudManager {
                 }
 
             }
-        }
+        } else assetsMap.clear()
     }
 
     override fun end() {

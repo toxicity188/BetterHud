@@ -20,10 +20,10 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
-
 
     private class TextCache(
         val name: String,
@@ -575,13 +575,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
             var imageStart = TEXT_IMAGE_START_CODEPOINT
             val imageCharWidthMap = HashMap<Int, ImageCharWidth>()
             images.forEach {
-                val h = (it.value.image.image.height.toDouble() * it.value.scale).roundToInt()
-                val div = h / it.value.image.image.height.toDouble()
                 imageCharWidthMap[++imageStart] = ImageCharWidth(
                     it.key,
+                    "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
                     it.value.location,
-                    (it.value.image.image.width * div).roundToInt(),
-                    h
+                    it.value.image.image.height,
+                    it.value.image.image.height
                 )
                 PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey()}.png") {
                     it.value.image.image.toByteArray()

@@ -7,8 +7,10 @@ import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.BackgroundManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.manager.MinecraftManager
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.text.HudText
+import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -19,6 +21,18 @@ class TextLayout(
     yamlObject: YamlObject,
     loc: PixelLocation
 ) : HudLayout(loc, yamlObject) {
+
+    companion object {
+        private fun interface EmojiProvider : (TextLayout, () -> Int) -> Map<Int, ImageCharWidth>
+        private val emojiProviderMap: List<EmojiProvider> = listOf(
+            EmojiProvider { layout, getter ->
+                if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
+                    MinecraftManager.applyAll(layout, getter)
+                } else emptyMap()
+            }
+        )
+    }
+
     val pattern: String = yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s")
     val text: HudText = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
         TextManagerImpl.getText(n).ifNull("this text doesn't exist: $n")
@@ -65,4 +79,16 @@ class TextLayout(
             }
         )
     )
+
+    val imageCharMap: Map<Int, ImageCharWidth> = run {
+        val map = text.imageCharWidth.toMutableMap()
+        var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size
+        val getter = {
+            ++baseValue
+        }
+        emojiProviderMap.forEach {
+            map += it(this@TextLayout, getter)
+        }
+        map
+    }
 }
