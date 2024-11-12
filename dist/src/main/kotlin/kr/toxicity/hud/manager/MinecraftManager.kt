@@ -31,7 +31,7 @@ object MinecraftManager : BetterHudManager {
         return map
     }
 
-    private class MinecraftAsset(val namespace: String, val width: Int, val height: Int) {
+    private data class MinecraftAsset(val namespace: String, val width: Int, val height: Int) {
         fun toJson(json: JsonArray, char: String, ascent: Int, scale: Double, font: Key): WidthComponent {
             val newHeight = (height.toDouble() * scale).roundToInt()
             val newWidth = (width.toDouble() / height.toDouble() * newHeight).roundToInt()
@@ -49,8 +49,15 @@ object MinecraftManager : BetterHudManager {
     override fun start() {
     }
 
+    private var previous = ""
+
     override fun reload(sender: Audience, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
+            val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
+            if (previous != current) {
+                previous = current
+            } else return
+            assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
             runWithExceptionHandling(sender, "Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
@@ -61,7 +68,6 @@ object MinecraftManager : BetterHudManager {
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                     parseJson(it)
                 }.asJsonObject
-                val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
                 info("Current minecraft version: $current")
                 val file = File(cache, "$current.jar")
                 if (!file.exists() || file.length() == 0L) {
