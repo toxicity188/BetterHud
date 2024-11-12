@@ -35,7 +35,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.level.storage.ServerLevelData
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -260,7 +259,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     }
 
     fun wrap(world: ServerLevel): WorldWrapper {
-        val levelName = (world.levelData as ServerLevelData).levelName
+        val levelName = world.dimension().location().path
         return WorldWrapper(
             levelName,
             createUUID(levelName)

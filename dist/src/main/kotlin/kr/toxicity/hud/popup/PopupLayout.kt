@@ -191,12 +191,12 @@ class PopupLayout(
                 pixel.opacity,
                 textLayout.property
             )
-            val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y)
             val imageCodepointMap = textLayout.text.imageCharWidth.map {
                 it.value.name to it.key
             }.toMap()
             val index = ++textIndex
             val keys = (0..<textLayout.line).map { lineIndex ->
+                val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y + lineIndex * textLayout.lineWidth)
                 TextManagerImpl.getKey(group) ?: run {
                     val array = textLayout.startJson()
                     HudImpl.createBit(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
@@ -213,7 +213,7 @@ class PopupLayout(
                         }
                     }
                     val imageMap = HashMap<String, WidthComponent>()
-                    val textEncoded = "popup_${parent.name}_text_${index}".encodeKey()
+                    val textEncoded = "popup_${parent.name}_text_${index}_${lineIndex + 1}".encodeKey()
                     val key = createAdventureKey(textEncoded)
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.text.imageCharWidth.size
                     textLayout.text.imageCharWidth.forEach {
