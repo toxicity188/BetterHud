@@ -2,7 +2,6 @@ package kr.toxicity.hud.util
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()

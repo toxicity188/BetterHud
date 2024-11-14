@@ -10,7 +10,7 @@ import java.util.*
 class YamlObjectImpl(
     path: String,
     private val map: MutableMap<*, *>
-): YamlConfigurationImpl(path), YamlObject {
+) : YamlConfigurationImpl(path), YamlObject {
 
     override fun save(file: File) {
         get().saveToYaml(file)

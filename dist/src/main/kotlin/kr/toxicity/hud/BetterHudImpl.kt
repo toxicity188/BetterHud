@@ -22,7 +22,7 @@ import java.util.function.Consumer
 import java.util.jar.JarFile
 
 @Suppress("UNUSED")
-class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
+class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     init {
         if (!bootstrap.dataFolder().exists() && !bootstrap.isVelocity) loadAssets("default", bootstrap.dataFolder().apply {
@@ -36,10 +36,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
         }
     }
 
-    private var managers: List<BetterHudManager> = emptyList()
-
-    fun start() {
-        managers = listOf(
+    private val managers: List<BetterHudManager> by lazy {
+        listOf(
             ConfigManagerImpl,
             MinecraftManager,
             CommandManager,
@@ -61,6 +59,9 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap): BetterHud {
             ShaderManagerImpl,
             PlayerManagerImpl,
         )
+    }
+
+    fun start() {
         managers.forEach {
             it.start()
         }

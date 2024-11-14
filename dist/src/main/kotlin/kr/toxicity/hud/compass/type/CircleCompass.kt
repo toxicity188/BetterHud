@@ -30,7 +30,7 @@ class CircleCompass(
     override val path: String,
     private val internalName: String,
     section: YamlObject
-): CompassImpl {
+) : CompassImpl {
     companion object {
         private val defaultColorEquation = TEquation("255").run {
             ColorEquation(

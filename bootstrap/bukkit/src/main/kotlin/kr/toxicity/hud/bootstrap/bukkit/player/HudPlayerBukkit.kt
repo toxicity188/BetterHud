@@ -10,12 +10,11 @@ import org.bukkit.Bukkit
 import org.bukkit.boss.BossBar
 import org.bukkit.entity.Player
 import java.util.*
-import kotlin.collections.ArrayList
 
 class HudPlayerBukkit(
     private val player: Player,
     private val audience: Audience
-): HudPlayerImpl() {
+) : HudPlayerImpl() {
     override fun uuid(): UUID = player.uniqueId
     override fun name(): String = player.name
     override fun handle(): Any = player

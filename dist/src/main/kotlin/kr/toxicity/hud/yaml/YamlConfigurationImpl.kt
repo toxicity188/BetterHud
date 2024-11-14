@@ -4,7 +4,7 @@ import kr.toxicity.hud.api.yaml.YamlConfiguration
 
 abstract class YamlConfigurationImpl(
     private val path: String,
-): YamlConfiguration {
+) : YamlConfiguration {
     override fun path(): String = path
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

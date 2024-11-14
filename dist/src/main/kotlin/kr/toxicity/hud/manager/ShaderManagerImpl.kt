@@ -187,13 +187,13 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                                     if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
                                     else return@write
                                 }
-                                if (s.isEmpty()) return@write
+                                if (s.isEmpty() || s.startsWith("//")) return@write
                                 val tagMatcher = tagPattern.matcher(s)
                                 if (tagMatcher.find()) {
                                     val group = tagMatcher.group("name")
                                     (tagBuilders[group]?.invoke() ?: tagSupplier[group])?.let {
                                         it.forEach apply@ { methodString ->
-                                            if (methodString.isEmpty()) return@apply
+                                            if (methodString.isEmpty() || methodString.startsWith("//")) return@apply
                                             val appendEnter = methodString.first() == '#'
                                             if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
                                             append(methodString.replace("  ", ""))

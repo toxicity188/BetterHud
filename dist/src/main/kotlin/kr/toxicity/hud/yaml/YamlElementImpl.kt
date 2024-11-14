@@ -9,7 +9,7 @@ import java.io.Serializable
 class YamlElementImpl(
     path: String,
     private val any: Any
-): YamlConfigurationImpl(path), YamlElement {
+) : YamlConfigurationImpl(path), YamlElement {
     override fun get(): Any = any
     override fun asString(): String = if (any is Serializable) any.toString() else throw RuntimeException("This is not a string: $any")
     override fun asInt(): Int = (any as? Number)?.toInt().ifNull("This is not a int: $any")

@@ -11,13 +11,12 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.bossevents.CustomBossEvent
 import net.minecraft.server.level.ServerPlayer
 import java.util.*
-import kotlin.collections.ArrayList
 
 class HudPlayerFabric(
     server: MinecraftServer,
     private val player: ServerPlayer,
     private val audience: Audience
-): HudPlayerImpl() {
+) : HudPlayerImpl() {
 
     init {
         val event = ArrayList<CustomBossEvent>()

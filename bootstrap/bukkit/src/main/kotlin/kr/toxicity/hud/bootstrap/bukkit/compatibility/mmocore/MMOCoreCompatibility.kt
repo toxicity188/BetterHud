@@ -319,9 +319,16 @@ class MMOCoreCompatibility : Compatibility {
                 ): Function<HudPlayer, Number> {
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
                     return Function { p ->
-                        (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).boundSkills.entries.firstOrNull {
-                            it.value.classSkill.skill.handler.id == skill.handler.id
-                        }?.key ?: 0
+                        val bar = p.bukkitPlayer.inventory.heldItemSlot
+                        var i = 0
+                        for ((index, entry) in (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).boundSkills.entries.withIndex()) {
+                            if (entry.value.classSkill.skill.handler.id == skill.handler.id) {
+                                i = entry.key
+                                if (index >= bar) i++
+                                break
+                            }
+                        }
+                        i
                     }
                 }
             },

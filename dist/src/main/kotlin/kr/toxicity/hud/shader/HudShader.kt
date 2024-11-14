@@ -9,7 +9,7 @@ data class HudShader(
     val outline: Boolean,
     val opacity: Double,
     val property: Int,
-): Comparable<HudShader> {
+) : Comparable<HudShader> {
     companion object {
         private val comparator = Comparator.comparing { s: HudShader ->
             s.gui

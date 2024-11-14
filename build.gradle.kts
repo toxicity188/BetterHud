@@ -66,29 +66,6 @@ val supportedVelocityVersions = listOf(
     "3.4"
 )
 
-val legacyNmsVersion = listOf(
-    //"v1_17_R1",
-    //"v1_18_R1",
-    "v1_18_R2",
-    "v1_19_R1",
-    "v1_19_R2",
-    "v1_19_R3",
-    "v1_20_R1",
-    "v1_20_R2",
-    "v1_20_R3",
-).map {
-    project("nms:$it")
-}
-val currentNmsVersion = listOf(
-    "v1_20_R4",
-    "v1_21_R1",
-    "v1_21_R2",
-).map {
-    project("nms:$it")
-}
-
-val allNmsVersion = legacyNmsVersion + currentNmsVersion
-
 allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
@@ -158,6 +135,31 @@ subprojects {
     }
 }
 
+val legacyNmsVersion = listOf(
+    //"v1_17_R1",
+    //"v1_18_R1",
+    "v1_18_R2",
+    "v1_19_R1",
+    "v1_19_R2",
+    "v1_19_R3",
+    "v1_20_R1",
+    "v1_20_R2",
+    "v1_20_R3",
+).map {
+    project("nms:$it")
+}.onEach {
+    it.legacy()
+}
+
+val currentNmsVersion = listOf(
+    "v1_20_R4",
+    "v1_21_R1",
+    "v1_21_R2",
+).map {
+    project("nms:$it")
+}
+
+val allNmsVersion = legacyNmsVersion + currentNmsVersion
 
 fun Project.dependency(any: Any) = also {
     if (any is Collection<*>) {
@@ -238,9 +240,9 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
     }
 }
 
-val apiShare = project("api:standard-api").adventure().legacy()
-val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
-val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
+val apiShare = project("api:standard-api").adventure()
+val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare)
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare)
 val apiFabric = project("api:fabric-api").adventure().dependency(apiShare)
 
 val api = listOf(
@@ -248,10 +250,8 @@ val api = listOf(
     apiBukkit,
     apiVelocity,
     apiFabric
-)
-
-legacyNmsVersion.forEach {
-    it.legacy()
+).onEach {
+    project -> project.legacy()
 }
 
 fun Project.api() = dependency(api)

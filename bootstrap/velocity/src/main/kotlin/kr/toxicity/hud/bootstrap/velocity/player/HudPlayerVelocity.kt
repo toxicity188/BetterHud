@@ -11,7 +11,7 @@ import java.util.*
 
 class HudPlayerVelocity(
     private val player: Player,
-): HudPlayerImpl() {
+) : HudPlayerImpl() {
     override fun uuid(): UUID = player.uniqueId
     override fun name(): String = player.username
     override fun handle(): Any = player

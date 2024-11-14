@@ -12,7 +12,7 @@ class HudImage(
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
-): HudConfiguration {
+) : HudConfiguration {
     val conditions = setting.toConditions()
     val listener = setting.get("listener")?.asObject()?.let {
         ListenerManagerImpl.getListener(it)

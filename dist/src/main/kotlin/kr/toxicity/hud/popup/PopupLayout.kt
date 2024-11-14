@@ -125,9 +125,9 @@ class PopupLayout(
             if (hudImage.image.size > 1) hudImage.image.forEach {
                 val fileName = "$NAME_SPACE_ENCODED:${it.name}"
 
-                val height = Math.round(it.image.image.height * target.scale).toInt()
+                val height = (it.image.image.height * target.scale).roundToInt().toInt()
                 val scale = height.toDouble() / it.image.image.height
-                val xOffset = Math.round(it.image.xOffset * scale).toInt()
+                val xOffset = (it.image.xOffset * scale).roundToInt().toInt()
                 val ascent = pixel.y
                 val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
@@ -160,7 +160,8 @@ class PopupLayout(
                         "chars" to jsonArrayOf(char)
                     ))
                 }
-                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), Math.round(it.image.image.width.toDouble() * target.scale).toInt()) + NEGATIVE_ONE_SPACE_COMPONENT
+                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), (it.image.image.width.toDouble() * target.scale).roundToInt()
+                    .toInt()) + NEGATIVE_ONE_SPACE_COMPONENT
                 list.add(comp.toPixelComponent(pixel.x))
             }
 
