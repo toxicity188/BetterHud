@@ -6,6 +6,7 @@ class ImageCharWidth(
     val name: String,
     val fileName: String,
     val location: PixelLocation,
+    val scale: Double,
     width: Int,
     height: Int
 ) : CharWidth(width, height)

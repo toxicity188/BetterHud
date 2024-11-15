@@ -34,6 +34,7 @@ object MinecraftManager : BetterHudManager {
                 namespace.replace('/', '_'),
                 "minecraft:$namespace.png",
                 layout.emojiLocation,
+                1.0,
                 width,
                 height
             )

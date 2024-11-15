@@ -20,7 +20,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
@@ -579,6 +578,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     it.key,
                     "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
                     it.value.location,
+                    it.value.scale,
                     it.value.image.image.height,
                     it.value.image.image.height
                 )

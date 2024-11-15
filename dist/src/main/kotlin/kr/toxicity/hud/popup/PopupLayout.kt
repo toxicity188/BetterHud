@@ -217,7 +217,7 @@ class PopupLayout(
                     val key = createAdventureKey(textEncoded)
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
                     textLayout.imageCharMap.forEach {
-                        val height = (it.value.height.toDouble() * textLayout.scale).roundToInt()
+                        val height = (it.value.height.toDouble() * textLayout.scale * textLayout.emojiScale * it.value.scale).roundToInt()
                         HudImpl.createBit(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
                             array.add(
                                 jsonObjectOf(
