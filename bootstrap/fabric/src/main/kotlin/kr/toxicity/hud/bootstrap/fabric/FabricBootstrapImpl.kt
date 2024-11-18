@@ -35,6 +35,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.network.ServerGamePacketListenerImpl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -144,10 +145,9 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             logger.info("Mod disabled.")
         }
         ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler, _, _ ->
-            val player = handler.player
             latestVersion?.let { latest ->
                 if (version() != latest) {
-                    val audience = audiences.audience(listOf(player))
+                    val audience = audiences.audience(listOf(handler.player))
                     audience.info("New BetterHud version found: $latest")
                     audience.info(
                         Component.text("Download: https://modrinth.com/plugin/betterhud2")
@@ -158,16 +158,16 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                                 )))
                 }
             }
-            register(player)
+            register(handler)
         })
         ServerPlayConnectionEvents.DISCONNECT.register(ServerPlayConnectionEvents.Disconnect { handler, _ ->
             disconnect(handler.player)
         })
     }
 
-    private fun register(player: ServerPlayer) {
-        PlayerManagerImpl.addHudPlayer(player.uuid) {
-            val impl = HudPlayerFabric(server, player, audiences.audience(listOf(player)))
+    private fun register(listener: ServerGamePacketListenerImpl) {
+        PlayerManagerImpl.addHudPlayer(listener.player.uuid) {
+            val impl = HudPlayerFabric(server, listener, audiences.audience(listOf(listener.player)))
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {

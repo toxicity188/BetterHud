@@ -9,12 +9,12 @@ import kr.toxicity.hud.util.BOOTSTRAP
 import net.kyori.adventure.audience.Audience
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.bossevents.CustomBossEvent
-import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.network.ServerGamePacketListenerImpl
 import java.util.*
 
 class HudPlayerFabric(
     server: MinecraftServer,
-    private val player: ServerPlayer,
+    private val listener: ServerGamePacketListenerImpl,
     private val audience: Audience
 ) : HudPlayerImpl() {
 
@@ -22,15 +22,15 @@ class HudPlayerFabric(
         val event = ArrayList<CustomBossEvent>()
         server.customBossEvents.events.forEach {
             if (it.players.any { p ->
-                p.uuid == player.uuid
+                p.uuid == listener.player.uuid
             }) {
-                it.removePlayer(player)
+                it.removePlayer(listener.player)
                 event.add(it)
             }
         }
         inject()
         event.forEach {
-            it.addPlayer(player)
+            it.addPlayer(listener.player)
         }
     }
 
@@ -41,25 +41,25 @@ class HudPlayerFabric(
 
     @Suppress("DEPRECATION")
     override fun locale(): Locale {
-        val split = player.clientInformation().language.split('_')
+        val split = listener.player.clientInformation().language.split('_')
         return if (split.size == 1) Locale(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
     }
 
-    override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)
+    override fun hasPermission(perm: String): Boolean = listener.player.hasPermission(perm)
 
-    override fun uuid(): UUID = player.uuid
-    override fun name(): String = player.scoreboardName
+    override fun uuid(): UUID = listener.player.uuid
+    override fun name(): String = listener.player.scoreboardName
 
     override fun location(): LocationWrapper = LocationWrapper(
         world(),
-        player.x,
-        player.y,
-        player.z,
-        player.xRot,
-        player.yRot
+        listener.player.x,
+        listener.player.y,
+        listener.player.z,
+        listener.player.xRot,
+        listener.player.yRot
     )
 
-    override fun world(): WorldWrapper = (BOOTSTRAP as FabricBootstrapImpl).wrap(player.serverLevel())
+    override fun world(): WorldWrapper = (BOOTSTRAP as FabricBootstrapImpl).wrap(listener.player.serverLevel())
 
-    override fun handle(): Any = player
+    override fun handle(): Any = listener.player
 }
