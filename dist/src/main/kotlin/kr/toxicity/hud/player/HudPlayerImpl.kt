@@ -123,11 +123,11 @@ abstract class HudPlayerImpl : HudPlayer {
             additionalComp?.let {
                 compList.add((-it.width / 2).toSpaceComponent() + it)
             }
-            var comp = EMPTY_WIDTH_COMPONENT + NEGATIVE_ONE_SPACE_COMPONENT
+            var comp = NEGATIVE_ONE_SPACE_COMPONENT
             compList.forEach {
                 comp += it + (-it.width).toSpaceComponent()
             }
-            last = comp
+            last = comp.finalizeFont()
 
             VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build())
         } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)

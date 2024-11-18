@@ -24,12 +24,12 @@ public interface Popup extends HudObject {
     int getMaxStack();
 
     /**
-     * Shows popup to some hudPlayer.
+     * Shows popup to some player.
      * @param reason causes
-     * @param hudPlayer target HudPlayer
+     * @param player target player
      * @return updater of popup or null if showing has failed.
      */
-    @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer hudPlayer);
+    @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer player);
 
     /**
      * Hides popup to some hudPlayer.

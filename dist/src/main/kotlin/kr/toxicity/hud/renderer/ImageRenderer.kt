@@ -12,7 +12,7 @@ import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 import kr.toxicity.hud.util.append
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -31,7 +31,10 @@ class ImageRenderer(
     private val type = image.type
     private val components = components.map {
         val comp = it.component
-        PixelComponent(WidthComponent(Component.text().append(comp.component.build().color(color)), comp.width), it.pixel)
+        PixelComponent(if (color.value() == NamedTextColor.WHITE.value()) comp else WidthComponent(
+            comp.component.build().toBuilder().color(color),
+            comp.width
+        ), it.pixel)
     }
 
     private val followHudPlayer = follow?.let {

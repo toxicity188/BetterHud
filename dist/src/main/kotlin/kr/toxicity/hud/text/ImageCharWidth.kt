@@ -9,4 +9,6 @@ class ImageCharWidth(
     val scale: Double,
     width: Int,
     height: Int
-) : CharWidth(width, height)
+) : CharWidth(width, height) {
+    override fun scaledWidth(scale: Double) = super.scaledWidth(scale * this.scale)
+}

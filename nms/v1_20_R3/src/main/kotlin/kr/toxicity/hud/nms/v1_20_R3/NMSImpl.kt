@@ -86,22 +86,22 @@ class NMSImpl : NMS {
         }
     }
 
-    override fun inject(hudPlayer: HudPlayer, color: BossBar.Color) {
-        val h = hudPlayer.handle() as CraftPlayer
+    override fun inject(player: HudPlayer, color: BossBar.Color) {
+        val h = player.handle() as CraftPlayer
         bossBarMap.computeIfAbsent(h.uniqueId) {
             HudPlayerBossBar(h, h.handle.connection, color, Component.empty())
         }
     }
-    override fun showBossBar(hudPlayer: HudPlayer, color: BossBar.Color, component: Component) {
-        bossBarMap[hudPlayer.uuid()]?.update(color, component)
+    override fun showBossBar(player: HudPlayer, color: BossBar.Color, component: Component) {
+        bossBarMap[player.uuid()]?.update(color, component)
     }
 
-    override fun removeBossBar(hudPlayer: HudPlayer) {
-        bossBarMap.remove(hudPlayer.uuid())?.remove()
+    override fun removeBossBar(player: HudPlayer) {
+        bossBarMap.remove(player.uuid())?.remove()
     }
 
-    override fun reloadBossBar(hudPlayer: HudPlayer, color: BossBar.Color) {
-        bossBarMap[hudPlayer.uuid()]?.resetDummy(color)
+    override fun reloadBossBar(player: HudPlayer, color: BossBar.Color) {
+        bossBarMap[player.uuid()]?.resetDummy(color)
     }
 
     override fun getVersion(): NMSVersion {

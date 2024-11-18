@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface HudListener {
     /**
-     * Gets the index of given hudPlayer.
+     * Gets the index of given player.
      * value must be 0..1.
-     * @param hudPlayer target HudPlayer
+     * @param player target player
      * @return index range
      */
-    double getValue(@NotNull HudPlayer hudPlayer);
+    double getValue(@NotNull HudPlayer player);
     HudListener ZERO = p -> 0;
 
     HudListener EMPTY = p -> -1;

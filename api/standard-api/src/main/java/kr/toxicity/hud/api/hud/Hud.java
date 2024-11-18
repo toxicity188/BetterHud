@@ -14,8 +14,8 @@ public interface Hud extends HudObject {
 
     /**
      * Returns the output of hud.
-     * @param hudPlayer target HudPlayer
+     * @param player target player
      * @return component of hud
      */
-    @NotNull List<WidthComponent> getComponents(@NotNull HudPlayer hudPlayer);
+    @NotNull List<WidthComponent> getComponents(@NotNull HudPlayer player);
 }

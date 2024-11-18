@@ -34,19 +34,22 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
         if (hud.listener != null) {
             list.add(EMPTY_PIXEL_COMPONENT)
         }
+        val negativeSpace = parent.getOrCreateSpace(-1)
         hud.image.forEach { pair ->
             val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
-            val height = Math.round(pair.image.image.height.toDouble() * image.scale).toInt()
+            val height = (pair.image.image.height.toDouble() * image.scale).roundToInt()
             val scale = height.toDouble() / pair.image.image.height
             val ascent = finalPixel.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
             val shaderGroup = ShaderGroup(shader, fileName, image.scale, ascent)
 
             val component = ImageManager.getImage(shaderGroup) ?: run {
                 val c = (++parent.imageChar).parseChar()
-                val finalWidth = WidthComponent(Component.text()
-                    .content(c)
+                val comp = Component.text()
                     .font(parent.imageKey)
-                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (pair.image.image.width.toDouble() * scale).roundToInt())
+                val finalWidth = WidthComponent(
+                    if (BOOTSTRAP.useLegacyFont()) comp.content(c).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else comp.content("$c$negativeSpace"),
+                    (pair.image.image.width.toDouble() * scale).roundToInt()
+                )
                 parent.jsonArray?.let { array ->
                     HudImpl.createBit(shader, ascent) { y ->
                         array.add(jsonObjectOf(
@@ -62,7 +65,7 @@ class HudImageElement(parent: HudImpl, private val image: ImageLayout, gui: GuiL
                 finalWidth
             }
 
-            list.add(component.toPixelComponent(finalPixel.x + Math.round(pair.image.xOffset * scale).toInt()))
+            list.add(component.toPixelComponent(finalPixel.x + (pair.image.xOffset * scale).roundToInt()))
         }
         val renderer = ImageRenderer(
             hud,

@@ -120,14 +120,15 @@ class PopupLayout(
                 target.property
             )
             val list = ArrayList<PixelComponent>()
+            val negativeSpace = parent.getOrCreateSpace(-1)
 
             if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
-            if (hudImage.image.size > 1) hudImage.image.forEach {
+            hudImage.image.forEach {
                 val fileName = "$NAME_SPACE_ENCODED:${it.name}"
 
-                val height = (it.image.image.height * target.scale).roundToInt().toInt()
+                val height = (it.image.image.height * target.scale).roundToInt()
                 val scale = height.toDouble() / it.image.image.height
-                val xOffset = (it.image.xOffset * scale).roundToInt().toInt()
+                val xOffset = (it.image.xOffset * scale).roundToInt()
                 val ascent = pixel.y
                 val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
@@ -143,28 +144,18 @@ class PopupLayout(
                         ))
                     }
                     val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
-                    val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), xWidth) + NEGATIVE_ONE_SPACE_COMPONENT
+                    val build = Component.text()
+                        .font(parent.imageKey)
+                    val comp = WidthComponent(
+                        if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
+                        xWidth
+                    )
                     ImageManager.setImage(shaderGroup, comp)
                     comp
                 }
 
                 list.add(component.toPixelComponent(pixel.x + xOffset))
-            } else hudImage.image[0].let {
-                val char = parent.newChar()
-                HudImpl.createBit(imageShader, pixel.y) { y ->
-                    array.add(jsonObjectOf(
-                        "type" to "bitmap",
-                        "file" to "$NAME_SPACE_ENCODED:${it.name}",
-                        "ascent" to y,
-                        "height" to (it.image.image.height * target.scale).roundToInt(),
-                        "chars" to jsonArrayOf(char)
-                    ))
-                }
-                val comp = WidthComponent(Component.text().content(char).font(parent.imageKey), (it.image.image.width.toDouble() * target.scale).roundToInt()
-                    .toInt()) + NEGATIVE_ONE_SPACE_COMPONENT
-                list.add(comp.toPixelComponent(pixel.x))
             }
-
             ImageRenderer(
                 hudImage,
                 target.color,
@@ -258,9 +249,8 @@ class PopupLayout(
                                     ))
                                 }
                                 return WidthComponent(Component.text()
-                                    .font(key)
                                     .content(result)
-                                    .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                                    .append(NEGATIVE_ONE_SPACE_COMPONENT.finalizeFont().component), (image.image.width.toDouble() * div).roundToInt())
                             }
                             BackgroundLayout(
                                 it.location.x,

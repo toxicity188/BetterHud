@@ -104,9 +104,8 @@ class HudTextElement(
                                 ))
                             }
                             return WidthComponent(Component.text()
-                                .font(key)
                                 .content(result)
-                                .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.image.width.toDouble() * div).roundToInt())
+                                .append(NEGATIVE_ONE_SPACE_COMPONENT.finalizeFont().component), (image.image.width.toDouble() * div).roundToInt())
                         }
                         BackgroundLayout(
                             it.location.x,

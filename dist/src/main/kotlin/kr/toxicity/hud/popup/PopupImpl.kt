@@ -129,16 +129,16 @@ class PopupImpl(
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
 
     override fun getMaxStack(): Int = move.locations.size
-    override fun show(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? {
+    override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? {
         if (keyMapping) {
-            hudPlayer.popupKeyMap[reason.key]?.let {
+            player.popupKeyMap[reason.key]?.let {
                 if (it.update()) return null
-                else hudPlayer.popupKeyMap.remove(reason.key)
+                else player.popupKeyMap.remove(reason.key)
             }
         }
-        return show0(reason, hudPlayer)?.apply {
+        return show0(reason, player)?.apply {
             if (keyMapping) {
-                hudPlayer.popupKeyMap[reason.key] = this
+                player.popupKeyMap[reason.key] = this
             }
         }
     }

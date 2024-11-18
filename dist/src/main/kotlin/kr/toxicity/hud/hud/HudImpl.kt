@@ -98,14 +98,14 @@ class HudImpl(
 
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
 
-    override fun getComponents(hudPlayer: HudPlayer): List<WidthComponent> {
-        if (!conditions(hudPlayer)) return emptyList()
+    override fun getComponents(player: HudPlayer): List<WidthComponent> {
+        if (!conditions(player)) return emptyList()
         return elements.map {
             val elements = it.elements
             elements[when (it.animationType) {
-                AnimationType.LOOP -> (hudPlayer.tick % elements.size).toInt()
-                AnimationType.PLAY_ONCE -> hudPlayer.tick.toInt().coerceAtMost(elements.lastIndex)
-            }].getComponent(hudPlayer)
+                AnimationType.LOOP -> (player.tick % elements.size).toInt()
+                AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(elements.lastIndex)
+            }].getComponent(player)
         }
     }
 

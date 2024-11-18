@@ -39,9 +39,10 @@ class HudPlayerFabric(
 
     override fun audience(): Audience = audience
 
+    @Suppress("DEPRECATION")
     override fun locale(): Locale {
         val split = player.clientInformation().language.split('_')
-        return if (split.size == 1) Locale.of(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
+        return if (split.size == 1) Locale(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
     }
 
     override fun hasPermission(perm: String): Boolean = player.hasPermission(perm)

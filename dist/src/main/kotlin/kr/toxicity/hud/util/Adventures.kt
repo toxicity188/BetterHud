@@ -44,7 +44,7 @@ fun String.toComponent() = Component.text(this).color(NamedTextColor.WHITE).deco
 
 val EMPTY_COMPONENT: Component = Component.empty()
 val EMPTY_WIDTH_COMPONENT
-    get() = WidthComponent(Component.text().color(NamedTextColor.WHITE), 0)
+    get() = WidthComponent(Component.text(), 0)
 val EMPTY_PIXEL_COMPONENT
     get() = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 
@@ -52,9 +52,9 @@ const val LEGACY_CENTER_SPACE_CODEPOINT = 0xFFC00
 const val CURRENT_CENTER_SPACE_CODEPOINT = 0xD0000
 
 private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((LEGACY_CENTER_SPACE_CODEPOINT - 1).parseChar()).font(LEGACY_SPACE_KEY), 0)
+    get() = WidthComponent(Component.text().content((LEGACY_CENTER_SPACE_CODEPOINT - 1).parseChar()), 0)
 private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((CURRENT_CENTER_SPACE_CODEPOINT - 1).parseChar()).font(SPACE_KEY), 0)
+    get() = WidthComponent(Component.text().content((CURRENT_CENTER_SPACE_CODEPOINT - 1).parseChar()), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
     get() = if (BOOTSTRAP.useLegacyFont()) {
         LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
@@ -93,23 +93,24 @@ fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
         val i = if (this > 0) 1 else -1
         WidthComponent(
             Component.text()
-                .font(LEGACY_SPACE_KEY)
                 .content("${((abs / 256 + 255) * i + 0xFFC00).parseChar()}${(abs % 256 * i + 0xFFC00).parseChar()}"),
             width
         )
     } else WidthComponent(
         Component.text()
-            .font(LEGACY_SPACE_KEY)
             .content((this + 0xFFC00).parseChar()),
         width
     )
 } else {
     WidthComponent(
         Component.text()
-            .font(SPACE_KEY)
             .content((this + 0xD0000).parseChar()),
         width
     )
+}
+
+fun WidthComponent.finalizeFont() = apply {
+    if (BOOTSTRAP.useLegacyFont()) component.font(LEGACY_SPACE_KEY) else component.font(SPACE_KEY)
 }
 
 private class SplitBuilder(

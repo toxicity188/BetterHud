@@ -115,10 +115,13 @@ class TextRenderer(
                     }
                     val total = it.left.width + length + it.right.width
                     val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
-                    finalComp = it.x.toSpaceComponent() + WidthComponent(builder.append(it.right.component), total) + minus.toSpaceComponent() + finalComp
+
+                    var build = EMPTY_WIDTH_COMPONENT.finalizeFont()
+                    if (it.x != 0) build += it.x.toSpaceComponent()
+                    finalComp = build + WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total) + minus.toSpaceComponent() + finalComp
                 }
                 if (finalComp.width > max) max = finalComp.width
-                widthComp = if (widthComp.width == 0) finalComp else widthComp plusWithAlign finalComp
+                widthComp = widthComp plusWithAlign finalComp
             }
             widthComp.toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
@@ -159,7 +162,7 @@ class TextRenderer(
                 .replacement { r, _ ->
                     when (r.group(1)) {
                         "image" -> data.imageCodepoint[r.group(3)]?.let { Component.text(it.parseChar()) } ?: Component.empty()
-                        "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.component ?: Component.empty()
+                        "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.finalizeFont()?.component ?: Component.empty()
                         else -> Component.empty()
                     }
                 }

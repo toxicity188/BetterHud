@@ -19,6 +19,7 @@ import kr.toxicity.hud.shader.RenderScale
 import kr.toxicity.hud.shader.ShaderProperty
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import java.awt.image.BufferedImage
 import java.io.File
@@ -42,10 +43,9 @@ class CircleCompass(
     }
     private var resourceRef: GlobalResource? = resource
     private val length = section.getAsInt("length", 20).coerceAtLeast(20).coerceAtMost(360)
-    private val encode = internalName.encodeKey()
+    private val encode = "compass_$internalName".encodeKey()
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
-    private var array: JsonArray? = JsonArray()
     private val applyOpacity = section.getAsBoolean("apply-opacity", false)
     private val scale = section.getAsDouble("scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("scale cannot be <= 0")
@@ -67,11 +67,29 @@ class CircleCompass(
         pixel.opacity,
         ShaderProperty.properties(section.get("properties")?.asArray())
     )
+    private var array: JsonArray? = JsonArray()
     private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
-    private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, y: Int): WidthComponent {
+
+    private inner class CompassComponent(
+        val x: Int,
+        val char: String,
+        val color: TextColor?,
+        val width: Int
+    ) {
+        fun toWidthComponent(): WidthComponent {
+            val comp = WidthComponent(Component.text()
+                .content(char)
+                .color(color)
+                .font(key)
+                .append(NEGATIVE_ONE_SPACE_COMPONENT.component), width)
+            return if (x == 0) comp else x.toSpaceComponent() + comp
+        }
+    }
+
+    private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, x: Int, y: Int): CompassComponent {
         val char = center++.parseChar()
         val nameEncoded = imageName.encodeKey()
         val maxHeight = (image.height.toDouble() * scale).roundToInt()
@@ -93,11 +111,7 @@ class CircleCompass(
                 image.toByteArray()
             }
         }
-        return WidthComponent(Component.text()
-            .content(char)
-            .color(color)
-            .font(key)
-            .append(NEGATIVE_ONE_SPACE_COMPONENT.component), (image.width.toDouble() * div).roundToInt())
+        return CompassComponent(x, char, if (color.value() != NamedTextColor.WHITE.value()) color else null, (image.width.toDouble() * div).roundToInt())
     }
 
     override fun getType(): HudObjectType<*> = HudObjectType.COMPASS
@@ -210,17 +224,19 @@ class CircleCompass(
                         },
                         colorEquation.evaluate(i.toDouble()),
                         image.withOpacity(sin(reverse.toDouble() / div.toDouble() * PI / 2) * opacity),
-                        location.y,
+                        location.x,
+                        location.y
                     )
                 }
             } else (0..<div).associate { i ->
-                CompassData(div - i) to location.x.toSpaceComponent() + getKey(
+                CompassData(div - i) to getKey(
                     "compass_image_${internalName}_${imageName}_${i + 1}",
                     scaleEquation.evaluate(i.toDouble()).apply {
                         if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
                     } * scale,
                     colorEquation.evaluate(i.toDouble()),
                     image.withOpacity(opacity),
+                    location.x,
                     location.y
                 )
             }
@@ -235,11 +251,129 @@ class CircleCompass(
 
     init {
         array?.let {
+            if (!BOOTSTRAP.useLegacyFont()) {
+                val max = images.max + 2 * space + length
+                val center = CURRENT_CENTER_SPACE_CODEPOINT
+                it.add(buildJsonObject {
+                    addProperty("type", "space")
+                    add("advances", buildJsonObject {
+                        for (i in -max..max) {
+                            addProperty((center + i).parseChar(), i)
+                        }
+                    })
+                })
+            }
             PackGenerator.addTask(resource.font + "$encode.json") {
                 jsonObjectOf("providers" to it).toByteArray()
             }
         }
     }
+
+    private interface CompassComponentBuilder {
+        infix fun append(component: CompassComponent?)
+        infix fun build(player: HudPlayer): WidthComponent
+    }
+
+    private fun builder(yaw: Double, mod: Double) = if (BOOTSTRAP.useLegacyFont()) LegacyComponentBuilder(yaw, mod) else CurrentComponentBuilder(yaw, mod)
+
+    //<=1.18
+    private inner class LegacyComponentBuilder(
+        private val yaw: Double,
+        private val mod: Double
+    ) : CompassComponentBuilder {
+
+        private var comp = (-(images.max / 2 + space)).toSpaceComponent()
+
+        override fun append(component: CompassComponent?) {
+            comp += component?.let {
+                val build = it.toWidthComponent()
+                val move = (mod * (space * 2 + build.width)).roundToInt()
+                (space + move).toSpaceComponent() + build + (space - move).toSpaceComponent()
+            } ?: (space * 2).toSpaceComponent()
+        }
+
+        override fun build(player: HudPlayer): WidthComponent {
+            val loc = player.location()
+            val world = player.world()
+            player.pointedLocation.forEach {
+                val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
+
+                val targetLoc = it.location
+                if (targetLoc.world.uuid != world.uuid) return@forEach
+                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
+                if (get < 0) get += 2
+                var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
+                if (yawCal < 0) yawCal += 2
+
+                val min = absMin(get - yawCal, -(yawCal - get))
+                val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
+
+                selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
+                    val build = pointComponent.toWidthComponent()
+                    val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
+                    val halfPoint = build.width.toDouble() / 2
+                    comp += (value - floor(halfPoint).toInt()).toSpaceComponent() + build + (-value - ceil(halfPoint).toInt()).toSpaceComponent()
+                }
+            }
+            return (-comp.width / 2).toSpaceComponent() + comp
+        }
+    }
+    private inner class CurrentComponentBuilder(
+        private val yaw: Double,
+        private val mod: Double
+    ) : CompassComponentBuilder {
+
+        private var comp = (-(images.max / 2 + space)).toSpaceComponent()
+        private var append = EMPTY_WIDTH_COMPONENT
+        private fun Int.spaceChar() = (CURRENT_CENTER_SPACE_CODEPOINT + this).parseChar()
+
+        override fun append(component: CompassComponent?) {
+            append += component?.let {
+                val move = (mod * (space * 2 + it.width)).roundToInt()
+                val build = WidthComponent(
+                    Component.text()
+                        .content(buildString {
+                            append((space + move).spaceChar())
+                            append(it.char)
+                            append((space - move - 1).spaceChar())
+                        })
+                        .color(it.color),
+                    space * 2 + it.width
+                )
+                if (it.x != 0) it.x.toSpaceComponent() + build else build
+            } ?: (space * 2).toSpaceComponent()
+        }
+
+        override fun build(player: HudPlayer): WidthComponent {
+            val loc = player.location()
+            val world = player.world()
+            append.component.font(key)
+            comp += append
+            player.pointedLocation.forEach {
+                val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
+
+                val targetLoc = it.location
+                if (targetLoc.world.uuid != world.uuid) return@forEach
+                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
+                if (get < 0) get += 2
+                var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
+                if (yawCal < 0) yawCal += 2
+
+                val min = absMin(get - yawCal, -(yawCal - get))
+                val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
+
+                selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
+                    val build = pointComponent.toWidthComponent()
+                    val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
+                    val halfPoint = build.width.toDouble() / 2
+                    comp += (value - floor(halfPoint).toInt()).toSpaceComponent() + build + (-value - ceil(halfPoint).toInt()).toSpaceComponent()
+                }
+            }
+            return (-comp.width / 2).toSpaceComponent() + comp
+        }
+    }
+
+
 
     override fun indicate(player: HudPlayer): WidthComponent {
         if (!conditions(player)) return EMPTY_WIDTH_COMPONENT
@@ -250,8 +384,8 @@ class CircleCompass(
         val div = ceil(quarterDegree).toInt()
         val lengthDiv = length / 2
         val mod = quarterDegree - div + 0.5
-        val loc = player.location()
-        val world = player.world()
+
+        val builder = builder(yaw, mod)
 
         fun getKey(index: Int) = when (div - index + lengthDiv) {
             (length * 0.5).roundToInt() -> images.sw
@@ -265,33 +399,10 @@ class CircleCompass(
             else -> images.chain
         }?.map?.get(CompassData(if (index > lengthDiv) length - index else index))
         //var comp = (-((getKey(length / 2)?.width ?: 0) + space)).toSpaceComponent()
-        var comp = (-(images.max / 2 + space)).toSpaceComponent()
         for (i in 1..<length) {
-            comp += getKey(i)?.let {
-                val move = (mod * (space * 2 + it.width)).roundToInt()
-                (space + move).toSpaceComponent() + it + (space - move).toSpaceComponent()
-            } ?: (space * 2).toSpaceComponent()
+            builder append getKey(i)
         }
-        player.pointedLocation.forEach {
-            val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
-
-            val targetLoc = it.location
-            if (targetLoc.world.uuid != world.uuid) return@forEach
-            var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
-            if (get < 0) get += 2
-            var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
-            if (yawCal < 0) yawCal += 2
-
-            val min = absMin(get - yawCal, -(yawCal - get))
-            val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
-
-            selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
-                val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
-                val halfPoint = pointComponent.width.toDouble() / 2
-                comp += (value - floor(halfPoint).toInt()).toSpaceComponent() + pointComponent + (-value - ceil(halfPoint).toInt()).toSpaceComponent()
-            }
-        }
-        return (-comp.width / 2).toSpaceComponent() + comp
+        return builder build player
     }
 
     private fun absMin(d1: Double, d2: Double): Double {
@@ -310,6 +421,4 @@ class CircleCompass(
     override fun hashCode(): Int {
         return internalName.hashCode()
     }
-
-
 }

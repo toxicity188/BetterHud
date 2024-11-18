@@ -33,8 +33,8 @@ default_compass:
   space: 2
   gui:
     x: 50
-    y: 20
+    y: 0
   pixel:
     x: 0
-    y: 0
+    y: 80
   apply-opacity: true
