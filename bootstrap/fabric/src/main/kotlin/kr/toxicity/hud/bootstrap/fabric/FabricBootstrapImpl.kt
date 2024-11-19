@@ -23,7 +23,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences
+import net.kyori.adventure.platform.fabric.FabricServerAudiences
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
@@ -79,7 +79,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private lateinit var server: MinecraftServer
     private lateinit var dataFolder: File
-    private lateinit var audiences: MinecraftServerAudiences
+    private lateinit var audiences: FabricServerAudiences
     private lateinit var volatileCode: FabricVolatileCode
     private lateinit var version: String
     private lateinit var core: BetterHudImpl
@@ -102,7 +102,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                     FabricBootstrap.POST_RELOAD_EVENT.call(state)
                 }
             }
-            audiences = MinecraftServerAudiences.builder(it).build()
+            audiences = FabricServerAudiences.builder(it).build()
             volatileCode = FabricVolatileCode()
 
             val dispatcher = it.commands.dispatcher

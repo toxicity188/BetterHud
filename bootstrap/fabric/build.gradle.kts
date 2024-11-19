@@ -31,11 +31,7 @@ dependencies {
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0") {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.fabricmc")
-    }
-    modImplementation("net.kyori:adventure-platform-fabric:6.1.0") {
+    modImplementation("net.kyori:adventure-platform-fabric:5.14.2") {
         exclude("net.kyori", "adventure-api")
         exclude("net.fabricmc")
     }
@@ -62,9 +58,9 @@ fabricModJson {
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
-        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.AdventureFabricCommon"),
+        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.AdventureCommon"),
         mainEntrypoint("net.kyori.adventure.platform.fabric.impl.compat.permissions.PermissionsApiIntegration"),
-        entrypoint("adventure-internal:sidedproxy/server", "net.kyori.adventure.platform.modcommon.impl.server.DedicatedServerProxy"),
+        entrypoint("adventure-internal:sidedproxy/server", "net.kyori.adventure.platform.fabric.impl.server.DedicatedServerProxy"),
         serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl"),
     )
     depends = mapOf(
@@ -75,9 +71,7 @@ fabricModJson {
     )
     mixins = listOf(
         mixin("adventure-platform-fabric.accessor.mixins.json"),
-        mixin("adventure-platform-fabric.mixins.json"),
-        mixin("adventure-platform-mod-shared.accessor.mixins.json"),
-        mixin("adventure-platform-mod-shared.mixins.json")
+        mixin("adventure-platform-fabric.mixins.json")
     )
     suggests = mapOf(
         "placeholder-api" to listOf("*"),
