@@ -333,9 +333,7 @@ val fabricJar by tasks.creating(Jar::class.java) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
-    })) {
-        exclude("META-INF/jars/**")
-    }
+    }))
     from(zipTree(tasks.shadowJar.map {
         it.archiveFile
     }))
