@@ -22,14 +22,15 @@ dependencies {
     })
     //Other mod dependency
     modCompileOnly("net.kyori:adventure-api:4.17.0")
-    modCompileOnly(include("eu.pb4:polymer-resource-pack:0.9.18+1.21.1")!!)
-    modCompileOnly(include("eu.pb4:placeholder-api:2.4.1+1.21")!!)
+    modCompileOnly(include("eu.pb4:polymer-resource-pack:0.10.2+1.21.3")!!)
+    modCompileOnly(include("eu.pb4:placeholder-api:2.5.0+1.21.2")!!)
     modCompileOnly("net.luckperms:api:5.4")
 
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.14.2")!!)
+    modImplementation(include("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:6.1.0")!!)
 }
 
 loom {
@@ -49,7 +50,7 @@ fabricModJson {
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
-        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl"),
+        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl")
     )
     depends = mapOf(
         "fabricloader" to listOf(">=${project.properties["loader_version"]}"),
@@ -57,11 +58,11 @@ fabricModJson {
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
         "adventure-platform-fabric" to listOf("*"),
-        "placeholder-api" to listOf("*"),
-        "polymer-resource-pack" to listOf("*")
+        "polymer-resource-pack" to listOf("*"),
+        "placeholder-api" to listOf("*")
     )
     suggests = mapOf(
-        "luckperms" to listOf("*")
+        "luckperms" to listOf("*"),
     )
 }
 
