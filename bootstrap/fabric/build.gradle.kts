@@ -14,8 +14,6 @@ repositories {
 //    }
 }
 
-configurations.create("merge")
-
 dependencies {
     minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
     mappings(loom.layered {
@@ -31,18 +29,8 @@ dependencies {
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0") {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.fabricmc")
-    }
-    modImplementation("net.kyori:adventure-platform-fabric:6.1.0") {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.fabricmc")
-    }
-
-    //Shadow
-    "merge"("net.kyori:adventure-text-serializer-legacy:4.17.0")
-    "merge"("net.kyori:adventure-api:4.17.0")
+    modImplementation(include("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:6.1.0")!!)
 }
 
 loom {
@@ -62,53 +50,29 @@ fabricModJson {
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
-        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.AdventureFabricCommon"),
-        mainEntrypoint("net.kyori.adventure.platform.fabric.impl.compat.permissions.PermissionsApiIntegration"),
-        entrypoint("adventure-internal:sidedproxy/server", "net.kyori.adventure.platform.modcommon.impl.server.DedicatedServerProxy"),
-        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl"),
+        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl")
     )
     depends = mapOf(
         "fabricloader" to listOf(">=${project.properties["loader_version"]}"),
         "minecraft" to listOf("~${project.properties["minecraft_version"]}"),
         "java" to listOf(">=21"),
-        "fabric-api" to listOf("*")
-    )
-    mixins = listOf(
-        mixin("adventure-platform-fabric.accessor.mixins.json"),
-        mixin("adventure-platform-fabric.mixins.json"),
-        mixin("adventure-platform-mod-shared.accessor.mixins.json"),
-        mixin("adventure-platform-mod-shared.mixins.json")
+        "fabric-api" to listOf("*"),
+        "adventure-platform-fabric" to listOf("*"),
+        "polymer-resource-pack" to listOf("*"),
+        "placeholder-api" to listOf("*")
     )
     suggests = mapOf(
-        "placeholder-api" to listOf("*"),
         "luckperms" to listOf("*"),
-        "polymer-resource-pack" to listOf("*")
     )
-}
-
-val addedJar by tasks.creating(Jar::class.java) {
-    from(sourceSets.main.get().output)
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    configurations.modImplementation.map {
-        it.resolve()
-    }.get().forEach {
-        from(zipTree(it)) {
-            exclude("META-INF/*.SF")
-            exclude("META-INF/*.DSA")
-            exclude("META-INF/*.RSA")
-        }
-    }
 }
 
 tasks {
     remapJar {
-        inputFile = addedJar.archiveFile
         archiveClassifier = "remapped"
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        configurations.getByName("merge").forEach {
-            from(zipTree(it)) {
-                exclude("META-INF/**")
-            }
+        from(configurations.modImplementation.get().filter {
+            !it.name.startsWith("fabric")
+        }) {
+            into("META-INF/jars")
         }
     }
     runServer {
