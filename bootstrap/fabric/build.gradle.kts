@@ -21,9 +21,8 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-1.21:2024.07.28")
     })
     //Other mod dependency
-    modCompileOnly("net.kyori:adventure-api:4.17.0")
-    modCompileOnly(include("eu.pb4:polymer-resource-pack:0.9.18+1.21.1")!!)
-    modCompileOnly(include("eu.pb4:placeholder-api:2.4.1+1.21")!!)
+    modCompileOnly("eu.pb4:polymer-resource-pack:0.9.18+1.21.1")
+    modCompileOnly("eu.pb4:placeholder-api:2.4.1+1.21")
     modCompileOnly("net.luckperms:api:5.4")
 
     //Kyori
