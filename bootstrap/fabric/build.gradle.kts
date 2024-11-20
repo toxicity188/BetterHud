@@ -49,7 +49,7 @@ fabricModJson {
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
-        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl")
+        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabrAicBootstrapImpl")
     )
     depends = mapOf(
         "fabricloader" to listOf(">=${project.properties["loader_version"]}"),

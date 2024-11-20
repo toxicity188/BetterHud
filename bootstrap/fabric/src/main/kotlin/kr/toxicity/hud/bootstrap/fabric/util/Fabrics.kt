@@ -24,7 +24,7 @@ val ServerPlayer.armor
     get(): Double {
         val attribute = Attributes.ARMOR.unwrapKey().orElse(null) ?: return 0.0
         return armorSlots.sumOf {
-            it.item.defaultInstance.components.get(DataComponents.ATTRIBUTE_MODIFIERS)?.modifiers?.sumOf { modifier ->
+            it.get(DataComponents.ATTRIBUTE_MODIFIERS)?.modifiers?.sumOf { modifier ->
                 if (modifier.attribute.`is`(attribute)) modifier.modifier.amount else 0.0
             } ?: 0.0
         }
