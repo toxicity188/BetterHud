@@ -55,12 +55,12 @@ fabricModJson {
         "minecraft" to listOf("~${project.properties["minecraft_version"]}"),
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
-        "adventure-platform-fabric" to listOf("*"),
-        "placeholder-api" to listOf("*"),
-        "polymer-resource-pack" to listOf("*")
+        "adventure-platform-fabric" to listOf("*")
     )
     suggests = mapOf(
-        "luckperms" to listOf("*")
+        "luckperms" to listOf("*"),
+        "placeholder-api" to listOf("*"),
+        "polymer-resource-pack" to listOf("*")
     )
 }
 
