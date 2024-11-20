@@ -62,13 +62,24 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
             }
             queue
         }
-        val pool = Executors.newFixedThreadPool(tasks.size)
-        CompletableFuture.allOf(
-            *tasks.map {
-                CompletableFuture.runAsync({
-                    it()
-                }, pool)
-            }.toTypedArray()
-        ).join()
+        try {
+            Executors.newFixedThreadPool(tasks.size).use { pool ->
+                CompletableFuture.allOf(
+                    *tasks.map {
+                        CompletableFuture.runAsync({
+                            it()
+                        }, pool)
+                    }.toTypedArray()
+                ).join()
+            }
+        } catch (error: OutOfMemoryError) {
+            warn(
+                "Async task failed!",
+                "You have to set your Linux max thread limit!",
+                "",
+                "Stack trace:",
+                error.stackTraceToString()
+            )
+        }
     }
 }
