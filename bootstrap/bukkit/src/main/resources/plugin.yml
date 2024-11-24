@@ -23,7 +23,7 @@ softdepend:
   - SkinsRestorer
   - Parties
   - GPS
-  - Oraxen
+  - Nexo
 permissions:
   hud.help:
     description: Access to help command.
