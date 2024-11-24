@@ -258,7 +258,6 @@ fun Project.api() = dependency(api)
 
 val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
-val oraxen = project("oraxen")
 val bedrock = project("bedrock")
 
 allNmsVersion.forEach {
@@ -269,9 +268,6 @@ allNmsVersion.forEach {
 scheduler.project("standard").adventure().bukkit().api()
 scheduler.project("folia").folia().api()
 
-oraxen.project("1.0").bukkit().api()
-oraxen.project("2.0").bukkit().api()
-
 dist.dependency(allNmsVersion)
 
 val bukkitBootstrap = project("bootstrap:bukkit")
@@ -281,7 +277,6 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .dependency(dist)
     .bukkitAudience()
     .dependency(scheduler.subprojects)
-    .dependency(oraxen.subprojects)
     .dependency(bedrock.subprojects)
     .dependency(allNmsVersion)
 
@@ -352,11 +347,6 @@ val pluginJar by tasks.creating(Jar::class.java) {
         }))
     }
     bedrock.subprojects.forEach {
-        from(zipTree(it.tasks.jar.map { t ->
-            t.archiveFile
-        }))
-    }
-    oraxen.subprojects.forEach {
         from(zipTree(it.tasks.jar.map { t ->
             t.archiveFile
         }))
