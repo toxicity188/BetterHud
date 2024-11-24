@@ -37,9 +37,6 @@ include(
     "scheduler:standard",
     "scheduler:folia",
 
-    "oraxen:1.0",
-    "oraxen:2.0",
-
     "bedrock:geyser",
     "bedrock:floodgate",
 
