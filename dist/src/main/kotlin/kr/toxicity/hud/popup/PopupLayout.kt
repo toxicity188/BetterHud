@@ -7,6 +7,8 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
 import kr.toxicity.hud.hud.HudImpl
+import kr.toxicity.hud.image.HudImage
+import kr.toxicity.hud.image.ImageComponent
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.location.LocationGroup
@@ -119,53 +121,56 @@ class PopupLayout(
                 pixel.opacity,
                 target.property
             )
-            val list = ArrayList<PixelComponent>()
             val negativeSpace = parent.getOrCreateSpace(-1)
 
-            if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
-            hudImage.image.forEach {
-                val fileName = "$NAME_SPACE_ENCODED:${it.name}"
+            fun HudImage.toComponent(): ImageComponent {
+                val list = ArrayList<PixelComponent>()
+                if (listener != null) list.add(EMPTY_PIXEL_COMPONENT)
+                image.forEach {
+                    val fileName = "$NAME_SPACE_ENCODED:${it.name}"
 
-                val height = (it.image.image.height * target.scale).roundToInt()
-                val scale = height.toDouble() / it.image.image.height
-                val xOffset = (it.image.xOffset * scale).roundToInt()
-                val ascent = pixel.y
-                val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
+                    val height = (it.image.image.height * target.scale).roundToInt()
+                    val scale = height.toDouble() / it.image.image.height
+                    val xOffset = (it.image.xOffset * scale).roundToInt()
+                    val ascent = pixel.y
+                    val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
-                val component = ImageManager.getImage(shaderGroup) ?: run {
-                    val char = parent.newChar()
-                    HudImpl.createBit(imageShader, ascent) { y ->
-                        array.add(jsonObjectOf(
-                            "type" to "bitmap",
-                            "file" to fileName,
-                            "ascent" to y,
-                            "height" to height,
-                            "chars" to jsonArrayOf(char)
-                        ))
+                    val component = ImageManager.getImage(shaderGroup) ?: run {
+                        val char = parent.newChar()
+                        HudImpl.createBit(imageShader, ascent) { y ->
+                            array.add(jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to fileName,
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(char)
+                            ))
+                        }
+                        val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
+                        val build = Component.text()
+                            .font(parent.imageKey)
+                        val comp = WidthComponent(
+                            if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
+                            xWidth
+                        )
+                        ImageManager.setImage(shaderGroup, comp)
+                        comp
                     }
-                    val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
-                    val build = Component.text()
-                        .font(parent.imageKey)
-                    val comp = WidthComponent(
-                        if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
-                        xWidth
-                    )
-                    ImageManager.setImage(shaderGroup, comp)
-                    comp
+                    list.add(component.toPixelComponent(pixel.x + xOffset))
                 }
-
-                list.add(component.toPixelComponent(pixel.x + xOffset))
+                return ImageComponent(this, list, children.entries.associate {
+                    it.key to it.value.toComponent()
+                })
             }
             ImageRenderer(
-                hudImage,
                 target.color,
                 target.space,
                 target.stack,
                 target.maxStack,
-                list,
+                target.image.toComponent(),
                 target.follow,
                 target.cancelIfFollowerNotExists,
-                hudImage.conditions.and(target.conditions)
+                hudImage.conditions and target.conditions
             )
         }
 

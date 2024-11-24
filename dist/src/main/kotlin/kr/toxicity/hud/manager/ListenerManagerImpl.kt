@@ -37,7 +37,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     override fun getAllListenerKeys(): Set<String> = Collections.unmodifiableSet(listenerMap.keys)
 
     fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
-        val clazz = section.get("class")?.asString().ifNull("class value not set.")
+        val clazz = section["class"]?.asString().ifNull("class value not set.")
         return listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
     }
 

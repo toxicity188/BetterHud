@@ -26,19 +26,19 @@ class PopupImpl(
     section: YamlObject
 ) : Popup, HudConfiguration {
     val gui = GuiLocation(section)
-    val move = section.get("move")?.asObject()?.let {
+    val move = section["move"]?.asObject()?.let {
         EquationPairLocation(it)
     } ?: EquationPairLocation.zero
     private val duration = section.getAsInt("duration", -1)
     private val update = section.getAsBoolean("update", true)
-    private val group = section.get("group")?.asString() ?: internalName
+    private val group = section["group"]?.asString() ?: internalName
     private val unique = section.getAsBoolean("unique", false)
     private val queue = duration > 0 && section.getAsBoolean("queue", false)
     private val push = !queue && section.getAsBoolean("push", false)
     private val alwaysCheckCondition = queue && section.getAsBoolean("always-check-condition", true)
     private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
-    private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section.get("index")?.asString()?.let {
+    private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
         }.let {
@@ -64,16 +64,16 @@ class PopupImpl(
     }
     fun newChar(): String = (++imageChar).parseChar()
 
-    private val sortType = section.get("sort")?.asString()?.let {
+    private val sortType = section["sort"]?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())
     } ?: PopupSortType.LAST
 
-    private val layouts = section.get("layouts")?.asObject()?.let {
+    private val layouts = section["layouts"]?.asObject()?.let {
         val json = array.ifNull("error is occurred.")
         it.mapSubConfiguration { _, yamlObject ->
-            val layout = yamlObject.get("name")?.asString().ifNull("name value not set.")
+            val layout = yamlObject["name"]?.asString().ifNull("name value not set.")
             var loc = GuiLocation(yamlObject)
-            yamlObject.get("gui")?.asObject()?.let { gui ->
+            yamlObject["gui"]?.asObject()?.let { gui ->
                 loc += GuiLocation(gui)
             }
             PopupLayout(
@@ -81,7 +81,7 @@ class PopupImpl(
                 LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                 this@PopupImpl,
                 loc,
-                yamlObject.get("pixel")?.asObject()?.let { pixel ->
+                yamlObject["pixel"]?.asObject()?.let { pixel ->
                     PixelLocation(pixel)
                 } ?: PixelLocation.zero,
                 resource.font,
@@ -99,12 +99,12 @@ class PopupImpl(
                 show(event, hudPlayer)
             }
         }
-        section.get("triggers")?.asObject()?.forEachSubConfiguration { _, yamlObject ->
+        section["triggers"]?.asObject()?.forEachSubConfiguration { _, yamlObject ->
             TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
                 task(u, t)
             }
         }
-        section.get("hide-triggers")?.asObject()?.forEachSubConfiguration { _, yamlObject ->
+        section["hide-triggers"]?.asObject()?.forEachSubConfiguration { _, yamlObject ->
             TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
                 PlayerManagerImpl.getHudPlayer(t)?.let {
                     hide(it)

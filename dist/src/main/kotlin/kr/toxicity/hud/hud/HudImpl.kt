@@ -50,15 +50,15 @@ class HudImpl(
         (++imageChar).parseChar()
     }
 
-    private val elements = section.get("layouts")?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
-        val layout = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
+    private val elements = section["layouts"]?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
+        val layout = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
             LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
         }
         var gui = GuiLocation(yamlObject)
-        yamlObject.get("gui")?.asObject()?.let {
+        yamlObject["gui"]?.asObject()?.let {
             gui += GuiLocation(it)
         }
-        val pixel = yamlObject.get("pixel")?.asObject()?.let {
+        val pixel = yamlObject["pixel"]?.asObject()?.let {
             PixelLocation(it)
         }  ?: PixelLocation.zero
         HudAnimation(

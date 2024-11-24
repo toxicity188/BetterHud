@@ -12,8 +12,8 @@ class EquationTriple(val x: TEquation, val y: TEquation, val opacity: TEquation)
     fun evaluate(d: Double) = Triple(x.evaluate(d), y.evaluate(d), opacity.evaluate(d))
 
     constructor(section: YamlObject): this(
-        section.get("x-equation")?.asString().ifNull("x-equation value not set.").toEquation(),
-        section.get("y-equation")?.asString().ifNull("y-equation value not set.").toEquation(),
-        section.get("opacity-equation")?.asString()?.toEquation() ?: TEquation.one
+        section["x-equation"]?.asString().ifNull("x-equation value not set.").toEquation(),
+        section["y-equation"]?.asString().ifNull("y-equation value not set.").toEquation(),
+        section["opacity-equation"]?.asString()?.toEquation() ?: TEquation.one
     )
 }

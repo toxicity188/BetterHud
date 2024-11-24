@@ -14,12 +14,12 @@ class HeadLayout(
     yamlObject: YamlObject,
     loc: PixelLocation
 ) : HudLayout(loc, yamlObject) {
-    val head: HudHead = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
+    val head: HudHead = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
         PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
     }
     val type = HeadRenderType.valueOf(yamlObject.getAsString("type", "standard").uppercase())
     val align: LayoutAlign = when (type) {
-        HeadRenderType.STANDARD -> yamlObject.get("align")?.asString().toLayoutAlign()
+        HeadRenderType.STANDARD -> yamlObject["align"]?.asString().toLayoutAlign()
         HeadRenderType.FANCY -> LayoutAlign.CENTER
     }
 }

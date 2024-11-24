@@ -9,4 +9,10 @@ import org.jetbrains.annotations.NotNull;
  * @param pixel pixel
  */
 public record PixelComponent(@NotNull WidthComponent component, int pixel) {
+    public @NotNull PixelComponent plus(@NotNull WidthComponent other) {
+        return new PixelComponent(
+                component.plus(other),
+                pixel
+        );
+    }
 }

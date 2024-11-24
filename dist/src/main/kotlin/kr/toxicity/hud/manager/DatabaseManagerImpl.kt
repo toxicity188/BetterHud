@@ -54,7 +54,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     add("compasses") {
                         CompassManagerImpl.getCompass(it)
                     }
-                    yaml.get("locations")?.asArray()?.forEach {
+                    yaml["locations"]?.asArray()?.forEach {
                         runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
                             player.pointers().add(PointedLocation.deserialize(it.asObject()))
                         }

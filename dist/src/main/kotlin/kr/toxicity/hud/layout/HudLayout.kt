@@ -10,8 +10,8 @@ import kr.toxicity.hud.util.toConditions
 abstract class HudLayout(originalLoc: PixelLocation, yaml: YamlObject) {
     val outline: Boolean = yaml.getAsBoolean("outline", false)
     val layer: Int = yaml.getAsInt("layer", 0)
-    val property: Int = ShaderProperty.properties(yaml.get("properties")?.asArray())
-    val follow: String? = yaml.get("follow")?.asString()
+    val property: Int = ShaderProperty.properties(yaml["properties"]?.asArray())
+    val follow: String? = yaml["follow"]?.asString()
     val location: PixelLocation = PixelLocation(yaml) + originalLoc + PixelLocation.hotBarHeight
     val cancelIfFollowerNotExists: Boolean = yaml.getAsBoolean("cancel-if-follower-not-exists", true)
     val conditions: ConditionBuilder = yaml.toConditions()

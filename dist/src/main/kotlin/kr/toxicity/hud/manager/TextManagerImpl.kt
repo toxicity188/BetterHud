@@ -226,7 +226,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
         DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
             runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
-                val fontDir = section.get("file")?.asString()?.let {
+                val fontDir = section["file"]?.asString()?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
                 val scale = section.getAsInt("scale", 16)
@@ -253,12 +253,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                 scale,
                                 resource.textures,
                                 TreeMap<String, LocatedImage>().apply {
-                                    section.get("images")?.asObject()
+                                    section["images"]?.asObject()
                                         ?.forEachSubConfiguration { key, yamlObject ->
                                             put(key, LocatedImage(
                                                 File(
                                                     assetsFolder,
-                                                    yamlObject.get("name")?.asString().ifNull("image does not set: $key")
+                                                    yamlObject["name"]?.asString().ifNull("image does not set: $key")
                                                 )
                                                     .ifNotExist("this image doesn't exist: $key")
                                                     .toImage()
@@ -271,7 +271,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                             ))
                                         }
                                 },
-                                section.get("include")?.asArray()?.map {
+                                section["include"]?.asArray()?.map {
                                     it.asString()
                                 } ?: emptyList(),
                                 section.toConditions(),
@@ -283,7 +283,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                 file.path,
                                 s,
                                 resource.textures,
-                                section.get("chars").ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
+                                section["chars"].ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
                                     BitmapData(
                                         obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
                                             y.asString()

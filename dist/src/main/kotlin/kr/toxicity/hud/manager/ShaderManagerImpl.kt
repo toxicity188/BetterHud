@@ -106,7 +106,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     val replaceList = mutableSetOf<String>()
 
                     val yaml = PluginConfiguration.SHADER.create()
-                    barColor = yaml.get("bar-color")?.asString()?.let {
+                    barColor = yaml["bar-color"]?.asString()?.let {
                         runCatching {
                             BossBar.Color.valueOf(it.uppercase())
                         }.getOrNull()
@@ -151,7 +151,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
                     if (yaml.getAsBoolean("disable-level-text", false)) replaceList.add("HideExp")
 
-                    yaml.get("hotbar")?.asObject()?.let {
+                    yaml["hotbar"]?.asObject()?.let {
                         if (it.getAsBoolean("disable", false)) {
                             replaceList.add("RemapHotBar")
                             val locations =

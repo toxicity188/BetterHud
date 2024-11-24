@@ -50,25 +50,25 @@ class CircleCompass(
     private val scale = section.getAsDouble("scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("scale cannot be <= 0")
     }
-    private val scaleEquation = section.get("scale-equation")?.asString()?.let {
+    private val scaleEquation = section["scale-equation"]?.asString()?.let {
         TEquation(it)
     } ?: TEquation.one
-    private val colorEquation = section.get("color-equation")?.asObject()?.let {
+    private val colorEquation = section["color-equation"]?.asObject()?.let {
         ColorEquation(it)
     } ?: defaultColorEquation
     private val space = section.getAsInt("space", 2).coerceAtLeast(0)
 
-    private val pixel = PixelLocation(section.get("pixel")?.asObject().ifNull("pixel value not set.")) + PixelLocation.hotBarHeight
+    private val pixel = PixelLocation(section["pixel"]?.asObject().ifNull("pixel value not set.")) + PixelLocation.hotBarHeight
     private val shader = HudShader(
-        GuiLocation(section.get("gui")?.asObject().ifNull("gui value not set.")),
+        GuiLocation(section["gui"]?.asObject().ifNull("gui value not set.")),
         RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
         section.getAsBoolean("outline", false),
         pixel.opacity,
-        ShaderProperty.properties(section.get("properties")?.asArray())
+        ShaderProperty.properties(section["properties"]?.asArray())
     )
     private var array: JsonArray? = JsonArray()
-    private val images = CompassImage(assets, section.get("file")?.asObject().ifNull("file value not set."))
+    private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
@@ -119,37 +119,37 @@ class CircleCompass(
     override fun getName(): String = internalName
 
     private inner class CompassImage(assets: File, section: YamlObject) {
-        val n = section.get("n")?.asObject()?.let {
+        val n = section["n"]?.asObject()?.let {
             CompassImageMap(assets, "n", it)
         }
-        val e = section.get("e")?.asObject()?.let {
+        val e = section["e"]?.asObject()?.let {
             CompassImageMap(assets, "e", it)
         }
-        val s = section.get("s")?.asObject()?.let {
+        val s = section["s"]?.asObject()?.let {
             CompassImageMap(assets, "s", it)
         }
-        val w = section.get("w")?.asObject()?.let {
+        val w = section["w"]?.asObject()?.let {
             CompassImageMap(assets, "w", it)
         }
-        val nw = section.get("nw")?.asObject()?.let {
+        val nw = section["nw"]?.asObject()?.let {
             CompassImageMap(assets, "nw", it)
         }
-        val ne = section.get("ne")?.asObject()?.let {
+        val ne = section["ne"]?.asObject()?.let {
             CompassImageMap(assets, "ne", it)
         }
-        val sw = section.get("sw")?.asObject()?.let {
+        val sw = section["sw"]?.asObject()?.let {
             CompassImageMap(assets, "sw", it)
         }
-        val se = section.get("se")?.asObject()?.let {
+        val se = section["se"]?.asObject()?.let {
             CompassImageMap(assets, "se", it)
         }
-        val chain = section.get("chain")?.asObject()?.let {
+        val chain = section["chain"]?.asObject()?.let {
             CompassImageMap(assets, "chain", it)
         }
-        val point = section.get("point")?.asObject()?.let {
+        val point = section["point"]?.asObject()?.let {
             CompassImageMap(assets, "point", it)
         }
-        val customIcon = section.get("custom-icon")?.asObject()?.associate {
+        val customIcon = section["custom-icon"]?.asObject()?.associate {
             it.key to CompassImageMap(assets, "custom_icon_${it.key}", it.value.asObject())
         } ?: emptyMap()
 
@@ -199,7 +199,7 @@ class CircleCompass(
         section: YamlObject
     ) {
         val map = run {
-            val fileName = section.get("name")?.asString().ifNull("name value not set.").replace('/', File.separatorChar)
+            val fileName = section["name"]?.asString().ifNull("name value not set.").replace('/', File.separatorChar)
             val scale = section.getAsDouble("scale", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0")
             }

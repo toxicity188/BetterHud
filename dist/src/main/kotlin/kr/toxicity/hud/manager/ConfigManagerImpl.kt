@@ -7,7 +7,6 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
-import kr.toxicity.hud.yaml.YamlObjectImpl
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -120,32 +119,32 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getAsBoolean("debug", false)
-            defaultHud = yaml.get("default-hud")?.asArray()?.map {
+            defaultHud = yaml["default-hud"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
-            defaultPopup = yaml.get("default-popup")?.asArray()?.map {
+            defaultPopup = yaml["default-popup"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
-            defaultCompass = yaml.get("default-compass")?.asArray()?.map {
+            defaultCompass = yaml["default-compass"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
-            yaml.get("default-font-name")?.asString()?.let {
+            yaml["default-font-name"]?.asString()?.let {
                 if (defaultFontName != it) needToUpdatePack = true
                 defaultFontName = it
             }
-            yaml.get("pack-type")?.asString()?.let {
+            yaml["pack-type"]?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find this pack type: $it") {
                     packType = PackType.valueOf(it.uppercase())
                 }
             }
             tickSpeed = yaml.getAsLong("tick-speed", 1)
-            numberFormat = yaml.get("number-format")?.asString()?.let {
+            numberFormat = yaml["number-format"]?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to read this number-format: $it") {
                     DecimalFormat(it)
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#")
             disableToBedrockPlayer = yaml.getAsBoolean("disable-to-bedrock-player", true)
-            yaml.get("build-folder-location")?.asString()?.let {
+            yaml["build-folder-location"]?.asString()?.let {
                 buildFolderLocation = it.replace('/', File.separatorChar)
             }
             line = yaml.getAsInt("bossbar-line", 1).coerceAtLeast(1).coerceAtMost(7)
@@ -161,10 +160,10 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             enableProtection = yaml.getAsBoolean("enable-protection", false)
             mergeBossBar = yaml.getAsBoolean("merge-boss-bar", true)
             enableSelfHost = yaml.getAsBoolean("enable-self-host", false)
-            mergeOtherFolders = yaml.get("merge-other-folders")?.asArray()?.map {
+            mergeOtherFolders = yaml["merge-other-folders"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
-            yaml.get("self-host-ip")?.asString()?.let { ip ->
+            yaml["self-host-ip"]?.asString()?.let { ip ->
                 selfHostIp = ip
             }
             selfHostPort = yaml.getAsInt("self-host-port", 8163)
@@ -175,22 +174,22 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             } else {
                 BOOTSTRAP.endMetrics()
             }
-            yaml.get("loading-head")?.asString()?.let {
+            yaml["loading-head"]?.asString()?.let {
                 loadingHead = it
             }
             clearBuildFolder = yaml.getAsBoolean("clear-build-folder", true)
             loadMinecraftDefaultTextures = yaml.getAsBoolean("load-minecraft-default-textures", true)
-            includedMinecraftTextures = yaml.get("included-minecraft-list")?.asArray()?.map {
+            includedMinecraftTextures = yaml["included-minecraft-list"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
             useLegacyFormat = yaml.getAsBoolean("use-legacy-format", true)
-            yaml.get("legacy-serializer")?.asString()?.let {
+            yaml["legacy-serializer"]?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
                     legacySerializer = it.toLegacySerializer()
                 }
             }
-            key = KeyResource(yaml.get("namespace")?.asString() ?: NAME_SPACE)
-            minecraftJarVersion = yaml.get("minecraft-jar-version")?.asString() ?: "bukkit"
+            key = KeyResource(yaml["namespace"]?.asString() ?: NAME_SPACE)
+            minecraftJarVersion = yaml["minecraft-jar-version"]?.asString() ?: "bukkit"
             removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
         }.onFailure { e ->
             warn(

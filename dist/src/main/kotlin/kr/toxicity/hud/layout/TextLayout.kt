@@ -33,34 +33,34 @@ class TextLayout(
         )
     }
 
-    val pattern: String = yamlObject.get("pattern")?.asString().ifNull("pattern value not set: $s")
-    val text: HudText = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let { n ->
+    val pattern: String = yamlObject["pattern"]?.asString().ifNull("pattern value not set: $s")
+    val text: HudText = yamlObject["name"]?.asString().ifNull("name value not set: $s").let { n ->
         TextManagerImpl.getText(n).ifNull("this text doesn't exist: $n")
     }
     val scale: Double = yamlObject.getAsDouble("scale", 1.0)
     val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
-    val align: LayoutAlign = yamlObject.get("align")?.asString().toLayoutAlign()
-    val lineAlign: LayoutAlign = yamlObject.get("line-align")?.asString().toLayoutAlign()
-    val color: TextColor = yamlObject.get("color")?.asString()?.toTextColor() ?: NamedTextColor.WHITE
-    val numberEquation: TEquation = yamlObject.get("number-equation")?.asString()?.let {
+    val align: LayoutAlign = yamlObject["align"]?.asString().toLayoutAlign()
+    val lineAlign: LayoutAlign = yamlObject["line-align"]?.asString().toLayoutAlign()
+    val color: TextColor = yamlObject["color"]?.asString()?.toTextColor() ?: NamedTextColor.WHITE
+    val numberEquation: TEquation = yamlObject["number-equation"]?.asString()?.let {
         TEquation(it)
     } ?: TEquation.t
-    val numberFormat: DecimalFormat = yamlObject.get("number-format")?.asString()?.let {
+    val numberFormat: DecimalFormat = yamlObject["number-format"]?.asString()?.let {
         DecimalFormat(it)
     } ?: ConfigManagerImpl.numberFormat
     val disableNumberFormat: Boolean = yamlObject.getAsBoolean("disable-number-format", true)
-    val background: HudBackground? = yamlObject.get("background")?.asString()?.let {
+    val background: HudBackground? = yamlObject["background"]?.asString()?.let {
         BackgroundManager.getBackground(it)
     }
     val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
-    val emojiLocation: PixelLocation = yamlObject.get("emoji-pixel")?.asObject()?.let {
+    val emojiLocation: PixelLocation = yamlObject["emoji-pixel"]?.asObject()?.let {
         PixelLocation(it)
     } ?: PixelLocation.zero
     val emojiScale: Double = yamlObject.getAsDouble("emoji-scale", 1.0).apply {
         if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
     }
     val useLegacyFormat: Boolean = yamlObject.getAsBoolean("use-legacy-format", ConfigManagerImpl.useLegacyFormat)
-    val legacySerializer: ComponentDeserializer = yamlObject.get("legacy-serializer")?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer
+    val legacySerializer: ComponentDeserializer = yamlObject["legacy-serializer"]?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer
 
     val line = yamlObject.getAsInt("line", 1).apply {
         if (this < 1) throw RuntimeException("line cannot be < 1: $s")

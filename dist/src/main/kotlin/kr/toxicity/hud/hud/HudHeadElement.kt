@@ -95,7 +95,7 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             head.type,
             head.follow,
             head.cancelIfFollowerNotExists,
-            head.conditions.and(head.head.conditions)
+            head.conditions and head.head.conditions
         ).getHead(UpdateEvent.EMPTY)
     }
 
