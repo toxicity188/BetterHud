@@ -45,11 +45,11 @@ class NexoCompatibility : Compatibility {
                             }
                         }
                         event.addResourcePack(pack)
-                        info("Successfully merged with Oraxen: (${state.time} ms)")
+                        info("Successfully merged with Nexo: (${state.time} ms)")
                     }
                     is Failure -> {
                         warn(
-                            "Fail to merge the resource pack with Oraxen.",
+                            "Fail to merge the resource pack with Nexo.",
                             "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
                         )
                     }
