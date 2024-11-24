@@ -23,21 +23,31 @@ class HudImage(
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }
-    val children by lazy {
-        fun Iterable<YamlElement>.asMap() = associate {
-            val str = it.asString()
-            if (str == name) throw RuntimeException("circular image reference: $name")
-            str to ImageManager.getImage(str).ifNull("This children image doesn't exist in $name: $str")
+
+    private val childrenList = when (val child = setting["children"]) {
+        is YamlArray -> child.map {
+            it.asString()
         }
-        when (val child = setting["children"]) {
-            is YamlArray -> child.asMap()
-            is YamlElement -> if (child.asString() == "*") ImageManager.allImage.associateBy {
+        is YamlElement -> listOf(child.asString())
+        null -> emptyList()
+        else -> throw RuntimeException("Unsupported children section: $name")
+    }
+
+    val children by lazy {
+        fun String.toImagePair() = this to ImageManager.getImage(this).ifNull("This children image doesn't exist in $name: $this")
+        when {
+            childrenList.isEmpty() -> emptyMap()
+            childrenList.size == 1 -> if (childrenList[0] == "*") ImageManager.allImage.filter {
+                it.name != name && !it.childrenList.contains(name)
+            }.associateBy {
                 it.name
-            } else listOf(child).asMap()
-            null -> emptyMap<String, HudImage>()
-            else -> throw RuntimeException("Unsupported children section: $name")
+            } else mapOf(childrenList[0].toImagePair())
+            else -> childrenList.associate {
+                it.toImagePair()
+            }
         }
     }
+
     val follow = setting["follow"]?.asString()?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $name: $it")

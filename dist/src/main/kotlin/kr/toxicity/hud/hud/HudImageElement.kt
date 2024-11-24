@@ -31,7 +31,7 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
             imageLayout.property
         )
         val negativeSpace = parent.getOrCreateSpace(-1)
-        fun HudImage.toComponent(): ImageComponent {
+        fun HudImage.toComponent(parentComponent: ImageComponent? = null): ImageComponent {
             val list = ArrayList<PixelComponent>()
             if (listener != null) {
                 list.add(EMPTY_PIXEL_COMPONENT)
@@ -68,7 +68,7 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
 
                 list.add(component.toPixelComponent(finalPixel.x + (pair.image.xOffset * scale).roundToInt()))
             }
-            return ImageComponent(this, list, children.entries.associate {
+            return ImageComponent(this, parentComponent, list, children.entries.associate {
                 it.key to it.value.toComponent()
             })
         }
@@ -77,7 +77,11 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
             imageLayout.space,
             imageLayout.stack,
             imageLayout.maxStack,
-            imageLayout.image.toComponent(),
+            try {
+                imageLayout.image.toComponent()
+            } catch (_: StackOverflowError) {
+                throw RuntimeException("circular reference found in ${imageLayout.image.name}")
+            },
             imageLayout.follow,
             imageLayout.cancelIfFollowerNotExists,
             imageLayout.conditions and imageLayout.image.conditions

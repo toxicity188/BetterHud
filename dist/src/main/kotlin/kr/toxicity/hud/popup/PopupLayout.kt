@@ -123,7 +123,7 @@ class PopupLayout(
             )
             val negativeSpace = parent.getOrCreateSpace(-1)
 
-            fun HudImage.toComponent(): ImageComponent {
+            fun HudImage.toComponent(parentComponent: ImageComponent? = null): ImageComponent {
                 val list = ArrayList<PixelComponent>()
                 if (listener != null) list.add(EMPTY_PIXEL_COMPONENT)
                 image.forEach {
@@ -158,7 +158,7 @@ class PopupLayout(
                     }
                     list.add(component.toPixelComponent(pixel.x + xOffset))
                 }
-                return ImageComponent(this, list, children.entries.associate {
+                return ImageComponent(this, parentComponent, list, children.entries.associate {
                     it.key to it.value.toComponent()
                 })
             }
@@ -167,7 +167,11 @@ class PopupLayout(
                 target.space,
                 target.stack,
                 target.maxStack,
-                target.image.toComponent(),
+                try {
+                    target.image.toComponent()
+                } catch (_: StackOverflowError) {
+                    throw RuntimeException("circular reference found in ${target.image.name}")
+                },
                 target.follow,
                 target.cancelIfFollowerNotExists,
                 hudImage.conditions and target.conditions

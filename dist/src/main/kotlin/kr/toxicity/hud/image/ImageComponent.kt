@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.TextColor
 
 class ImageComponent(
     private val original: HudImage,
+    private val parent: ImageComponent?,
     val images: List<PixelComponent>,
     val children: Map<String, ImageComponent>,
 ) : Map<String, ImageComponent> by children {
@@ -23,7 +24,7 @@ class ImageComponent(
     val max
         get(): Int = maxOf(images.maxOf {
             it.component.width
-        }, children.values.maxOfOrNull {
+        }, values.maxOfOrNull {
             it.max
         } ?: 0)
 
@@ -34,33 +35,36 @@ class ImageComponent(
 
     fun applyColor(color: TextColor): ImageComponent = ImageComponent(
         original,
+        parent,
         images.map {
             it.applyColor(color)
         },
-        children.entries.associate {
+        entries.associate {
             it.key to it.value.applyColor(color)
         }
     )
 
     private fun interface ImageMapper : (HudPlayer) -> ImageComponent
 
-    private val childrenMapper: (UpdateEvent) -> ImageMapper = original.childrenMapper?.map {
-        children[it.first].ifNull("This children doesn't exist in ${original.name}: ${it.first}") to it.second
-    }?.let {
-        { event: UpdateEvent ->
-            it.map { builder ->
-                builder.first to builder.second.build(event)
-            }.let { buildList ->
-                ImageMapper { player ->
-                    buildList.firstOrNull { pair ->
-                        pair.second(player)
-                    }?.first ?: this
+    private val childrenMapper: (ImageComponent, UpdateEvent) -> ImageMapper = run {
+        original.childrenMapper?.map {
+            children[it.first].ifNull("This children doesn't exist in ${original.name}: ${it.first}") to it.second
+        }?.let {
+            { root, event ->
+                it.map { builder ->
+                    builder.first.imageMapper(event) to builder.second.build(event)
+                }.let { buildList ->
+                    ImageMapper ret@ { player ->
+                        buildList.firstOrNull { pair ->
+                            pair.second(player)
+                        }?.first?.invoke(player) ?: root
+                    }
                 }
             }
-        }
-    } ?: {
-        ImageMapper {
-            this
+        } ?: { root, _ ->
+            ImageMapper {
+                root
+            }
         }
     }
 
@@ -72,9 +76,9 @@ class ImageComponent(
     fun imageMapper(event: UpdateEvent): (HudPlayer) -> ImageComponent {
         val buildFollow = original.follow?.build(event)
         val mapperTree = ImageMapperTree(
-            childrenMapper(event),
-            children.entries.associate {
-                it.key to it.value.childrenMapper(event)
+            childrenMapper(this, event),
+            entries.associate {
+                it.key to it.value.childrenMapper(this, event)
             }
         )
         return { player ->
