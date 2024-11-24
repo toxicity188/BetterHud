@@ -20,7 +20,6 @@ import kotlin.math.roundToInt
 class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val chars = run {
-        val hud = imageLayout.image
         val finalPixel = imageLayout.location + pixel
 
         val shader = HudShader(
@@ -34,7 +33,7 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
         val negativeSpace = parent.getOrCreateSpace(-1)
         fun HudImage.toComponent(): ImageComponent {
             val list = ArrayList<PixelComponent>()
-            if (hud.listener != null) {
+            if (listener != null) {
                 list.add(EMPTY_PIXEL_COMPONENT)
             }
             image.forEach { pair ->
