@@ -79,7 +79,7 @@ class TextRenderer(
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
         val buildPattern = parsedPatter(reason)
-        val cond = condition.build(reason)
+        val cond = condition build reason
 
         val followTarget = followHudPlayer?.build(reason)
 

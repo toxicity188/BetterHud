@@ -96,7 +96,7 @@ class HudImpl(
         return HudObjectType.HUD
     }
 
-    private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
+    private val conditions = section.toConditions() build UpdateEvent.EMPTY
 
     override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()

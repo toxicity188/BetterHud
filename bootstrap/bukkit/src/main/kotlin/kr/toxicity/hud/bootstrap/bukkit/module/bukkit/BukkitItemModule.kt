@@ -40,7 +40,7 @@ class BukkitItemModule : BukkitModule {
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
             "update" to { c ->
-                c.get("type")?.asString()?.let {
+                c["type"]?.asString()?.let {
                     val predicate: (UpdateItemEvent) -> Boolean = when (it) {
                         "drop" -> { e -> e.original is PlayerDropItemEvent }
                         "pickup" -> { e -> e.original is EntityPickupItemEvent }

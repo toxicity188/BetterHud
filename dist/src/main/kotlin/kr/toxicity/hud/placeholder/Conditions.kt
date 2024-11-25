@@ -39,8 +39,8 @@ object Conditions {
 
         val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer.")).map[section["operation"]?.asString().ifNull(operationValue)].ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
         return ConditionBuilder { updateEvent ->
-            val o1 = first.build(updateEvent)
-            val o2 = second.build(updateEvent)
+            val o1 = first build updateEvent
+            val o2 = second build updateEvent
             ({ p ->
                 operation(o1.value(p), o2.value(p))
             })

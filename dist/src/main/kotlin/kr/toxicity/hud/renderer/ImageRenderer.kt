@@ -29,16 +29,16 @@ class ImageRenderer(
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
-    private val component = component.applyColor(color)
+    private val component = component applyColor color
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> PixelComponent {
-        val cond = conditions.build(reason)
+        val cond = conditions build reason
         val listen = component.listener(reason)
         val follow = followHudPlayer?.build(reason)
 
         val stackGetter = stack?.build(reason)
         val maxStackGetter = maxStack?.build(reason)
 
-        val mapper = component.imageMapper(reason)
+        val mapper = component mapper reason
 
         return build@ { hudPlayer, frame ->
 

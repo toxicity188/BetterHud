@@ -23,10 +23,11 @@ fun RenderedImage.save(outputStream: OutputStream) {
 }
 
 fun RenderedImage.toByteArray(): ByteArray {
-    return ByteArrayOutputStream(2048).use {
-        ImageIO.write(this, "png", it)
-        it
-    }.toByteArray()
+    val byte = ByteArrayOutputStream()
+    byte.buffered().use { buffer ->
+        ImageIO.write(this, "png", buffer)
+    }
+    return byte.toByteArray()
 }
 
 fun ByteArray.hexToImage(): BufferedImage {

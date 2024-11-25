@@ -6,7 +6,7 @@ data class MinecraftVersion(
     val first: Int,
     val second: Int,
     val third: Int
-): Comparable<MinecraftVersion> {
+) : Comparable<MinecraftVersion> {
     companion object {
         val current = MinecraftVersion(Bukkit.getBukkitVersion()
             .substringBefore('-'))

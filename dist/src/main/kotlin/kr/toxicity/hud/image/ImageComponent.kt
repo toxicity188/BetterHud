@@ -28,19 +28,19 @@ class ImageComponent(
             it.max
         } ?: 0)
 
-    private fun PixelComponent.applyColor(color: TextColor) = PixelComponent(if (color.value() == NamedTextColor.WHITE.value()) component else WidthComponent(
+    private infix fun PixelComponent.applyColor(color: TextColor) = PixelComponent(if (color.value() == NamedTextColor.WHITE.value()) component else WidthComponent(
         component.component.build().toBuilder().color(color),
         component.width
     ), pixel)
 
-    fun applyColor(color: TextColor): ImageComponent = ImageComponent(
+    infix fun applyColor(color: TextColor): ImageComponent = ImageComponent(
         original,
         parent,
         images.map {
-            it.applyColor(color)
+            it applyColor color
         },
         entries.associate {
-            it.key to it.value.applyColor(color)
+            it.key to (it.value applyColor color)
         }
     )
 
@@ -52,7 +52,7 @@ class ImageComponent(
         }?.let {
             { root, event ->
                 it.map { builder ->
-                    builder.first.imageMapper(event) to builder.second.build(event)
+                    builder.first mapper event to (builder.second build event)
                 }.let { buildList ->
                     ImageMapper ret@ { player ->
                         buildList.firstOrNull { pair ->
@@ -73,7 +73,7 @@ class ImageComponent(
         val children: Map<String, ImageMapper>
     ) : Map<String, ImageMapper> by children
 
-    fun imageMapper(event: UpdateEvent): (HudPlayer) -> ImageComponent {
+    infix fun mapper(event: UpdateEvent): (HudPlayer) -> ImageComponent {
         val buildFollow = original.follow?.build(event)
         val mapperTree = ImageMapperTree(
             childrenMapper(this, event),

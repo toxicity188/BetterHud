@@ -74,7 +74,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "cooldown_skill" to search@ { c ->
-                val name = c.get("skill")?.asString().ifNull("skill value not set.")
+                val name = c["skill"]?.asString().ifNull("skill value not set.")
                 val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull("the skill named \"$name\" doesn't exist.")
                 return@search { _: UpdateEvent ->
                     HudListener { p ->

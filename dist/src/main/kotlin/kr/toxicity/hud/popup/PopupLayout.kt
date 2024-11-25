@@ -47,7 +47,7 @@ class PopupLayout(
     }
 
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
-        val build = layout.conditions.build(reason)
+        val build = layout.conditions build reason
         val map = groups.map {
             it.getComponent(reason)
         }

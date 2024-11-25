@@ -26,7 +26,7 @@ class HudElement(
         HudHeadElement(hud, image, gui, pixel)
     }
 
-    val conditions = layout.conditions.build(UpdateEvent.EMPTY)
+    val conditions = layout.conditions build UpdateEvent.EMPTY
 
     private val max = imageElement.maxOfOrNull {
         it.max

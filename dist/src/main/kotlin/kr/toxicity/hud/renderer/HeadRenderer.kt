@@ -129,7 +129,7 @@ class HeadRenderer(
         }
     }
     fun getHead(event: UpdateEvent): (HudPlayer) -> PixelComponent {
-        val cond = conditions.build(event)
+        val cond = conditions build event
         val playerPlaceholder = followPlayer?.build(event)
         return build@{ player ->
             var targetPlayer = player

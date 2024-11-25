@@ -69,7 +69,7 @@ class CircleCompass(
     )
     private var array: JsonArray? = JsonArray()
     private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
-    private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
+    private val conditions = section.toConditions() build UpdateEvent.EMPTY
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
 

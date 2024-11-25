@@ -43,7 +43,7 @@ class PopupImpl(
             if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
         }.let {
             { reason ->
-                it.build(reason).let { placeholder ->
+                (it build reason).let { placeholder ->
                     { hudPlayer ->
                         (placeholder(hudPlayer) as Number).toInt()
                     }
@@ -147,7 +147,7 @@ class PopupImpl(
         val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl()
         }
-        val buildCondition = conditions.build(reason)
+        val buildCondition = conditions build reason
         if (!buildCondition(hudPlayer)) return null
         var updater = {
         }

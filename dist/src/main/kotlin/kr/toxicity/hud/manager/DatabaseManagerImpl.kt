@@ -219,8 +219,6 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     if (ConfigManagerImpl.debug) e.printStackTrace()
                 }
             }
-        }.handle { _, e ->
-            e?.printStackTrace()
         }.join()
     }
 
