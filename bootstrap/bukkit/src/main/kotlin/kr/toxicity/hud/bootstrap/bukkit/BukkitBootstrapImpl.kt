@@ -227,7 +227,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", object : HudPlaceholder<String> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val format = "%${args[0]}%"
+                    val format = "%${args.joinToString(",")}%"
                     return Function { player ->
                         runCatching {
                             PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)

@@ -20,7 +20,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.9.4")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.4.4")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.1.0-dev.0")
+    compileOnly("com.nexomc:nexo:0.1.0-dev.24")
     compileOnly("team.unnamed:creative-api:1.7.3")
 }
 
