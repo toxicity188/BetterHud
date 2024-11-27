@@ -31,7 +31,7 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.2"
+val betterCommand = "1.3"
 
 val supportedMinecraftVersions = listOf(
     //1.17
