@@ -16,7 +16,6 @@ import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import team.unnamed.creative.ResourcePack
 
 class NexoCompatibility : Compatibility {
     override val website: String = "https://www.spigotmc.org/resources/72448/"
@@ -38,13 +37,9 @@ class NexoCompatibility : Compatibility {
             fun generate(event: NexoPrePackGenerateEvent) {
                 when (val state = PLUGIN.reload()) {
                     is Success -> {
-                        val pack = ResourcePack.resourcePack()
                         state.resourcePack.forEach {
-                            pack.unknownFile(it.key) { stream ->
-                                stream.write(it.value)
-                            }
+                            event.addUnknownFile(it.key, it.value)
                         }
-                        event.addResourcePack(pack)
                         info("Successfully merged with Nexo: (${state.time} ms)")
                     }
                     is Failure -> {
