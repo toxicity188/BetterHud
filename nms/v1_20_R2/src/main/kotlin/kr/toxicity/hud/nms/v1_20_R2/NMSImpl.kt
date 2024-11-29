@@ -141,6 +141,9 @@ class NMSImpl : NMS {
             override fun getScaledHealth(): Float {
                 return player.scaledHealth
             }
+            override fun getHealthScale(): Double {
+                return player.healthScale
+            }
             override fun getFirstPlayed(): Long {
                 return player.firstPlayed
             }
