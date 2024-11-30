@@ -7,12 +7,12 @@ import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.warn
 
 object Conditions {
-    fun parse(section: YamlObject): ConditionBuilder {
-        var value: ConditionBuilder = ConditionBuilder.alwaysTrue
+    fun parse(section: YamlObject, defaultBuilder: ConditionBuilder = ConditionBuilder.alwaysTrue): ConditionBuilder {
+        var value: ConditionBuilder = defaultBuilder
         section.forEachSubConfiguration { s, yamlObject ->
             runCatching {
                 val new = parse0(yamlObject)
-                value = when (val gate = yamlObject.get("gate")?.asString() ?: "and") {
+                value = when (val gate = yamlObject["gate"]?.asString() ?: "and") {
                     "and" -> value and new
                     "or" -> value or new
                     else -> {
@@ -31,16 +31,16 @@ object Conditions {
 
     @Suppress("UNCHECKED_CAST")
     private fun parse0(section: YamlObject): ConditionBuilder {
-        val first = PlaceholderManagerImpl.find(section.get("first")?.asString().ifNull("first value not set."))
-        val second = PlaceholderManagerImpl.find(section.get("second")?.asString().ifNull("second value not set."))
-        val operationValue = section.get("operation")?.asString().ifNull("operation value not set")
+        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull("first value not set."))
+        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull("second value not set."))
+        val operationValue = section["operation"]?.asString().ifNull("operation value not set")
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")
 
-        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer.")).map[section.get("operation")?.asString().ifNull(operationValue)].ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
+        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer.")).map[section["operation"]?.asString().ifNull(operationValue)].ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
         return ConditionBuilder { updateEvent ->
-            val o1 = first.build(updateEvent)
-            val o2 = second.build(updateEvent)
+            val o1 = first build updateEvent
+            val o2 = second build updateEvent
             ({ p ->
                 operation(o1.value(p), o2.value(p))
             })

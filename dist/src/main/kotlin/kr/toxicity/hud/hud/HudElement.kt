@@ -17,16 +17,16 @@ class HudElement(
     pixel: PixelLocation
 ) {
     private val imageElement = layout.image.map { image ->
-        HudImageElement(hud, image, gui, pixel)
+        HudImageParser(hud, image, gui, pixel)
     }
     private val textElement = layout.text.map { textLayout ->
-        HudTextElement(hud, resource, textLayout, gui, pixel)
+        HudTextParser(hud, resource, textLayout, gui, pixel)
     }
     private val headElement = layout.head.map { image ->
-        HudHeadElement(hud, image, gui, pixel)
+        HudHeadParser(hud, image, gui, pixel)
     }
 
-    val conditions = layout.conditions.build(UpdateEvent.EMPTY)
+    val conditions = layout.conditions build UpdateEvent.EMPTY
 
     private val max = imageElement.maxOfOrNull {
         it.max

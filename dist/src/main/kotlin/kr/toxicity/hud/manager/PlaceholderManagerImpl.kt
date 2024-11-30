@@ -218,7 +218,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                         val find = find(result)
                         runCatching {
                             builder.add { r ->
-                                find.build(r).let { b ->
+                                (find build r).let { b ->
                                     {
                                         b.stringValue(it)
                                     }

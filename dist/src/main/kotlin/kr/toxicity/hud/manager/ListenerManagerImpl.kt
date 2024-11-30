@@ -14,11 +14,11 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
 
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->
-            val v = PlaceholderManagerImpl.find(c.get("value")?.asString().ifNull("value value not set."))
-            val m = PlaceholderManagerImpl.find(c.get("max")?.asString().ifNull("max value not set."))
+            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull("value value not set."))
+            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull("max value not set."))
             return@placeholder { event ->
-                val value = v.build(event)
-                val max = m.build(event)
+                val value = v build event
+                val max = m build event
                 if (value.clazz == max.clazz && value.clazz == java.lang.Number::class.java) {
                     HudListener {
                         runCatching {
@@ -37,7 +37,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     override fun getAllListenerKeys(): Set<String> = Collections.unmodifiableSet(listenerMap.keys)
 
     fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
-        val clazz = section.get("class")?.asString().ifNull("class value not set.")
+        val clazz = section["class"]?.asString().ifNull("class value not set.")
         return listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
     }
 

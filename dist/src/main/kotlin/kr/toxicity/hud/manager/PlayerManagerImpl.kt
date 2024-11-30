@@ -32,7 +32,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
             set.clear()
             locationProviders.forEach {
                 val provided = it.provide(player)
-                if (provided.isNotEmpty()) set.addAll(provided)
+                if (provided.isNotEmpty()) set += provided
             }
         }
     }
@@ -55,7 +55,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     fun getHudPlayer(name: String) = stringPlayer[name]
 
     override fun addLocationProvider(provider: PointedLocationProvider) {
-        locationProviders.add(provider)
+        locationProviders += provider
     }
 
     override fun preReload() {

@@ -23,7 +23,7 @@ class RenderScale(
 
         fun fromConfig(offset: PixelLocation, yamlObject: YamlObject) = RenderScale(
             offset,
-            yamlObject.get("render-scale")?.asObject()?.let {
+            yamlObject["render-scale"]?.asObject()?.let {
                 Scale(it.getAsDouble("x", 1.0), it.getAsDouble("y", 1.0))
             } ?: scaleOne
         )

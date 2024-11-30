@@ -17,7 +17,7 @@ class YamlArrayImpl(
     override fun iterator(): MutableIterator<YamlElement> {
         val returnList = ArrayList<YamlElement>()
         list.forEach {
-            if (it != null) returnList.add(it.toYaml(path()))
+            if (it != null) returnList += it.toYaml(path())
         }
         return returnList.iterator()
     }

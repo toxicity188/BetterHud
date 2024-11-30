@@ -29,7 +29,7 @@ class AnimationLocation(
     )
 
     constructor(section: YamlObject): this(
-        section.get("type")?.asString()?.let {
+        section["type"]?.asString()?.let {
             AnimationType.valueOf(it.uppercase())
         } ?: AnimationType.LOOP,
         section.getAsInt("duration", 20).coerceAtLeast(1),

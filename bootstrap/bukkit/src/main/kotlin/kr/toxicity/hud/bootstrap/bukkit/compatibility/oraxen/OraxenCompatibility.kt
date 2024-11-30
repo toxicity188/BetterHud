@@ -1,23 +1,25 @@
-package kr.toxicity.hud.bootstrap.bukkit.compatibility.nexo
+package kr.toxicity.hud.bootstrap.bukkit.compatibility.oraxen
 
-import com.nexomc.nexo.api.events.resourcepack.NexoPrePackGenerateEvent
+import io.th0rgal.oraxen.api.events.OraxenPackGeneratedEvent
+import io.th0rgal.oraxen.utils.VirtualFile
+import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
-import kr.toxicity.hud.util.BOOTSTRAP
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import java.io.ByteArrayInputStream
 
-class NexoCompatibility : Compatibility {
+class OraxenCompatibility : Compatibility {
+
     override val website: String = "https://www.spigotmc.org/resources/72448/"
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
@@ -31,20 +33,26 @@ class NexoCompatibility : Compatibility {
         get() = mapOf()
 
     override fun start() {
-        (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
         registerListener(object : Listener {
             @EventHandler
-            fun generate(event: NexoPrePackGenerateEvent) {
+            fun generate(event: OraxenPackGeneratedEvent) {
                 when (val state = PLUGIN.reload()) {
                     is Success -> {
+                        val output = event.output
                         state.resourcePack.forEach {
-                            event.addUnknownFile(it.key, it.value)
+                            output.add(
+                                VirtualFile(
+                                    it.key.substringBeforeLast('/'),
+                                    it.key.substringAfterLast('/'),
+                                    ByteArrayInputStream(it.value).buffered()
+                                )
+                            )
                         }
-                        info("Successfully merged with Nexo: (${state.time} ms)")
+                        info("Successfully merged with Oraxen: (${state.time} ms)")
                     }
                     is Failure -> {
                         warn(
-                            "Fail to merge the resource pack with Nexo.",
+                            "Fail to merge the resource pack with Oraxen.",
                             "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
                         )
                     }
@@ -53,7 +61,7 @@ class NexoCompatibility : Compatibility {
             }
         })
         info(
-            "BetterHud hooks Nexo.",
+            "BetterHud hooks Oraxen.",
             "Be sure to set 'pack-type' to 'none' in your config."
         )
     }

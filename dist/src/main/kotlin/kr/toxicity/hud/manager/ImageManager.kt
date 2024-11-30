@@ -1,7 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.image.HudImage
+import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.image.enums.SplitType
 import kr.toxicity.hud.pack.PackGenerator
@@ -16,10 +16,12 @@ import java.util.regex.Pattern
 
 object ImageManager : BetterHudManager {
 
-    private val imageMap = HashMap<String, HudImage>()
+    private val imageMap = HashMap<String, ImageElement>()
     private val emptySetting = YamlObjectImpl("", mutableMapOf<String, Any>())
 
     private val imageNameComponent = ConcurrentHashMap<ShaderGroup, WidthComponent>()
+
+    val allImage get() = imageMap.values
 
     @Synchronized
     fun getImage(group: ShaderGroup) = imageNameComponent[group]
@@ -46,15 +48,15 @@ object ImageManager : BetterHudManager {
         DATA_FOLDER.subFolder("images").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this image: $s in ${file.name}") {
                 val image = when (val type = ImageType.valueOf(
-                    yamlObject.get("type")?.asString().ifNull("type value not set.").uppercase()
+                    yamlObject["type"]?.asString().ifNull("type value not set.").uppercase()
                 )) {
                     ImageType.SINGLE -> {
                         val targetFile = File(
                             assets,
-                            yamlObject.get("file")?.asString().ifNull("file value not set.")
+                            yamlObject["file"]?.asString().ifNull("file value not set.")
                                 .replace('/', File.separatorChar)
                         )
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
                             listOf(
@@ -65,22 +67,22 @@ object ImageManager : BetterHudManager {
                                     .toNamed(targetFile.name),
                             ),
                             type,
-                            yamlObject.get("setting")?.asObject() ?: emptySetting
+                            yamlObject["setting"]?.asObject() ?: emptySetting
                         )
                     }
 
                     ImageType.LISTENER -> {
-                        val splitType = yamlObject.get("split-type")?.asString()?.let { splitType ->
+                        val splitType = yamlObject["split-type"]?.asString()?.let { splitType ->
                             runWithExceptionHandling(sender, "Unable to find that split-type: $splitType") {
                                 SplitType.valueOf(splitType.uppercase())
                             }.getOrNull()
                         } ?: SplitType.LEFT
                         val getFile = File(
                             assets,
-                            yamlObject.get("file")?.asString().ifNull("file value not set.")
+                            yamlObject["file"]?.asString().ifNull("file value not set.")
                                 .replace('/', File.separatorChar)
                         )
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
                             splitType.split(
@@ -91,17 +93,17 @@ object ImageManager : BetterHudManager {
                                     .toNamed(getFile.name), yamlObject.getAsInt("split", 25).coerceAtLeast(1)
                             ),
                             type,
-                            yamlObject.get("setting")?.asObject()
+                            yamlObject["setting"]?.asObject()
                                 .ifNull("setting configuration not found.")
                         )
                     }
 
                     ImageType.SEQUENCE -> {
                         val globalFrame = yamlObject.getAsInt("frame", 1).coerceAtLeast(1)
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
-                            (yamlObject.get("files")?.asArray()?.map {
+                            (yamlObject["files"]?.asArray()?.map {
                                 it.asString()
                             } ?: emptyList()).ifEmpty {
                                 warn("files is empty.")
@@ -125,7 +127,7 @@ object ImageManager : BetterHudManager {
                                 }
                             }.sum(),
                             type,
-                            yamlObject.get("setting")?.asObject() ?: emptySetting
+                            yamlObject["setting"]?.asObject() ?: emptySetting
                         )
                     }
                 }

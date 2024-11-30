@@ -12,11 +12,9 @@ import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.location.animation.AnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
-import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 
 class HudImpl(
@@ -25,17 +23,6 @@ class HudImpl(
     resource: GlobalResource,
     section: YamlObject
 ): Hud, HudConfiguration {
-    companion object {
-        const val DEFAULT_BIT = 13
-        const val MAX_BIT = 23 - DEFAULT_BIT
-        const val ADD_HEIGHT = (1 shl DEFAULT_BIT - 1) - 1
-
-        fun createBit(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
-            ShaderManagerImpl.addHudShader(shader) { id ->
-                consumer(-((id + (1 shl MAX_BIT) shl DEFAULT_BIT) + ADD_HEIGHT + y))
-            }
-        }
-    }
 
     var imageChar = 0xCE000
 
@@ -50,15 +37,15 @@ class HudImpl(
         (++imageChar).parseChar()
     }
 
-    private val elements = section.get("layouts")?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
-        val layout = yamlObject.get("name")?.asString().ifNull("name value not set: $s").let {
+    private val elements = section["layouts"]?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
+        val layout = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
             LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
         }
         var gui = GuiLocation(yamlObject)
-        yamlObject.get("gui")?.asObject()?.let {
+        yamlObject["gui"]?.asObject()?.let {
             gui += GuiLocation(it)
         }
-        val pixel = yamlObject.get("pixel")?.asObject()?.let {
+        val pixel = yamlObject["pixel"]?.asObject()?.let {
             PixelLocation(it)
         }  ?: PixelLocation.zero
         HudAnimation(
@@ -78,12 +65,12 @@ class HudImpl(
     }
     init {
         jsonArray?.let { array ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array.add(jsonObjectOf(
+            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array += jsonObjectOf(
                 "type" to "space",
                 "advances" to jsonObjectOf(*spaces.map {
                     it.value to it.key
                 }.toTypedArray())
-            ))
+            )
             PackGenerator.addTask(resource.font + "$imageEncoded.json") {
                 jsonObjectOf("providers" to array).toByteArray()
             }
@@ -96,7 +83,7 @@ class HudImpl(
         return HudObjectType.HUD
     }
 
-    private val conditions = section.toConditions().build(UpdateEvent.EMPTY)
+    private val conditions = section.toConditions() build UpdateEvent.EMPTY
 
     override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()

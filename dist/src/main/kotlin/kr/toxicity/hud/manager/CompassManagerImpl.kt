@@ -23,7 +23,7 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
         DATA_FOLDER.subFolder("compasses").forEachAllYaml(sender) { f, s, c ->
             runWithExceptionHandling(sender, "Unable to load this compass: $s in ${f.name}") {
                 compassMap.putSync("compass", s) {
-                    c.get("type")?.asString().ifNull("type value not set.").run {
+                    c["type"]?.asString().ifNull("type value not set.").run {
                         CompassType.valueOf(uppercase()).build(resource, assets, f.path, s, c)
                     }
                 }

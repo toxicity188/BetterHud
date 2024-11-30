@@ -110,8 +110,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 DATA_FOLDER.subFolder("placeholders").forEachAllYaml(CONSOLE) { file, s, yamlObject ->
                     runWithExceptionHandling(CONSOLE, "Unable to read this placeholder task: $s in ${file.name}") {
-                        val variable = yamlObject.get("variable")?.asString().ifNull("variable not set.")
-                        val placeholder = yamlObject.get("placeholder")?.asString().ifNull("placeholder not set.")
+                        val variable = yamlObject["variable"]?.asString().ifNull("variable not set.")
+                        val placeholder = yamlObject["placeholder"]?.asString().ifNull("placeholder not set.")
                         val update = yamlObject.getAsInt("update", 1).coerceAtLeast(1)
                         val async = yamlObject.getAsBoolean("async", false)
                         updateTask.add(object : PlaceholderTask {
@@ -227,7 +227,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", object : HudPlaceholder<String> {
                 override fun getRequiredArgsLength(): Int = 1
                 override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    val format = "%${args[0]}%"
+                    val format = "%${args.joinToString(",")}%"
                     return Function { player ->
                         runCatching {
                             PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)

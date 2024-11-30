@@ -71,13 +71,13 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     private val reloadEndTask = ArrayList<(ReloadState) -> Unit>()
 
     override fun addReloadStartTask(runnable: Runnable) {
-        reloadStartTask.add {
+        reloadStartTask += {
             runnable.run()
         }
     }
 
     override fun addReloadEndTask(runnable: Consumer<ReloadState>) {
-        reloadEndTask.add {
+        reloadEndTask += {
             runnable.accept(it)
         }
     }
@@ -103,9 +103,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 val resource = GlobalResource()
                 managers.forEach {
-                    CompletableFuture.runAsync {
-                        it.reload(sender, resource)
-                    }.join()
+                    it.reload(sender, resource)
                 }
                 managers.forEach {
                     it.postReload()

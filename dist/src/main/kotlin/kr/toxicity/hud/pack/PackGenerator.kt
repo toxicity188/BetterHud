@@ -186,7 +186,10 @@ object PackGenerator {
                         override fun close() {
                             synchronized(zip) {
                                 zip.zip.close()
-                                info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(zip.byte)}" else mbFormat(zip.byte)}")
+                                info(
+                                    "File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(zip.byte)}" else mbFormat(zip.byte)}",
+                                    "File zipped: ${mbFormat(file.length())}"
+                                )
                                 if (ConfigManagerImpl.needToUpdatePack || ConfigManagerImpl.forceUpdate || beforeByte != zip.byte) {
                                     beforeByte = zip.byte
                                     if (host && message != null) {

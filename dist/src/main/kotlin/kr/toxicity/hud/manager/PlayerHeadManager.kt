@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.player.HudPlayerHead
+import kr.toxicity.hud.element.HeadElement
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.*
 import kr.toxicity.hud.resource.GlobalResource
@@ -20,7 +21,7 @@ object PlayerHeadManager : BetterHudManager {
     private val defaultProviders = GameProfileSkinProvider()
     private val headLock = Collections.synchronizedMap(WeakHashMap<String, HudPlayerHeadImpl>())
     private val headCache = ConcurrentHashMap<String, CachedHead>()
-    private val headMap = HashMap<String, HudHead>()
+    private val headMap = HashMap<String, HeadElement>()
 
     private val headNameComponent = ConcurrentHashMap<ShaderGroup, String>()
 
@@ -53,11 +54,11 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun addSkinProvider(provider: PlayerSkinProvider) {
-        skinProviders.add(provider)
+        skinProviders += provider
     }
 
     override fun start() {
-        skinProviders.add(MineToolsProvider())
+        skinProviders += MineToolsProvider()
         PLUGIN.loadAssets("skin") { s, stream ->
             val image = stream.toImage()
             loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->
@@ -127,7 +128,7 @@ object PlayerHeadManager : BetterHudManager {
         DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
-                    val head = HudHead(file.path, s, yamlObject)
+                    val head = HeadElement(file.path, s, yamlObject)
                     val pixel = head.pixel
                     PackGenerator.addTask(resource.textures + "${"pixel_$pixel".encodeKey()}.png") {
                         BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {

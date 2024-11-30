@@ -2,11 +2,12 @@ package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
 import kr.toxicity.hud.api.manager.TextManager
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.PluginConfiguration
+import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.*
@@ -54,8 +55,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
     @Volatile
     private var fontIndex = 0
 
-    private val textMap = HashMap<String, HudText>()
-    private val textCacheMap = HashMap<TextCache, HudText>()
+    private val textMap = HashMap<String, TextElement>()
+    private val textCacheMap = HashMap<TextCache, TextElement>()
 
     private val textWidthMap = HashMap<Int, Int>()
     private val textKeyMap = ConcurrentHashMap<ShaderGroup, BackgroundKey>()
@@ -207,18 +208,18 @@ object TextManagerImpl : BetterHudManager, TextManager {
         }
         val parseDefault = parseTTFFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
-        } ?: emptyList(),ConditionBuilder.alwaysTrue, fontConfig.getAsBoolean("merge-default-bitmap", true))
+        } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = (it.value.width.toDouble() * configHeight / it.value.height.toDouble()).roundToInt()
         }
         parseDefault.array.forEach {
-            defaultArray.add(jsonObjectOf(
+            defaultArray += jsonObjectOf(
                 "type" to "bitmap",
                 "file" to "$NAME_SPACE_ENCODED:${it.file}",
                 "ascent" to configAscent,
                 "height" to configHeight,
                 "chars" to it.chars
-            ))
+            )
         }
         PackGenerator.addTask(resource.font + "${ConfigManagerImpl.key.defaultKey.value()}.json") {
             jsonObjectOf("providers" to defaultArray).toByteArray()
@@ -226,7 +227,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
         DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
             runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
-                val fontDir = section.get("file")?.asString()?.let {
+                val fontDir = section["file"]?.asString()?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
                 val scale = section.getAsInt("scale", 16)
@@ -253,12 +254,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                 scale,
                                 resource.textures,
                                 TreeMap<String, LocatedImage>().apply {
-                                    section.get("images")?.asObject()
+                                    section["images"]?.asObject()
                                         ?.forEachSubConfiguration { key, yamlObject ->
                                             put(key, LocatedImage(
                                                 File(
                                                     assetsFolder,
-                                                    yamlObject.get("name")?.asString().ifNull("image does not set: $key")
+                                                    yamlObject["name"]?.asString().ifNull("image does not set: $key")
                                                 )
                                                     .ifNotExist("this image doesn't exist: $key")
                                                     .toImage()
@@ -271,11 +272,11 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                             ))
                                         }
                                 },
-                                section.get("include")?.asArray()?.map {
+                                section["include"]?.asArray()?.map {
                                     it.asString()
                                 } ?: emptyList(),
-                                section.toConditions(),
-                                section.getAsBoolean("merge-default-bitmap", false)
+                                section.getAsBoolean("merge-default-bitmap", false),
+                                section,
                             )
                         }
                         "bitmap" -> {
@@ -283,7 +284,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                 file.path,
                                 s,
                                 resource.textures,
-                                section.get("chars").ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
+                                section["chars"].ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
                                     BitmapData(
                                         obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
                                             y.asString()
@@ -291,7 +292,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                                         obj.get("file").ifNull("file value not set.").asString()
                                     )
                                 },
-                                section.toConditions()
+                                section
                             )
                         }
                         else -> throw RuntimeException("Unsupported type: only ttf or bitmap supported.")
@@ -429,11 +430,11 @@ object TextManagerImpl : BetterHudManager, TextManager {
         saveName: String,
         imageSaveFolder: List<String>,
         data: List<BitmapData>,
-        condition: ConditionBuilder
-    ): HudText {
+        yamlObject: YamlObject,
+    ): TextElement {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
-                HudText(path, saveName, old.array, old.charWidth, old.imageCharWidth, old.conditions)
+                TextElement(path, saveName, old.array, old.charWidth, old.imageCharWidth, yamlObject)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
@@ -480,19 +481,19 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 PackGenerator.addTask(imageSaveFolder + name) {
                     file.toByteArray()
                 }
-                textArray.add(HudTextArray(
+                textArray += HudTextArray(
                     name,
                     jsonArrayOf(*d.codepoints.toTypedArray()),
                     divHeight
-                ))
+                )
             }
-            HudText(
+            TextElement(
                 path,
                 saveName,
                 textArray,
                 charWidthMap,
                 mapOf(),
-                condition
+                yamlObject
             )
         }
     }
@@ -510,12 +511,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
         imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
         supportedLanguage: List<String>,
-        condition: ConditionBuilder,
-        mergeDefaultBitmap: Boolean
-    ): HudText {
+        mergeDefaultBitmap: Boolean,
+        yamlObject: YamlObject
+    ): TextElement {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
-                HudText(path, saveName, old.array, old.charWidth, old.imageCharWidth, old.conditions)
+                TextElement(path, saveName, old.array, old.charWidth, old.imageCharWidth, yamlObject)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
@@ -620,7 +621,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                 }
             }
-            val result = HudText(path, saveName, textList, charWidthMap, imageCharWidthMap, condition)
+            val result = TextElement(path, saveName, textList, charWidthMap, imageCharWidthMap, yamlObject)
             synchronized(textCacheMap) {
                 textCacheMap[TextCache(saveName, images.keys)] = result
             }

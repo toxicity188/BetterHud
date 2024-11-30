@@ -3,6 +3,7 @@ package kr.toxicity.hud.util
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.placeholder.ColorOverride
 import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.yaml.YamlArrayImpl
@@ -61,6 +62,9 @@ fun File.forEachAllYaml(sender: Audience, block: (File, String, YamlObject) -> U
 fun YamlObject.toConditions() = get("conditions")?.asObject()?.let {
     Conditions.parse(it)
 } ?: ConditionBuilder.alwaysTrue
+fun YamlObject.toColorOverrides() = get("color-overrides")?.asObject()?.let {
+    ColorOverride.builder(it)
+} ?: ColorOverride.empty
 
 fun YamlObject.getTEquation(key: String) = get(key)?.asString()?.let {
     TEquation(it)

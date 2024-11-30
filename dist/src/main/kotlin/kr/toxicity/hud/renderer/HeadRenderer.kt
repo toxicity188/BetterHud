@@ -5,13 +5,12 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.layout.HeadLayout
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.placeholder.ConditionBuilder
 import kr.toxicity.hud.player.head.HeadKey
-import kr.toxicity.hud.player.head.HeadRenderType
 import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
@@ -21,6 +20,7 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 
 class HeadRenderer(
+    layout: HeadLayout,
     private val space: String,
     private val nextPage: String,
     private val negativePixel: String,
@@ -28,14 +28,9 @@ class HeadRenderer(
     private val font: Key,
     private val pixel: Int,
     private val x: Int,
-    private val align: LayoutAlign,
-    type: HeadRenderType,
-    follow: String?,
-    private val cancelIfFollowerNotExists: Boolean,
-    private val conditions: ConditionBuilder,
-) {
+) : HeadLayout by layout {
     private interface HeadPixelGetter {
-        fun render(head: HudPlayerHead): TextComponent.Builder
+        fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder
     }
 
     private inner class StandardPixelGetter : HeadPixelGetter {
@@ -56,12 +51,14 @@ class HeadRenderer(
                     .append((if (index < 63 && index % 8 == 7) (-pixel - 1).toSpaceComponent() else NEGATIVE_ONE_SPACE_COMPONENT).component)
             }
         }
-        override fun render(head: HudPlayerHead): TextComponent.Builder {
+        override fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder {
             val comp = Component.text().font(font)
             var i = 0
             head.flatHead().forEach { next ->
                 val index = i++
-                comp.append(pixelGetter(index, next))
+                comp.append(pixelGetter(index, color?.let {
+                    next * it
+                } ?: next))
             }
             return comp
         }
@@ -102,15 +99,18 @@ class HeadRenderer(
                     .append((if (index < 63 && index % 8 == 7) (-pixel - 1).toSpaceComponent() else NEGATIVE_ONE_SPACE_COMPONENT).component)
             }
         }
-        override fun render(head: HudPlayerHead): TextComponent.Builder {
+        override fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder {
             val comp = Component.text().font(font)
             val main = head.mainHead()
             val hair = head.hairHead()
             for (index in 0..63) {
+                val next = color?.let {
+                    main[index] * it
+                } ?: main[index]
                 hair[index]?.let {
-                    comp.append(headGetter(index, main[index]))
+                    comp.append(headGetter(index, next))
                         .append(pixelGetter(index, it, true))
-                } ?: comp.append(pixelGetter(index, main[index], false))
+                } ?: comp.append(pixelGetter(index, next, false))
 
             }
             return comp
@@ -129,23 +129,24 @@ class HeadRenderer(
         }
     }
     fun getHead(event: UpdateEvent): (HudPlayer) -> PixelComponent {
-        val cond = conditions.build(event)
+        val cond = conditions build event
         val playerPlaceholder = followPlayer?.build(event)
-        return build@{ player ->
+        val colorApply = colorOverrides(event)
+        return build@ { player ->
             var targetPlayer = player
             var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
                 val value = it.value(player)
-                val pair = getHead(value.toString())
-                pair.first?.let { player ->
+                val (follow, head) = getHead(value.toString())
+                follow?.let { player ->
                     targetPlayer = player
                 } ?: run {
                     if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
                 }
-                targetPlayerHead = pair.second
+                targetPlayerHead = head
             }
             if (cond(targetPlayer)) {
-                WidthComponent(pixelType.render(targetPlayerHead), pixel).toPixelComponent(
+                WidthComponent(pixelType.render(targetPlayerHead, colorApply(targetPlayer)), pixel).toPixelComponent(
                     when (align) {
                         LayoutAlign.LEFT -> x
                         LayoutAlign.CENTER -> x - pixel / 2

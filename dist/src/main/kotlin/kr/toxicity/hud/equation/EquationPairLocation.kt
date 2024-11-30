@@ -25,10 +25,10 @@ class EquationPairLocation(
 
     constructor(section: YamlObject): this(
         section.getAsInt("duration", 1).coerceAtLeast(1),
-        section.get("gui")?.asObject()?.let {
+        section["gui"]?.asObject()?.let {
             EquationPair(it)
         } ?: EquationPair.zero,
-        section.get("pixel")?.asObject()?.let {
+        section["pixel"]?.asObject()?.let {
             EquationTriple(it)
         } ?: EquationTriple.zero
     )

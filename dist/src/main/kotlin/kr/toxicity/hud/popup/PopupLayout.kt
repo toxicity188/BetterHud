@@ -6,15 +6,15 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.component.LayoutComponentContainer
-import kr.toxicity.hud.hud.HudImpl
+import kr.toxicity.hud.element.ImageElement
+import kr.toxicity.hud.image.ImageComponent
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.layout.BackgroundLayout
-import kr.toxicity.hud.location.LocationGroup
 import kr.toxicity.hud.layout.LayoutGroup
-import kr.toxicity.hud.location.animation.AnimationType
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.location.LocationGroup
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.location.animation.AnimationType
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.HeadKey
 import kr.toxicity.hud.player.head.HeadRenderType.FANCY
@@ -45,7 +45,7 @@ class PopupLayout(
     }
 
     fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
-        val build = layout.conditions.build(reason)
+        val build = layout.conditions build reason
         val map = groups.map {
             it.getComponent(reason)
         }
@@ -109,7 +109,6 @@ class PopupLayout(
         }
 
         val image = layout.image.map { target ->
-            val hudImage = target.image
             val pixel = elementPixel + pair.pixel + target.location
             val imageShader = HudShader(
                 elementGui,
@@ -119,53 +118,53 @@ class PopupLayout(
                 pixel.opacity,
                 target.property
             )
-            val list = ArrayList<PixelComponent>()
             val negativeSpace = parent.getOrCreateSpace(-1)
 
-            if (hudImage.listener != null) list.add(EMPTY_PIXEL_COMPONENT)
-            hudImage.image.forEach {
-                val fileName = "$NAME_SPACE_ENCODED:${it.name}"
+            fun ImageElement.toComponent(parentComponent: ImageComponent? = null): ImageComponent {
+                val list = ArrayList<PixelComponent>()
+                if (listener != null) list.add(EMPTY_PIXEL_COMPONENT)
+                image.forEach {
+                    val fileName = "$NAME_SPACE_ENCODED:${it.name}"
 
-                val height = (it.image.image.height * target.scale).roundToInt()
-                val scale = height.toDouble() / it.image.image.height
-                val xOffset = (it.image.xOffset * scale).roundToInt()
-                val ascent = pixel.y
-                val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
+                    val height = (it.image.image.height * target.scale).roundToInt()
+                    val scale = height.toDouble() / it.image.image.height
+                    val xOffset = (it.image.xOffset * scale).roundToInt()
+                    val ascent = pixel.y
+                    val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
 
-                val component = ImageManager.getImage(shaderGroup) ?: run {
-                    val char = parent.newChar()
-                    HudImpl.createBit(imageShader, ascent) { y ->
-                        array.add(jsonObjectOf(
-                            "type" to "bitmap",
-                            "file" to fileName,
-                            "ascent" to y,
-                            "height" to height,
-                            "chars" to jsonArrayOf(char)
-                        ))
+                    val component = image(shaderGroup) {
+                        val char = parent.newChar()
+                        createAscent(imageShader, ascent) { y ->
+                            array += jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to fileName,
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(char)
+                            )
+                        }
+                        val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
+                        val build = Component.text()
+                            .font(parent.imageKey)
+                        val comp = WidthComponent(
+                            if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
+                            xWidth
+                        )
+                        comp
                     }
-                    val xWidth = (it.image.image.width.toDouble() * scale).roundToInt()
-                    val build = Component.text()
-                        .font(parent.imageKey)
-                    val comp = WidthComponent(
-                        if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
-                        xWidth
-                    )
-                    ImageManager.setImage(shaderGroup, comp)
-                    comp
+                    list += component.toPixelComponent(pixel.x + xOffset)
                 }
-
-                list.add(component.toPixelComponent(pixel.x + xOffset))
+                return ImageComponent(this, parentComponent, list, children.entries.associate {
+                    it.key to it.value.toComponent()
+                })
             }
             ImageRenderer(
-                hudImage,
-                target.color,
-                target.space,
-                target.stack,
-                target.maxStack,
-                list,
-                target.follow,
-                target.cancelIfFollowerNotExists,
-                hudImage.conditions.and(target.conditions)
+                target,
+                try {
+                    target.source.toComponent()
+                } catch (_: StackOverflowError) {
+                    throw RuntimeException("circular reference found in ${target.source.name}")
+                }
             )
         }
 
@@ -188,19 +187,17 @@ class PopupLayout(
             }.toMap()
             val index = ++textIndex
             val keys = (0..<textLayout.line).map { lineIndex ->
-                val group = ShaderGroup(textShader, textLayout.text.name, textLayout.scale, pixel.y + lineIndex * textLayout.lineWidth)
-                TextManagerImpl.getKey(group) ?: run {
+                val group = ShaderGroup(textShader, textLayout.source.name, textLayout.scale, pixel.y + lineIndex * textLayout.lineWidth)
+                text(group) {
                     val array = textLayout.startJson()
-                    HudImpl.createBit(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
-                        textLayout.text.array.forEach {
-                            array.add(
-                                jsonObjectOf(
-                                    "type" to "bitmap",
-                                    "file" to "$NAME_SPACE_ENCODED:${it.file}",
-                                    "ascent" to y,
-                                    "height" to (it.height * textLayout.scale).roundToInt(),
-                                    "chars" to it.chars
-                                )
+                    createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
+                        textLayout.source.array.forEach {
+                            array += jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to "$NAME_SPACE_ENCODED:${it.file}",
+                                "ascent" to y,
+                                "height" to (it.height * textLayout.scale).roundToInt(),
+                                "chars" to it.chars
                             )
                         }
                     }
@@ -209,15 +206,13 @@ class PopupLayout(
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
                     textLayout.imageCharMap.forEach {
                         val height = (it.value.height.toDouble() * textLayout.scale * textLayout.emojiScale * it.value.scale).roundToInt()
-                        HudImpl.createBit(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
-                            array.add(
-                                jsonObjectOf(
-                                    "type" to "bitmap",
-                                    "file" to it.value.fileName,
-                                    "ascent" to y,
-                                    "height" to height,
-                                    "chars" to jsonArrayOf(it.key.parseChar())
-                                )
+                        createAscent(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
+                            array += jsonObjectOf(
+                                "type" to "bitmap",
+                                "file" to it.value.fileName,
+                                "ascent" to y,
+                                "height" to height,
+                                "chars" to jsonArrayOf(it.key.parseChar())
                             )
                         }
                     }
@@ -232,7 +227,7 @@ class PopupLayout(
                                 val result = (++imageTextIndex).parseChar()
                                 val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
                                 val div = height.toDouble() / image.image.height
-                                HudImpl.createBit(HudShader(
+                                createAscent(HudShader(
                                     elementGui,
                                     textLayout.renderScale,
                                     textLayout.layer - 1,
@@ -240,13 +235,13 @@ class PopupLayout(
                                     pixel.opacity * it.location.opacity,
                                     textLayout.property
                                 ), pixel.y + it.location.y + lineIndex * textLayout.lineWidth) { y ->
-                                    array.add(jsonObjectOf(
+                                    array += jsonObjectOf(
                                         "type" to "bitmap",
                                         "file" to "$NAME_SPACE_ENCODED:$file.png",
                                         "ascent" to y,
                                         "height" to height,
                                         "chars" to jsonArrayOf(result)
-                                    ))
+                                    )
                                 }
                                 return WidthComponent(Component.text()
                                     .content(result)
@@ -259,35 +254,17 @@ class PopupLayout(
                                 getString(it.body, "background_${it.name}_body".encodeKey())
                             )
                         }
-                    ).apply {
-                        TextManagerImpl.setKey(group, this)
-                    }
+                    )
                 }
             }
             TextRenderer(
-                textLayout.text.charWidth,
-                textLayout.imageCharMap,
-                textLayout.color,
+                textLayout,
                 HudTextData(
                     keys,
                     imageCodepointMap,
                     textLayout.splitWidth
                 ),
-                textLayout.pattern,
-                textLayout.align,
-                textLayout.lineAlign,
-                textLayout.scale,
-                textLayout.emojiScale,
                 pixel.x,
-                textLayout.numberEquation,
-                textLayout.numberFormat,
-                textLayout.disableNumberFormat,
-                textLayout.follow,
-                textLayout.cancelIfFollowerNotExists,
-                textLayout.useLegacyFormat,
-                textLayout.legacySerializer,
-                textLayout.space,
-                textLayout.conditions and textLayout.text.conditions
             )
         }
 
@@ -313,48 +290,47 @@ class PopupLayout(
                 )
             }
             HeadRenderer(
+                headLayout,
                 parent.getOrCreateSpace(-1),
-                parent.getOrCreateSpace(-(headLayout.head.pixel * 8 + 1)),
-                parent.getOrCreateSpace(-(headLayout.head.pixel + 1)),
+                parent.getOrCreateSpace(-(headLayout.source.pixel * 8 + 1)),
+                parent.getOrCreateSpace(-(headLayout.source.pixel + 1)),
                 (0..7).map { i ->
-                    val encode = "pixel_${headLayout.head.pixel}".encodeKey()
+                    val encode = "pixel_${headLayout.source.pixel}".encodeKey()
                     val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                     val char = parent.newChar()
-                    val ascent = pixel.y + i * headLayout.head.pixel
-                    val height = headLayout.head.pixel
+                    val ascent = pixel.y + i * headLayout.source.pixel
+                    val height = headLayout.source.pixel
                     val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
 
-                    val mainChar = PlayerHeadManager.getHead(shaderGroup) ?: run {
-                        HudImpl.createBit(shader, ascent) { y ->
-                            array.add(jsonObjectOf(
+                    val mainChar = head(shaderGroup) {
+                        createAscent(shader, ascent) { y ->
+                            array += jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to fileName,
                                 "ascent" to y,
                                 "height" to height,
                                 "chars" to jsonArrayOf(char)
-                            ))
+                            )
                         }
-                        PlayerHeadManager.setHead(shaderGroup, char)
                         char
                     }
                     when (headLayout.type) {
                         STANDARD -> HeadKey(mainChar, mainChar)
                         FANCY -> {
-                            val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - headLayout.head.pixel)
+                            val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - headLayout.source.pixel)
                             HeadKey(
                                 mainChar,
-                                PlayerHeadManager.getHead(hairShaderGroup) ?: run {
+                                head(hairShaderGroup) {
                                     val twoChar = parent.newChar()
-                                    HudImpl.createBit(hair, ascent - headLayout.head.pixel) { y ->
-                                        array.add(jsonObjectOf(
+                                    createAscent(hair, ascent - headLayout.source.pixel) { y ->
+                                        array += jsonObjectOf(
                                             "type" to "bitmap",
                                             "file" to fileName,
                                             "ascent" to y,
                                             "height" to height,
                                             "chars" to jsonArrayOf(twoChar)
-                                        ))
+                                        )
                                     }
-                                    PlayerHeadManager.setHead(hairShaderGroup, twoChar)
                                     twoChar
                                 }
                             )
@@ -362,13 +338,8 @@ class PopupLayout(
                     }
                 },
                 parent.imageKey,
-                headLayout.head.pixel * 8,
-                pixel.x,
-                headLayout.align,
-                headLayout.type,
-                headLayout.follow,
-                headLayout.cancelIfFollowerNotExists,
-                headLayout.conditions and headLayout.head.conditions
+                headLayout.source.pixel * 8,
+                pixel.x
             )
         }
     }
