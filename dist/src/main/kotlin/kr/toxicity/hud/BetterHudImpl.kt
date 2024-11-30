@@ -103,9 +103,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 val resource = GlobalResource()
                 managers.forEach {
-                    CompletableFuture.runAsync {
-                        it.reload(sender, resource)
-                    }.join()
+                    it.reload(sender, resource)
                 }
                 managers.forEach {
                     it.postReload()

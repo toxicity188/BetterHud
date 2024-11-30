@@ -41,13 +41,13 @@ class TextRenderer(
 
     private val widthViewer = ValueViewer<Pair<Style, Int>, Int>()
         .addFunction(
-            {
-                when (it.first.font()) {
-                    SPACE_KEY -> it.second - CURRENT_CENTER_SPACE_CODEPOINT
-                    LEGACY_SPACE_KEY -> it.second - LEGACY_CENTER_SPACE_CODEPOINT
-                    null -> when (it.second) {
+            { (style, codepoint) ->
+                when (style.font()) {
+                    SPACE_KEY -> codepoint - CURRENT_CENTER_SPACE_CODEPOINT
+                    LEGACY_SPACE_KEY -> codepoint - LEGACY_CENTER_SPACE_CODEPOINT
+                    null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> (source.charWidth[it.second]?.scaledWidth(scale) ?: imageCharMapGet[it.second]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
+                        else -> (source.charWidth[codepoint]?.scaledWidth(scale) ?: imageCharMapGet[codepoint]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
                     }
                     else -> null
                 }

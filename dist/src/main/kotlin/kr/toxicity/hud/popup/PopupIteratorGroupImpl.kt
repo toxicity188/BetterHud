@@ -18,7 +18,7 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
             while (loop.hasNext()) {
                 val next = loop.next()
                 if (next.markedAsRemoval()) next.remove()
-                else map.add(next.index)
+                else map += next.index
             }
             val i = if (iterator.index < 0) when (iterator.sortType) {
                 PopupSortType.FIRST -> if (p >= 0) p else 0
@@ -40,7 +40,7 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
                     val get = more[t++]
                     if (sourceSet.remove(get)) {
                         biggest = ++get.index
-                        newValue.add(get)
+                        newValue += get
                     }
                 }
                 if (newValue.isNotEmpty()) sourceSet.addAll(newValue)
@@ -55,7 +55,7 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
                 }
                 iterator.index -= minus
             }
-            sourceSet.add(iterator)
+            sourceSet += iterator
         }
     }
 
@@ -89,7 +89,7 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
             sourceSet.removeIf { next ->
                 i++
                 if (checkCondition(next)) {
-                    result.addAll(next.next())
+                    result += next.next()
                     false
                 } else {
                     next.remove()

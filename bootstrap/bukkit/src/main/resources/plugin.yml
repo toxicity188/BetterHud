@@ -24,6 +24,7 @@ softdepend:
   - Parties
   - GPS
   - Nexo
+  - Oraxen
 permissions:
   hud.help:
     description: Access to help command.

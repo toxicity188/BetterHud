@@ -3,7 +3,6 @@ package kr.toxicity.hud.element
 import kr.toxicity.hud.api.yaml.YamlArray
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
-import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.image.NamedLoadedImage
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.manager.ImageManager
@@ -19,7 +18,7 @@ class ImageElement(
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
-) : HudConfiguration, HudElement, ConditionSource by ConditionSource.Impl(setting) {
+) : HudElement, ConditionSource by ConditionSource.Impl(setting) {
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }
