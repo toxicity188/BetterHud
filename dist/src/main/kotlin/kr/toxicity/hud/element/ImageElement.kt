@@ -1,25 +1,25 @@
-package kr.toxicity.hud.image
+package kr.toxicity.hud.element
 
 import kr.toxicity.hud.api.yaml.YamlArray
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
+import kr.toxicity.hud.image.NamedLoadedImage
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.Conditions
+import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.util.ifNull
-import kr.toxicity.hud.util.toConditions
 
-class HudImage(
+class ImageElement(
     override val path: String,
     val name: String,
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
-) : HudConfiguration {
-    val conditions = setting.toConditions()
+) : HudConfiguration, HudElement, ConditionSource by ConditionSource.Impl(setting) {
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }

@@ -6,6 +6,7 @@ import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.layout.enums.LayoutOffset
 import kr.toxicity.hud.location.animation.AnimationLocation
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 
@@ -13,7 +14,7 @@ class LayoutGroup(
     override val path: String,
     sender: Audience,
     section: YamlObject
-) : HudConfiguration {
+) : HudConfiguration, ConditionSource by ConditionSource.Impl(section) {
 
     private val loc = PixelLocation(section)
 
@@ -29,16 +30,14 @@ class LayoutGroup(
     } ?: LayoutOffset.CENTER
 
     val image = section["images"]?.asObject()?.mapSubConfiguration { s, yamlObject ->
-        ImageLayout(s, yamlObject, loc)
+        ImageLayout.Impl(s, this, yamlObject, loc)
     } ?: emptyList()
     val text = section["texts"]?.asObject()?.mapSubConfiguration { s, yamlObject ->
-        TextLayout(s, yamlObject, loc)
+        TextLayout.Impl(s, this, yamlObject, loc)
     } ?: emptyList()
     val head = section["heads"]?.asObject()?.mapSubConfiguration { s, yamlObject ->
-        HeadLayout(s, yamlObject, loc)
+        HeadLayout.Impl(s, this, yamlObject, loc)
     } ?: emptyList()
-
-    val conditions = section.toConditions()
 
     val animation = section["animations"]?.asObject()?.let { animations ->
         AnimationLocation(animations)

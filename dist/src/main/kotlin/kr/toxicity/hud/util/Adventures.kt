@@ -151,7 +151,7 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
     var i = 0
     val list = ArrayList<WidthComponent>()
     val topBuilder = SplitBuilder {
-        list.add(WidthComponent(it, i))
+        list += WidthComponent(it, i)
         i = 0
     }
     fun Component.parse(target: SplitBuilder, bold: Boolean, italic: Boolean) {
@@ -205,6 +205,38 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
     }
     val style = style()
     parse(topBuilder, style.parseDecoration(TextDecoration.BOLD, false), style.parseDecoration(TextDecoration.ITALIC, false))
-    if (!topBuilder.isClean) list.add(WidthComponent(topBuilder.build(), i))
+    if (!topBuilder.isClean) list += WidthComponent(topBuilder.build(), i)
     return list
+}
+
+infix fun PixelComponent.applyColor(color: TextColor?): PixelComponent = if (color == null) this else PixelComponent(
+    component.applyColor(color),
+    pixel
+)
+
+infix fun WidthComponent.applyColor(color: TextColor?): WidthComponent = when (color?.value()) {
+    null -> this
+    NamedTextColor.WHITE.value() -> WidthComponent(
+        component.build().toBuilder().color(null),
+        width
+    )
+    else -> {
+        val build = component.build()
+        val finalColor = build.color()?.let {
+            it * color
+        } ?: color
+        WidthComponent(
+            build.toBuilder().color(finalColor),
+            width
+        )
+    }
+}
+
+operator fun TextColor.times(other: TextColor): TextColor {
+    infix fun Int.process(other: Int) = (toDouble() / 255 * other.toDouble()).toInt()
+    return TextColor.color(
+        red() process other.red(),
+        green() process other.green(),
+        blue() process other.blue()
+    )
 }

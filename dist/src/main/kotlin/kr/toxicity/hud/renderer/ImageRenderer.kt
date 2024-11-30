@@ -4,26 +4,19 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.image.ImageComponent
+import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.placeholder.ConditionBuilder
-import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
 import kr.toxicity.hud.util.append
-import net.kyori.adventure.text.format.TextColor
+import kr.toxicity.hud.util.applyColor
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class ImageRenderer(
-    color: TextColor,
-    private val space: Int,
-    private val stack: PlaceholderBuilder<*>?,
-    private val maxStack: PlaceholderBuilder<*>?,
-    component: ImageComponent,
-    follow: String?,
-    private val cancelIfFollowerNotExists: Boolean,
-    private val conditions: ConditionBuilder
-) {
+    layout: ImageLayout,
+    component: ImageComponent
+) : ImageLayout by layout {
     private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
@@ -39,6 +32,7 @@ class ImageRenderer(
         val maxStackGetter = maxStack?.build(reason)
 
         val mapper = component mapper reason
+        val colorApply = colorOverrides(reason)
 
         return build@ { hudPlayer, frame ->
 
@@ -65,8 +59,8 @@ class ImageRenderer(
                             .coerceAtLeast(0)
                             .coerceAtMost(selected.images.lastIndex)])
                     }
-                    empty
-                } else component.type.getComponent(listen, frame, selected, target)
+                    empty.applyColor(colorApply(target))
+                } else component.type.getComponent(listen, frame, selected, target).applyColor(colorApply(target))
             } else EMPTY_PIXEL_COMPONENT
         }
     }

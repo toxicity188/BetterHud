@@ -6,7 +6,7 @@ import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import kr.toxicity.command.BetterCommandSource
-import kr.toxicity.command.CommandModule
+import kr.toxicity.command.impl.CommandModule
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.bukkit.nms.NMS

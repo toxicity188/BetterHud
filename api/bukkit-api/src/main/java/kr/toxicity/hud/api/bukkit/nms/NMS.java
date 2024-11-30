@@ -1,7 +1,7 @@
 package kr.toxicity.hud.api.bukkit.nms;
 
 import kr.toxicity.command.BetterCommandSource;
-import kr.toxicity.command.CommandModule;
+import kr.toxicity.command.impl.CommandModule;
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

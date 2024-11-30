@@ -15,11 +15,11 @@ Welcome to BetterHud!
 
 </div>
 
-### Multi-platform server-side HUD implementation of Minecraft.
+### Multiplatform server-side HUD implementation of Minecraft
 This project implements a server-side HUD.
 
 - Supports auto-generating resource pack.
-- Supports display image(include png sequence), display, head.
+- Supports display image(include png sequence), text, head.
 - Supports animation.
 
 ### Platform

@@ -8,7 +8,6 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.compass.CompassImpl
 import kr.toxicity.hud.equation.TEquation
-import kr.toxicity.hud.hud.HudImpl
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
@@ -96,14 +95,14 @@ class CircleCompass(
         val newHeight = (image.height.toDouble() * scale * scaleMultiplier).roundToInt()
         val div = newHeight.toDouble() / image.height.toDouble()
         array?.let { array ->
-            HudImpl.createBit(shader, pixel.y + y + (maxHeight - newHeight) / 2) { bit ->
-                array.add(jsonObjectOf(
+            createAscent(shader, pixel.y + y + (maxHeight - newHeight) / 2) { bit ->
+                array += jsonObjectOf(
                     "type" to "bitmap",
                     "file" to "$NAME_SPACE_ENCODED:$nameEncoded.png",
                     "ascent" to bit,
                     "height" to newHeight,
                     "chars" to jsonArrayOf(char)
-                ))
+                )
             }
         }
         resourceRef?.let {
@@ -254,14 +253,14 @@ class CircleCompass(
             if (!BOOTSTRAP.useLegacyFont()) {
                 val max = images.max + 2 * space + length
                 val center = CURRENT_CENTER_SPACE_CODEPOINT
-                it.add(buildJsonObject {
+                it += buildJsonObject {
                     addProperty("type", "space")
                     add("advances", buildJsonObject {
                         for (i in -max..max) {
                             addProperty((center + i).parseChar(), i)
                         }
                     })
-                })
+                }
             }
             PackGenerator.addTask(resource.font + "$encode.json") {
                 jsonObjectOf("providers" to it).toByteArray()

@@ -4,7 +4,6 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.HeadLayout
-import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.player.head.HeadKey
 import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.renderer.HeadRenderer
@@ -13,7 +12,7 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 
-class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
+class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val renderer = run {
         val final = head.location + pixel
@@ -37,51 +36,50 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
             )
         }
         HeadRenderer(
+            head,
             parent.getOrCreateSpace(-1),
-            parent.getOrCreateSpace(-(head.head.pixel * 8 + 1)),
-            parent.getOrCreateSpace(-(head.head.pixel + 1)),
+            parent.getOrCreateSpace(-(head.source.pixel * 8 + 1)),
+            parent.getOrCreateSpace(-(head.source.pixel + 1)),
             (0..7).map { i ->
-                val encode = "pixel_${head.head.pixel}".encodeKey()
+                val encode = "pixel_${head.source.pixel}".encodeKey()
                 val fileName = "$NAME_SPACE_ENCODED:$encode.png"
-                val ascent = final.y + i * head.head.pixel
-                val height = head.head.pixel
+                val ascent = final.y + i * head.source.pixel
+                val height = head.source.pixel
                 val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
                 val char = (++parent.imageChar).parseChar()
-                val mainChar = PlayerHeadManager.getHead(shaderGroup) ?: run {
+                val mainChar = head(shaderGroup) {
                     parent.jsonArray?.let { array ->
-                        HudImpl.createBit(shader, ascent) { y ->
-                            array.add(jsonObjectOf(
+                        createAscent(shader, ascent) { y ->
+                            array += jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to fileName,
                                 "ascent" to y,
                                 "height" to height,
                                 "chars" to jsonArrayOf(char)
-                            ))
+                            )
                         }
                     }
-                    PlayerHeadManager.setHead(shaderGroup, char)
                     char
                 }
                 when (head.type) {
                     STANDARD -> HeadKey(mainChar, mainChar)
                     FANCY -> {
-                        val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - head.head.pixel)
+                        val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - head.source.pixel)
                         HeadKey(
                             mainChar,
-                            PlayerHeadManager.getHead(hairShaderGroup) ?: run {
+                            head(hairShaderGroup) {
                                 val twoChar = (++parent.imageChar).parseChar()
                                 parent.jsonArray?.let { array ->
-                                    HudImpl.createBit(hair, ascent - head.head.pixel) { y ->
-                                        array.add(jsonObjectOf(
+                                    createAscent(hair, ascent - head.source.pixel) { y ->
+                                        array += jsonObjectOf(
                                             "type" to "bitmap",
                                             "file" to fileName,
                                             "ascent" to y,
                                             "height" to height,
                                             "chars" to jsonArrayOf(twoChar)
-                                        ))
+                                        )
                                     }
                                 }
-                                PlayerHeadManager.setHead(hairShaderGroup, twoChar)
                                 twoChar
                             }
                         )
@@ -89,13 +87,8 @@ class HudHeadElement(parent: HudImpl, private val head: HeadLayout, gui: GuiLoca
                 }
             },
             parent.imageKey,
-            head.head.pixel * 8,
-            final.x,
-            head.align,
-            head.type,
-            head.follow,
-            head.cancelIfFollowerNotExists,
-            head.conditions and head.head.conditions
+            head.source.pixel * 8,
+            final.x
         ).getHead(UpdateEvent.EMPTY)
     }
 

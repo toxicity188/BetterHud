@@ -30,7 +30,6 @@ class PopupImpl(
         EquationPairLocation(it)
     } ?: EquationPairLocation.zero
     private val duration = section.getAsInt("duration", -1)
-    private val update = section.getAsBoolean("update", true)
     private val group = section["group"]?.asString() ?: internalName
     private val unique = section.getAsBoolean("unique", false)
     private val queue = duration > 0 && section.getAsBoolean("queue", false)
@@ -151,31 +150,21 @@ class PopupImpl(
         if (!buildCondition(hudPlayer)) return null
         var updater = {
         }
-        val valueMap = layouts.map {
-            it.getComponent(reason)
-        }
-        val mapper: (Int, Int) -> List<WidthComponent> = if (update) {
-            { index, t ->
-                valueMap.map {
-                    it(hudPlayer, index, t)
+        val valueMap = layouts
+            .asSequence()
+            .map {
+                it.getComponent(reason)
+            }
+            .map {
+                { index: Int, frame: Int ->
+                    it(hudPlayer, index, frame)
                 }
             }
-        } else {
-            fun getValue() = valueMap.map { func ->
-                { a: Int, b: Int ->
-                    func(hudPlayer, a, b)
-                }
+            .toList()
+        val mapper: (Int, Int) -> List<WidthComponent> = { index, t ->
+            valueMap.map {
+                it(index, t)
             }
-            var allValues = getValue()
-            updater = {
-                allValues = getValue()
-            }
-            val mapper2: (Int, Int) -> List<WidthComponent> = { index, t ->
-                allValues.map {
-                    it(index, t)
-                }
-            }
-            mapper2
         }
         var cond = {
             buildCondition(hudPlayer)

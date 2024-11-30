@@ -4,7 +4,6 @@ import kr.toxicity.hud.api.BetterHudDependency
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.util.subFile
 import kr.toxicity.hud.util.subFolder
-import kr.toxicity.hud.util.toYaml
 import me.lucko.jarrelocator.JarRelocator
 import me.lucko.jarrelocator.Relocation
 import java.io.File
@@ -95,8 +94,8 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         }
 
         fun addURL(url: URL) {
-            unopenedURLs.add(url)
-            pathURLs.add(url)
+            unopenedURLs += url
+            pathURLs += url
         }
     }
 

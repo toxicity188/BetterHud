@@ -71,13 +71,13 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     private val reloadEndTask = ArrayList<(ReloadState) -> Unit>()
 
     override fun addReloadStartTask(runnable: Runnable) {
-        reloadStartTask.add {
+        reloadStartTask += {
             runnable.run()
         }
     }
 
     override fun addReloadEndTask(runnable: Consumer<ReloadState>) {
-        reloadEndTask.add {
+        reloadEndTask += {
             runnable.accept(it)
         }
     }

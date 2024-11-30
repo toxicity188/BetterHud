@@ -8,7 +8,7 @@ fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     var index = 0
     while (index < size) {
         val subList = subList(index, (index + splitSize).coerceAtMost(size))
-        if (subList.isNotEmpty()) result.add(subList)
+        if (subList.isNotEmpty()) result += subList
         index += splitSize
     }
     return result
@@ -17,7 +17,7 @@ fun <T> List<T>.split(splitSize: Int): List<List<T>> {
 fun <T> List<List<T>>.sum(): List<T> {
     val result = ArrayList<T>()
     forEach {
-        result.addAll(it)
+        result += it
     }
     return result
 }
@@ -53,7 +53,7 @@ fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
             val add = (size.toDouble() / available).toInt()
             while (i <= size) {
                 val get = subList(i, (i + add).coerceAtMost(size))
-                queue.add {
+                queue += {
                     get.forEach { t ->
                         block(t)
                     }

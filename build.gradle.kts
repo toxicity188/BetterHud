@@ -31,7 +31,7 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.3"
+val betterCommand = "1.4"
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -86,6 +86,7 @@ allprojects {
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
+        implementation("io.github.toxicity188:BetterCommand:$betterCommand")
     }
 
     tasks {
@@ -129,9 +130,6 @@ subprojects {
         dokkaSourceSets.configureEach {
             displayName = project.name
         }
-    }
-    dependencies {
-        compileOnly("com.github.toxicity188:BetterCommand:$betterCommand")
     }
 }
 
@@ -300,12 +298,11 @@ dependencies {
         implementation(it)
     }
     implementation(dist)
-    implementation("com.github.toxicity188:BetterCommand:$betterCommand")
     implementation("org.bstats:bstats-bukkit:$bStats")
     implementation("org.bstats:bstats-velocity:$bStats")
 }
 
-val sourceJar by tasks.creating(Jar::class.java) {
+val sourcesJar by tasks.creating(Jar::class.java) {
     dependsOn(tasks.classes)
     fun getProjectSource(project: Project): Array<File> {
         return if (project.subprojects.isEmpty()) project.sourceSets.main.get().allSource.srcDirs.toTypedArray() else ArrayList<File>().apply {
@@ -314,13 +311,13 @@ val sourceJar by tasks.creating(Jar::class.java) {
             }
         }.toTypedArray()
     }
-    archiveClassifier = "source"
+    archiveClassifier = "sources"
     from(*getProjectSource(project))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-val dokkaJar by tasks.creating(Jar::class.java) {
+val javadocJar by tasks.creating(Jar::class.java) {
     dependsOn(tasks.dokkaGenerate)
-    archiveClassifier = "dokka"
+    archiveClassifier = "javadoc"
     from(layout.buildDirectory.dir("dokka/html").orNull?.asFile)
 }
 val fabricJar by tasks.creating(Jar::class.java) {
@@ -391,7 +388,8 @@ fun Jar.relocateAll() {
             "kotlin",
             "net.objecthunter.exp4j",
             "org.bstats",
-            "me.lucko.jarrelocator"
+            "me.lucko.jarrelocator",
+            "kr.toxicity.command.impl"
         ).map {
             Relocation(it, "${project.group}.shaded.$it")
         }
@@ -420,10 +418,7 @@ tasks {
         pluginJars(fileTree("plugins"))
     }
     build {
-        finalizedBy(sourceJar, dokkaJar, pluginJar, velocityJar, fabricJar)
-    }
-    logLinkDokkaGeneratePublicationHtml {
-        enabled = false
+        finalizedBy(sourcesJar, javadocJar, pluginJar, velocityJar, fabricJar)
     }
     shadowJar {
         archiveClassifier = ""
@@ -435,7 +430,7 @@ tasks {
 
 bukkitBootstrap.modrinthPublish(
     pluginJar,
-    listOf(sourceJar, dokkaJar),
+    listOf(sourcesJar, javadocJar),
     listOf("bukkit", "spigot", "paper", "purpur", "folia"),
     supportedMinecraftVersions,
     listOf(),
@@ -444,7 +439,7 @@ bukkitBootstrap.modrinthPublish(
 
 velocityBootstrap.modrinthPublish(
     velocityJar,
-    listOf(sourceJar, dokkaJar),
+    listOf(sourcesJar, javadocJar),
     listOf("velocity"),
     supportedMinecraftVersions,
     listOf(),
@@ -452,7 +447,7 @@ velocityBootstrap.modrinthPublish(
 )
 fabricBootstrap.modrinthPublish(
     fabricJar,
-    listOf(sourceJar, dokkaJar),
+    listOf(sourcesJar, javadocJar),
     listOf("fabric", "quilt"),
     listOf(minecraft),
     listOf("fabric-api"),

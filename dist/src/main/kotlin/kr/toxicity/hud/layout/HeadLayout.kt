@@ -5,21 +5,37 @@ import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.player.head.HeadRenderType
-import kr.toxicity.hud.player.head.HudHead
+import kr.toxicity.hud.element.HeadElement
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toLayoutAlign
 
-class HeadLayout(
-    s: String,
-    yamlObject: YamlObject,
-    loc: PixelLocation
-) : HudLayout(loc, yamlObject) {
-    val head: HudHead = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
-        PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
-    }
-    val type = HeadRenderType.valueOf(yamlObject.getAsString("type", "standard").uppercase())
-    val align: LayoutAlign = when (type) {
-        HeadRenderType.STANDARD -> yamlObject["align"]?.asString().toLayoutAlign()
-        HeadRenderType.FANCY -> LayoutAlign.CENTER
+interface HeadLayout : HudLayout<HeadElement> {
+    val type: HeadRenderType
+    val align: LayoutAlign
+
+    class Impl(
+        override val source: HeadElement,
+        group: LayoutGroup,
+        yamlObject: YamlObject,
+        loc: PixelLocation
+    ) : HeadLayout, HudLayout<HeadElement> by HudLayout.Impl(source, group, loc, yamlObject) {
+        constructor(
+            s: String,
+            group: LayoutGroup,
+            yamlObject: YamlObject,
+            loc: PixelLocation
+        ): this(
+            yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
+                PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
+            },
+            group,
+            yamlObject,
+            loc
+        )
+        override val type = HeadRenderType.valueOf(yamlObject.getAsString("type", "standard").uppercase())
+        override val align: LayoutAlign = when (type) {
+            HeadRenderType.STANDARD -> yamlObject["align"]?.asString().toLayoutAlign()
+            HeadRenderType.FANCY -> LayoutAlign.CENTER
+        }
     }
 }

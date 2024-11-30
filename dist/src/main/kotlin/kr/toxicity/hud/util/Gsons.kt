@@ -46,6 +46,10 @@ fun parseJson(reader: Reader): JsonElement = JsonReader(reader).use {
 }
 fun parseJson(string: String) = parseJson(StringReader(string).buffered())
 
+operator fun JsonArray.plusAssign(other: JsonElement) {
+    add(other)
+}
+
 fun Any.toJsonElement(): JsonElement = when (this) {
     is String -> JsonPrimitive(this)
     is Char -> JsonPrimitive(this)

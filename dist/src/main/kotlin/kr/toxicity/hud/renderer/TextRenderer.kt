@@ -4,49 +4,25 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.placeholder.ConditionBuilder
-import kr.toxicity.hud.text.CharWidth
 import kr.toxicity.hud.text.HudTextData
-import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
-import java.text.DecimalFormat
 import java.util.regex.Pattern
 import kotlin.math.ceil
 import kotlin.math.floor
 
 class TextRenderer(
-    private val widthMap: Map<Int, CharWidth>,
-    private val imageWidthMap: Map<Int, ImageCharWidth>,
-    private val defaultColor: TextColor,
+    layout: TextLayout,
     private val data: HudTextData,
-    pattern: String,
-    private val align: LayoutAlign,
-    private val lineAlign: LayoutAlign,
-    private val scale: Double,
-    private val emojiScale: Double,
     private val x: Int,
-
-    private val numberEquation: TEquation,
-    private val numberPattern: DecimalFormat,
-    private val disableNumberFormat: Boolean,
-
-    follow: String?,
-    private val cancelIfFollowerNotExists: Boolean,
-
-    private val useLegacyFormat: Boolean,
-    private val legacySerializer: ComponentDeserializer,
-    private val space: Int,
-    private val condition: ConditionBuilder
-) {
+) : TextLayout by layout {
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
@@ -61,6 +37,8 @@ class TextRenderer(
 
     private val parsedPatter = PlaceholderManagerImpl.parse(pattern)
 
+    private val imageCharMapGet = imageCharMap
+
     private val widthViewer = ValueViewer<Pair<Style, Int>, Int>()
         .addFunction(
             {
@@ -69,7 +47,7 @@ class TextRenderer(
                     LEGACY_SPACE_KEY -> it.second - LEGACY_CENTER_SPACE_CODEPOINT
                     null -> when (it.second) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> (widthMap[it.second]?.scaledWidth(scale) ?: imageWidthMap[it.second]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
+                        else -> (source.charWidth[it.second]?.scaledWidth(scale) ?: imageCharMapGet[it.second]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
                     }
                     else -> null
                 }
@@ -79,9 +57,10 @@ class TextRenderer(
 
     fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
         val buildPattern = parsedPatter(reason)
-        val cond = condition build reason
+        val cond = conditions build reason
 
         val followTarget = followHudPlayer?.build(reason)
+        val colorApply = colorOverrides(reason)
 
         return build@ { hudPlayer ->
             var targetHudPlayer = hudPlayer
@@ -123,7 +102,7 @@ class TextRenderer(
                 if (finalComp.width > max) max = finalComp.width
                 widthComp = widthComp plusWithAlign finalComp
             }
-            widthComp.toPixelComponent(when (align) {
+            widthComp.applyColor(colorApply(targetHudPlayer)).toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
                 LayoutAlign.CENTER -> x - max / 2
                 LayoutAlign.RIGHT -> x - max
@@ -156,7 +135,7 @@ class TextRenderer(
 
     private fun String.parseToComponent(): Component {
         var targetString = (if (useLegacyFormat) legacySerializer(this) else Component.text(this))
-            .color(defaultColor)
+            .color(color)
             .replaceText(TextReplacementConfig.builder()
                 .match(imagePattern)
                 .replacement { r, _ ->
@@ -179,7 +158,7 @@ class TextRenderer(
                 .replacement { r, _ ->
                     val g = r.group()
                     Component.text(runCatching {
-                        numberPattern.format(numberEquation.evaluate(g.toDouble()))
+                        numberFormat.format(numberEquation.evaluate(g.toDouble()))
                     }.getOrDefault(g))
                 }
                 .build())

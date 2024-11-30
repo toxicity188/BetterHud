@@ -4,11 +4,10 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.image.HudImage
+import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.ImageComponent
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.layout.ImageLayout
-import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
@@ -17,7 +16,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
-class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
+class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val chars = run {
         val finalPixel = imageLayout.location + pixel
@@ -31,7 +30,7 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
             imageLayout.property
         )
         val negativeSpace = parent.getOrCreateSpace(-1)
-        fun HudImage.toComponent(parentComponent: ImageComponent? = null): ImageComponent {
+        fun ImageElement.toComponent(parentComponent: ImageComponent? = null): ImageComponent {
             val list = ArrayList<PixelComponent>()
             if (listener != null) {
                 list.add(EMPTY_PIXEL_COMPONENT)
@@ -40,10 +39,10 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
                 val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
                 val height = (pair.image.image.height.toDouble() * imageLayout.scale).roundToInt()
                 val scale = height.toDouble() / pair.image.image.height
-                val ascent = finalPixel.y.coerceAtLeast(-HudImpl.ADD_HEIGHT).coerceAtMost(HudImpl.ADD_HEIGHT)
+                val ascent = finalPixel.y.coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
                 val shaderGroup = ShaderGroup(shader, fileName, imageLayout.scale, ascent)
 
-                val component = ImageManager.getImage(shaderGroup) ?: run {
+                val component = image(shaderGroup) {
                     val c = (++parent.imageChar).parseChar()
                     val comp = Component.text()
                         .font(parent.imageKey)
@@ -52,17 +51,16 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
                         (pair.image.image.width.toDouble() * scale).roundToInt()
                     )
                     parent.jsonArray?.let { array ->
-                        HudImpl.createBit(shader, ascent) { y ->
-                            array.add(jsonObjectOf(
+                        createAscent(shader, ascent) { y ->
+                            array += jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to fileName,
                                 "ascent" to y,
                                 "height" to height,
                                 "chars" to jsonArrayOf(c)
-                            ))
+                            )
                         }
                     }
-                    ImageManager.setImage(shaderGroup, finalWidth)
                     finalWidth
                 }
 
@@ -73,18 +71,12 @@ class HudImageElement(parent: HudImpl, private val imageLayout: ImageLayout, gui
             })
         }
         val renderer = ImageRenderer(
-            imageLayout.color,
-            imageLayout.space,
-            imageLayout.stack,
-            imageLayout.maxStack,
+            imageLayout,
             try {
-                imageLayout.image.toComponent()
+                imageLayout.source.toComponent()
             } catch (_: StackOverflowError) {
-                throw RuntimeException("circular reference found in ${imageLayout.image.name}")
-            },
-            imageLayout.follow,
-            imageLayout.cancelIfFollowerNotExists,
-            imageLayout.conditions and imageLayout.image.conditions
+                throw RuntimeException("circular reference found in ${imageLayout.source.name}")
+            }
         )
         renderer.max() to renderer.getComponent(UpdateEvent.EMPTY)
     }

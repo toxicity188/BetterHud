@@ -1,7 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.image.HudImage
+import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.image.enums.SplitType
 import kr.toxicity.hud.pack.PackGenerator
@@ -16,7 +16,7 @@ import java.util.regex.Pattern
 
 object ImageManager : BetterHudManager {
 
-    private val imageMap = HashMap<String, HudImage>()
+    private val imageMap = HashMap<String, ImageElement>()
     private val emptySetting = YamlObjectImpl("", mutableMapOf<String, Any>())
 
     private val imageNameComponent = ConcurrentHashMap<ShaderGroup, WidthComponent>()
@@ -56,7 +56,7 @@ object ImageManager : BetterHudManager {
                             yamlObject["file"]?.asString().ifNull("file value not set.")
                                 .replace('/', File.separatorChar)
                         )
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
                             listOf(
@@ -82,7 +82,7 @@ object ImageManager : BetterHudManager {
                             yamlObject["file"]?.asString().ifNull("file value not set.")
                                 .replace('/', File.separatorChar)
                         )
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
                             splitType.split(
@@ -100,7 +100,7 @@ object ImageManager : BetterHudManager {
 
                     ImageType.SEQUENCE -> {
                         val globalFrame = yamlObject.getAsInt("frame", 1).coerceAtLeast(1)
-                        HudImage(
+                        ImageElement(
                             file.path,
                             s,
                             (yamlObject["files"]?.asArray()?.map {
