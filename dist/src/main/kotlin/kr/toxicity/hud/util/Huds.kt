@@ -1,12 +1,12 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.ShaderManagerImpl
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.BackgroundKey
 
 
@@ -20,12 +20,12 @@ fun createAscent(shader: HudShader, y: Int, consumer: (Int) -> Unit) {
     }
 }
 
-fun text(group: ShaderGroup, creator: () -> BackgroundKey) = TextManagerImpl.getKey(group) ?: creator().apply {
+fun text(group: HudLayout.Identifier, creator: () -> BackgroundKey) = TextManagerImpl.getKey(group) ?: creator().apply {
     TextManagerImpl.setKey(group, this)
 }
-fun image(group: ShaderGroup, creator: () -> WidthComponent) = ImageManager.getImage(group) ?: creator().apply {
+fun image(group: HudLayout.Identifier, creator: () -> WidthComponent) = ImageManager.getImage(group) ?: creator().apply {
     ImageManager.setImage(group, this)
 }
-fun head(group: ShaderGroup, creator: () -> String) = PlayerHeadManager.getHead(group) ?: creator().apply {
+fun head(group: HudLayout.Identifier, creator: () -> String) = PlayerHeadManager.getHead(group) ?: creator().apply {
     PlayerHeadManager.setHead(group, this)
 }

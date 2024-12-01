@@ -22,9 +22,12 @@ class HudImpl(
     private val internalName: String,
     resource: GlobalResource,
     section: YamlObject
-): Hud, HudConfiguration {
+) : Hud, HudConfiguration {
 
-    var imageChar = 0xCE000
+    private var imageChar = 0xCE000
+
+    val newChar
+        get() = (++imageChar).parseChar()
 
     private val imageEncoded = "hud_${internalName}_image".encodeKey()
     val imageKey = createAdventureKey(imageEncoded)

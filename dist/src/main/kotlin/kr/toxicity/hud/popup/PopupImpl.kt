@@ -59,9 +59,11 @@ class PopupImpl(
     private var imageChar = 0xCE000
 
     fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
-        newChar()
+        newChar
     }
-    fun newChar(): String = (++imageChar).parseChar()
+
+    val newChar
+        get() = (++imageChar).parseChar()
 
     private val sortType = section["sort"]?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())

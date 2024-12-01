@@ -2,10 +2,13 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.element.HeadElement
+import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.pack.PackGenerator
-import kr.toxicity.hud.player.head.*
+import kr.toxicity.hud.player.head.GameProfileSkinProvider
+import kr.toxicity.hud.player.head.HudPlayerHeadImpl
+import kr.toxicity.hud.player.head.MineToolsProvider
+import kr.toxicity.hud.player.head.PlayerSkinProvider
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.format.TextColor
@@ -23,13 +26,13 @@ object PlayerHeadManager : BetterHudManager {
     private val headCache = ConcurrentHashMap<String, CachedHead>()
     private val headMap = HashMap<String, HeadElement>()
 
-    private val headNameComponent = ConcurrentHashMap<ShaderGroup, String>()
+    private val headNameComponent = ConcurrentHashMap<HudLayout.Identifier, String>()
 
 
     @Synchronized
-    fun getHead(group: ShaderGroup) = headNameComponent[group]
+    fun getHead(group: HudLayout.Identifier) = headNameComponent[group]
     @Synchronized
-    fun setHead(group: ShaderGroup, string: String) {
+    fun setHead(group: HudLayout.Identifier, string: String) {
         headNameComponent[group] = string
     }
 

@@ -21,7 +21,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.9.4")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.4.4")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.1.0-dev.37")
+    compileOnly("com.nexomc:nexo:0.1.0-dev.62")
     compileOnly("io.th0rgal:oraxen:1.185.0")
 }
 

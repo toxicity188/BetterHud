@@ -9,7 +9,6 @@ import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 
 class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
@@ -45,9 +44,8 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                 val ascent = final.y + i * head.source.pixel
                 val height = head.source.pixel
-                val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
-                val char = (++parent.imageChar).parseChar()
-                val mainChar = head(shaderGroup) {
+                val char = parent.newChar
+                val mainChar = head(head.identifier(shader, ascent)) {
                     parent.jsonArray?.let { array ->
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
@@ -64,11 +62,10 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 when (head.type) {
                     STANDARD -> HeadKey(mainChar, mainChar)
                     FANCY -> {
-                        val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - head.source.pixel)
                         HeadKey(
                             mainChar,
-                            head(hairShaderGroup) {
-                                val twoChar = (++parent.imageChar).parseChar()
+                            head(head.identifier(hair, ascent - head.source.pixel)) {
+                                val twoChar = parent.newChar
                                 parent.jsonArray?.let { array ->
                                     createAscent(hair, ascent - head.source.pixel) { y ->
                                         array += jsonObjectOf(

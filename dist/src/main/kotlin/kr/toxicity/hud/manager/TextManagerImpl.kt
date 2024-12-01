@@ -6,11 +6,14 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
+import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.ShaderGroup
-import kr.toxicity.hud.text.*
+import kr.toxicity.hud.text.BackgroundKey
+import kr.toxicity.hud.text.CharWidth
+import kr.toxicity.hud.text.HudTextArray
+import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
@@ -59,7 +62,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val textCacheMap = HashMap<TextCache, TextElement>()
 
     private val textWidthMap = HashMap<Int, Int>()
-    private val textKeyMap = ConcurrentHashMap<ShaderGroup, BackgroundKey>()
+    private val textKeyMap = ConcurrentHashMap<HudLayout.Identifier, BackgroundKey>()
 
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
@@ -127,9 +130,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val FRC = FontRenderContext(null, true, true)
 
     @Synchronized
-    fun getKey(shaderGroup: ShaderGroup) = textKeyMap[shaderGroup]
+    fun getKey(shaderGroup: HudLayout.Identifier) = textKeyMap[shaderGroup]
     @Synchronized
-    fun setKey(shaderGroup: ShaderGroup, key: BackgroundKey) {
+    fun setKey(shaderGroup: HudLayout.Identifier, key: BackgroundKey) {
         textKeyMap[shaderGroup] = key
     }
 

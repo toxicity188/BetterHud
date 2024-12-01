@@ -13,7 +13,6 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.BackgroundKey
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
@@ -44,8 +43,7 @@ class HudTextParser(
         val index2 = ++parent.textIndex
         val keys = (0..<text.line).map { lineIndex ->
             val yAxis = (loc.y + lineIndex * text.lineWidth).coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
-            val group = ShaderGroup(shader, text.source.name, text.scale, yAxis)
-            text(group) {
+            text(text.identifier(shader, yAxis)) {
                 val array = text.startJson()
                 text.source.array.forEach {
                     createAscent(shader, yAxis) { y ->
@@ -62,7 +60,7 @@ class HudTextParser(
                 val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey()
                 val key = createAdventureKey(textEncoded)
                 text.imageCharMap.forEach {
-                    val height = (it.value.height.toDouble() * text.scale * text.emojiScale * it.value.scale).roundToInt()
+                    val height = (it.value.height.toDouble() * text.scale * text.emoji.scale * it.value.scale).roundToInt()
                     createAscent(shader, loc.y + it.value.location.y + lineIndex * text.lineWidth) { y ->
                         array += jsonObjectOf(
                             "type" to "bitmap",
@@ -79,10 +77,10 @@ class HudTextParser(
                 BackgroundKey(
                     key,
                     //TODO replace it to proper background in the future.
-                    text.background?.let {
+                    text.background.source?.let {
                         fun getString(image: LoadedImage, file: String): WidthComponent {
                             val result = (++textIndex).parseChar()
-                            val height = (image.image.height.toDouble() * text.backgroundScale).roundToInt()
+                            val height = (image.image.height.toDouble() * text.background.scale).roundToInt()
                             val div = height.toDouble() / image.image.height
                             createAscent(HudShader(
                                 gui,

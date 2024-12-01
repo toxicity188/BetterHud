@@ -14,7 +14,7 @@ import kr.toxicity.hud.util.ifNull
 
 class ImageElement(
     override val path: String,
-    val name: String,
+    override val name: String,
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject

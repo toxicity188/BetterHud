@@ -23,7 +23,6 @@ import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.BackgroundKey
 import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
@@ -130,10 +129,8 @@ class PopupLayout(
                     val scale = height.toDouble() / it.image.image.height
                     val xOffset = (it.image.xOffset * scale).roundToInt()
                     val ascent = pixel.y
-                    val shaderGroup = ShaderGroup(imageShader, fileName, target.scale, ascent)
-
-                    val component = image(shaderGroup) {
-                        val char = parent.newChar()
+                    val component = image(target.identifier(imageShader, ascent)) {
+                        val char = parent.newChar
                         createAscent(imageShader, ascent) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
@@ -187,8 +184,7 @@ class PopupLayout(
             }.toMap()
             val index = ++textIndex
             val keys = (0..<textLayout.line).map { lineIndex ->
-                val group = ShaderGroup(textShader, textLayout.source.name, textLayout.scale, pixel.y + lineIndex * textLayout.lineWidth)
-                text(group) {
+                text(textLayout.identifier(textShader, pixel.y + lineIndex * textLayout.lineWidth)) {
                     val array = textLayout.startJson()
                     createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
                         textLayout.source.array.forEach {
@@ -205,7 +201,7 @@ class PopupLayout(
                     val key = createAdventureKey(textEncoded)
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
                     textLayout.imageCharMap.forEach {
-                        val height = (it.value.height.toDouble() * textLayout.scale * textLayout.emojiScale * it.value.scale).roundToInt()
+                        val height = (it.value.height.toDouble() * textLayout.scale * textLayout.emoji.scale * it.value.scale).roundToInt()
                         createAscent(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
@@ -222,10 +218,10 @@ class PopupLayout(
                     BackgroundKey(
                         key,
                         //TODO replace it to proper background in the future.
-                        textLayout.background?.let {
+                        textLayout.background.source?.let {
                             fun getString(image: LoadedImage, file: String): WidthComponent {
                                 val result = (++imageTextIndex).parseChar()
-                                val height = (image.image.height.toDouble() * textLayout.backgroundScale).roundToInt()
+                                val height = (image.image.height.toDouble() * textLayout.background.scale).roundToInt()
                                 val div = height.toDouble() / image.image.height
                                 createAscent(HudShader(
                                     elementGui,
@@ -297,12 +293,10 @@ class PopupLayout(
                 (0..7).map { i ->
                     val encode = "pixel_${headLayout.source.pixel}".encodeKey()
                     val fileName = "$NAME_SPACE_ENCODED:$encode.png"
-                    val char = parent.newChar()
+                    val char = parent.newChar
                     val ascent = pixel.y + i * headLayout.source.pixel
                     val height = headLayout.source.pixel
-                    val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
-
-                    val mainChar = head(shaderGroup) {
+                    val mainChar = head(headLayout.identifier(shader, ascent)) {
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
@@ -317,11 +311,10 @@ class PopupLayout(
                     when (headLayout.type) {
                         STANDARD -> HeadKey(mainChar, mainChar)
                         FANCY -> {
-                            val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - headLayout.source.pixel)
                             HeadKey(
                                 mainChar,
-                                head(hairShaderGroup) {
-                                    val twoChar = parent.newChar()
+                                head(headLayout.identifier(hair, ascent - headLayout.source.pixel)) {
+                                    val twoChar = parent.newChar
                                     createAscent(hair, ascent - headLayout.source.pixel) { y ->
                                         array += jsonObjectOf(
                                             "type" to "bitmap",

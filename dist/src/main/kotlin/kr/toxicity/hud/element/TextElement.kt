@@ -8,7 +8,7 @@ import kr.toxicity.hud.text.ImageCharWidth
 
 class TextElement(
     override val path: String,
-    val name: String,
+    override val name: String,
     val array: List<HudTextArray>,
     val charWidth: Map<Int, CharWidth>,
     val imageCharWidth: Map<Int, ImageCharWidth>,

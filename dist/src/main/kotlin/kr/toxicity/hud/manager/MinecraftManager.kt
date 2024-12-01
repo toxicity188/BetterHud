@@ -33,7 +33,7 @@ object MinecraftManager : BetterHudManager {
             return ImageCharWidth(
                 namespace.replace('/', '_'),
                 "minecraft:$namespace.png",
-                layout.emojiLocation,
+                layout.emoji.location,
                 1.0,
                 width,
                 height

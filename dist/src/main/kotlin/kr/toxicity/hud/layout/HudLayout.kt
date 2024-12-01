@@ -2,8 +2,8 @@ package kr.toxicity.hud.layout
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.element.HudElement
-import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.shader.RenderScale
 import kr.toxicity.hud.shader.ShaderProperty
 
@@ -16,6 +16,10 @@ interface HudLayout<T : HudElement> : ConditionSource {
     val location: PixelLocation
     val cancelIfFollowerNotExists: Boolean
     val renderScale: RenderScale
+
+    interface Identifier {
+        val name: String
+    }
 
     class Impl<T : HudElement>(
         override val source: T,
