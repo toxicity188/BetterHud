@@ -39,7 +39,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
                 val height = (pair.image.image.height.toDouble() * imageLayout.scale).roundToInt()
                 val scale = height.toDouble() / pair.image.image.height
                 val ascent = finalPixel.y.coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
-                val component = image(imageLayout.identifier(shader, ascent)) {
+                val component = image(imageLayout.identifier(shader, ascent, fileName)) {
                     val c = parent.newChar
                     val comp = Component.text()
                         .font(parent.imageKey)

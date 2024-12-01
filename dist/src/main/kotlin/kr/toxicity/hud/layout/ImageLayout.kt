@@ -20,9 +20,9 @@ interface ImageLayout : HudLayout<ImageElement> {
     val stack: PlaceholderBuilder<*>?
     val maxStack: PlaceholderBuilder<*>?
 
-    fun identifier(shader: HudShader, ascent: Int): HudLayout.Identifier {
+    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
         return ImageIdentifier(
-            ShaderGroup(shader, source.name, ascent),
+            ShaderGroup(shader, fileName, ascent),
             this
         )
     }

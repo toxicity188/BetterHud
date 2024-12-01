@@ -129,7 +129,7 @@ class PopupLayout(
                     val scale = height.toDouble() / it.image.image.height
                     val xOffset = (it.image.xOffset * scale).roundToInt()
                     val ascent = pixel.y
-                    val component = image(target.identifier(imageShader, ascent)) {
+                    val component = image(target.identifier(imageShader, ascent, fileName)) {
                         val char = parent.newChar
                         createAscent(imageShader, ascent) { y ->
                             array += jsonObjectOf(
