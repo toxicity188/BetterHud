@@ -124,7 +124,7 @@ class HeadRenderer(
 
 
     private val followPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it).apply {
+        PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }

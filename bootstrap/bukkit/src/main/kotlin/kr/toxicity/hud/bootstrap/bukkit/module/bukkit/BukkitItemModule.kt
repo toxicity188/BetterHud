@@ -23,16 +23,16 @@ class BukkitItemModule : BukkitModule {
     override fun start() {
         registerListener(object : Listener {
             @EventHandler
-            fun drop(e: PlayerDropItemEvent) {
-                UpdateItemEvent(e.player, e.itemDrop.itemStack, e).call()
+            fun PlayerDropItemEvent.drop() {
+                UpdateItemEvent(player, itemDrop.itemStack, this).call()
             }
             @EventHandler
-            fun pickup(e: EntityPickupItemEvent) {
-                val entity = e.entity
+            fun EntityPickupItemEvent.pickup() {
+                val entity = entity
                 if (entity is Player) UpdateItemEvent(
                     entity,
-                    e.item.itemStack,
-                    e
+                    item.itemStack,
+                    this
                 ).call()
             }
         })

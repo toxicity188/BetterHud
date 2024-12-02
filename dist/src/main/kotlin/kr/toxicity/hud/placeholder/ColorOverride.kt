@@ -30,9 +30,9 @@ fun interface ColorOverride : (HudPlayer) -> TextColor? {
             pair += builder to color
         }
 
-        fun conditional(yaml: YamlObject) {
+        fun conditional(yaml: YamlObject, source: PlaceholderSource) {
             conditional(
-                yaml.toConditions(),
+                yaml.toConditions(source),
                 yaml["color"]
                     .ifNull("'color' section not found.")
                     .asString()
@@ -58,10 +58,10 @@ fun interface ColorOverride : (HudPlayer) -> TextColor? {
                 null
             }
         }
-        fun builder(yaml: YamlObject) : Builder {
+        fun builder(yaml: YamlObject, source: PlaceholderSource) : Builder {
             return YamlBuilder().apply {
                 yaml.forEach {
-                    conditional(it.value.asObject())
+                    conditional(it.value.asObject(), source)
                 }
                 defaultColor = yaml["default-color"]?.asString()?.toTextColor()
             }

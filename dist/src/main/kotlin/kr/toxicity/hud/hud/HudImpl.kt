@@ -14,6 +14,7 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 
@@ -22,7 +23,7 @@ class HudImpl(
     private val internalName: String,
     resource: GlobalResource,
     section: YamlObject
-) : Hud, HudConfiguration {
+) : Hud, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
 
     private var imageChar = 0xCE000
 
@@ -37,7 +38,7 @@ class HudImpl(
     var textIndex = 0
 
     fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
-        (++imageChar).parseChar()
+        newChar
     }
 
     private val elements = section["layouts"]?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
@@ -86,7 +87,7 @@ class HudImpl(
         return HudObjectType.HUD
     }
 
-    private val conditions = section.toConditions() build UpdateEvent.EMPTY
+    private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
 
     override fun getComponents(player: HudPlayer): List<WidthComponent> {
         if (!conditions(player)) return emptyList()

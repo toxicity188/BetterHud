@@ -30,12 +30,12 @@ class TextRenderer(
     }
 
     private val followHudPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it).apply {
+        PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
 
-    private val parsedPatter = PlaceholderManagerImpl.parse(pattern)
+    private val parsedPatter = PlaceholderManagerImpl.parse(pattern, this)
 
     private val imageCharMapGet = imageCharMap
 

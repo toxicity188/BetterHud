@@ -72,12 +72,12 @@ interface ImageLayout : HudLayout<ImageElement> {
         override val scale: Double = yamlObject.getAsDouble("scale", 1.0)
         override val space: Int = yamlObject.getAsInt("space", 1)
         override val stack: PlaceholderBuilder<*>? = yamlObject["stack"]?.asString()?.let {
-            PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            PlaceholderManagerImpl.find(it, this).ifNull("this placeholder doesn't exist: $it").apply {
                 if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
             }
         }
         override val maxStack: PlaceholderBuilder<*>? = yamlObject["max-stack"]?.asString()?.let {
-            PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            PlaceholderManagerImpl.find(it, this).ifNull("this placeholder doesn't exist: $it").apply {
                 if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
             }
         }

@@ -15,15 +15,15 @@ interface ConditionSource {
 
     class Impl(
         override val colorOverrides: ColorOverride.Builder,
-        override val conditions: ConditionBuilder
+        override val conditions: ConditionBuilder,
     ) : ConditionSource {
-        constructor(yamlObject: YamlObject): this(
-            yamlObject.toColorOverrides(),
-            yamlObject.toConditions()
+        constructor(yamlObject: YamlObject, source: PlaceholderSource): this(
+            yamlObject.toColorOverrides(source),
+            yamlObject.toConditions(source),
         )
-        constructor(parent: ConditionSource, yamlObject: YamlObject): this(
-            parent.colorOverrides + yamlObject.toColorOverrides(),
-            parent.conditions and yamlObject.toConditions()
+        constructor(yamlObject: YamlObject): this(
+            yamlObject,
+            PlaceholderSource.Impl(yamlObject)
         )
     }
 }

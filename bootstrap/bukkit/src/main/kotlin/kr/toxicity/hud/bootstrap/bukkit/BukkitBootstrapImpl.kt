@@ -202,12 +202,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         if (pluginManager.isPluginEnabled("GPS")) PlayerManagerImpl.addLocationProvider(GPSLocationProvider())
         pluginManager.registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
-            fun join(e: PlayerJoinEvent) {
-                register(e.player)
+            fun PlayerJoinEvent.join() {
+                register(player)
             }
             @EventHandler
-            fun quit(e: PlayerQuitEvent) {
-                val player = e.player
+            fun PlayerQuitEvent.quit() {
+                val player = player
                 PlayerManagerImpl.removeHudPlayer(player.uniqueId)?.let {
                     it.cancel()
                     HudPlayerQuitEvent(it).call()
@@ -255,8 +255,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                     warn("Download: https://www.spigotmc.org/resources/115559")
                     Bukkit.getPluginManager().registerEvents(object : Listener {
                         @EventHandler
-                        fun join(e: PlayerJoinEvent) {
-                            val player = e.player
+                        fun PlayerJoinEvent.join() {
+                            val player = player
                             if (player.isOp && ConfigManagerImpl.versionCheck) {
                                 val audience = audiences.player(player)
                                 audience.info("New BetterHud version found: $body")

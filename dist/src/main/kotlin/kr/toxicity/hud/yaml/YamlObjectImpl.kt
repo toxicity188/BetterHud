@@ -11,6 +11,9 @@ class YamlObjectImpl(
     path: String,
     private val map: MutableMap<*, *>
 ) : YamlConfigurationImpl(path), YamlObject {
+    companion object {
+        val empty = YamlObjectImpl("", HashMap<Any, Any>())
+    }
 
     override fun save(file: File) {
         get().saveToYaml(file)

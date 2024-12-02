@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
@@ -14,8 +15,9 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
 
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->
-            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull("value value not set."))
-            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull("max value not set."))
+            val source = PlaceholderSource.Impl(c)
+            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull("value value not set."), source)
+            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull("max value not set."), source)
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
