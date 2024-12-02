@@ -111,7 +111,7 @@ class PopupLayout(
             val pixel = elementPixel + pair.pixel + target.location
             val imageShader = HudShader(
                 elementGui,
-                target.renderScale,
+                target.renderScale + pair.pixel + target.location,
                 target.layer,
                 target.outline,
                 pixel.opacity,
@@ -170,10 +170,11 @@ class PopupLayout(
         } ?: 0
 
         val texts = layout.text.map { textLayout ->
-            val pixel = elementPixel + pair.pixel + textLayout.location
+            val pixel = textLayout.location + elementPixel + pair.pixel
+            val render = textLayout.renderScale + elementPixel + pair.pixel
             val textShader = HudShader(
                 elementGui,
-                textLayout.renderScale,
+                render,
                 textLayout.layer,
                 textLayout.outline,
                 pixel.opacity,
@@ -225,7 +226,7 @@ class PopupLayout(
                                 val div = height.toDouble() / image.image.height
                                 createAscent(HudShader(
                                     elementGui,
-                                    textLayout.renderScale,
+                                    render,
                                     textLayout.layer - 1,
                                     false,
                                     pixel.opacity * it.location.opacity,
@@ -265,10 +266,11 @@ class PopupLayout(
         }
 
         val heads = layout.head.map { headLayout ->
-            val pixel = elementPixel + pair.pixel + headLayout.location
+            val pixel = headLayout.location + elementPixel + pair.pixel
+            val render = headLayout.renderScale + elementPixel + pair.pixel
             val shader = HudShader(
                 elementGui,
-                headLayout.renderScale,
+                render,
                 headLayout.layer,
                 headLayout.outline,
                 pixel.opacity,
@@ -278,7 +280,7 @@ class PopupLayout(
                 STANDARD -> shader
                 FANCY -> HudShader(
                     elementGui,
-                    headLayout.renderScale * 1.125,
+                    render * 1.125,
                     headLayout.layer + 1,
                     true,
                     pixel.opacity,
@@ -296,7 +298,7 @@ class PopupLayout(
                     val char = parent.newChar
                     val ascent = pixel.y + i * headLayout.source.pixel
                     val height = headLayout.source.pixel
-                    val mainChar = head(headLayout.identifier(shader, ascent)) {
+                    val mainChar = head(headLayout.identifier(shader, ascent, fileName)) {
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
@@ -313,7 +315,7 @@ class PopupLayout(
                         FANCY -> {
                             HeadKey(
                                 mainChar,
-                                head(headLayout.identifier(hair, ascent - headLayout.source.pixel)) {
+                                head(headLayout.identifier(hair, ascent - headLayout.source.pixel, fileName)) {
                                     val twoChar = parent.newChar
                                     createAscent(hair, ascent - headLayout.source.pixel) { y ->
                                         array += jsonObjectOf(

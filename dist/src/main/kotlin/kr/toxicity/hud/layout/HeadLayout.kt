@@ -15,8 +15,8 @@ interface HeadLayout : HudLayout<HeadElement> {
     val type: HeadRenderType
     val align: LayoutAlign
 
-    fun identifier(shader: HudShader, ascent: Int): HudLayout.Identifier {
-        return ShaderGroup(shader, source.name, ascent)
+    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
+        return ShaderGroup(shader, fileName, ascent)
     }
 
     class Impl(

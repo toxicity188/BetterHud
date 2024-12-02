@@ -28,7 +28,7 @@ object PackGenerator {
     private open class Builder {
         @Volatile
         var byte = 0L
-        val byteArrayMap = WeakHashMap<String, ByteArray>()
+        val byteArrayMap = HashMap<String, ByteArray>()
     }
     private class ZipBuilder(
         val zip: ZipOutputStream

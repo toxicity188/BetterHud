@@ -29,9 +29,10 @@ class HudTextParser(
 
     private val renderer = run {
         val loc = text.location + pixel
+        val render = text.renderScale + pixel
         val shader = HudShader(
             gui,
-            text.renderScale,
+            render,
             text.layer,
             text.outline,
             loc.opacity,
@@ -84,7 +85,7 @@ class HudTextParser(
                             val div = height.toDouble() / image.image.height
                             createAscent(HudShader(
                                 gui,
-                                text.renderScale,
+                                render,
                                 text.layer - 1,
                                 false,
                                 loc.opacity * it.location.opacity,

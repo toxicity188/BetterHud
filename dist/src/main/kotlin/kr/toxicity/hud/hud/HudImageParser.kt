@@ -22,7 +22,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
 
         val shader = HudShader(
             gui,
-            imageLayout.renderScale,
+            imageLayout.renderScale + pixel,
             imageLayout.layer,
             imageLayout.outline,
             finalPixel.opacity,

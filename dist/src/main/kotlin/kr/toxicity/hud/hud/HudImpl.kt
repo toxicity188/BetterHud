@@ -54,7 +54,7 @@ class HudImpl(
         HudAnimation(
             layout.animation.type,
             layout.animation.location.map {
-                HudElement(
+                HudParser(
                     this@HudImpl,
                     resource,
                     layout,
@@ -117,6 +117,6 @@ class HudImpl(
 
     private class HudAnimation(
         val animationType: AnimationType,
-        val elements: List<HudElement>
+        val elements: List<HudParser>
     )
 }

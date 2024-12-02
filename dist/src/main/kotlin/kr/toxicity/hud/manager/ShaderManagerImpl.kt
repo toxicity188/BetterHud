@@ -37,8 +37,15 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         add("case ${id}:")
                         if (shader.property > 0) add("    property = ${shader.property};")
                         if (shader.opacity < 1.0) add("    opacity = ${shader.opacity.toFloat()};")
-                        if (shader.renderScale.scale.x != 1.0) add("    pos.x = (pos.x - (${shader.renderScale.relativeOffset.x})) * ${shader.renderScale.scale.x} + (${shader.renderScale.relativeOffset.x});")
-                        if (shader.renderScale.scale.y != 1.0) add("    pos.y = (pos.y - (${shader.renderScale.relativeOffset.y})) * ${shader.renderScale.scale.y} + (${shader.renderScale.relativeOffset.y});")
+                        val static = shader.renderScale.scale.staticScale
+                        fun applyScale(offset: Int, scale: Double, pos: String) {
+                            if (scale != 1.0 || static) {
+                                val scaleFloat = scale.toFloat()
+                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * ui.$pos / ScreenSize.$pos" else scaleFloat} + (${offset});")
+                            }
+                        }
+                        applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")
+                        applyScale(shader.renderScale.relativeOffset.y, shader.renderScale.scale.y, "y")
                         if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
                         if (shader.gui.y != 0.0) add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
                         if (shader.layer != 0) add("    layer = ${shader.layer};")
