@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * HudPlayer quit event.
+ * player quit event.
  */
 @Getter
 public class HudPlayerQuitEvent extends PlayerEvent implements BetterHudEvent {

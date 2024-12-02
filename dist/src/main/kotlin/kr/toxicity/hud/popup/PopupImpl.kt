@@ -15,6 +15,7 @@ import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import java.util.*
@@ -24,7 +25,7 @@ class PopupImpl(
     resource: GlobalResource,
     val internalName: String,
     section: YamlObject
-) : Popup, HudConfiguration {
+) : Popup, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
     val gui = GuiLocation(section)
     val move = section["move"]?.asObject()?.let {
         EquationPairLocation(it)
@@ -38,7 +39,7 @@ class PopupImpl(
     private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it).apply {
+        PlaceholderManagerImpl.find(it, this).apply {
             if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
         }.let {
             { reason ->
@@ -59,9 +60,11 @@ class PopupImpl(
     private var imageChar = 0xCE000
 
     fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
-        newChar()
+        newChar
     }
-    fun newChar(): String = (++imageChar).parseChar()
+
+    val newChar
+        get() = (++imageChar).parseChar()
 
     private val sortType = section["sort"]?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())
@@ -90,7 +93,7 @@ class PopupImpl(
         throw RuntimeException("layouts is empty.")
     }
 
-    private val conditions = section.toConditions()
+    private val conditions = section.toConditions(this)
 
     init {
         val task = task@ { event: UpdateEvent, uuid: UUID ->

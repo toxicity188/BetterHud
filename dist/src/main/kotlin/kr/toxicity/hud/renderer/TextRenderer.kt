@@ -30,12 +30,12 @@ class TextRenderer(
     }
 
     private val followHudPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it).apply {
+        PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
 
-    private val parsedPatter = PlaceholderManagerImpl.parse(pattern)
+    private val parsedPatter = PlaceholderManagerImpl.parse(pattern, this)
 
     private val imageCharMapGet = imageCharMap
 
@@ -47,7 +47,7 @@ class TextRenderer(
                     LEGACY_SPACE_KEY -> codepoint - LEGACY_CENTER_SPACE_CODEPOINT
                     null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> (source.charWidth[codepoint]?.scaledWidth(scale) ?: imageCharMapGet[codepoint]?.scaledWidth(scale * emojiScale))?.let { c -> c + 1 }
+                        else -> (source.charWidth[codepoint]?.scaledWidth(scale) ?: imageCharMapGet[codepoint]?.scaledWidth(scale * emoji.scale))?.let { c -> c + 1 }
                     }
                     else -> null
                 }

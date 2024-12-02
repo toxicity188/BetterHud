@@ -6,6 +6,8 @@ import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
+import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toTextColor
 import net.kyori.adventure.text.format.NamedTextColor
@@ -17,6 +19,35 @@ interface ImageLayout : HudLayout<ImageElement> {
     val space: Int
     val stack: PlaceholderBuilder<*>?
     val maxStack: PlaceholderBuilder<*>?
+
+    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
+        return ImageIdentifier(
+            ShaderGroup(shader, fileName, ascent),
+            this
+        )
+    }
+
+    class ImageIdentifier(
+        val delegate: HudLayout.Identifier,
+        layout: ImageLayout
+    ) : HudLayout.Identifier by delegate {
+        val scale = layout.scale
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is ImageIdentifier) return false
+
+            if (scale != other.scale) return false
+            if (delegate != other.delegate) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = scale.hashCode()
+            result = 31 * result + delegate.hashCode()
+            return result
+        }
+    }
 
     class Impl(
         override val source: ImageElement,
@@ -41,12 +72,12 @@ interface ImageLayout : HudLayout<ImageElement> {
         override val scale: Double = yamlObject.getAsDouble("scale", 1.0)
         override val space: Int = yamlObject.getAsInt("space", 1)
         override val stack: PlaceholderBuilder<*>? = yamlObject["stack"]?.asString()?.let {
-            PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            PlaceholderManagerImpl.find(it, this).ifNull("this placeholder doesn't exist: $it").apply {
                 if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
             }
         }
         override val maxStack: PlaceholderBuilder<*>? = yamlObject["max-stack"]?.asString()?.let {
-            PlaceholderManagerImpl.find(it).ifNull("this placeholder doesn't exist: $it").apply {
+            PlaceholderManagerImpl.find(it, this).ifNull("this placeholder doesn't exist: $it").apply {
                 if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
             }
         }

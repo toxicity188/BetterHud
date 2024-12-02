@@ -5,10 +5,14 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.api.yaml.YamlElement
+import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.placeholder.Placeholder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.ifNull
 import net.kyori.adventure.audience.Audience
 import java.text.DecimalFormat
 import java.util.Collections
@@ -16,6 +20,7 @@ import java.util.function.Function
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
+
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
     private val equationPatter = Pattern.compile("(@(?<equation>(([()\\-+*./% ]|[a-zA-Z]|[0-9])+)))")
@@ -23,6 +28,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     private val doubleDecimal = DecimalFormat("#.###")
 
     private val number = PlaceholderContainerImpl(
+        "number",
         java.lang.Number::class.java,
         0.0,
         mapOf<String, HudPlaceholder<Number>>(
@@ -44,13 +50,24 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
                 }
             },
-        ), {
+        ),
+        {
             it.toDoubleOrNull()
-        }, {
+        },
+        {
             doubleDecimal.format(it)
+        },
+        mapOf(
+            "evaluate" to { n, e ->
+                TEquation(e.asString()).evaluate(n.toDouble())
+            }
+        ),
+        { a, b ->
+            DecimalFormat(b).format(a)
         }
     )
     private val string = PlaceholderContainerImpl(
+        "string",
         java.lang.String::class.java,
         "<none>",
         mapOf(
@@ -62,14 +79,41 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
                 }
             },
-        ), {
+        ),
+        {
             val matcher = stringPattern.matcher(it)
             if (matcher.find()) matcher.group("content") else null
-        }, {
+        },
+        {
             it.toString()
+        },
+        mapOf(
+            "trim" to { s, e ->
+                if (e.asBoolean()) s.trim() else s
+            },
+            "join" to { s, e ->
+                val j = e.asString()
+                buildString {
+                    val point = s.codePoints().toArray()
+                    point.forEachIndexed { index, c ->
+                        appendCodePoint(c)
+                        if (index < point.lastIndex) append(j)
+                    }
+                }
+            },
+            "replace" to { s, e ->
+                val obj = e.asObject()
+                val from = obj["from"].ifNull("Cannot find 'from' section.").asString()
+                val to = obj["to"].ifNull("Cannot find 'to' section.").asString()
+                s.replace(from, to)
+            }
+        ),
+        { a, _ ->
+            a.toString()
         }
     )
     private val boolean = PlaceholderContainerImpl(
+        "boolean",
         java.lang.Boolean::class.java,
         false,
         mapOf(
@@ -81,14 +125,24 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
                 }
             }
-        ), {
+        ),
+        {
             when (it) {
                 "true" -> true
                 "false" -> false
                 else -> null
             }
-        }, {
+        },
+        {
             it.toString()
+        },
+        mapOf(
+            "reversed" to { b, e ->
+                if (e.asBoolean()) !b else b
+            }
+        ),
+        { a, _ ->
+            a.toString()
         }
     )
 
@@ -99,22 +153,58 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     )
 
     class PlaceholderContainerImpl<T, R>(
+        val name: String,
         val clazz: Class<R>,
         val defaultValue: T,
         private val defaultMap: Map<String, HudPlaceholder<T>>,
         val parser: (String) -> T?,
-        val stringMapper: (R) -> String
+        val stringMapper: (R) -> String,
+        private val optionApplier: Map<String, (T, YamlElement) -> T> = emptyMap(),
+        private val optionStringApplier: (R, String) -> String
     ) : PlaceholderContainer<T> {
-        val map = HashMap(defaultMap)
+        private val map = HashMap(defaultMap)
 
         fun init() {
             map.clear()
             map += defaultMap
         }
 
-        fun stringValue(any: Any): String {
-            return if (clazz.isAssignableFrom(any.javaClass)) stringMapper(clazz.cast(any))
-            else any.toString()
+        fun get(key: String, option: YamlObject): HudPlaceholder<T>? {
+            val get = map[key] ?: return null
+            val appliers = option.mapNotNull { (key, element) ->
+                optionApplier[key]?.let {
+                    { value: T ->
+                        it(value, element)
+                    }
+                }
+            }
+            return if (appliers.isEmpty()) get else object : HudPlaceholder<T> by get {
+                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, T> {
+                    val func = get(args, reason)
+                    return Function {
+                        var value = func.apply(it)
+                        appliers.forEach {
+                            value = it(value)
+                        }
+                        value
+                    }
+                }
+            }
+        }
+
+        fun stringValue(option: YamlObject): (Any) -> String {
+            val applier = option[name]?.asString()?.let {
+                { value: Any ->
+                    optionStringApplier(clazz.cast(value), it)
+                }
+            } ?: { value: Any ->
+                stringMapper(clazz.cast(value))
+            }
+            return { any ->
+                if (clazz.isAssignableFrom(any.javaClass)) {
+                    applier(any)
+                } else any.toString()
+            }
         }
 
         override fun addPlaceholder(name: String, placeholder: HudPlaceholder<T>) {
@@ -124,7 +214,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         override fun getAllPlaceholders(): Map<String, HudPlaceholder<*>> = Collections.unmodifiableMap(map)
     }
 
-    fun find(target: String): PlaceholderBuilder<*> {
+    fun find(target: String, source: PlaceholderSource): PlaceholderBuilder<*> {
+        val (option, stringOption) = source.placeholderOption to source.stringPlaceholderFormat
         val equation = equationPatter.matcher(target)
         val numberMapper: (Double) -> Double = if (equation.find()) {
             TEquation(equation.group("equation")).let { mapper ->
@@ -147,7 +238,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
 
         val args = if (pattern.length > head.length + 1) pattern.substring(head.length + 1).split(',') else emptyList()
         val get = types.values.firstNotNullOfOrNull {
-            it.map[first]?.let { mapper ->
+            it.get(first, option)?.let { mapper ->
                 it to mapper
             }
         } ?: types.values.firstNotNullOfOrNull {
@@ -163,6 +254,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
         val type = types[group]
+
+        val stringMapper = type?.stringValue(stringOption) ?: get.first.stringValue(stringOption)
 
         return object : PlaceholderBuilder<Any> {
             override val clazz: Class<out Any>
@@ -186,15 +279,14 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
 
                     override fun stringValue(player: HudPlayer): String {
-                        val value = invoke(player)
-                        return type?.stringValue(value) ?: get.first.stringValue(value)
+                        return stringMapper(invoke(player))
                     }
                 }
             }
         }
     }
 
-    fun parse(target: String): (UpdateEvent) -> (HudPlayer) -> String {
+    fun parse(target: String, source: PlaceholderSource): (UpdateEvent) -> (HudPlayer) -> String {
         var skip = false
         val builder = ArrayList<(UpdateEvent) -> (HudPlayer) -> String>()
         val sb = StringBuilder()
@@ -204,7 +296,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     '/' -> skip = true
                     '[' -> {
                         val build = sb.toString()
-                        builder.add {
+                        builder += {
                             {
                                 build
                             }
@@ -215,9 +307,9 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     ']' -> {
                         val result = sb.toString()
                         sb.setLength(0)
-                        val find = find(result)
+                        val find = find(result, source)
                         runCatching {
-                            builder.add { r ->
+                            builder += { r ->
                                 (find build r).let { b ->
                                     {
                                         b.stringValue(it)
@@ -238,7 +330,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         }
         if (sb.isNotEmpty()) {
             val build = sb.toString()
-            builder.add {
+            builder += {
                 {
                     build
                 }

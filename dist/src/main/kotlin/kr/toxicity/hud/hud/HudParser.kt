@@ -9,7 +9,7 @@ import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 
-class HudElement(
+class HudParser(
     hud: HudImpl,
     resource: GlobalResource,
     private val layout: LayoutGroup,

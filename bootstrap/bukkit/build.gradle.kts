@@ -18,10 +18,10 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.SkriptLang:Skript:2.9.4")
+    compileOnly("com.github.SkriptLang:Skript:2.9.5")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.4.4")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.1.0-dev.37")
+    compileOnly("com.nexomc:nexo:0.1.0-dev.73")
     compileOnly("io.th0rgal:oraxen:1.185.0")
 }
 

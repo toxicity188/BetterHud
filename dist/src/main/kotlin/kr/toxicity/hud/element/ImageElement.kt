@@ -10,15 +10,16 @@ import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.placeholder.ConditionSource
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.util.ifNull
 
 class ImageElement(
     override val path: String,
-    val name: String,
+    override val name: String,
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
-) : HudElement, ConditionSource by ConditionSource.Impl(setting) {
+) : HudElement, ConditionSource by ConditionSource.Impl(setting), PlaceholderSource by PlaceholderSource.Impl(setting) {
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }
@@ -48,11 +49,11 @@ class ImageElement(
     }
 
     val follow = setting["follow"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it).apply {
+        PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $name: $it")
         }
     }
     val childrenMapper = setting["children-mapper"]?.asObject()?.map {
-        it.key to Conditions.parse(it.value.asObject())
+        it.key to Conditions.parse(it.value.asObject(), this)
     }
 }

@@ -89,6 +89,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var legacySerializer = LEGACY_AMPERSAND
         private set
     private var removeDefaultHotbar = false
+    var disableLegacyOffset = false
+        private set
 
     override fun start() {
     }
@@ -191,6 +193,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             key = KeyResource(yaml["namespace"]?.asString() ?: NAME_SPACE)
             minecraftJarVersion = yaml["minecraft-jar-version"]?.asString() ?: "bukkit"
             removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
+            disableLegacyOffset = yaml.getAsBoolean("disable-legacy-offset", false)
         }.onFailure { e ->
             warn(
                 "Unable to load config.yml",

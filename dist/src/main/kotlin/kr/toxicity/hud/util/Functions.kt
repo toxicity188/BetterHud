@@ -18,7 +18,12 @@ fun <R> runWithExceptionHandling(sender: Audience, message: String, block: () ->
         sender.warn(message)
         sender.warn("Reason: ${it.message ?: it.javaClass.name}")
     }
-    if (ConfigManagerImpl.debug) it.printStackTrace()
+    if (ConfigManagerImpl.debug) {
+        warn(
+            "Stack trace:",
+            it.stackTraceToString()
+        )
+    }
 }
 
 fun <T, R> T.runWithExceptionHandling(sender: Audience, message: String, block: T.() -> R) = runCatching(block).onFailure {
@@ -26,5 +31,10 @@ fun <T, R> T.runWithExceptionHandling(sender: Audience, message: String, block: 
         sender.warn(message)
         sender.warn("Reason: ${it.message ?: it.javaClass.name}")
     }
-    if (ConfigManagerImpl.debug) it.printStackTrace()
+    if (ConfigManagerImpl.debug) {
+        warn(
+            "Stack trace:",
+            it.stackTraceToString()
+        )
+    }
 }

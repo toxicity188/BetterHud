@@ -9,16 +9,16 @@ import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 
 class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
 
     private val renderer = run {
         val final = head.location + pixel
+        val render = head.renderScale + pixel
         val shader = HudShader(
             gui,
-            head.renderScale,
+            render,
             head.layer,
             head.outline,
             final.opacity,
@@ -28,7 +28,7 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
             STANDARD -> shader
             FANCY -> HudShader(
                 gui,
-                head.renderScale * 1.125,
+                render * 1.125,
                 head.layer + 1,
                 true,
                 final.opacity,
@@ -45,9 +45,8 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                 val ascent = final.y + i * head.source.pixel
                 val height = head.source.pixel
-                val shaderGroup = ShaderGroup(shader, fileName, 1.0, ascent)
-                val char = (++parent.imageChar).parseChar()
-                val mainChar = head(shaderGroup) {
+                val char = parent.newChar
+                val mainChar = head(head.identifier(shader, ascent, fileName)) {
                     parent.jsonArray?.let { array ->
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
@@ -64,11 +63,10 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 when (head.type) {
                     STANDARD -> HeadKey(mainChar, mainChar)
                     FANCY -> {
-                        val hairShaderGroup = ShaderGroup(hair, fileName, 1.0, ascent - head.source.pixel)
                         HeadKey(
                             mainChar,
-                            head(hairShaderGroup) {
-                                val twoChar = (++parent.imageChar).parseChar()
+                            head(head.identifier(hair, ascent - head.source.pixel, fileName)) {
+                                val twoChar = parent.newChar
                                 parent.jsonArray?.let { array ->
                                     createAscent(hair, ascent - head.source.pixel) { y ->
                                         array += jsonObjectOf(

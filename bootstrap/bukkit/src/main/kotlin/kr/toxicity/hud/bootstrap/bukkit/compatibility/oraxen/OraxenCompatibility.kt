@@ -2,7 +2,6 @@ package kr.toxicity.hud.bootstrap.bukkit.compatibility.oraxen
 
 import io.th0rgal.oraxen.api.events.OraxenPackGeneratedEvent
 import io.th0rgal.oraxen.utils.VirtualFile
-import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.plugin.ReloadState.*
@@ -35,10 +34,10 @@ class OraxenCompatibility : Compatibility {
     override fun start() {
         registerListener(object : Listener {
             @EventHandler
-            fun generate(event: OraxenPackGeneratedEvent) {
+            fun OraxenPackGeneratedEvent.generate() {
                 when (val state = PLUGIN.reload()) {
                     is Success -> {
-                        val output = event.output
+                        val output = output
                         state.resourcePack.forEach {
                             output.add(
                                 VirtualFile(

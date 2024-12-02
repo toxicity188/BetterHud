@@ -4,9 +4,9 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.image.enums.SplitType
+import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import kr.toxicity.hud.yaml.YamlObjectImpl
 import net.kyori.adventure.audience.Audience
@@ -19,14 +19,14 @@ object ImageManager : BetterHudManager {
     private val imageMap = HashMap<String, ImageElement>()
     private val emptySetting = YamlObjectImpl("", mutableMapOf<String, Any>())
 
-    private val imageNameComponent = ConcurrentHashMap<ShaderGroup, WidthComponent>()
+    private val imageNameComponent = ConcurrentHashMap<HudLayout.Identifier, WidthComponent>()
 
     val allImage get() = imageMap.values
 
     @Synchronized
-    fun getImage(group: ShaderGroup) = imageNameComponent[group]
+    fun getImage(group: HudLayout.Identifier) = imageNameComponent[group]
     @Synchronized
-    fun setImage(group: ShaderGroup, component: WidthComponent) {
+    fun setImage(group: HudLayout.Identifier, component: WidthComponent) {
         imageNameComponent[group] = component
     }
 

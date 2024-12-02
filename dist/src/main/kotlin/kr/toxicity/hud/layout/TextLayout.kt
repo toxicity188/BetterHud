@@ -10,6 +10,8 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.MinecraftManager
 import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.element.TextElement
+import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.text.ImageCharWidth
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
@@ -38,15 +40,60 @@ interface TextLayout : HudLayout<TextElement> {
     val numberEquation: TEquation
     val numberFormat: DecimalFormat
     val disableNumberFormat: Boolean
-    val background: HudBackground?
-    val backgroundScale: Double
-    val emojiLocation: PixelLocation
-    val emojiScale: Double
     val useLegacyFormat: Boolean
     val legacySerializer: ComponentDeserializer
     val line: Int
     val splitWidth: Int
     val lineWidth: Int
+
+    val background: BackgroundInfo
+    val emoji: EmojiInfo
+
+    data class BackgroundInfo(
+        val source: HudBackground?,
+        val scale: Double
+    )
+
+    data class EmojiInfo(
+        val location: PixelLocation,
+        val scale: Double
+    )
+
+    fun identifier(shader: HudShader, ascent: Int): HudLayout.Identifier {
+        return TextIdentifier(
+            ShaderGroup(shader, source.name, ascent),
+            this
+        )
+    }
+
+    class TextIdentifier(
+        val delegate: HudLayout.Identifier,
+        layout: TextLayout
+    ) : HudLayout.Identifier by delegate {
+        val scale = layout.scale
+        val background = layout.background
+        val emoji = layout.emoji
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is TextIdentifier) return false
+
+            if (scale != other.scale) return false
+            if (delegate != other.delegate) return false
+            if (background != other.background) return false
+            if (emoji != other.emoji) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = scale.hashCode()
+            result = 31 * result + delegate.hashCode()
+            result = 31 * result + background.hashCode()
+            result = 31 * result + emoji.hashCode()
+            return result
+        }
+    }
 
     fun startJson() = jsonArrayOf(
         jsonObjectOf(
@@ -106,16 +153,20 @@ interface TextLayout : HudLayout<TextElement> {
             DecimalFormat(it)
         } ?: ConfigManagerImpl.numberFormat
         override val disableNumberFormat: Boolean = yamlObject.getAsBoolean("disable-number-format", true)
-        override val background: HudBackground? = yamlObject["background"]?.asString()?.let {
-            BackgroundManager.getBackground(it)
-        }
-        override val backgroundScale: Double = yamlObject.getAsDouble("background-scale", scale)
-        override val emojiLocation: PixelLocation = yamlObject["emoji-pixel"]?.asObject()?.let {
-            PixelLocation(it)
-        } ?: PixelLocation.zero
-        override val emojiScale: Double = yamlObject.getAsDouble("emoji-scale", 1.0).apply {
-            if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
-        }
+        override val background: BackgroundInfo = BackgroundInfo(
+            yamlObject["background"]?.asString()?.let {
+                BackgroundManager.getBackground(it)
+            },
+            yamlObject.getAsDouble("background-scale", scale)
+        )
+        override val emoji: EmojiInfo = EmojiInfo(
+            yamlObject["emoji-pixel"]?.asObject()?.let {
+                PixelLocation(it)
+            } ?: PixelLocation.zero,
+            yamlObject.getAsDouble("emoji-scale", 1.0).apply {
+                if (this <= 0) throw RuntimeException("emoji-scale cannot be <= 0")
+            }
+        )
         override val useLegacyFormat: Boolean = yamlObject.getAsBoolean("use-legacy-format", ConfigManagerImpl.useLegacyFormat)
         override val legacySerializer: ComponentDeserializer = yamlObject["legacy-serializer"]?.asString()?.toLegacySerializer() ?: ConfigManagerImpl.legacySerializer
 

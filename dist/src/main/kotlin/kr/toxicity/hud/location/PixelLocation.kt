@@ -1,6 +1,7 @@
 package kr.toxicity.hud.location
 
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.manager.ConfigManagerImpl
 
 data class PixelLocation(val x: Int, val y: Int, val opacity: Double) : Comparable<PixelLocation> {
     companion object {
@@ -13,7 +14,9 @@ data class PixelLocation(val x: Int, val y: Int, val opacity: Double) : Comparab
             image.opacity
         }
 
-        val hotBarHeight = PixelLocation(0, -54, 1.0)
+        private val _hotBarHeight = PixelLocation(0, -54, 1.0)
+        val hotBarHeight
+            get() = if (ConfigManagerImpl.disableLegacyOffset) zero else _hotBarHeight
         val zero = PixelLocation(0, 0, 1.0)
     }
     constructor(section: YamlObject): this(

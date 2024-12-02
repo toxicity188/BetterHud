@@ -11,7 +11,6 @@ import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.renderer.ImageRenderer
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.shader.HudShader
-import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
@@ -23,7 +22,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
 
         val shader = HudShader(
             gui,
-            imageLayout.renderScale,
+            imageLayout.renderScale + pixel,
             imageLayout.layer,
             imageLayout.outline,
             finalPixel.opacity,
@@ -40,10 +39,8 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
                 val height = (pair.image.image.height.toDouble() * imageLayout.scale).roundToInt()
                 val scale = height.toDouble() / pair.image.image.height
                 val ascent = finalPixel.y.coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
-                val shaderGroup = ShaderGroup(shader, fileName, imageLayout.scale, ascent)
-
-                val component = image(shaderGroup) {
-                    val c = (++parent.imageChar).parseChar()
+                val component = image(imageLayout.identifier(shader, ascent, fileName)) {
+                    val c = parent.newChar
                     val comp = Component.text()
                         .font(parent.imageKey)
                     val finalWidth = WidthComponent(

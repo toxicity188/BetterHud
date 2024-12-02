@@ -32,12 +32,12 @@ public interface Popup extends HudObject {
     @Nullable PopupUpdater show(@NotNull UpdateEvent reason, @NotNull HudPlayer player);
 
     /**
-     * Hides popup to some hudPlayer.
-     * @param hudPlayer target HudPlayer
+     * Hides popup to some player.
+     * @param player target player
      * @return whether to success
      */
-    default boolean hide(@NotNull HudPlayer hudPlayer) {
-        var group = hudPlayer.getPopupGroupIteratorMap().remove(getGroupName());
+    default boolean hide(@NotNull HudPlayer player) {
+        var group = player.getPopupGroupIteratorMap().remove(getGroupName());
         if (group != null) {
             group.clear();
             return true;
@@ -46,7 +46,7 @@ public interface Popup extends HudObject {
 
     /**
      * Gets a last index of popup.
-     * It equals getMaxStackSize() - 1
+     * It equals getMaxStack() - 1
      * @return last index
      */
     default int getLastIndex() {

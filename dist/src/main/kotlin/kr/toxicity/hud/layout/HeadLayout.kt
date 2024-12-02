@@ -6,12 +6,18 @@ import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.player.head.HeadRenderType
 import kr.toxicity.hud.element.HeadElement
+import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toLayoutAlign
 
 interface HeadLayout : HudLayout<HeadElement> {
     val type: HeadRenderType
     val align: LayoutAlign
+
+    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
+        return ShaderGroup(shader, fileName, ascent)
+    }
 
     class Impl(
         override val source: HeadElement,

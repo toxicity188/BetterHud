@@ -7,11 +7,11 @@ import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.warn
 
 object Conditions {
-    fun parse(section: YamlObject, defaultBuilder: ConditionBuilder = ConditionBuilder.alwaysTrue): ConditionBuilder {
-        var value: ConditionBuilder = defaultBuilder
+    fun parse(section: YamlObject, source: PlaceholderSource): ConditionBuilder {
+        var value: ConditionBuilder = ConditionBuilder.alwaysTrue
         section.forEachSubConfiguration { s, yamlObject ->
             runCatching {
-                val new = parse0(yamlObject)
+                val new = parse0(yamlObject, source)
                 value = when (val gate = yamlObject["gate"]?.asString() ?: "and") {
                     "and" -> value and new
                     "or" -> value or new
@@ -30,9 +30,9 @@ object Conditions {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun parse0(section: YamlObject): ConditionBuilder {
-        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull("first value not set."))
-        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull("second value not set."))
+    private fun parse0(section: YamlObject, source: PlaceholderSource): ConditionBuilder {
+        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull("first value not set."), source)
+        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull("second value not set."), source)
         val operationValue = section["operation"]?.asString().ifNull("operation value not set")
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")

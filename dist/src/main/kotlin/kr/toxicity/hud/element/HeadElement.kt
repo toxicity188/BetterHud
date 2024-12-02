@@ -5,7 +5,7 @@ import kr.toxicity.hud.placeholder.ConditionSource
 
 class HeadElement(
     override val path: String,
-    val name: String,
+    override val name: String,
     yaml: YamlObject
 ) : HudElement, ConditionSource by ConditionSource.Impl(yaml) {
     val pixel = yaml.getAsInt("pixel", 1).coerceAtLeast(1)

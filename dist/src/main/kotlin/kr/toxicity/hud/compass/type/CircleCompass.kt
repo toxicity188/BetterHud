@@ -13,6 +13,7 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.RenderScale
 import kr.toxicity.hud.shader.ShaderProperty
@@ -30,7 +31,7 @@ class CircleCompass(
     override val path: String,
     private val internalName: String,
     section: YamlObject
-) : CompassImpl {
+) : CompassImpl, PlaceholderSource by PlaceholderSource.Impl(section) {
     companion object {
         private val defaultColorEquation = TEquation("255").run {
             ColorEquation(
@@ -68,7 +69,7 @@ class CircleCompass(
     )
     private var array: JsonArray? = JsonArray()
     private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
-    private val conditions = section.toConditions() build UpdateEvent.EMPTY
+    private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
 
 

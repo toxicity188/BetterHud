@@ -34,11 +34,11 @@ class NexoCompatibility : Compatibility {
         (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
         registerListener(object : Listener {
             @EventHandler
-            fun generate(event: NexoPrePackGenerateEvent) {
+            fun NexoPrePackGenerateEvent.generate() {
                 when (val state = PLUGIN.reload()) {
                     is Success -> {
                         state.resourcePack.forEach {
-                            event.addUnknownFile(it.key, it.value)
+                            addUnknownFile(it.key, it.value)
                         }
                         info("Successfully merged with Nexo: (${state.time} ms)")
                     }

@@ -28,7 +28,7 @@ object PackGenerator {
     private open class Builder {
         @Volatile
         var byte = 0L
-        val byteArrayMap = WeakHashMap<String, ByteArray>()
+        val byteArrayMap = HashMap<String, ByteArray>()
     }
     private class ZipBuilder(
         val zip: ZipOutputStream
@@ -40,7 +40,7 @@ object PackGenerator {
 
         fun save(packFile: PackFile) {
             val replace = packFile.path.replace('/', File.separatorChar)
-            val arr = packFile.array()
+            val arr = packFile()
             synchronized(this) {
                 byte += arr.size
                 byteArrayMap[packFile.path] = arr
@@ -105,7 +105,7 @@ object PackGenerator {
                         }
 
                         override fun invoke(p1: PackFile) {
-                            val byte = p1.array()
+                            val byte = p1()
                             synchronized(builder) {
                                 builder.byte += byte.size
                                 builder.byteArrayMap[p1.path] = byte
@@ -157,14 +157,16 @@ object PackGenerator {
                     })
                     fun addEntry(entry: ZipEntry, byte: ByteArray) {
                         synchronized(zip) {
-                            zip.byteArrayMap[entry.name] = byte
-                            zip.byte += byte.size
-                            zip.zip.putNextEntry(entry)
-                            zip.zip.write(byte)
-                            zip.zip.closeEntry()
-                            if (protection) {
-                                entry.crc = byte.size.toLong()
-                                entry.size = BigInteger(byte).mod(BigInteger.valueOf(Long.MAX_VALUE)).toLong()
+                            runWithExceptionHandling(sender, "Unable to write this file: ${entry.name}") {
+                                zip.byteArrayMap[entry.name] = byte
+                                zip.byte += byte.size
+                                zip.zip.putNextEntry(entry)
+                                zip.zip.write(byte)
+                                zip.zip.closeEntry()
+                                if (protection) {
+                                    entry.crc = byte.size.toLong()
+                                    entry.size = BigInteger(byte).mod(BigInteger.valueOf(Long.MAX_VALUE)).toLong()
+                                }
                             }
                         }
                     }
@@ -203,7 +205,7 @@ object PackGenerator {
 
                         override fun invoke(p1: PackFile) {
                             val entry = ZipEntry(p1.path)
-                            val byte = p1.array()
+                            val byte = p1()
                             addEntry(entry, byte)
                         }
                     }
