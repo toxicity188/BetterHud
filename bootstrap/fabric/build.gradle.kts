@@ -52,7 +52,7 @@ fabricModJson {
         serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl")
     )
     depends = mapOf(
-        "fabricloader" to listOf(">=${project.properties["loader_version"]}"),
+        "fabricloader" to listOf("*"),
         "minecraft" to listOf("~${project.properties["minecraft_version"]}"),
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
