@@ -175,7 +175,7 @@ fun Project.dependency(any: Any) = also {
         }
     }
 }
-fun Project.bukkit() = dependency("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
+fun Project.bukkit() = dependency("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
     .dependency("org.bstats:bstats-bukkit:$bStats")
     .dependency(rootProject.fileTree("shaded"))
 fun Project.velocity() = also {
@@ -185,7 +185,7 @@ fun Project.velocity() = also {
     it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
     it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
 }
-fun Project.folia() = dependency("io.papermc.paper:paper-api:$minecraft-R0.1-SNAPSHOT")
+fun Project.folia() = dependency("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
 fun Project.adventure() = dependency("net.kyori:adventure-api:$adventure")
     .dependency("net.kyori:adventure-text-minimessage:$adventure")
     .dependency("net.kyori:adventure-text-serializer-legacy:$adventure")
