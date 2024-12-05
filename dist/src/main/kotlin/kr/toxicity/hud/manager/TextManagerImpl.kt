@@ -97,7 +97,10 @@ object TextManagerImpl : BetterHudManager, TextManager {
             addAll(0x30A1..0x30FA)
         },
         "china" to HashSet<Int>().apply {
-            addAll(0x4E00..0x9FFF)
+            addAll(0x4E00..0x9FFF) // CJK Unified Ideographs
+            addAll(0xFF00..0xFFFE) // Fullwidth Forms
+            addAll(0x3000..0x306F) // CJK Symbols and Punctuation
+            addAll(0x2000..0x206F) // General Punctuation
         },
         "russia" to HashSet<Int>().apply {
             addAll(0x0400..0x045F)
