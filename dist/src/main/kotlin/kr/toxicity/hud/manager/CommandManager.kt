@@ -5,13 +5,11 @@ import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.CommandListener
 import kr.toxicity.command.impl.CommandMessage
-import kr.toxicity.command.SenderType
 import kr.toxicity.command.impl.annotation.Aliases
 import kr.toxicity.command.impl.annotation.Command
 import kr.toxicity.command.impl.annotation.Description
 import kr.toxicity.command.impl.annotation.Option
 import kr.toxicity.command.impl.annotation.Permission
-import kr.toxicity.command.impl.annotation.Sender
 import kr.toxicity.command.impl.annotation.Source
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
@@ -420,25 +418,37 @@ object CommandManager : BetterHudManager {
                 .permission("hud.turn")
                 .executes(object : CommandListener {
                     //Turn on
+                    private val on_no_target = library.registerKey(CommandMessage("betterhud.turn.on.message.no_target", Component.text("No target player provided.")))
                     private val on_success = library.registerKey(CommandMessage("betterhud.turn.on.message.success", Component.text("Successfully turned the HUD on.")))
                     @Command
                     @Description(key = "betterhud.turn.on.description", defaultValue = "Turns on your HUD.")
                     @Permission("hud.turn.on")
-                    @Sender(type = [SenderType.PLAYER])
-                    fun on(@Source me: HudPlayer) {
-                        me.isHudEnabled = true
+                    fun on(@Source me: BetterCommandSource, @Option target: HudPlayerStack?) {
+                        when {
+                            target != null && me.hasPermission("betterhud.turn.on.admin") -> target.forEach { p ->
+                                p.isHudEnabled = true
+                            }
+                            me is HudPlayer -> me.isHudEnabled = true
+                            else -> return on_no_target.send(me)
+                        }
                         on_success.send(me)
                     }
                     //Turn on
 
                     //Turn off
+                    private val off_no_target = library.registerKey(CommandMessage("betterhud.turn.off.message.no_target", Component.text("No target player provided.")))
                     private val off_success = library.registerKey(CommandMessage("betterhud.turn.off.message.success", Component.text("Successfully turned the HUD off.")))
                     @Command
                     @Description(key = "betterhud.turn.off.description", defaultValue = "Turns off your HUD.")
                     @Permission("hud.turn.off")
-                    @Sender(type = [SenderType.PLAYER])
-                    fun off(@Source me: HudPlayer) {
-                        me.isHudEnabled = false
+                    fun off(@Source me: BetterCommandSource, @Option target: HudPlayerStack?) {
+                        when {
+                            target != null && me.hasPermission("betterhud.turn.off.admin") -> target.forEach { p ->
+                                p.isHudEnabled = false
+                            }
+                            me is HudPlayer -> me.isHudEnabled = false
+                            else -> return off_no_target.send(me)
+                        }
                         off_success.send(me)
                     }
                     //Turn off
