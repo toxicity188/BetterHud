@@ -14,13 +14,13 @@ buildscript {
 
 plugins {
     `java-library`
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "1.7.4" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.6" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0-Beta"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
-    id("fabric-loom") version "1.8-SNAPSHOT" apply false
+    id("fabric-loom") version "1.9-SNAPSHOT" apply false
     id("com.modrinth.minotaur") version "2.+"
     id("com.github.ben-manes.versions") version "0.51.0"
 }

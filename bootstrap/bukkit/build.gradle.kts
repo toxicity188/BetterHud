@@ -5,7 +5,7 @@ repositories {
     maven("https://repo.alessiodp.com/releases/") //Parties
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
     maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
-    maven("https://repo.nexomc.com/snapshots/") //Nexo
+    maven("https://repo.nexomc.com/releases/") //Nexo
     maven("https://repo.oraxen.com/releases") //Oraxen
 }
 
@@ -21,7 +21,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.9.5")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.4.4")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.1.0-dev.73")
+    compileOnly("com.nexomc:nexo:0.2.0")
     compileOnly("io.th0rgal:oraxen:1.185.0")
 }
 

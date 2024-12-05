@@ -12,8 +12,13 @@ import kr.toxicity.hud.text.HudTextData
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.minimessage.Context
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import java.util.regex.Pattern
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -26,7 +31,9 @@ class TextRenderer(
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
-        private val imagePattern = Pattern.compile("<(?<type>(image|space)):(?<name>(([a-zA-Z]|[0-9]|_|-)+))>")
+        private val emptyTag by lazy {
+            Tag.selfClosingInserting(Component.empty())
+        }
     }
 
     private val followHudPlayer = follow?.let {
@@ -133,23 +140,39 @@ class TextRenderer(
         }
     }
 
+    private val miniMessage = MiniMessage.builder()
+        .tags(TagResolver.resolver(
+            TagResolver.standard(),
+            TagResolver.resolver(setOf(
+                "image",
+                "img"
+            )) { queue: ArgumentQueue, _: Context ->
+                queue.peek()?.value()?.let { value ->
+                    data.imageCodepoint[value]?.let { Tag.selfClosingInserting(Component.text(it.parseChar())) }
+                } ?: emptyTag
+            },
+            TagResolver.resolver(setOf(
+                "space",
+                "shift"
+            )) { queue: ArgumentQueue, _: Context ->
+                queue.peek()?.value()?.toIntOrNull()?.let { value ->
+                    Tag.selfClosingInserting(value.toSpaceComponent().finalizeFont().component)
+                } ?: emptyTag
+            }
+        ))
+        .apply {
+            if (color.value() != NamedTextColor.WHITE.value()) postProcessor {
+                it.color(color)
+            }
+        }
+        .build()
+
     private fun String.parseToComponent(): Component {
         var targetString = (if (useLegacyFormat) legacySerializer(this) else Component.text(this))
-            .color(color)
-            .replaceText(TextReplacementConfig.builder()
-                .match(imagePattern)
-                .replacement { r, _ ->
-                    when (r.group(1)) {
-                        "image" -> data.imageCodepoint[r.group(3)]?.let { Component.text(it.parseChar()) } ?: Component.empty()
-                        "space" -> r.group(3).toIntOrNull()?.toSpaceComponent()?.finalizeFont()?.component ?: Component.empty()
-                        else -> Component.empty()
-                    }
-                }
-                .build())
             .replaceText(TextReplacementConfig.builder()
                 .match(allPattern)
                 .replacement { r, _ ->
-                    MiniMessage.miniMessage().deserialize(r.group())
+                    miniMessage.deserialize(r.group())
                 }
                 .build())
         if (!disableNumberFormat) {
