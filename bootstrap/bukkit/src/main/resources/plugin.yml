@@ -26,42 +26,44 @@ softdepend:
   - Nexo
   - Oraxen
 permissions:
-  hud.help:
+  betterhud.help:
     description: Access to help command.
     default: op
-  hud.reload:
+  betterhud.reload:
     description: Access to reload command.
     default: op
-  hud.hud:
+  betterhud.hud:
     description: Access to hud command.
     default: op
     children:
-      hud.hud.add: true
-      hud.hud.remove: true
-  hud.compass:
+      betterhud.hud.add: true
+      betterhud.hud.remove: true
+  betterhud.compass:
     description: Access to compass command.
     default: op
     children:
-      hud.compass.add: true
-      hud.compass.remove: true
-  hud.turn:
+      betterhud.compass.add: true
+      betterhud.compass.remove: true
+  betterhud.turn:
     description: Access to turn command.
     default: op
     children:
-      hud.turn.on: true
-      hud.turn.off: true
-  hud.pointer:
+      betterhud.turn.on: true
+      betterhud.turn.off: true
+      betterhud.turn.on.admin: true
+      betterhud.turn.off.admin: true
+  betterhud.pointer:
     description: Access to pointer command.
     default: op
     children:
-      hud.pointer.set: true
-      hud.pointer.clear: true
-      hud.pointer.remove: true
-  hud.popup:
+      betterhud.pointer.set: true
+      betterhud.pointer.clear: true
+      betterhud.pointer.remove: true
+  betterhud.popup:
     description: Access to popup command.
     default: op
     children:
-      hud.popup.add: true
-      hud.popup.remove: true
-      hud.popup.show: true
-      hud.popup.hide: true
+      betterhud.popup.add: true
+      betterhud.popup.remove: true
+      betterhud.popup.show: true
+      betterhud.popup.hide: true
