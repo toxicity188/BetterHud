@@ -23,9 +23,9 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(including Folia) 1.18.2-1.21.3
+- Bukkit(including Folia) 1.18.2-1.21.4
 - Velocity 3.3-3.4
-- Fabric server 1.21.3
+- Fabric server 1.21.4
 
 ### Library
 - [kotlin stdlib](https://github.com/JetBrains/kotlin): Implements better functional programming.
@@ -54,6 +54,21 @@ Requires Java 17, 21 Eclipse Adoptium.
 - Build dokka-based docs jar: ./gradlew dokkaJar
 
 ### API
+Get from maven central
+``` kotlin
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("net.kyori:adventure-api:VERSION") //Adventure api
+    compileOnly("io.github.toxicity188:BetterHud-standard-api:VERSION") //Standard api
+    compileOnly("io.github.toxicity188:BetterHud-bukkit-api:VERSION") //Platform api
+    compileOnly("io.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
+}
+```
+
+Get from Jitpack  
 [![](https://jitpack.io/v/toxicity188/BetterHud.svg)](https://jitpack.io/#toxicity188/BetterHud)
 ``` kotlin
 repositories {
@@ -62,9 +77,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:VERSION") //Adventure api.
-    compileOnly("com.github.toxicity188:BetterHud:VERSION") //BetterHud.
-    compileOnly("com.github.toxicity188:BetterCommand:VERSION") //BetterCommand library.
+    compileOnly("net.kyori:adventure-api:VERSION") //Adventure api
+    compileOnly("com.github.toxicity188:BetterHud:VERSION") //BetterHud
+    compileOnly("com.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
 }
 ```
 

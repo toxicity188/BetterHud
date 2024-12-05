@@ -16,7 +16,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "1.7.4" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.6" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0-Beta"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
@@ -59,7 +59,8 @@ val supportedMinecraftVersions = listOf(
     "1.21",
     "1.21.1",
     "1.21.2",
-    "1.21.3"
+    "1.21.3",
+    "1.21.4"
 )
 val supportedVelocityVersions = listOf(
     "3.3",
@@ -72,7 +73,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.9.2" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
+    version = "1.10" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -153,6 +154,7 @@ val currentNmsVersion = listOf(
     "v1_20_R4",
     "v1_21_R1",
     "v1_21_R2",
+    "v1_21_R3",
 ).map {
     project("nms:$it")
 }
@@ -175,7 +177,7 @@ fun Project.dependency(any: Any) = also {
         }
     }
 }
-fun Project.bukkit() = dependency("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
+fun Project.bukkit() = dependency("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPSHOT")
     .dependency("org.bstats:bstats-bukkit:$bStats")
     .dependency(rootProject.fileTree("shaded"))
 fun Project.velocity() = also {
@@ -185,7 +187,7 @@ fun Project.velocity() = also {
     it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
     it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
 }
-fun Project.folia() = dependency("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+fun Project.folia() = dependency("io.papermc.paper:paper-api:$minecraft-R0.1-SNAPSHOT")
 fun Project.adventure() = dependency("net.kyori:adventure-api:$adventure")
     .dependency("net.kyori:adventure-text-minimessage:$adventure")
     .dependency("net.kyori:adventure-text-serializer-legacy:$adventure")
