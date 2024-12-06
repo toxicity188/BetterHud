@@ -106,17 +106,6 @@ interface TextLayout : HudLayout<TextElement> {
     )
 
     val imageCharMap: Map<Int, ImageCharWidth>
-        get() = run {
-            val map = source.imageCharWidth.toMutableMap()
-            var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size
-            val getter = {
-                ++baseValue
-            }
-            emojiProviderMap.forEach {
-                map += it(this@TextLayout, getter)
-            }
-            map
-        }
 
     class Impl(
         s: String,
@@ -142,7 +131,7 @@ interface TextLayout : HudLayout<TextElement> {
 
         override val pattern: String = yamlObject["pattern"]?.asString().ifNull("pattern value not set: $s")
         override val scale: Double = yamlObject.getAsDouble("scale", 1.0)
-        override val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
+        override val space: Int = yamlObject.getAsInt("space", 0)
         override val align: LayoutAlign = yamlObject["align"]?.asString().toLayoutAlign()
         override val lineAlign: LayoutAlign = yamlObject["line-align"]?.asString().toLayoutAlign()
         override val color: TextColor = yamlObject["color"]?.asString()?.toTextColor() ?: NamedTextColor.WHITE
@@ -177,5 +166,16 @@ interface TextLayout : HudLayout<TextElement> {
             if (this < 1) throw RuntimeException("split-width cannot be < 1: $s")
         }
         override val lineWidth = yamlObject.getAsInt("line-width", 10)
+        override val imageCharMap: Map<Int, ImageCharWidth> = run {
+            val map = source.imageCharWidth.toMutableMap()
+            var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size
+            val getter = {
+                ++baseValue
+            }
+            emojiProviderMap.forEach {
+                map += it(this, getter)
+            }
+            map
+        }
     }
 }
