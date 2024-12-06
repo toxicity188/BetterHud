@@ -20,6 +20,7 @@ uniform int FogShape;
 uniform vec3 Light0_Direction;
 uniform vec3 Light1_Direction;
 uniform vec2 ScreenSize;
+uniform vec3 ModelOffset;
 
 out float vertexDistance;
 out vec4 vertexColor;
