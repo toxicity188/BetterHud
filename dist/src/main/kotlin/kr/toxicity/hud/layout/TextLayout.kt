@@ -131,7 +131,7 @@ interface TextLayout : HudLayout<TextElement> {
 
         override val pattern: String = yamlObject["pattern"]?.asString().ifNull("pattern value not set: $s")
         override val scale: Double = yamlObject.getAsDouble("scale", 1.0)
-        override val space: Int = yamlObject.getAsInt("space", 0).coerceAtLeast(0)
+        override val space: Int = yamlObject.getAsInt("space", 0)
         override val align: LayoutAlign = yamlObject["align"]?.asString().toLayoutAlign()
         override val lineAlign: LayoutAlign = yamlObject["line-align"]?.asString().toLayoutAlign()
         override val color: TextColor = yamlObject["color"]?.asString()?.toTextColor() ?: NamedTextColor.WHITE
