@@ -59,7 +59,8 @@ val supportedMinecraftVersions = listOf(
     "1.21",
     "1.21.1",
     "1.21.2",
-    "1.21.3"
+    "1.21.3",
+    "1.21.4"
 )
 val supportedVelocityVersions = listOf(
     "3.3",
@@ -153,6 +154,7 @@ val currentNmsVersion = listOf(
     "v1_20_R4",
     "v1_21_R1",
     "v1_21_R2",
+    "v1_21_R3",
 ).map {
     project("nms:$it")
 }
