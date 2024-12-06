@@ -28,7 +28,7 @@ dependencies {
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation(include("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0")!!)
+    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0")
     modImplementation(include("net.kyori:adventure-platform-fabric:6.1.0")!!)
 }
 
