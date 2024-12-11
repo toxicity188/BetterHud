@@ -42,7 +42,7 @@ class CircleCompass(
         }
     }
     private var resourceRef: GlobalResource? = resource
-    private val length = section.getAsInt("length", 20).coerceAtLeast(20).coerceAtMost(360)
+    private val length = section.getAsInt("length", 10).coerceAtLeast(20).coerceAtMost(360)
     private val encode = "compass_$internalName".encodeKey()
     private val key = createAdventureKey(encode)
     private var center = 0xC0000

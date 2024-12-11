@@ -18,7 +18,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 class NexoCompatibility : Compatibility {
-    override val website: String = "https://www.spigotmc.org/resources/72448/"
+    override val website: String = "https://www.spigotmc.org/resources/121103/"
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>

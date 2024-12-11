@@ -15,6 +15,7 @@ uniform mat4 ProjMat;
 uniform int FogShape;
 uniform vec2 ScreenSize;
 uniform float GameTime;
+uniform vec3 ChunkOffset;
 
 out float vertexDistance;
 out vec4 vertexColor;

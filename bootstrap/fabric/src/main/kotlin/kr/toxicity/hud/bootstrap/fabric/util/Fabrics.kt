@@ -20,10 +20,6 @@ val HudPlayer.fabricPlayer
     get() = handle() as ServerPlayer
 
 val ServerPlayer.armor
-    get(): Double {
-        return attributes.getInstance(Attributes.ARMOR)?.modifiers?.sumOf { modifier ->
-            modifier.amount
-        } ?: 0.0
-    }
+    get(): Double = attributes.getValue(Attributes.ARMOR)
 
 fun ServerPlayer.hasPermission(perm: String) = PERMISSION_GETTER(this, perm)
