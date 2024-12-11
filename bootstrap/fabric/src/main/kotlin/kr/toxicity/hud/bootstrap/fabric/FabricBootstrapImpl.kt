@@ -86,10 +86,16 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private var latestVersion: String? = null
 
+    var skipInitialReload = false
+
     override fun onInitializeServer() {
-        ServerLifecycleEvents.SERVER_STARTED.register {
+        ServerLifecycleEvents.SERVER_STARTING.register {
             server = it
-            dataFolder = FabricLoader.getInstance().gameDir.resolve("mods").resolve("BetterHud").toFile()
+            dataFolder = FabricLoader.getInstance()
+                .gameDir
+                .resolve("config")
+                .resolve("betterhud")
+                .toFile()
             version = FabricLoader.getInstance().getModContainer(MOD_ID).map { c ->
                 c.metadata.version.friendlyString
             }.orElse("unknown")
@@ -118,8 +124,10 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             core.start()
             ModuleManager.start()
             CompatibilityManager.start()
+        }
+        ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                core.reload()
+                if (!skipInitialReload) core.reload()
                 logger.info("Mod enabled.")
                 if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
                 else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {

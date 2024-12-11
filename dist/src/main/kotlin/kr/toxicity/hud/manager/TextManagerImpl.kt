@@ -177,6 +177,29 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
     fun translate(locale: String, key: String) = translatableString[locale.uppercase()]?.get(key)
 
+    private fun createFont(dir: File?, scale: Int, useUnifont: Boolean) = if (useUnifont) {
+        JavaBitmapProvider((dir?.inputStream()?.buffered()?.use {
+            runCatching {
+                Font.createFont(Font.TRUETYPE_FONT, it)
+            }.getOrElse { e ->
+                warn(
+                    "Unable to load this font: ${dir.path}",
+                    "",
+                    "If you're using Ubuntu, try this command:",
+                    "apt install fontconfig"
+                )
+                throw e
+            }
+        } ?: BufferedImage(
+            1,
+            1,
+            BufferedImage.TYPE_INT_ARGB
+        ).createGraphics().font).deriveFont(scale.toFloat()))
+    } else {
+        UnifontBitmapProvider(scale)
+    }
+
+
     override fun reload(sender: Audience, resource: GlobalResource) {
         synchronized(this) {
             fontIndex = 0
@@ -201,17 +224,11 @@ object TextManagerImpl : BetterHudManager, TextManager {
         val configHeight = fontConfig.getAsInt("height", 9)
         val configAscent = fontConfig.getAsInt("ascent", 8).coerceAtMost(configHeight)
 
-        val defaultProvider = if (!fontConfig.getAsBoolean("use-unifont", false)) {
-            JavaBitmapProvider(File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).run {
-                (if (exists()) runCatching {
-                    inputStream().buffered().use {
-                        Font.createFont(Font.TRUETYPE_FONT, it)
-                    }
-                }.getOrNull() else null) ?: BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().font
-            }.deriveFont(configScale.toFloat()))
-        } else {
-            UnifontBitmapProvider(configScale)
-        }
+        val defaultProvider = createFont(
+            File(DATA_FOLDER, ConfigManagerImpl.defaultFontName).takeIf { it.exists() },
+            configScale,
+            fontConfig.getAsBoolean("use-unifont", false)
+        )
         val parseDefault = parseTTFFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
         } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)
@@ -238,17 +255,11 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 }
                 val scale = section.getAsInt("scale", 16)
 
-                val provider = if (!section.getAsBoolean("use-unifont", false)) {
-                    JavaBitmapProvider((fontDir?.inputStream()?.buffered()?.use {
-                        Font.createFont(Font.TRUETYPE_FONT, it)
-                    } ?: BufferedImage(
-                        1,
-                        1,
-                        BufferedImage.TYPE_INT_ARGB
-                    ).createGraphics().font).deriveFont(scale.toFloat()))
-                } else {
-                    UnifontBitmapProvider(scale)
-                }
+                val provider = createFont(
+                    fontDir,
+                    scale,
+                    section.getAsBoolean("use-unifont", false)
+                )
 
                 textMap.putSync("text", s) {
                     when (section.getAsString("type", "ttf").lowercase()) {

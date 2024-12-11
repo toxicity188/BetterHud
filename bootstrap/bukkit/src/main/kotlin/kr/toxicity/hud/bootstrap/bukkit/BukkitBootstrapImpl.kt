@@ -164,7 +164,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun core(): BetterHud = core
     override fun version(): String = description.version
 
-    @Volatile
     var skipInitialReload = false
 
     override fun onLoad() {

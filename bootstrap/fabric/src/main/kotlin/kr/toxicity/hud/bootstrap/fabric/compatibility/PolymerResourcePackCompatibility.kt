@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
@@ -28,6 +29,7 @@ class PolymerResourcePackCompatibility : Compatibility {
         get() = mapOf()
 
     override fun start() {
+        (PLUGIN.bootstrap() as FabricBootstrapImpl).skipInitialReload = true
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register { builder ->
             when (val state = PLUGIN.reload()) {
                 is Success -> {
