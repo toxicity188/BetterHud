@@ -1,6 +1,8 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.nexo
 
 import com.nexomc.nexo.api.events.resourcepack.NexoPrePackGenerateEvent
+import com.nexomc.nexo.configs.Settings
+import com.nexomc.nexo.pack.server.PackServerType
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.plugin.ReloadState.*
@@ -31,7 +33,7 @@ class NexoCompatibility : Compatibility {
         get() = mapOf()
 
     override fun start() {
-        (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
+        if (Settings.PACK_SERVER_TYPE.value != PackServerType.NONE.name) (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
         registerListener(object : Listener {
             @EventHandler
             fun NexoPrePackGenerateEvent.generate() {

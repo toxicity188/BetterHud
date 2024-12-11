@@ -2,6 +2,7 @@ package kr.toxicity.hud.bootstrap.fabric.manager
 
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.bootstrap.fabric.compatibility.Compatibility
+import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerAutoHostCompatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerResourcePackCompatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.TextPlaceholderAPICompatibility
 import kr.toxicity.hud.util.CONSOLE
@@ -18,6 +19,9 @@ object CompatibilityManager {
         },
         "polymer-resource-pack" to {
             PolymerResourcePackCompatibility()
+        },
+        "polymer-autohost" to {
+            PolymerAutoHostCompatibility()
         }
     )
 
