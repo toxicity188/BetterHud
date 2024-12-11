@@ -17,6 +17,7 @@ import net.kyori.adventure.key.Key
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 import java.util.jar.JarFile
@@ -82,16 +83,11 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         }
     }
 
-    @Volatile
-    private var onReload = false
+    private val onReload = AtomicBoolean()
 
     override fun reload(sender: Audience): ReloadState {
-        synchronized(this) {
-            if (onReload) {
-                return ReloadState.ON_RELOAD
-            }
-            onReload = true
-        }
+        if (onReload.get()) return ReloadState.ON_RELOAD
+        onReload.set(true)
         val time = System.currentTimeMillis()
         val result = CompletableFuture.supplyAsync {
             reloadStartTask.forEach {
@@ -117,9 +113,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
             }
             result
         }.join()
-        synchronized(this) {
-            onReload = false
-        }
+        onReload.set(false)
         return result
     }
 
@@ -178,7 +172,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     override fun getConfigManager(): ConfigManager = ConfigManagerImpl
     override fun getPlayerManager(): PlayerManager = PlayerManagerImpl
     override fun getTextManager(): TextManager = TextManagerImpl
-    override fun isOnReload(): Boolean = onReload
+    override fun isOnReload(): Boolean = onReload.get()
     override fun getDefaultKey(): Key = DEFAULT_KEY
     override fun translate(locale: String, key: String): String? = TextManagerImpl.translate(locale, key)
 }

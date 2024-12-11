@@ -1,6 +1,7 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.oraxen
 
 import io.th0rgal.oraxen.api.events.OraxenPackGeneratedEvent
+import io.th0rgal.oraxen.config.Settings
 import io.th0rgal.oraxen.utils.VirtualFile
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -8,8 +9,10 @@ import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
+import kr.toxicity.hud.util.BOOTSTRAP
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
@@ -32,6 +35,7 @@ class OraxenCompatibility : Compatibility {
         get() = mapOf()
 
     override fun start() {
+        if (Settings.UPLOAD.toBool()) (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
         registerListener(object : Listener {
             @EventHandler
             fun OraxenPackGeneratedEvent.generate() {

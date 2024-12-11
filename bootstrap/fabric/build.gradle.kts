@@ -22,6 +22,7 @@ dependencies {
     })
     //Other mod dependency
     modCompileOnly("eu.pb4:polymer-resource-pack:0.11.1+1.21.4")
+    modCompileOnly("eu.pb4:polymer-autohost:0.11.1+1.21.4")
     modCompileOnly("eu.pb4:placeholder-api:2.5.1+1.21.3")
     modCompileOnly("net.luckperms:api:5.4")
 
@@ -61,6 +62,7 @@ fabricModJson {
     suggests = mapOf(
         "luckperms" to listOf("*"),
         "polymer-resource-pack" to listOf("*"),
+        "polymer-autohost" to listOf("*"),
         "placeholder-api" to listOf("*")
     )
 }
