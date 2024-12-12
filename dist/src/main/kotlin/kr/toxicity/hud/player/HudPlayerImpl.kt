@@ -82,6 +82,8 @@ abstract class HudPlayerImpl : HudPlayer {
     final override fun setHudEnabled(toEnable: Boolean) {
         enabled = toEnable
     }
+
+    @Synchronized
     final override fun save() {
         val current = DatabaseManagerImpl.currentDatabase
         if (!current.isClosed) current.save(this)
@@ -89,6 +91,7 @@ abstract class HudPlayerImpl : HudPlayer {
 
     protected abstract fun updatePlaceholder()
 
+    @Synchronized
     final override fun update() {
         updatePlaceholder()
         tick++
@@ -133,6 +136,7 @@ abstract class HudPlayerImpl : HudPlayer {
         } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
     }
 
+    @Synchronized
     final override fun resetElements() {
         val popupNames = popups.filter {
             !it.isDefault
@@ -170,6 +174,7 @@ abstract class HudPlayerImpl : HudPlayer {
         }
     }
 
+    @Synchronized
     final override fun cancel() {
         popupGroup.forEach {
             it.value.clear()
