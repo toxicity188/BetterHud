@@ -1,37 +1,17 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.manager.EncodeManager
 
-fun String.encodeFile(): String {
+fun String.encodeFile(namespace: EncodeManager.EncodeNamespace): String {
     val split = split('.')
     if (split.size != 2) throw RuntimeException("Invaild file name: $this")
-    return "${split[0].encodeKey()}.${split[1]}"
+    return "${split[0].encodeKey(namespace)}.${split[1]}"
 }
 fun String.decodeFile(): String {
     val split = split('.')
     if (split.size != 2) throw RuntimeException("Invaild file name: $this")
     return "${split[0].decodeKey()}.${split[1]}"
-}
-
-fun String.encodeKey(): String {
-    return if (ConfigManagerImpl.resourcePackObfuscation) {
-        val sb = StringBuilder()
-        fun Int.encode(): Int {
-            val and = inv() and 0xF
-            return (and + 3) % (0xF + 1)
-        }
-
-        fun append(int: Int) {
-            sb.append(Character.forDigit(int, 16))
-        }
-        forEach {
-            if (it.code > 0xFF) throw RuntimeException("Invalid name: $this. you must use ([a-zA-Z]|_).")
-            val utf8Char = it.code and 0xFF
-            append((utf8Char shr 4).encode())
-            append(utf8Char.encode())
-        }
-        sb.toString().reversed()
-    } else this
 }
 
 fun String.decodeKey(): String {
@@ -55,3 +35,5 @@ fun String.decodeKey(): String {
         return sb.toString()
     } else this
 }
+
+fun String.encodeKey(namespace: EncodeManager.EncodeNamespace) = if (ConfigManagerImpl.resourcePackObfuscation) EncodeManager.generateKey(namespace, this) else this

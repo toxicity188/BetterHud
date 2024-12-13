@@ -59,6 +59,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
             ShaderManagerImpl,
             PlayerManagerImpl,
+            EncodeManager,
         )
     }
 

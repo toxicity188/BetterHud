@@ -13,6 +13,7 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.RenderScale
@@ -43,7 +44,7 @@ class CircleCompass(
     }
     private var resourceRef: GlobalResource? = resource
     private val length = section.getAsInt("length", 10).coerceAtLeast(20).coerceAtMost(360)
-    private val encode = "compass_$internalName".encodeKey()
+    private val encode = "compass_$internalName".encodeKey(EncodeManager.EncodeNamespace.FONT)
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
     private val applyOpacity = section.getAsBoolean("apply-opacity", false)
@@ -91,7 +92,7 @@ class CircleCompass(
 
     private fun getKey(imageName: String, scaleMultiplier: Double, color: TextColor, image: BufferedImage, x: Int, y: Int): CompassComponent {
         val char = center++.parseChar()
-        val nameEncoded = imageName.encodeKey()
+        val nameEncoded = imageName.encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
         val maxHeight = (image.height.toDouble() * scale).roundToInt()
         val newHeight = (image.height.toDouble() * scale * scaleMultiplier).roundToInt()
         val div = newHeight.toDouble() / image.height.toDouble()

@@ -14,6 +14,7 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -30,7 +31,7 @@ class HudImpl(
     val newChar
         get() = (++imageChar).parseChar()
 
-    private val imageEncoded = "hud_${internalName}_image".encodeKey()
+    private val imageEncoded = "hud_${internalName}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
     private val spaces = HashMap<Int, String>()

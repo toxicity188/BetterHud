@@ -13,7 +13,7 @@ val BOOTSTRAP
 
 const val NAME_SPACE = BetterHud.DEFAULT_NAMESPACE
 val NAME_SPACE_ENCODED
-    get() = ConfigManagerImpl.key.encodedNamespace
+    get() = ConfigManagerImpl.key.namespace
 
 val DATA_FOLDER
     get() = BOOTSTRAP.dataFolder().apply {

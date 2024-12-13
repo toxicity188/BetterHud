@@ -52,7 +52,7 @@ class PopupImpl(
         }
     }
 
-    private val imageEncoded = "popup_${name}_image".encodeKey()
+    private val imageEncoded = "popup_${name}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
@@ -96,7 +96,7 @@ class PopupImpl(
     private val conditions = section.toConditions(this)
 
     init {
-        val task = task@ { event: UpdateEvent, uuid: UUID ->
+        val task = { event: UpdateEvent, uuid: UUID ->
             PlayerManagerImpl.getHudPlayer(uuid)?.let { hudPlayer ->
                 show(event, hudPlayer)
             }

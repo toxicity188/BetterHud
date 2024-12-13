@@ -9,6 +9,7 @@ import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.resource.GlobalResource
@@ -38,9 +39,12 @@ class HudTextParser(
             loc.opacity,
             text.property
         )
-        val imageCodepointMap = text.imageCharMap.map {
-            it.value.name to it.key
-        }.toMap()
+        val scaledMap = text.source.charWidth.entries.associate { (k, v) ->
+            k to v * text.scale
+        }
+        val scaledImageMap = text.imageCharMap.entries.associate { (k, v) ->
+            k to v * text.scale * text.emoji.scale
+        }
         val index2 = ++parent.textIndex
         val keys = (0..<text.line).map { lineIndex ->
             val yAxis = (loc.y + lineIndex * text.lineWidth).coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
@@ -57,18 +61,17 @@ class HudTextParser(
                         )
                     }
                 }
-                var textIndex = TEXT_IMAGE_START_CODEPOINT + text.imageCharMap.size
-                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey()
+                var textIndex = TEXT_IMAGE_START_CODEPOINT + scaledImageMap.size
+                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                 val key = createAdventureKey(textEncoded)
-                text.imageCharMap.forEach {
-                    val height = (it.value.height.toDouble() * text.scale * text.emoji.scale * it.value.scale).roundToInt()
-                    createAscent(shader, loc.y + it.value.location.y + lineIndex * text.lineWidth) { y ->
+                scaledImageMap.forEach { (k, v) ->
+                    createAscent(shader, loc.y + v.location.y + lineIndex * text.lineWidth + v.ascent) { y ->
                         array += jsonObjectOf(
                             "type" to "bitmap",
-                            "file" to it.value.fileName,
+                            "file" to v.fileName,
                             "ascent" to y,
-                            "height" to height,
-                            "chars" to jsonArrayOf(it.key.parseChar())
+                            "height" to v.normalizedHeight,
+                            "chars" to jsonArrayOf(k.parseChar())
                         )
                     }
                 }
@@ -105,9 +108,9 @@ class HudTextParser(
                         }
                         BackgroundLayout(
                             it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey()),
-                            getString(it.right, "background_${it.name}_right".encodeKey()),
-                            getString(it.body, "background_${it.name}_body".encodeKey())
+                            getString(it.left, "background_${it.name}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.right, "background_${it.name}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.body, "background_${it.name}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
                         )
                     }
                 )
@@ -117,7 +120,14 @@ class HudTextParser(
             text,
             HudTextData(
                 keys,
-                imageCodepointMap,
+                scaledMap.entries.associate { (k, v) ->
+                    k to v.normalizedWidth
+                } + scaledImageMap.entries.associate { (k, v) ->
+                    k to v.normalizedWidth
+                },
+                scaledImageMap.map {
+                    it.value.name to it.key
+                }.toMap(),
                 text.splitWidth,
             ),
             loc.x

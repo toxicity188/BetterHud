@@ -44,8 +44,6 @@ class TextRenderer(
 
     private val parsedPatter = PlaceholderManagerImpl.parse(pattern, this)
 
-    private val imageCharMapGet = imageCharMap
-
     private val widthViewer = ValueViewer<Pair<Style, Int>, Int>()
         .addFunction(
             { (style, codepoint) ->
@@ -54,7 +52,7 @@ class TextRenderer(
                     LEGACY_SPACE_KEY -> codepoint - LEGACY_CENTER_SPACE_CODEPOINT
                     null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> (source.charWidth[codepoint]?.scaledWidth(scale) ?: imageCharMapGet[codepoint]?.scaledWidth(scale * emoji.scale))?.let { c -> c + 1 }
+                        else -> data.codepoint[codepoint]?.let { c -> c + 1 }
                     }
                     else -> null
                 }

@@ -12,7 +12,7 @@ import kr.toxicity.hud.manager.TextManagerImpl
 import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
-import kr.toxicity.hud.text.ImageCharWidth
+import kr.toxicity.hud.text.ImageTextScale
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -21,7 +21,7 @@ import java.text.DecimalFormat
 interface TextLayout : HudLayout<TextElement> {
 
     companion object {
-        private fun interface EmojiProvider : (TextLayout, () -> Int) -> Map<Int, ImageCharWidth>
+        private fun interface EmojiProvider : (TextLayout, () -> Int) -> Map<Int, ImageTextScale>
         private val emojiProviderMap: List<EmojiProvider> = listOf(
             EmojiProvider { layout, getter ->
                 if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
@@ -105,7 +105,7 @@ interface TextLayout : HudLayout<TextElement> {
         )
     )
 
-    val imageCharMap: Map<Int, ImageCharWidth>
+    val imageCharMap: Map<Int, ImageTextScale>
 
     class Impl(
         s: String,
@@ -166,8 +166,8 @@ interface TextLayout : HudLayout<TextElement> {
             if (this < 1) throw RuntimeException("split-width cannot be < 1: $s")
         }
         override val lineWidth = yamlObject.getAsInt("line-width", 10)
-        override val imageCharMap: Map<Int, ImageCharWidth> = run {
-            val map = source.imageCharWidth.toMutableMap()
+        override val imageCharMap: Map<Int, ImageTextScale> = run {
+            val map = source.imageTextScale.toMutableMap()
             var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size
             val getter = {
                 ++baseValue

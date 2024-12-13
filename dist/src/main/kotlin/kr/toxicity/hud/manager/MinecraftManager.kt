@@ -2,7 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.text.ImageCharWidth
+import kr.toxicity.hud.text.ImageTextScale
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.io.File
@@ -20,8 +20,8 @@ object MinecraftManager : BetterHudManager {
 
     private val assetsMap = Collections.synchronizedSet(HashSet<MinecraftAsset>())
 
-    fun applyAll(layout: TextLayout, intGetter: () -> Int): Map<Int, ImageCharWidth> {
-        val map = HashMap<Int, ImageCharWidth>()
+    fun applyAll(layout: TextLayout, intGetter: () -> Int): Map<Int, ImageTextScale> {
+        val map = HashMap<Int, ImageTextScale>()
         assetsMap.forEach {
             map[intGetter()] = it.toCharWidth(layout)
         }
@@ -29,14 +29,14 @@ object MinecraftManager : BetterHudManager {
     }
 
     private data class MinecraftAsset(val namespace: String, val width: Int, val height: Int) {
-        fun toCharWidth(layout: TextLayout): ImageCharWidth {
-            return ImageCharWidth(
+        fun toCharWidth(layout: TextLayout): ImageTextScale {
+            return ImageTextScale(
                 namespace.replace('/', '_'),
                 "minecraft:$namespace.png",
                 layout.emoji.location,
-                1.0,
-                width,
-                height
+                layout.source.scale?.let { it - height } ?: 0,
+                width.toDouble(),
+                height.toDouble()
             )
         }
     }
