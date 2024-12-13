@@ -181,15 +181,15 @@ class PopupLayout(
                 pixel.opacity,
                 textLayout.property
             )
-            val imageCodepointMap = textLayout.imageCharMap.map {
-                it.value.name to it.key
-            }.toMap()
+            val scaledImageMap = textLayout.imageCharMap.entries.associate { (k, v) ->
+                k to v * textLayout.scale * textLayout.emoji.scale
+            }
             val index = ++textIndex
             val keys = (0..<textLayout.line).map { lineIndex ->
                 text(textLayout.identifier(textShader, pixel.y + lineIndex * textLayout.lineWidth)) {
                     val array = textLayout.startJson()
-                    createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
-                        textLayout.source.array.forEach {
+                    textLayout.source.array.forEach {
+                        createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to "$NAME_SPACE_ENCODED:${it.file}",
@@ -202,15 +202,14 @@ class PopupLayout(
                     val textEncoded = "popup_${parent.name}_text_${index}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                     val key = createAdventureKey(textEncoded)
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
-                    textLayout.imageCharMap.forEach {
-                        val height = (it.value.height.toDouble() * textLayout.scale * textLayout.emoji.scale * it.value.scale).roundToInt()
-                        createAscent(textShader, pixel.y + it.value.location.y + lineIndex * textLayout.lineWidth) { y ->
+                    scaledImageMap.forEach { (k, v) ->
+                        createAscent(textShader, pixel.y + v.location.y + lineIndex * textLayout.lineWidth + v.ascent) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
-                                "file" to it.value.fileName,
+                                "file" to v.fileName,
                                 "ascent" to y,
-                                "height" to height,
-                                "chars" to jsonArrayOf(it.key.parseChar())
+                                "height" to v.normalizedHeight,
+                                "chars" to jsonArrayOf(k.parseChar())
                             )
                         }
                     }
@@ -259,7 +258,14 @@ class PopupLayout(
                 textLayout,
                 HudTextData(
                     keys,
-                    imageCodepointMap,
+                    textLayout.source.charWidth.entries.associate { (k, v) ->
+                        k to v.normalizedWidth
+                    } + scaledImageMap.entries.associate { (k, v) ->
+                        k to v.normalizedWidth
+                    },
+                    scaledImageMap.map {
+                        it.value.name to it.key
+                    }.toMap(),
                     textLayout.splitWidth
                 ),
                 pixel.x,

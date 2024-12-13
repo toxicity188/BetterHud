@@ -10,10 +10,7 @@ import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.text.BackgroundKey
-import kr.toxicity.hud.text.CharWidth
-import kr.toxicity.hud.text.HudTextArray
-import kr.toxicity.hud.text.ImageCharWidth
+import kr.toxicity.hud.text.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
@@ -177,7 +174,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
     fun translate(locale: String, key: String) = translatableString[locale.uppercase()]?.get(key)
 
-    private fun createFont(dir: File?, scale: Int, useUnifont: Boolean) = if (useUnifont) {
+    private fun createFont(dir: File?, scale: Int, useUnifont: Boolean) = if (!useUnifont) {
         JavaBitmapProvider((dir?.inputStream()?.buffered()?.use {
             runCatching {
                 Font.createFont(Font.TRUETYPE_FONT, it)
@@ -229,11 +226,11 @@ object TextManagerImpl : BetterHudManager, TextManager {
             configScale,
             fontConfig.getAsBoolean("use-unifont", false)
         )
-        val parseDefault = parseTTFFont("",  "default_$configScale", defaultProvider, configScale, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
+        val parseDefault = parseTTFFont("",  "default_$configScale", configScale, defaultProvider, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
         } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)
         parseDefault.charWidth.forEach {
-            textWidthMap[it.key] = (it.value.width.toDouble() * configHeight / it.value.height.toDouble()).roundToInt()
+            textWidthMap[it.key] = (it.value.width * configHeight / it.value.height).roundToInt()
         }
         parseDefault.array.forEach {
             defaultArray += jsonObjectOf(
@@ -267,8 +264,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
                             parseTTFFont(
                                 file.path,
                                 "${fontDir?.nameWithoutExtension ?: "default"}_$scale",
-                                provider,
                                 scale,
+                                provider,
                                 resource.textures,
                                 TreeMap<String, LocatedImage>().apply {
                                     section["images"]?.asObject()
@@ -353,7 +350,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
                         val width = image.width / str.length
                         var i2 = 0
                         str.codePoints().forEach { char ->
-                            defaultBitmapImageMap[char] = image.getSubimage(width * i2++, height * i1, width, height)
+                            image.getSubimage(width * i2++, height * i1, width, height).removeEmptyWidth()?.let { i ->
+                                defaultBitmapImageMap[char] = i.image
+                            }
                         }
                     }
                 }
@@ -426,17 +425,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
             unifont.filter {
                 filter(it.first)
             }.forEachAsync {
-                val byteImage = it.second.hexToImage()
-                val imageWidth = (byteImage.width.toDouble() / 16 * scale).roundToInt()
-                val scaledImage = byteImage.getScaledInstance(imageWidth, scale, BufferedImage.SCALE_SMOOTH)
-
-                BufferedImage(imageWidth, scale, BufferedImage.TYPE_INT_ARGB).apply {
-                    createGraphics().run {
-                        drawImage(scaledImage, 0, 0, null)
-                        dispose()
-                    }
-                }.fontSubImage()?.let { image ->
-                    block(CharImage(it.first, image))
+                it.second.hexToImage().removeEmptyWidth()?.let { image ->
+                    block(CharImage(it.first, image.image))
                 }
             }
         }
@@ -451,13 +441,13 @@ object TextManagerImpl : BetterHudManager, TextManager {
     ): TextElement {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
-                TextElement(path, saveName, old.array, old.charWidth, old.imageCharWidth, yamlObject)
+                TextElement(path, saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
                 "font${++fontIndex}"
             }
-            val charWidthMap = HashMap<Int, CharWidth>()
+            val charWidthMap = HashMap<Int, TextScale>()
             val textArray = ArrayList<HudTextArray>()
             val assetsFolder = DATA_FOLDER.subFolder("assets")
             data.forEachIndexed { i, d ->
@@ -485,12 +475,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
                 codepointStream.forEachIndexed { h, s ->
                     s.forEachIndexed { w, i ->
-                        charWidthMap[i] = CharWidth(
+                        charWidthMap[i] = TextScale(
                             file.getSubimage(w * divWidth, h * divHeight, divWidth, divHeight)
                                     .removeEmptyWidth()?.let {
                                         it.xOffset + it.image.width
-                                    } ?: 0,
-                            divHeight
+                                    }?.toDouble() ?: 0.0,
+                            divHeight.toDouble()
                         )
                     }
                 }
@@ -507,6 +497,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             TextElement(
                 path,
                 saveName,
+                null,
                 textArray,
                 charWidthMap,
                 mapOf(),
@@ -520,11 +511,23 @@ object TextManagerImpl : BetterHudManager, TextManager {
         val file: String
     )
 
+    private data class FontDisplay(val width: Int, val height: Int) : Comparable<FontDisplay> {
+        companion object {
+            private val comparator = Comparator.comparing { display: FontDisplay ->
+                display.width
+            }.thenComparing { display: FontDisplay ->
+                display.height
+            }
+        }
+
+        override fun compareTo(other: FontDisplay): Int = comparator.compare(this, other)
+    }
+
     private fun parseTTFFont(
         path: String,
         saveName: String,
-        fontProvider: FontBitmapProvider,
         scale: Int,
+        fontProvider: FontBitmapProvider,
         imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
         supportedLanguage: List<String>,
@@ -533,40 +536,34 @@ object TextManagerImpl : BetterHudManager, TextManager {
     ): TextElement {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
-                TextElement(path, saveName, old.array, old.charWidth, old.imageCharWidth, yamlObject)
+                TextElement(path, saveName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
             }
         } ?: run {
             val saveFontName = synchronized (this) {
                 "font${++fontIndex}"
             }
-            val height = fontProvider.height
-            val pairMap = TreeMap<Int, MutableSet<CharImage>>()
-            val charWidthMap = HashMap<Int, CharWidth>()
+            val pairMap = TreeMap<FontDisplay, MutableSet<CharImage>>()
+            val charWidthMap = HashMap<Int, TextScale>()
             fun addImage(image: CharImage) {
+                val w = image.image.width
+                val h = image.image.height
                 synchronized(pairMap) {
-                    pairMap.computeIfAbsent(image.image.width) {
+                    pairMap.computeIfAbsent(FontDisplay(
+                        w,
+                        h
+                    )) {
                         TreeSet()
                     }.add(image)
                 }
                 synchronized(charWidthMap) {
-                    charWidthMap[image.codepoint] = CharWidth(
-                        image.image.width,
-                        height
-                    )
+                    charWidthMap[image.codepoint] = TextScale(
+                        w.toDouble(),
+                        h.toDouble()
+                    ) * (scale.toDouble() / h)
                 }
             }
-            if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync {
-                val mul = scale.toDouble() / it.value.width
-                val newWidth = (it.value.width * mul).roundToInt()
-                val newHeight = (it.value.height * mul).roundToInt()
-                BufferedImage(scale, height, BufferedImage.TYPE_INT_ARGB).apply {
-                    createGraphics().run {
-                        drawImage(it.value.getScaledInstance(newWidth, newHeight, BufferedImage.SCALE_SMOOTH), 0, height - newHeight, null)
-                        dispose()
-                    }
-                }.fontSubImage()?.let { resizedImage ->
-                    addImage(CharImage(it.key, resizedImage))
-                }
+            if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync { (k, v) ->
+                addImage(CharImage(k, v))
             }
             val supportedCodepoint = HashSet<Int>()
             supportedLanguage.forEach {
@@ -590,22 +587,23 @@ object TextManagerImpl : BetterHudManager, TextManager {
             val textList = ArrayList<HudTextArray>()
             var i = 0
             var imageStart = TEXT_IMAGE_START_CODEPOINT
-            val imageCharWidthMap = HashMap<Int, ImageCharWidth>()
-            images.forEach {
-                imageCharWidthMap[++imageStart] = ImageCharWidth(
-                    it.key,
-                    "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png",
-                    it.value.location,
-                    it.value.scale,
-                    it.value.image.image.height,
-                    it.value.image.image.height
+            val imageTextScaleMap = HashMap<Int, ImageTextScale>()
+            images.forEach { (k, v) ->
+                val nh = v.image.image.height.toDouble() * v.scale
+                imageTextScaleMap[++imageStart] = ImageTextScale(
+                    k,
+                    "$NAME_SPACE_ENCODED:${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png",
+                    v.location,
+                    scale - nh.roundToInt(),
+                    v.image.image.width.toDouble() * v.scale,
+                    nh
                 )
-                PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
-                    it.value.image.image.toByteArray()
+                PackGenerator.addTask(imageSaveFolder + "${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
+                    v.image.image.toByteArray()
                 }
             }
-            pairMap.forEach {
-                val width = it.key
+            pairMap.forEach { (k, v) ->
+                val (w, h) = k
                 fun save(list: List<CharImage>) {
                     val encode = "text_${saveFontName}_${++i}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
                     val name = "$encode.png"
@@ -616,19 +614,19 @@ object TextManagerImpl : BetterHudManager, TextManager {
                         })
                     }
                     PackGenerator.addTask(imageSaveFolder + name) {
-                        BufferedImage(width * list.size.coerceAtMost(CHAR_LENGTH), height * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
+                        BufferedImage(w * list.size.coerceAtMost(CHAR_LENGTH), h * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
                             createGraphics().run {
                                 composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
                                 list.forEachIndexed { index, pair ->
-                                    drawImage(pair.image, width * (index % CHAR_LENGTH), height * (index / CHAR_LENGTH), null)
+                                    drawImage(pair.image, w * (index % CHAR_LENGTH), h * (index / CHAR_LENGTH), null)
                                 }
                                 dispose()
                             }
                         }.toByteArray()
                     }
-                    textList += HudTextArray(name, json, height)
+                    textList += HudTextArray(name, json, scale)
                 }
-                it.value.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
+                v.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
                     if (target.size % CHAR_LENGTH == 0 || target.size < CHAR_LENGTH) {
                         save(target)
                     } else {
@@ -638,7 +636,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                 }
             }
-            val result = TextElement(path, saveName, textList, charWidthMap, imageCharWidthMap, yamlObject)
+            val result = TextElement(path, saveName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
             synchronized(textCacheMap) {
                 textCacheMap[TextCache(saveName, images.keys)] = result
             }
