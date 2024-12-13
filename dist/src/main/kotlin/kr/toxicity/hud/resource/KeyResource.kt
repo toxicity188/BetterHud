@@ -1,16 +1,16 @@
 package kr.toxicity.hud.resource
 
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.util.encodeKey
 import net.kyori.adventure.key.Key
 
-class KeyResource(namespace: String) {
-    val encodedNamespace = namespace.encodeKey()
+class KeyResource(val namespace: String) {
 
-    private fun create(name: String) = Key.key(encodedNamespace, name)
+    private fun create(name: String) = Key.key(namespace, name)
 
-    val spaceKey = create("space".encodeKey())
-    val legacySpaceKey = create("legacy_space".encodeKey())
-    val defaultKey = create("default".encodeKey())
-    val spacesTtfKey = create("spaces".encodeKey())
-    val splitterKey = create("splitter".encodeKey())
+    val spaceKey = create("space".encodeKey(EncodeManager.EncodeNamespace.FONT))
+    val legacySpaceKey = create("legacy_space".encodeKey(EncodeManager.EncodeNamespace.FONT))
+    val defaultKey = create("default".encodeKey(EncodeManager.EncodeNamespace.FONT))
+    val spacesTtfKey = create("spaces".encodeKey(EncodeManager.EncodeNamespace.FONT))
+    val splitterKey = create("splitter".encodeKey(EncodeManager.EncodeNamespace.FONT))
 }

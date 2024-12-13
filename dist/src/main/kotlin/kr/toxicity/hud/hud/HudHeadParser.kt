@@ -8,6 +8,7 @@ import kr.toxicity.hud.player.head.HeadKey
 import kr.toxicity.hud.player.head.HeadRenderType.*
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.location.GuiLocation
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 
@@ -41,7 +42,7 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
             parent.getOrCreateSpace(-(head.source.pixel * 8 + 1)),
             parent.getOrCreateSpace(-(head.source.pixel + 1)),
             (0..7).map { i ->
-                val encode = "pixel_${head.source.pixel}".encodeKey()
+                val encode = "pixel_${head.source.pixel}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
                 val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                 val ascent = final.y + i * head.source.pixel
                 val height = head.source.pixel

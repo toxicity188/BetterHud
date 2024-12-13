@@ -477,7 +477,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 }.distinct()
                 if (distinct.size != 1) throw RuntimeException("Codepoint length of bitmap does not same.")
                 val width = distinct[0]
-                val encode = "text_${saveFontName}_${i + 1}".encodeKey()
+                val encode = "text_${saveFontName}_${i + 1}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
                 val name = "$encode.png"
 
                 val divWidth = file.width / width
@@ -571,14 +571,14 @@ object TextManagerImpl : BetterHudManager, TextManager {
             val supportedCodepoint = HashSet<Int>()
             supportedLanguage.forEach {
                 languageCodepointRange[it]?.let { lang ->
-                    supportedCodepoint.addAll(lang)
+                    supportedCodepoint += lang
                 }
             }
             var filter = { i: Int ->
                 !charWidthMap.containsKey(i)
             }
             if (supportedCodepoint.isNotEmpty()) {
-                supportedCodepoint.addAll(defaultLatin)
+                supportedCodepoint += defaultLatin
                 val old = filter
                 filter = {
                     old(it) && supportedCodepoint.contains(it)
@@ -594,20 +594,20 @@ object TextManagerImpl : BetterHudManager, TextManager {
             images.forEach {
                 imageCharWidthMap[++imageStart] = ImageCharWidth(
                     it.key,
-                    "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey()}.png",
+                    "$NAME_SPACE_ENCODED:${"glyph_${it.key}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png",
                     it.value.location,
                     it.value.scale,
                     it.value.image.image.height,
                     it.value.image.image.height
                 )
-                PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey()}.png") {
+                PackGenerator.addTask(imageSaveFolder + "${"glyph_${it.key}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
                     it.value.image.image.toByteArray()
                 }
             }
             pairMap.forEach {
                 val width = it.key
                 fun save(list: List<CharImage>) {
-                    val encode = "text_${saveFontName}_${++i}".encodeKey()
+                    val encode = "text_${saveFontName}_${++i}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
                     val name = "$encode.png"
                     val json = JsonArray()
                     list.split(CHAR_LENGTH).forEach { subList ->
@@ -626,7 +626,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                             }
                         }.toByteArray()
                     }
-                    textList.add(HudTextArray(name, json, height))
+                    textList += HudTextArray(name, json, height)
                 }
                 it.value.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
                     if (target.size % CHAR_LENGTH == 0 || target.size < CHAR_LENGTH) {

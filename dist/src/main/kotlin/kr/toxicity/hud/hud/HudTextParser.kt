@@ -9,6 +9,7 @@ import kr.toxicity.hud.layout.BackgroundLayout
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.resource.GlobalResource
@@ -58,7 +59,7 @@ class HudTextParser(
                     }
                 }
                 var textIndex = TEXT_IMAGE_START_CODEPOINT + text.imageCharMap.size
-                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey()
+                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                 val key = createAdventureKey(textEncoded)
                 text.imageCharMap.forEach {
                     val height = (it.value.height.toDouble() * text.scale * text.emoji.scale * it.value.scale).roundToInt()
@@ -105,9 +106,9 @@ class HudTextParser(
                         }
                         BackgroundLayout(
                             it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey()),
-                            getString(it.right, "background_${it.name}_right".encodeKey()),
-                            getString(it.body, "background_${it.name}_body".encodeKey())
+                            getString(it.left, "background_${it.name}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.right, "background_${it.name}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.body, "background_${it.name}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
                         )
                     }
                 )

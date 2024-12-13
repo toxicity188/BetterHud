@@ -83,7 +83,6 @@ abstract class HudPlayerImpl : HudPlayer {
         enabled = toEnable
     }
 
-    @Synchronized
     final override fun save() {
         val current = DatabaseManagerImpl.currentDatabase
         if (!current.isClosed) current.save(this)
