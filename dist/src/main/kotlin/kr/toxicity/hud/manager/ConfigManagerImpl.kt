@@ -86,7 +86,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     )
         private set
 
-    var useLegacyFormat = true
+    var useLegacyFormat = false
     var legacySerializer = LEGACY_AMPERSAND
         private set
     private var removeDefaultHotbar = false
@@ -189,7 +189,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             includedMinecraftTextures = yaml["included-minecraft-list"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
-            useLegacyFormat = yaml.getAsBoolean("use-legacy-format", true)
+            useLegacyFormat = yaml.getAsBoolean("use-legacy-format",  false)
             yaml["legacy-serializer"]?.asString()?.let {
                 runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
                     legacySerializer = it.toLegacySerializer()
