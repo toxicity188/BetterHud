@@ -87,8 +87,7 @@ class NMSImpl : NMS {
     }
 
     override fun inject(player: HudPlayer, color: BossBar.Color) {
-        val h = player.handle()
-        h as CraftPlayer
+        val h = player.handle() as CraftPlayer
         bossBarMap.computeIfAbsent(h.uniqueId) {
             PlayerBossBar(h, h.handle.connection, color, Component.empty())
         }
