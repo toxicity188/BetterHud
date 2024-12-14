@@ -13,7 +13,6 @@ public interface ConfigManager {
         ASSETS,
         FILE,
         ALL
-        ;
     }
     static boolean checkAvailable(@NotNull DebugLevel debugLevel) {
         var manager = BetterHudAPI.inst().getConfigManager();

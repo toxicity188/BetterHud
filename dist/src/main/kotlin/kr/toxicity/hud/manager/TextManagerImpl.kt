@@ -23,7 +23,6 @@ import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToInt
-import kotlin.math.sqrt
 
 object TextManagerImpl : BetterHudManager, TextManager {
 

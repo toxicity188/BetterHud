@@ -1,7 +1,6 @@
 package kr.toxicity.hud.popup
 
 import com.google.gson.JsonArray
-import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
