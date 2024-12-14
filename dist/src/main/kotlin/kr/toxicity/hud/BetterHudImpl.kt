@@ -100,6 +100,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 val resource = GlobalResource()
                 managers.forEach {
+                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.javaClass.simpleName}...")
                     it.reload(sender, resource)
                 }
                 managers.forEach {

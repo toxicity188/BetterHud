@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.manager.ConfigManager
+import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackType
@@ -65,8 +66,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
         private set
     var loadingHead = "random"
         private set
-    var debug = false
-        private set
+    private var debug = false
+    private var debugLevel = DebugLevel.ASSETS
 
     var resourcePackObfuscation = false
         private set
@@ -95,7 +96,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     override fun start() {
     }
 
-    override fun getBossbarLine(): Int = line
     override fun reload(sender: Audience, resource: GlobalResource) {
         if (removeDefaultHotbar) {
             PLUGIN.loadAssets("empty") { n, i ->
@@ -121,6 +121,11 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getAsBoolean("debug", false)
+            debugLevel = runCatching {
+                DebugLevel.valueOf(yaml.getAsString("debug-level", "asset").uppercase())
+            }.getOrElse {
+                DebugLevel.ASSETS
+            }
             defaultHud = yaml["default-hud"]?.asArray()?.map {
                 it.asString()
             } ?: emptyList()
@@ -203,4 +208,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     }
     override fun end() {
     }
+
+    override fun getBossbarLine(): Int = line
+    override fun getDebugLevel(): DebugLevel = debugLevel
+    override fun isDebug(): Boolean = debug
 }

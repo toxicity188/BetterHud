@@ -1,4 +1,5 @@
 debug: false
+debug-level: assets
 metrics: true
 version-check: true
 number-format: "#,###.#"

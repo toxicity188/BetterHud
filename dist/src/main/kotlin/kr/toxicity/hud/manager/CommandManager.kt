@@ -43,7 +43,7 @@ object CommandManager : BetterHudManager {
         }
     }, MiniMessage.miniMessage(), BOOTSTRAP.logger())
         .exceptionHandler {
-            if (ConfigManagerImpl.debug) {
+            if (ConfigManagerImpl.isDebug) {
                 warn(
                     "Stack trace:",
                     it.stackTraceToString()
