@@ -12,6 +12,9 @@ public interface UpdateEvent {
      * Empty event.
      */
     UpdateEvent EMPTY = new UpdateEvent() {
+
+        private static final UUID EMPTY = UUID.randomUUID();
+
         @Override
         public @NotNull UpdateReason getType() {
             return UpdateReason.EMPTY;
@@ -19,7 +22,7 @@ public interface UpdateEvent {
 
         @Override
         public @NotNull Object getKey() {
-            return UUID.randomUUID();
+            return EMPTY;
         }
     };
 

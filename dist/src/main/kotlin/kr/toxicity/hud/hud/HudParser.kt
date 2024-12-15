@@ -19,8 +19,8 @@ class HudParser(
     private val imageElement = layout.image.map { image ->
         HudImageParser(hud, image, gui, pixel)
     }
-    private val textElement = layout.text.map { textLayout ->
-        HudTextParser(hud, resource, textLayout, gui, pixel)
+    private val textElement = layout.text.mapIndexed { index, textLayout ->
+        HudTextParser(index + 1, hud, resource, textLayout, gui, pixel)
     }
     private val headElement = layout.head.map { image ->
         HudHeadParser(hud, image, gui, pixel)

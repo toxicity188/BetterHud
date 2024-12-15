@@ -71,6 +71,7 @@ class PopupImpl(
 
     private val layouts = section["layouts"]?.asObject()?.let {
         val json = array.ifNull("error is occurred.")
+        var i = 0
         it.mapSubConfiguration { _, yamlObject ->
             val layout = yamlObject["name"]?.asString().ifNull("name value not set.")
             var loc = GuiLocation(yamlObject)
@@ -78,6 +79,7 @@ class PopupImpl(
                 loc += GuiLocation(gui)
             }
             PopupLayout(
+                ++i,
                 json,
                 LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                 this@PopupImpl,

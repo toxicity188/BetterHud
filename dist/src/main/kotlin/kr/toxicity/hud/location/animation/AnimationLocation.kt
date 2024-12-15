@@ -5,7 +5,7 @@ import kr.toxicity.hud.equation.EquationTriple
 import kr.toxicity.hud.location.PixelLocation
 import kotlin.math.roundToInt
 
-class AnimationLocation(
+data class AnimationLocation(
     val type: AnimationType,
     val location: List<PixelLocation>
 ) {

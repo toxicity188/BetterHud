@@ -197,6 +197,7 @@ fun Project.library() = also {
         compileOnly("org.yaml:snakeyaml:2.3")
         compileOnly("com.google.code.gson:gson:2.11.0")
         compileOnly("net.objecthunter:exp4j:0.4.8")
+        compileOnly("net.jodah:expiringmap:0.5.11")
         implementation("me.lucko:jar-relocator:1.7") {
             exclude("org.ow2.asm")
         }
@@ -384,6 +385,7 @@ fun Jar.relocateAll() {
         listOf(
             "kotlin",
             "net.objecthunter.exp4j",
+            "net.jodah.expiringmap",
             "org.bstats",
             "me.lucko.jarrelocator",
             "kr.toxicity.command.impl"

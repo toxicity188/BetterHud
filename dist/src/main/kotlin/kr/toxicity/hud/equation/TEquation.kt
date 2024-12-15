@@ -2,8 +2,11 @@ package kr.toxicity.hud.equation
 
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
+import net.objecthunter.exp4j.function.Function
 import kotlin.math.E
 import kotlin.math.PI
+import kotlin.math.max
+import kotlin.math.min
 
 class TEquation(expression: String) {
     companion object {
@@ -13,6 +16,14 @@ class TEquation(expression: String) {
     }
 
     private val expression = ExpressionBuilder(expression)
+        .functions(
+            object : Function("min", 2) {
+                override fun apply(vararg p0: Double): Double = min(p0[0], p0[1])
+            },
+            object : Function("max", 2) {
+                override fun apply(vararg p0: Double): Double = max(p0[0], p0[1])
+            }
+        )
         .variables(setOf(
             "t",
             "pi",

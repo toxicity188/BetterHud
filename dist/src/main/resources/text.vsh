@@ -79,6 +79,7 @@ void main() {
             }
 
             vertexColor = ((pos.z == 0 || ceil(pos.z * 100) == 100000) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
+            vertexColor.a = max(vertexColor.a, 1 / 255);
 
             //Wave
             if ((property & 1) > 0) {

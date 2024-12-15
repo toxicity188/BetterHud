@@ -65,12 +65,19 @@ public class BetterHudDependency {
             "asm-commons",
             "9.7.1",
             false,
-            List.of(BetterHudPlatform.VELOCITY)
+            List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.BUKKIT)
     );
     public static final BetterHudDependency EXP4J = new BetterHudDependency(
             "net{}objecthunter",
             "exp4j",
             "0.4.8",
+            true,
+            BetterHudPlatform.ALL
+    );
+    public static final BetterHudDependency EXPIRING_MAP = new BetterHudDependency(
+            "net{}jodah",
+            "expiringmap",
+            "0.5.11",
             true,
             BetterHudPlatform.ALL
     );

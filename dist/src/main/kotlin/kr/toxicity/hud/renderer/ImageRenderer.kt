@@ -35,7 +35,6 @@ class ImageRenderer(
         val colorApply = colorOverrides(reason)
 
         return build@ { hudPlayer, frame ->
-
             val selected = mapper(hudPlayer)
 
             val stackFrame = (stackGetter?.value(hudPlayer) as? Number)?.toDouble() ?: 0.0

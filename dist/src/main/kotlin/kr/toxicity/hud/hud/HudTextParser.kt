@@ -21,6 +21,7 @@ import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
 class HudTextParser(
+    globalIndex: Int,
     parent: HudImpl,
     resource: GlobalResource,
     private val text: TextLayout,
@@ -62,7 +63,7 @@ class HudTextParser(
                     }
                 }
                 var textIndex = TEXT_IMAGE_START_CODEPOINT + scaledImageMap.size
-                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
+                val textEncoded = "hud_${parent.name}_text_${globalIndex}_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                 val key = createAdventureKey(textEncoded)
                 scaledImageMap.forEach { (k, v) ->
                     createAscent(shader, loc.y + v.location.y + lineIndex * text.lineWidth + v.ascent) { y ->

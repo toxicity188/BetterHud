@@ -31,6 +31,7 @@ import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
 class PopupLayout(
+    private val globalIndex: Int,
     private val json: JsonArray,
     private val layout: LayoutGroup,
     private val parent: PopupImpl,
@@ -202,7 +203,7 @@ class PopupLayout(
                             )
                         }
                     }
-                    val textEncoded = "popup_${parent.name}_text_${index}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
+                    val textEncoded = "popup_${parent.name}_text_${globalIndex}_${index}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                     val key = createAdventureKey(textEncoded)
                     var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
                     scaledImageMap.forEach { (k, v) ->
