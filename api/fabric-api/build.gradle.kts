@@ -47,9 +47,6 @@ fabricModJson {
 }
 
 tasks {
-    compileJava {
-        dependsOn(clean)
-    }
     remapJar {
         archiveBaseName = "betterhud-${project.name}"
         archiveClassifier = ""

@@ -69,9 +69,6 @@ fabricModJson {
 }
 
 tasks {
-    compileJava {
-        dependsOn(clean)
-    }
     remapJar {
         archiveClassifier = ""
     }
