@@ -5,7 +5,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 
 fun interface ComponentDeserializer : (String) -> Component
 
-private val I_DO_NOT_THINK_THAT by lazy {
+val LEGACY_SECTION_SERIALIZER by lazy { //I don't think that
     LegacyComponentSerializer.builder()
         .useUnusualXRepeatedCharacterHexFormat()
         .character('§')
@@ -13,7 +13,7 @@ private val I_DO_NOT_THINK_THAT by lazy {
         .hexColors()
         .build()
 }
-private val IT_IS_A_GOOD_IDEA by lazy {
+val LEGACY_AMPERSAND_SERIALIZER by lazy { //It is a good idea
     LegacyComponentSerializer.builder()
         .useUnusualXRepeatedCharacterHexFormat()
         .character('&')
@@ -22,6 +22,6 @@ private val IT_IS_A_GOOD_IDEA by lazy {
         .build()
 }
 
-val LEGACY_SECTION: ComponentDeserializer = ComponentDeserializer { p1 -> I_DO_NOT_THINK_THAT.deserialize(p1) }
-val LEGACY_AMPERSAND: ComponentDeserializer = ComponentDeserializer { p1 -> IT_IS_A_GOOD_IDEA.deserialize(p1) }
-val LEGACY_BOTH: ComponentDeserializer = ComponentDeserializer { p1 -> I_DO_NOT_THINK_THAT.deserialize(p1.replace('&', '§')) }
+val LEGACY_SECTION: ComponentDeserializer = ComponentDeserializer { p1 -> LEGACY_SECTION_SERIALIZER.deserialize(p1) }
+val LEGACY_AMPERSAND: ComponentDeserializer = ComponentDeserializer { p1 -> LEGACY_AMPERSAND_SERIALIZER.deserialize(p1) }
+val LEGACY_BOTH: ComponentDeserializer = ComponentDeserializer { p1 -> LEGACY_SECTION_SERIALIZER.deserialize(p1.replace('&', '§')) }

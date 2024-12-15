@@ -240,19 +240,19 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
     }
 }
 
-val apiShare = project("api:standard-api").adventure()
-val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare)
-val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare)
-val apiFabric = project("api:fabric-api").adventure().dependency(apiShare)
+val apiShare = project("api:standard-api").adventure().legacy()
+val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
+val apiFabric = project("api:fabric-api").adventure().dependency(apiShare).also {
+    it.apply(plugin = "fabric-loom")
+}
 
 val api = listOf(
     apiShare,
     apiBukkit,
     apiVelocity,
     apiFabric
-).onEach {
-    project -> project.legacy()
-}
+)
 
 fun Project.api() = dependency(api)
 
@@ -296,13 +296,17 @@ allNmsVersion.forEach {
 }
 
 dependencies {
-    api.forEach {
-        implementation(it)
-    }
     implementation(dist)
     implementation("org.bstats:bstats-bukkit:$bStats")
     implementation("org.bstats:bstats-velocity:$bStats")
 }
+
+fun Project.jar() = zipTree(tasks.jar.map {
+    it.archiveFile
+})
+fun Project.shadowJar() = zipTree(tasks.shadowJar.map {
+    it.archiveFile
+})
 
 val sourcesJar by tasks.creating(Jar::class.java) {
     dependsOn(tasks.classes)
@@ -325,39 +329,33 @@ val javadocJar by tasks.creating(Jar::class.java) {
 val fabricJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(apiShare.jar())
+    from(zipTree(apiFabric.tasks.named("remapJar").map {
+        (it as org.gradle.jvm.tasks.Jar).archiveFile
+    }))
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
     }))
-    from(zipTree(tasks.shadowJar.map {
-        it.archiveFile
-    }))
+    from(shadowJar())
     doLast {
         relocateAll()
     }
 }
 val pluginJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "bukkit"
-    from(zipTree(bukkitBootstrap.tasks.jar.map {
-        it.archiveFile
-    }))
-    scheduler.subprojects.forEach {
-        from(zipTree(it.tasks.jar.map { t ->
-            t.archiveFile
-        }))
-    }
-    bedrock.subprojects.forEach {
-        from(zipTree(it.tasks.jar.map { t ->
-            t.archiveFile
-        }))
+    (listOf(
+        apiShare,
+        apiBukkit,
+        bukkitBootstrap
+    ) + scheduler.subprojects + bedrock.subprojects).forEach {
+        from(it.jar())
     }
     allNmsVersion.forEach {
         from(zipTree(it.tasks.named("reobfJar").map { t ->
             (t as RemapJar).outputJar
         }))
     }
-    from(zipTree(tasks.shadowJar.map {
-        it.archiveFile
-    }))
+    from(shadowJar())
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
@@ -367,12 +365,14 @@ val pluginJar by tasks.creating(Jar::class.java) {
 }
 val velocityJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "velocity"
-    from(zipTree(velocityBootstrap.tasks.jar.map {
-        it.archiveFile
-    }))
-    from(zipTree(tasks.shadowJar.map {
-        it.archiveFile
-    }))
+    listOf(
+        apiShare,
+        apiVelocity,
+        velocityBootstrap
+    ).forEach {
+        from(it.jar())
+    }
+    from(shadowJar())
     doLast {
         relocateAll()
     }

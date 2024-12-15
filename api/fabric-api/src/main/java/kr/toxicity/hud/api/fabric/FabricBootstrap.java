@@ -6,7 +6,8 @@ import kr.toxicity.hud.api.plugin.ReloadState;
 
 public interface FabricBootstrap extends BetterHudBootstrap {
 
-    EventRegistry<EventRegistry.Unit> PRE_RELOAD_EVENT = new EventRegistry<>();
+    EventRegistry<EventRegistry.Unit> PRE_RELOAD_EVENT = new EventRegistry<EventRegistry.Unit>()
+            .register(u -> EventRegistry.clearAll());
     EventRegistry<ReloadState> POST_RELOAD_EVENT = new EventRegistry<>();
 
     @Override

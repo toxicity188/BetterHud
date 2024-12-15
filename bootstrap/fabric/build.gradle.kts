@@ -15,10 +15,10 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
+    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.21:2024.07.28")
+        parchment("org.parchmentmc.data:${properties["parchment"]}")
     })
     //Other mod dependency
     modCompileOnly("eu.pb4:polymer-resource-pack:0.11.1+1.21.4")
@@ -27,10 +27,10 @@ dependencies {
     modCompileOnly("net.luckperms:api:5.4")
 
     //Kyori
-    modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:6.1.0")
-    modImplementation(include("net.kyori:adventure-platform-fabric:6.1.0")!!)
+    modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
+    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${properties["kyori_mod_implementation"]}")
+    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")!!)
 }
 
 loom {
@@ -64,6 +64,9 @@ fabricModJson {
         "polymer-resource-pack" to listOf("*"),
         "polymer-autohost" to listOf("*"),
         "placeholder-api" to listOf("*")
+    )
+    mixins = listOf(
+        mixin("betterhud.mixins.json")
     )
 }
 
