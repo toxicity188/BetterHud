@@ -128,7 +128,7 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYamlAsync(sender) { file, s, yamlObject ->
+        DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
                     val head = HeadElement(file.path, s, yamlObject)

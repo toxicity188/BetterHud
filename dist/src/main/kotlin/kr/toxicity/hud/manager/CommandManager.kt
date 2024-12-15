@@ -120,6 +120,9 @@ object CommandManager : BetterHudManager {
             .nullMessage(CommandMessage("betterhud.null.icon", Component.text("Unable to find this icon: [icon]")))
             .build()
         )
+        .silentLog {
+            !ConfigManagerImpl.isDebug
+        }
 
     @Suppress("UNUSED")
     val module = library.module<BetterCommandSource>("hud")

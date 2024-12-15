@@ -10,8 +10,7 @@ Welcome to BetterHud!
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/rePyFESDbk)
 [![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/toxicity188/BetterHud?style=for-the-badge&logo=github)](https://github.com/toxicity188/BetterHud/issues)
 [![Static Badge](https://img.shields.io/badge/WIKI-blue?style=for-the-badge)](https://github.com/toxicity188/BetterHud/wiki)
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/toxicity188/BetterHud?style=for-the-badge)
-
+[![CodeFactor](https://www.codefactor.io/repository/github/toxicity188/betterhud/badge/master?style=for-the-badge)](https://www.codefactor.io/repository/github/toxicity188/betterhud/overview/master)
 
 </div>
 
@@ -55,6 +54,9 @@ Requires Java 17, 21 Eclipse Adoptium.
 
 ### API
 Get from maven central
+
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-standard-api?style=for-the-badge) (BetterHud)  
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterCommand?style=for-the-badge) (BetterCommand)
 ``` kotlin
 repositories {
     mavenCentral()

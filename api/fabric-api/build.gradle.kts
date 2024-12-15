@@ -17,6 +17,11 @@ loom {
     }
 }
 
-tasks.runServer {
-    enabled = false
+tasks {
+    runServer {
+        enabled = false
+    }
+    remapJar {
+        archiveClassifier = "remapped"
+    }
 }
