@@ -43,7 +43,7 @@ object CommandManager : BetterHudManager {
         }
     }, MiniMessage.miniMessage(), BOOTSTRAP.logger())
         .exceptionHandler {
-            if (ConfigManagerImpl.debug) {
+            if (ConfigManagerImpl.isDebug) {
                 warn(
                     "Stack trace:",
                     it.stackTraceToString()
@@ -380,7 +380,7 @@ object CommandManager : BetterHudManager {
                     private val hide_error2 = library.registerKey(CommandMessage("betterhud.popup.hide.message.error.2", Component.text("Cause: [cause]")))
                     @Command
                     @Description(key = "betterhud.popup.hide.description", defaultValue = "Hides a popup for a player.")
-                    @Aliases(aliases = ["s"])
+                    @Aliases(aliases = ["h"])
                     @Permission("hud.popup.hide")
                     fun hide(@Source me: BetterCommandSource, players: HudPlayerStack, popups: PopupStack) {
                         var stack = 0

@@ -27,8 +27,9 @@ fun Event.call(): Boolean {
 fun Event.toUpdateEvent(key: Any = UUID.randomUUID()) = BukkitEventUpdateEvent(this, key)
 
 inline fun <reified T : Event, R : Any> UpdateEvent.unwrap(block: (T) -> R): R {
-    return if (this is BukkitEventUpdateEvent) {
-        val e = event
+    val evt = source()
+    return if (evt is BukkitEventUpdateEvent) {
+        val e = evt.event
         if (e is T) block(e)
         else throw RuntimeException("Unsupported event found: ${e.javaClass.simpleName}")
     } else throw RuntimeException("Unsupported update found: ${javaClass.simpleName}")

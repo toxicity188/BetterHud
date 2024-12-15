@@ -34,4 +34,13 @@ public interface UpdateEvent {
      * @return unique key
      */
     @NotNull Object getKey();
+
+    /**
+     * Gets a source of this event.
+     * You need to call this to get original event, not instance itself.
+     * @return source
+     */
+    default @NotNull UpdateEvent source() {
+        return this;
+    }
 }

@@ -123,7 +123,7 @@ public class BetterHudDependency {
             "adventure-text-serializer-legacy",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.FABRIC)
     );
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_JSON = new BetterHudDependency(
             "net{}kyori",

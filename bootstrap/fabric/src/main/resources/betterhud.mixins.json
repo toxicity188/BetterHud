@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "kr.toxicity.hud.bootstrap.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "verbose": false,
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "entity.EntityMixin",
+    "entity.LivingEntityMixin"
+  ]
+}

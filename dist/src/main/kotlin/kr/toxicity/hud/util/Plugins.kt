@@ -3,6 +3,8 @@ package kr.toxicity.hud.util
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.adapter.LocationWrapper
+import kr.toxicity.hud.api.manager.ConfigManager
+import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
 import kr.toxicity.hud.manager.ConfigManagerImpl
 
 val PLUGIN
@@ -24,6 +26,9 @@ val VOLATILE_CODE = BOOTSTRAP.volatileCode()
 
 fun info(vararg message: String) = BOOTSTRAP.logger().info(*message)
 fun warn(vararg message: String) = BOOTSTRAP.logger().warn(*message)
+fun debug(level: DebugLevel, vararg message: String) {
+    if (ConfigManager.checkAvailable(level)) BOOTSTRAP.logger().info(*message)
+}
 fun task(block: () -> Unit) = BOOTSTRAP.scheduler().task(block)
 fun task(location: LocationWrapper, block: () -> Unit) = BOOTSTRAP.scheduler().task(location, block)
 fun taskLater(delay: Long, block: () -> Unit) = BOOTSTRAP.scheduler().taskLater(delay, block)

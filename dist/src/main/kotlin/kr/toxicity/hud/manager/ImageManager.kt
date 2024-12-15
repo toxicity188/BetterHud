@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.enums.ImageType
 import kr.toxicity.hud.image.enums.SplitType
@@ -45,7 +46,7 @@ object ImageManager : BetterHudManager {
             imageNameComponent.clear()
         }
         val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYaml(sender) { file, s, yamlObject ->
+        DATA_FOLDER.subFolder("images").forEachAllYamlAsync(sender) { file, s, yamlObject ->
             runWithExceptionHandling(sender, "Unable to load this image: $s in ${file.name}") {
                 val image = when (val type = ImageType.valueOf(
                     yamlObject["type"]?.asString().ifNull("type value not set.").uppercase()
@@ -131,6 +132,7 @@ object ImageManager : BetterHudManager {
                         )
                     }
                 }
+                debug(ConfigManager.DebugLevel.ASSETS, "Generating image $s...")
                 imageMap.putSync("image", s) {
                     image
                 }

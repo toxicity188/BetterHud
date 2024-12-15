@@ -1,7 +1,6 @@
 package kr.toxicity.hud.popup
 
 import com.google.gson.JsonArray
-import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
@@ -144,33 +143,17 @@ class PopupImpl(
             }
         }
     }
-    private fun show0(reason: UpdateEvent, hudPlayer: HudPlayer): PopupUpdater? {
+    private fun show0(reason: UpdateEvent, player: HudPlayer): PopupUpdater? {
         val key = reason.key
-        val get = hudPlayer.popupGroupIteratorMap.computeIfAbsent(group) {
+        val get = player.popupGroupIteratorMap.computeIfAbsent(group) {
             PopupIteratorGroupImpl()
         }
         val buildCondition = conditions build reason
-        if (!buildCondition(hudPlayer)) return null
+        if (!buildCondition(player)) return null
         var updater = {
         }
-        val valueMap = layouts
-            .asSequence()
-            .map {
-                it.getComponent(reason)
-            }
-            .map {
-                { index: Int, frame: Int ->
-                    it(hudPlayer, index, frame)
-                }
-            }
-            .toList()
-        val mapper: (Int, Int) -> List<WidthComponent> = { index, t ->
-            valueMap.map {
-                it(index, t)
-            }
-        }
         var cond = {
-            buildCondition(hudPlayer)
+            buildCondition(player)
         }
         if (duration > 0) {
             val old = cond
@@ -184,12 +167,15 @@ class PopupImpl(
                 ++i < duration && old()
             }
         }
-        val value = index?.invoke(reason)?.invoke(hudPlayer) ?: -1
+        val value = index?.invoke(reason)?.invoke(player) ?: -1
         val remove0 = {
-            hudPlayer.popupKeyMap.remove(key)
+            player.popupKeyMap.remove(key)
             Unit
         }
         val iterator = PopupIteratorImpl(
+            reason,
+            player,
+            layouts,
             this,
             unique,
             lastIndex,
@@ -199,7 +185,6 @@ class PopupImpl(
             queue,
             push,
             alwaysCheckCondition,
-            mapper,
             value,
             cond,
             remove0
@@ -213,7 +198,7 @@ class PopupImpl(
             }
             override fun remove() {
                 iterator.remove()
-                if (get.index == 0) hudPlayer.popupGroupIteratorMap.remove(group)
+                if (get.index == 0) player.popupGroupIteratorMap.remove(group)
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {
