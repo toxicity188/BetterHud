@@ -243,15 +243,14 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
 val apiShare = project("api:standard-api").adventure().legacy()
 val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
 val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
-val apiFabric = project("api:fabric-api").adventure().dependency(apiShare).also {
+project("api:fabric-api").dependency(apiShare).also {
     it.apply(plugin = "fabric-loom")
 }
 
 val api = listOf(
     apiShare,
     apiBukkit,
-    apiVelocity,
-    apiFabric
+    apiVelocity
 )
 
 fun Project.api() = dependency(api)
@@ -281,7 +280,7 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .dependency(allNmsVersion)
 
 val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
-val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventure().also {
+val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).also {
     it.apply(plugin = "fabric-loom")
 }
 
@@ -329,10 +328,6 @@ val javadocJar by tasks.creating(Jar::class.java) {
 val fabricJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(apiShare.jar())
-    from(zipTree(apiFabric.tasks.named("remapJar").map {
-        (it as org.gradle.jvm.tasks.Jar).archiveFile
-    }))
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
     }))

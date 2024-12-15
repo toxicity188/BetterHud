@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "kr.toxicity.hud.bootstrap.fabric.mixin",
+  "package": "kr.toxicity.hud.api.fabric.mixin",
   "compatibilityLevel": "JAVA_21",
   "verbose": false,
   "injectors": {

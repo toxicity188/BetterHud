@@ -23,7 +23,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
@@ -79,7 +78,6 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private lateinit var server: MinecraftServer
     private lateinit var dataFolder: File
-    private lateinit var audiences: MinecraftServerAudiences
     private lateinit var volatileCode: FabricVolatileCode
     private lateinit var version: String
     private lateinit var core: BetterHudImpl
@@ -108,7 +106,6 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                     FabricBootstrap.POST_RELOAD_EVENT.call(state)
                 }
             }
-            audiences = MinecraftServerAudiences.builder(it).build()
             volatileCode = FabricVolatileCode()
 
             val dispatcher = it.commands.dispatcher
@@ -155,7 +152,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler, _, _ ->
             latestVersion?.let { latest ->
                 if (version() != latest) {
-                    val audience = audiences.audience(listOf(handler.player))
+                    val audience = handler.player
                     audience.info("New BetterHud version found: $latest")
                     audience.info(
                         Component.text("Download: https://modrinth.com/plugin/betterhud2")
@@ -175,7 +172,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     private fun register(listener: ServerGamePacketListenerImpl) {
         PlayerManagerImpl.addHudPlayer(listener.player.uuid) {
-            val impl = HudPlayerFabric(server, listener, audiences.audience(listOf(listener.player)))
+            val impl = HudPlayerFabric(server, listener)
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
                 task {
@@ -199,7 +196,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     override fun dataFolder(): File = dataFolder
 
     override fun console(): Audience {
-        return audiences.console()
+        return server
     }
 
     override fun core(): BetterHud = core

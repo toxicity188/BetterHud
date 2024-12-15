@@ -1,7 +1,7 @@
-package kr.toxicity.hud.bootstrap.fabric.mixin.entity;
+package kr.toxicity.hud.api.fabric.mixin.entity;
 
-import kr.toxicity.hud.api.fabric.event.entity.PlayerDamageByEntityEvent;
 import kr.toxicity.hud.api.fabric.event.entity.PlayerAttackEntityEvent;
+import kr.toxicity.hud.api.fabric.event.entity.PlayerDamageByEntityEvent;
 import kr.toxicity.hud.api.fabric.event.entity.PlayerKillEntityEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
-
     @Inject(method = "hurtServer", at = @At("TAIL"))
     private void hurtServer(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
         var entity = (LivingEntity) (Object) this;

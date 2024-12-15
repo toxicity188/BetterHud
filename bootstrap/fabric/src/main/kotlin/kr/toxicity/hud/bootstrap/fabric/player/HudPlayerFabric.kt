@@ -14,8 +14,7 @@ import java.util.*
 
 class HudPlayerFabric(
     server: MinecraftServer,
-    private val listener: ServerGamePacketListenerImpl,
-    private val audience: Audience
+    private val listener: ServerGamePacketListenerImpl
 ) : HudPlayerImpl() {
 
     init {
@@ -37,7 +36,7 @@ class HudPlayerFabric(
     override fun updatePlaceholder() {
     }
 
-    override fun audience(): Audience = audience
+    override fun audience(): Audience = listener.player
 
     @Suppress("DEPRECATION")
     override fun locale(): Locale {

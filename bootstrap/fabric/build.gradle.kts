@@ -30,7 +30,8 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${properties["kyori_mod_implementation"]}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")!!)
+    modImplementation("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")
+    implementation(include(project(":api:fabric-api"))!!)
 }
 
 loom {
@@ -54,10 +55,10 @@ fabricModJson {
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),
-        "minecraft" to listOf("~${project.properties["minecraft_version"]}"),
+        "minecraft" to listOf("~${project.properties["supported_version"]}"),
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
-        "adventure-platform-fabric" to listOf("*")
+        "betterhud-fabric-api" to listOf("*")
     )
     suggests = mapOf(
         "luckperms" to listOf("*"),
@@ -65,19 +66,14 @@ fabricModJson {
         "polymer-autohost" to listOf("*"),
         "placeholder-api" to listOf("*")
     )
-    mixins = listOf(
-        mixin("betterhud.mixins.json")
-    )
 }
 
 tasks {
+    compileJava {
+        dependsOn(clean)
+    }
     remapJar {
-        archiveClassifier = "remapped"
-        from(configurations.modImplementation.get().filter {
-            !it.name.startsWith("fabric")
-        }) {
-            into("META-INF/jars")
-        }
+        archiveClassifier = ""
     }
     runServer {
         enabled = false

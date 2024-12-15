@@ -37,7 +37,7 @@ This project implements a server-side HUD.
 - [better command](https://github.com/toxicity188/BetterCommand): Implements multi-platform supporting command.
 
 
-## Dependency
+### Dependency
 - Bukkit: No
 - Velocity: No
 - Fabric server: [Fabric API](https://modrinth.com/mod/fabric-api)
@@ -57,15 +57,31 @@ Get from maven central
 
 ![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-standard-api?style=for-the-badge) (BetterHud)  
 ![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterCommand?style=for-the-badge) (BetterCommand)
+
+[Bukkit example plugin](https://github.com/toxicity188/BetterHud-MMOCore)  
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-bukkit-api) (BetterHud for Bukkit)
 ``` kotlin
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:VERSION") //Adventure api
     compileOnly("io.github.toxicity188:BetterHud-standard-api:VERSION") //Standard api
     compileOnly("io.github.toxicity188:BetterHud-bukkit-api:VERSION") //Platform api
+    compileOnly("io.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
+}
+```
+
+[Fabric example mod](https://github.com/toxicity188/betterhud-fabric-example)  
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-fabric-api) (BetterHud for Fabric)
+``` kotlin
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("io.github.toxicity188:BetterHud-standard-api:VERSION") //Standard api
+    modCompileOnly("io.github.toxicity188:BetterHud-fabric-api:VERSION") //Platform api
     compileOnly("io.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
 }
 ```
