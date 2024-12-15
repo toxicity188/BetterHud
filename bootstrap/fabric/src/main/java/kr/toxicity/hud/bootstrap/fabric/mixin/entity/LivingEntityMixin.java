@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class LivingEntityMixin {
 
     @Inject(method = "hurt", at = @At("TAIL"))
-    private void hurt( DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+    private void hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
         var entity = (LivingEntity) (Object) this;
         if (damageSource.getEntity() instanceof ServerPlayer player) {
             PlayerAttackEntityEvent.REGISTRY.call(new PlayerAttackEntityEvent(player, entity));
