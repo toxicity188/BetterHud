@@ -181,6 +181,9 @@ class PopupLayout(
                 pixel.opacity,
                 textLayout.property
             )
+            val scaledMap = textLayout.source.charWidth.entries.associate { (k, v) ->
+                k to v * textLayout.scale
+            }
             val scaledImageMap = textLayout.imageCharMap.entries.associate { (k, v) ->
                 k to v * textLayout.scale * textLayout.emoji.scale
             }
@@ -258,7 +261,7 @@ class PopupLayout(
                 textLayout,
                 HudTextData(
                     keys,
-                    textLayout.source.charWidth.entries.associate { (k, v) ->
+                    scaledMap.entries.associate { (k, v) ->
                         k to v.normalizedWidth
                     } + scaledImageMap.entries.associate { (k, v) ->
                         k to v.normalizedWidth

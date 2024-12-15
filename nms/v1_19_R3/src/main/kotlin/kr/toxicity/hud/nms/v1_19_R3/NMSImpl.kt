@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class NMSImpl : NMS {
     companion object {
         private const val INJECT_NAME = BetterHud.DEFAULT_NAMESPACE
-        private val bossBarMap = ConcurrentHashMap<UUID, HudPlayerBossBar>()
+        private val bossBarMap = ConcurrentHashMap<UUID, PlayerBossBar>()
 
         @Suppress("UNCHECKED_CAST")
         private val operation = ClientboundBossEventPacket::class.java.declaredClasses.first {
@@ -88,7 +88,7 @@ class NMSImpl : NMS {
     override fun inject(player: HudPlayer, color: BossBar.Color) {
         val h = player.handle() as CraftPlayer
         bossBarMap.computeIfAbsent(h.uniqueId) {
-            HudPlayerBossBar(h, h.handle.connection, color, Component.empty())
+            PlayerBossBar(h, h.handle.connection, color, Component.empty())
         }
     }
     override fun showBossBar(player: HudPlayer, color: BossBar.Color, component: Component) {
@@ -200,8 +200,8 @@ class NMSImpl : NMS {
     }
 
     private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID, val buf: FriendlyByteBuf)
-    private class HudPlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BossBar.Color, component: Component): ChannelDuplexHandler() {
-        private inner class HudPlayerDummyBossBar(color: BossBar.Color) {
+    private class PlayerBossBar(val player: Player, val listener: ServerGamePacketListenerImpl, color: BossBar.Color, component: Component): ChannelDuplexHandler() {
+        private inner class PlayerDummyBossBar(color: BossBar.Color) {
             val line = BetterHudAPI.inst().configManager.bossbarLine - 1
             val dummyBars = (0..<line).map {
                 HudBossBar(UUID.randomUUID(), Component.empty(), color).apply {
@@ -212,7 +212,7 @@ class NMSImpl : NMS {
                 it.uuid
             }
         }
-        private var dummy = HudPlayerDummyBossBar(color)
+        private var dummy = PlayerDummyBossBar(color)
         private val dummyBarHandleMap = Collections.synchronizedMap(LinkedHashMap<UUID, CachedHudBossbar>())
         private val otherBarCache = ConcurrentLinkedQueue<Pair<UUID, HudByteBuf>>()
         private val uuid = UUID.randomUUID().apply {
@@ -240,7 +240,7 @@ class NMSImpl : NMS {
             dummy.dummyBarsUUID.forEach {
                 listener.send(ClientboundBossEventPacket.createRemovePacket(it))
             }
-            dummy = HudPlayerDummyBossBar(color)
+            dummy = PlayerDummyBossBar(color)
             dummy.dummyBars.forEach { 
                 listener.send(ClientboundBossEventPacket.createAddPacket(it))
             }

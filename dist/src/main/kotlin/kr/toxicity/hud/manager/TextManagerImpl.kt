@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.PluginConfiguration
@@ -52,7 +53,6 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
     private const val CHAR_LENGTH = 16
 
-    @Volatile
     private var fontIndex = 0
 
     private val textMap = HashMap<String, TextElement>()
@@ -228,7 +228,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         )
         val parseDefault = parseTTFFont("",  "default_$configScale", configScale, defaultProvider, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
-        } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)
+        } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = (it.value.width * configHeight / it.value.height).roundToInt()
         }
@@ -245,6 +245,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             jsonObjectOf("providers" to defaultArray).toByteArray()
         }
 
+        val suppliers = mutableListOf<Pair<String, TextSupplier>>()
         DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
             runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
                 val fontDir = section["file"]?.asString()?.let {
@@ -257,62 +258,63 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     scale,
                     section.getAsBoolean("use-unifont", false)
                 )
-
-                textMap.putSync("text", s) {
-                    when (section.getAsString("type", "ttf").lowercase()) {
-                        "ttf" -> {
-                            parseTTFFont(
-                                file.path,
-                                "${fontDir?.nameWithoutExtension ?: "default"}_$scale",
-                                scale,
-                                provider,
-                                resource.textures,
-                                TreeMap<String, LocatedImage>().apply {
-                                    section["images"]?.asObject()
-                                        ?.forEachSubConfiguration { key, yamlObject ->
-                                            put(key, LocatedImage(
-                                                File(
-                                                    assetsFolder,
-                                                    yamlObject["name"]?.asString().ifNull("image does not set: $key")
-                                                )
-                                                    .ifNotExist("this image doesn't exist: $key")
-                                                    .toImage()
-                                                    .removeEmptyWidth()
-                                                    .ifNull("invalid image: $key"),
-                                                PixelLocation(yamlObject),
-                                                yamlObject.getAsDouble("scale", 1.0).apply {
-                                                    if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
-                                                }
-                                            ))
-                                        }
-                                },
-                                section["include"]?.asArray()?.map {
-                                    it.asString()
-                                } ?: emptyList(),
-                                section.getAsBoolean("merge-default-bitmap", false),
-                                section,
-                            )
-                        }
-                        "bitmap" -> {
-                            parseBitmapFont(
-                                file.path,
-                                s,
-                                resource.textures,
-                                section["chars"].ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
-                                    BitmapData(
-                                        obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
-                                            y.asString()
-                                        },
-                                        obj.get("file").ifNull("file value not set.").asString()
-                                    )
-                                },
-                                section
-                            )
-                        }
-                        else -> throw RuntimeException("Unsupported type: only ttf or bitmap supported.")
+                suppliers += s to when (section.getAsString("type", "ttf").lowercase()) {
+                    "ttf" -> {
+                        parseTTFFont(
+                            file.path,
+                            "${fontDir?.nameWithoutExtension ?: "default"}_$scale",
+                            scale,
+                            provider,
+                            resource.textures,
+                            TreeMap<String, LocatedImage>().apply {
+                                section["images"]?.asObject()
+                                    ?.forEachSubConfiguration { key, yamlObject ->
+                                        put(key, LocatedImage(
+                                            File(
+                                                assetsFolder,
+                                                yamlObject["name"]?.asString().ifNull("image does not set: $key")
+                                            )
+                                                .ifNotExist("this image doesn't exist: $key")
+                                                .toImage()
+                                                .removeEmptyWidth()
+                                                .ifNull("invalid image: $key"),
+                                            PixelLocation(yamlObject),
+                                            yamlObject.getAsDouble("scale", 1.0).apply {
+                                                if (this <= 0.0) throw RuntimeException("scale cannot be <= 0: $key")
+                                            }
+                                        ))
+                                    }
+                            },
+                            section["include"]?.asArray()?.map {
+                                it.asString()
+                            } ?: emptyList(),
+                            section.getAsBoolean("merge-default-bitmap", false),
+                            section,
+                        )
                     }
-
+                    "bitmap" -> {
+                        parseBitmapFont(
+                            file.path,
+                            s,
+                            resource.textures,
+                            section["chars"].ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
+                                BitmapData(
+                                    obj.get("codepoints").ifNull("codepoints value not set.").asArray().map { y ->
+                                        y.asString()
+                                    },
+                                    obj.get("file").ifNull("file value not set.").asString()
+                                )
+                            },
+                            section
+                        )
+                    }
+                    else -> throw RuntimeException("Unsupported type: only ttf or bitmap supported.")
                 }
+            }
+        }
+        suppliers.forEachAsync { (n, s) ->
+            textMap.putSync("text", n) {
+                s()
             }
         }
     }
@@ -401,9 +403,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             val h = height
             unicodeRange.filter { char ->
-                targetFont.canDisplay(char) && filter(char)
+                filter(char)
             }.forEachAsync { char ->
-                BufferedImage(
+                if (targetFont.canDisplay(char)) BufferedImage(
                     targetFont.size,
                     h,
                     BufferedImage.TYPE_INT_ARGB
@@ -438,71 +440,75 @@ object TextManagerImpl : BetterHudManager, TextManager {
         imageSaveFolder: List<String>,
         data: List<BitmapData>,
         yamlObject: YamlObject,
-    ): TextElement {
+    ): TextSupplier {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
-                TextElement(path, saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                TextSupplier {
+                    TextElement(path, saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                }
             }
         } ?: run {
-            val saveFontName = synchronized (this) {
-                "font${++fontIndex}"
-            }
-            val charWidthMap = HashMap<Int, TextScale>()
-            val textArray = ArrayList<HudTextArray>()
-            val assetsFolder = DATA_FOLDER.subFolder("assets")
-            data.forEachIndexed { i, d ->
-                val file = File(assetsFolder, d.file.replace('/', File.separatorChar))
-                    .ifNotExist("Unable to find this asset file: ${d.file}")
-                    .toImage()
-                if (d.codepoints.isEmpty()) throw RuntimeException("Codepoint is empty.")
-                if (file.height % d.codepoints.size != 0) throw RuntimeException("Image height ${file.height} cannot be divided to ${d.codepoints.size}.")
-                val codepointStream = d.codepoints.map { s ->
-                    s.codePoints().toArray().apply {
-                        if (isEmpty()) throw RuntimeException("Codepoint is empty.")
-                        if (file.width % size != 0) throw RuntimeException("Image width ${file.width} cannot be divided to ${size}.")
+            val saveFontName = "font${++fontIndex}"
+            TextSupplier {
+                val charWidthMap = HashMap<Int, TextScale>()
+                val textArray = ArrayList<HudTextArray>()
+                val assetsFolder = DATA_FOLDER.subFolder("assets")
+                debug(ConfigManager.DebugLevel.ASSETS, "Generating bitmap text $saveName...")
+                data.forEachIndexed { i, d ->
+                    val file = File(assetsFolder, d.file.replace('/', File.separatorChar))
+                        .ifNotExist("Unable to find this asset file: ${d.file}")
+                        .toImage()
+                    if (d.codepoints.isEmpty()) throw RuntimeException("Codepoint is empty.")
+                    if (file.height % d.codepoints.size != 0) throw RuntimeException("Image height ${file.height} cannot be divided to ${d.codepoints.size}.")
+                    val codepointStream = d.codepoints.map { s ->
+                        s.codePoints().toArray().apply {
+                            if (isEmpty()) throw RuntimeException("Codepoint is empty.")
+                            if (file.width % size != 0) throw RuntimeException("Image width ${file.width} cannot be divided to ${size}.")
+                        }
                     }
-                }
-                val distinct = codepointStream.map { c ->
-                    c.size
-                }.distinct()
-                if (distinct.size != 1) throw RuntimeException("Codepoint length of bitmap does not same.")
-                val width = distinct[0]
-                val encode = "text_${saveFontName}_${i + 1}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
-                val name = "$encode.png"
+                    val distinct = codepointStream.map { c ->
+                        c.size
+                    }.distinct()
+                    if (distinct.size != 1) throw RuntimeException("Codepoint length of bitmap does not same.")
+                    val width = distinct[0]
+                    val encode = "text_${saveFontName}_${i + 1}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
+                    val name = "$encode.png"
 
-                val divWidth = file.width / width
-                val divHeight = file.height / d.codepoints.size
+                    val divWidth = file.width / width
+                    val divHeight = file.height / d.codepoints.size
 
-                codepointStream.forEachIndexed { h, s ->
-                    s.forEachIndexed { w, i ->
-                        charWidthMap[i] = TextScale(
-                            file.getSubimage(w * divWidth, h * divHeight, divWidth, divHeight)
+                    codepointStream.forEachIndexed { h, s ->
+                        s.forEachIndexed { w, i ->
+                            charWidthMap[i] = TextScale(
+                                file.getSubimage(w * divWidth, h * divHeight, divWidth, divHeight)
                                     .removeEmptyWidth()?.let {
                                         it.xOffset + it.image.width
                                     }?.toDouble() ?: 0.0,
-                            divHeight.toDouble()
-                        )
+                                divHeight.toDouble()
+                            )
+                        }
                     }
-                }
 
-                PackGenerator.addTask(imageSaveFolder + name) {
-                    file.toByteArray()
+                    PackGenerator.addTask(imageSaveFolder + name) {
+                        file.toByteArray()
+                    }
+                    textArray += HudTextArray(
+                        name,
+                        jsonArrayOf(*d.codepoints.toTypedArray()),
+                        divHeight
+                    )
                 }
-                textArray += HudTextArray(
-                    name,
-                    jsonArrayOf(*d.codepoints.toTypedArray()),
-                    divHeight
+                debug(ConfigManager.DebugLevel.ASSETS, "Finalizing bitmap text $saveName...")
+                TextElement(
+                    path,
+                    saveName,
+                    null,
+                    textArray,
+                    charWidthMap,
+                    mapOf(),
+                    yamlObject
                 )
             }
-            TextElement(
-                path,
-                saveName,
-                null,
-                textArray,
-                charWidthMap,
-                mapOf(),
-                yamlObject
-            )
         }
     }
 
@@ -523,6 +529,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
         override fun compareTo(other: FontDisplay): Int = comparator.compare(this, other)
     }
 
+    private fun interface TextSupplier : () -> TextElement
+
     private fun parseTTFFont(
         path: String,
         saveName: String,
@@ -533,114 +541,119 @@ object TextManagerImpl : BetterHudManager, TextManager {
         supportedLanguage: List<String>,
         mergeDefaultBitmap: Boolean,
         yamlObject: YamlObject
-    ): TextElement {
+    ): TextSupplier {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
-                TextElement(path, saveName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                TextSupplier {
+                    TextElement(path, saveName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                }
             }
         } ?: run {
-            val saveFontName = synchronized (this) {
-                "font${++fontIndex}"
-            }
-            val pairMap = TreeMap<FontDisplay, MutableSet<CharImage>>()
-            val charWidthMap = HashMap<Int, TextScale>()
-            fun addImage(image: CharImage) {
-                val w = image.image.width
-                val h = image.image.height
-                synchronized(pairMap) {
-                    pairMap.computeIfAbsent(FontDisplay(
-                        w,
-                        h
-                    )) {
-                        TreeSet()
-                    }.add(image)
-                }
-                synchronized(charWidthMap) {
-                    charWidthMap[image.codepoint] = TextScale(
-                        w.toDouble(),
-                        h.toDouble()
-                    ) * (scale.toDouble() / h)
-                }
-            }
-            if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync { (k, v) ->
-                addImage(CharImage(k, v))
-            }
-            val supportedCodepoint = HashSet<Int>()
-            supportedLanguage.forEach {
-                languageCodepointRange[it]?.let { lang ->
-                    supportedCodepoint += lang
-                }
-            }
-            var filter = { i: Int ->
-                !charWidthMap.containsKey(i)
-            }
-            if (supportedCodepoint.isNotEmpty()) {
-                supportedCodepoint += defaultLatin
-                val old = filter
-                filter = {
-                    old(it) && supportedCodepoint.contains(it)
-                }
-            }
-            fontProvider.provide(filter) {
-                addImage(it)
-            }
-            val textList = ArrayList<HudTextArray>()
-            var i = 0
-            var imageStart = TEXT_IMAGE_START_CODEPOINT
-            val imageTextScaleMap = HashMap<Int, ImageTextScale>()
-            images.forEach { (k, v) ->
-                val nh = v.image.image.height.toDouble() * v.scale
-                imageTextScaleMap[++imageStart] = ImageTextScale(
-                    k,
-                    "$NAME_SPACE_ENCODED:${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png",
-                    v.location,
-                    scale - nh.roundToInt(),
-                    v.image.image.width.toDouble() * v.scale,
-                    nh
-                )
-                PackGenerator.addTask(imageSaveFolder + "${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
-                    v.image.image.toByteArray()
-                }
-            }
-            pairMap.forEach { (k, v) ->
-                val (w, h) = k
-                fun save(list: List<CharImage>) {
-                    val encode = "text_${saveFontName}_${++i}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
-                    val name = "$encode.png"
-                    val json = JsonArray()
-                    list.split(CHAR_LENGTH).forEach { subList ->
-                        json.add(subList.joinToString("") { pair ->
-                            pair.codepoint.parseChar()
-                        })
+            val saveFontName = "font${++fontIndex}"
+            TextSupplier {
+                debug(ConfigManager.DebugLevel.ASSETS, "Starting font text $saveName...")
+                val pairMap = TreeMap<FontDisplay, MutableSet<CharImage>>()
+                val charWidthMap = HashMap<Int, TextScale>()
+                fun addImage(image: CharImage) {
+                    val w = image.image.width
+                    val h = image.image.height
+                    synchronized(pairMap) {
+                        pairMap.computeIfAbsent(FontDisplay(
+                            w,
+                            h
+                        )) {
+                            TreeSet()
+                        }.add(image)
                     }
-                    PackGenerator.addTask(imageSaveFolder + name) {
-                        BufferedImage(w * list.size.coerceAtMost(CHAR_LENGTH), h * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
-                            createGraphics().run {
-                                composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
-                                list.forEachIndexed { index, pair ->
-                                    drawImage(pair.image, w * (index % CHAR_LENGTH), h * (index / CHAR_LENGTH), null)
+                    synchronized(charWidthMap) {
+                        charWidthMap[image.codepoint] = TextScale(
+                            w.toDouble(),
+                            h.toDouble()
+                        ) * (scale.toDouble() / h)
+                    }
+                }
+                if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync { (k, v) ->
+                    addImage(CharImage(k, v))
+                }
+                val supportedCodepoint = HashSet<Int>()
+                supportedLanguage.forEach {
+                    languageCodepointRange[it]?.let { lang ->
+                        supportedCodepoint += lang
+                    }
+                }
+                var filter = { i: Int ->
+                    !charWidthMap.containsKey(i)
+                }
+                if (supportedCodepoint.isNotEmpty()) {
+                    supportedCodepoint += defaultLatin
+                    val old = filter
+                    filter = {
+                        old(it) && supportedCodepoint.contains(it)
+                    }
+                }
+                fontProvider.provide(filter) {
+                    addImage(it)
+                }
+                debug(ConfigManager.DebugLevel.ASSETS, "Generate font text $saveName...")
+                val textList = ArrayList<HudTextArray>()
+                var i = 0
+                var imageStart = TEXT_IMAGE_START_CODEPOINT
+                val imageTextScaleMap = HashMap<Int, ImageTextScale>()
+                images.forEach { (k, v) ->
+                    val nh = v.image.image.height.toDouble() * v.scale
+                    imageTextScaleMap[++imageStart] = ImageTextScale(
+                        k,
+                        "$NAME_SPACE_ENCODED:${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png",
+                        v.location,
+                        scale - nh.roundToInt(),
+                        v.image.image.width.toDouble() * v.scale,
+                        nh
+                    )
+                    PackGenerator.addTask(imageSaveFolder + "${"glyph_${k}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
+                        v.image.image.toByteArray()
+                    }
+                }
+                pairMap.forEach { (k, v) ->
+                    val (w, h) = k
+                    fun save(list: List<CharImage>) {
+                        val encode = "text_${saveFontName}_${++i}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
+                        val name = "$encode.png"
+                        val json = JsonArray()
+                        list.split(CHAR_LENGTH).forEach { subList ->
+                            json.add(subList.joinToString("") { pair ->
+                                pair.codepoint.parseChar()
+                            })
+                        }
+                        PackGenerator.addTask(imageSaveFolder + name) {
+                            BufferedImage(w * list.size.coerceAtMost(CHAR_LENGTH), h * (((list.size - 1) / CHAR_LENGTH) + 1), BufferedImage.TYPE_INT_ARGB).apply {
+                                createGraphics().run {
+                                    composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
+                                    list.forEachIndexed { index, pair ->
+                                        drawImage(pair.image, w * (index % CHAR_LENGTH), h * (index / CHAR_LENGTH), null)
+                                    }
+                                    dispose()
                                 }
-                                dispose()
-                            }
-                        }.toByteArray()
+                            }.toByteArray()
+                        }
+                        textList += HudTextArray(name, json, scale)
                     }
-                    textList += HudTextArray(name, json, scale)
-                }
-                v.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
-                    if (target.size % CHAR_LENGTH == 0 || target.size < CHAR_LENGTH) {
-                        save(target)
-                    } else {
-                        val split = target.split(CHAR_LENGTH)
-                        save(split.subList(0, split.lastIndex).sum())
-                        save(split.last())
+                    v.toList().split(CHAR_LENGTH * CHAR_LENGTH).forEach { target ->
+                        if (target.size % CHAR_LENGTH == 0 || target.size < CHAR_LENGTH) {
+                            save(target)
+                        } else {
+                            val split = target.split(CHAR_LENGTH)
+                            save(split.subList(0, split.lastIndex).sum())
+                            save(split.last())
+                        }
                     }
                 }
+                debug(ConfigManager.DebugLevel.ASSETS, "Finalizing font text $saveName...")
+                val result = TextElement(path, saveName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
+                synchronized(textCacheMap) {
+                    textCacheMap[TextCache(saveName, images.keys)] = result
+                }
+                result
             }
-            val result = TextElement(path, saveName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
-            synchronized(textCacheMap) {
-                textCacheMap[TextCache(saveName, images.keys)] = result
-            }
-            result
         }
     }
 

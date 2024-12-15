@@ -1,12 +1,18 @@
 package kr.toxicity.hud.popup
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupSortType
+import kr.toxicity.hud.api.update.PopupUpdateEvent
+import kr.toxicity.hud.api.update.UpdateEvent
 import java.util.*
 
 class PopupIteratorImpl(
+    reason: UpdateEvent,
+    player: HudPlayer,
+    layouts: List<PopupLayout>,
     private val parent: Popup,
     private val unique: Boolean,
     private val maxIndex: Int,
@@ -16,7 +22,6 @@ class PopupIteratorImpl(
     private val save: Boolean,
     private val push: Boolean,
     private val alwaysCheckCondition: Boolean,
-    private val mapper: (Int,  Int) -> List<WidthComponent>,
     private var value: Int,
     private val condition: () -> Boolean,
     private val removeTask: () -> Unit,
@@ -25,6 +30,26 @@ class PopupIteratorImpl(
     private var i = -1
     private var removal = false
     private val id = UUID.randomUUID()
+
+    private val valueMap = run {
+        val newReason = PopupUpdateEvent(reason, this)
+        layouts
+            .asSequence()
+            .map {
+                it.getComponent(newReason)
+            }
+            .map {
+                { index: Int, frame: Int ->
+                    it(player, index, frame)
+                }
+            }
+            .toList()
+    }
+    private val mapper: (Int) -> List<WidthComponent> = { t ->
+        valueMap.map {
+            it(i, t)
+        }
+    }
 
     override fun parent(): Popup = parent
 
@@ -49,7 +74,7 @@ class PopupIteratorImpl(
     override fun getKey(): Any = key
 
     override fun next(): List<WidthComponent> {
-        return mapper(i, tick++)
+        return mapper(tick++)
     }
 
     override fun markedAsRemoval(): Boolean = removal

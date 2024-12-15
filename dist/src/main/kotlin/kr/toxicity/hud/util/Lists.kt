@@ -39,8 +39,13 @@ fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
 
 
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
+    forEachAsync({ i -> i }, block)
+}
+fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
     if (isNotEmpty()) {
-        val available = Runtime.getRuntime().availableProcessors()
+        val available = multiplier(Runtime.getRuntime().availableProcessors())
+            .coerceAtLeast(4)
+            .coerceAtMost(256)
         val tasks = if (available >= size) {
             map {
                 {

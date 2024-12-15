@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.update.PopupUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
@@ -50,6 +51,12 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     }
                 }
             },
+            "popup_index" to HudPlaceholder.of { _, u ->
+                val iterator = (u as PopupUpdateEvent).iterator
+                Function {
+                    iterator.index
+                }
+            }
         ),
         {
             it.toDoubleOrNull()

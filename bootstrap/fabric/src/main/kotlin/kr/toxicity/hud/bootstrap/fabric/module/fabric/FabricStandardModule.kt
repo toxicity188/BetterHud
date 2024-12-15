@@ -1,23 +1,24 @@
 package kr.toxicity.hud.bootstrap.fabric.module.fabric
 
-import kr.toxicity.hud.api.bukkit.trigger.HudBukkitEventTrigger
+import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.bootstrap.fabric.module.FabricModule
 import kr.toxicity.hud.bootstrap.fabric.util.armor
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
-import kr.toxicity.hud.bootstrap.fabric.module.Module
+import kr.toxicity.hud.bootstrap.fabric.util.toMiniMessageString
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.ItemStack
 import java.util.function.Function
 
-class FabricStandardModule : Module {
-    override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
+class FabricStandardModule : FabricModule {
+    override val triggers: Map<String, (YamlObject) -> HudFabricEventTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
         get() = mapOf(
@@ -180,7 +181,7 @@ class FabricStandardModule : Module {
         get() = mapOf(
             "name" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.fabricPlayer.scoreboardName
+                    p.fabricPlayer.name.toMiniMessageString()
                 }
             },
             "gamemode" to HudPlaceholder.of { _, _ ->

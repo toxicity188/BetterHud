@@ -1,5 +1,6 @@
 package kr.toxicity.hud.pack
 
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
@@ -214,6 +215,7 @@ object PackGenerator {
             tasks.values.forEachAsync { t ->
                 runWithExceptionHandling(sender, "Unable to save this file: ${t.path}") {
                     saveTask(t)
+                    debug(ConfigManager.DebugLevel.FILE,"Pack file ${t.path} is generated.")
                 }
             }
             runWithExceptionHandling(sender, "Unable to finalized resource pack build.") {

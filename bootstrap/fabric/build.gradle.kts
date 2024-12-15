@@ -15,10 +15,10 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
+    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.21:2024.07.28")
+        parchment("org.parchmentmc.data:${properties["parchment"]}")
     })
     //Other mod dependency
     modCompileOnly("eu.pb4:polymer-resource-pack:0.9.18+1.21.1")
@@ -27,9 +27,9 @@ dependencies {
     modCompileOnly("net.luckperms:api:5.4")
 
     //Kyori
-    modCompileOnly("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"]}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.14.2")!!)
+    modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
+    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")!!)
 }
 
 loom {
