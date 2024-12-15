@@ -8,7 +8,7 @@ import kr.toxicity.hud.api.fabric.update.FabricUpdateEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import net.fabricmc.loader.api.FabricLoader
-import net.kyori.adventure.platform.modcommon.impl.NonWrappingComponentSerializer
+import net.kyori.adventure.platform.fabric.impl.NonWrappingComponentSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.luckperms.api.LuckPermsProvider
 import net.minecraft.network.chat.Component
