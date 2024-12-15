@@ -446,7 +446,10 @@ fabricBootstrap.modrinthPublish(
     fabricJar,
     listOf(sourcesJar, javadocJar),
     listOf("fabric", "quilt"),
-    listOf(minecraft),
+    supportedMinecraftVersions.subList(
+        supportedMinecraftVersions.indexOf(properties["supported_version"]),
+        supportedMinecraftVersions.size
+    ),
     listOf("fabric-api"),
     listOf("luckperms", "placeholder-api", "polymer")
 )

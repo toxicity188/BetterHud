@@ -22,15 +22,6 @@ loom {
     }
 }
 
-tasks {
-    runServer {
-        enabled = false
-    }
-    remapJar {
-        archiveClassifier = "remapped"
-    }
-}
-
 fabricModJson {
     id = "betterhud-fabric-api"
     name = "${rootProject.name}-Fabric-API"
