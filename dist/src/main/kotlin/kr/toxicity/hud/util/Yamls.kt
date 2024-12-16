@@ -60,17 +60,6 @@ fun File.forEachAllYaml(sender: Audience, block: (File, String, YamlObject) -> U
         }
     }
 }
-fun File.forEachAllYamlAsync(sender: Audience, block: (File, String, YamlObject) -> Unit) {
-    val list = mutableListOf<() -> Unit>()
-    forEachAllYaml(sender) { f, s, y ->
-        list += {
-            block(f, s, y)
-        }
-    }
-    list.forEachAsync {
-        it()
-    }
-}
 
 fun YamlObject.toConditions(source: PlaceholderSource) = get("conditions")?.asObject()?.let {
     Conditions.parse(it, source)

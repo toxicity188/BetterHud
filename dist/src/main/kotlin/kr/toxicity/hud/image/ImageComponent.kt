@@ -70,8 +70,8 @@ class ImageComponent(
         val buildFollow = original.follow?.build(event)
         val mapperTree = ImageMapperTree(
             childrenMapper(this, event),
-            entries.associate {
-                it.key to it.value.childrenMapper(this, event)
+            entries.associate { (k, v) ->
+                k to v.childrenMapper(v, event)
             }
         )
         return { player ->

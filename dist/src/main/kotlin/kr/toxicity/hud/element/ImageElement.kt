@@ -23,6 +23,9 @@ class ImageElement(
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }
+    val scale = setting.getAsDouble("scale", 1.0).apply {
+        if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $name")
+    }
 
     private val childrenList = when (val child = setting["children"]) {
         is YamlArray -> child.map {

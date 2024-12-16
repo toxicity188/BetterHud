@@ -51,11 +51,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.InputStream
-import java.net.URI
 import java.net.URLClassLoader
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.function.Function
 
 @Suppress("UNUSED")
@@ -241,37 +237,28 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach {
             register(it)
         }
-        if (core.isDevVersion) warn("This build is dev version - be careful to use it!")
-        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
-            HttpClient.newHttpClient().sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val body = it.body()
-                if (description.version != body) {
-                    warn("New version found: $body")
-                    warn("Download: https://www.spigotmc.org/resources/115559")
-                    Bukkit.getPluginManager().registerEvents(object : Listener {
-                        @EventHandler
-                        fun PlayerJoinEvent.join() {
-                            val player = player
-                            if (player.isOp && ConfigManagerImpl.versionCheck) {
-                                val audience = audiences.player(player)
-                                audience.info("New BetterHud version found: $body")
-                                audience.info(
-                                    Component.text("Download: https://www.spigotmc.org/resources/115559")
-                                    .clickEvent(
-                                        ClickEvent.clickEvent(
+        core.isOldVersion {
+            warn(
+                "New version found: $it",
+                "Download: https://www.spigotmc.org/resources/115559"
+            )
+            Bukkit.getPluginManager().registerEvents(object : Listener {
+                @EventHandler
+                fun PlayerJoinEvent.join() {
+                    val player = player
+                    if (player.isOp && ConfigManagerImpl.versionCheck) {
+                        val audience = audiences.player(player)
+                        audience.info("New BetterHud version found: $it")
+                        audience.info(
+                            Component.text("Download: https://www.spigotmc.org/resources/115559")
+                                .clickEvent(
+                                    ClickEvent.clickEvent(
                                         ClickEvent.Action.OPEN_URL,
                                         "https://www.spigotmc.org/resources/115559"
                                     )))
-                            }
-                        }
-                    }, this)
+                    }
                 }
-            }
+            }, this)
         }
         core.start()
         scheduler.asyncTask {

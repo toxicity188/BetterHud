@@ -36,7 +36,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
             }
             image.forEach { pair ->
                 val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
-                val height = (pair.image.image.height.toDouble() * imageLayout.scale).roundToInt()
+                val height = (pair.image.image.height.toDouble() * imageLayout.scale * scale).roundToInt()
                 val scale = height.toDouble() / pair.image.image.height
                 val ascent = finalPixel.y.coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
                 val component = image(imageLayout.identifier(shader, ascent, fileName)) {

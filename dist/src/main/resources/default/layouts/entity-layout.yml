@@ -1,0 +1,22 @@
+entity_health_image:
+  images:
+    1:
+      name: player
+      y: -20
+    2:
+      name: entity_health_empty
+    3:
+      name: entity_health_white
+    4:
+      name: entity_health_red
+entity_health_text:
+  texts:
+    1:
+      name: entity_font
+      pattern: "Health: <#FFD800>[entity_health] // [entity_max_health]"
+      placeholder-string-format:
+        number: "#,###"
+      y: -16
+      x: -32
+      scale: 0.5
+      align: left

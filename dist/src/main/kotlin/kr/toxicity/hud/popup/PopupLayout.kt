@@ -127,7 +127,7 @@ class PopupLayout(
                 image.forEach {
                     val fileName = "$NAME_SPACE_ENCODED:${it.name}"
 
-                    val height = (it.image.image.height * target.scale).roundToInt()
+                    val height = (it.image.image.height * target.scale * scale).roundToInt()
                     val scale = height.toDouble() / it.image.image.height
                     val xOffset = (it.image.xOffset * scale).roundToInt()
                     val ascent = pixel.y

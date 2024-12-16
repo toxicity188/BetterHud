@@ -1,5 +1,6 @@
 package kr.toxicity.hud.bootstrap.fabric.module.fabric
 
+import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity
 import kr.toxicity.hud.api.fabric.event.EntityEvent
 import kr.toxicity.hud.api.fabric.event.entity.PlayerAttackEntityEvent
 import kr.toxicity.hud.api.fabric.event.entity.PlayerDamageByEntityEvent
@@ -14,6 +15,7 @@ import kr.toxicity.hud.bootstrap.fabric.module.FabricModule
 import kr.toxicity.hud.bootstrap.fabric.util.createFabricTrigger
 import kr.toxicity.hud.bootstrap.fabric.util.toMiniMessageString
 import kr.toxicity.hud.bootstrap.fabric.util.unwrap
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -78,6 +80,20 @@ class FabricEntityModule : FabricModule {
                     }
                 }
             },
+            "last_damage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        (e.entity() as? FabricLivingEntity)?.`betterhud$getLastDamage`()
+                    }
+                }
+            },
+            "last_health" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        (e.entity() as? FabricLivingEntity)?.`betterhud$getLastHealth`()
+                    }
+                }
+            },
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
@@ -106,7 +122,7 @@ class FabricEntityModule : FabricModule {
             "type" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        e.entity().type.descriptionId
+                        BuiltInRegistries.ENTITY_TYPE.getKey(e.entity().type).path
                     }
                 }
             },
