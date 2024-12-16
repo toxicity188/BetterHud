@@ -92,6 +92,13 @@ class FabricStandardModule : FabricModule {
                     (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastHealth`()
                 }
             },
+            "last_health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.fabricPlayer as FabricLivingEntity).let {
+                        it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                    }
+                }
+            },
             "vehicle_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.fabricPlayer.vehicle as? LivingEntity)?.health ?: 0.0

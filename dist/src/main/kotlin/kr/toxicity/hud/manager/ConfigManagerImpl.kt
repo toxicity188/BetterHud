@@ -94,6 +94,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
         private set
 
     override fun start() {
+        preReload()
     }
 
     override fun reload(sender: Audience, resource: GlobalResource) {

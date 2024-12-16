@@ -108,7 +108,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
                         LazyValueAccess(
                             delay,
                             multiplier,
-                            initialBuild(p)
+                            initialBuild(p).coerceAtLeast(0.0).coerceAtMost(1.0)
                         )
                     }(get)
                     other

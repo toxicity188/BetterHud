@@ -90,6 +90,15 @@ class BukkitEntityModule : BukkitModule {
                     }
                 }
             },
+            "last_health_percentage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function {
+                        (e.entity as? LivingEntity)?.let { le ->
+                            (le.health + le.lastDamage) / le.maximumHealth
+                        } ?: 0.0
+                    }
+                }
+            },
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {

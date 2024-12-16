@@ -109,6 +109,13 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.let { bp -> bp.health + bp.lastDamage }
                 }
             },
+            "last_health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.let { bp ->
+                        (bp.health + bp.lastDamage) / bp.maximumHealth
+                    }
+                }
+            },
             "vehicle_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.bukkitPlayer.vehicle as? LivingEntity)?.health ?: 0.0

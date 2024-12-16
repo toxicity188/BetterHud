@@ -12,7 +12,7 @@ entity_health_white:
       class: entity_health
       lazy: true
       delay: 10
-      initial-value: entity_last_health
+      initial-value: entity_last_health_percentage
 
 entity_health_red:
   type: listener

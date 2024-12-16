@@ -94,6 +94,15 @@ class FabricEntityModule : FabricModule {
                     }
                 }
             },
+            "last_health_percentage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        (e.entity() as? FabricLivingEntity)?.let {
+                            it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                        }
+                    }
+                }
+            },
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
