@@ -44,6 +44,12 @@ public interface BetterHud {
     }
 
     /**
+     * Checks whether this build is dev version.
+     * @return whether this build is dev version
+     */
+    boolean isDevVersion();
+
+    /**
      * Gets a bootstrap.
      * @return bootstrap.
      */

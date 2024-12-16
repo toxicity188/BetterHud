@@ -131,7 +131,7 @@ class VelocityBootstrapImpl @Inject constructor(
 
     @Subscribe
     fun enable(e: ProxyInitializeEvent) {
-        if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
+        if (core.isDevVersion) logger.warn("This build is dev version - be careful to use it!")
         else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()

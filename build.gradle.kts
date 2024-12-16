@@ -2,6 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import io.papermc.paperweight.tasks.RemapJar
 import me.lucko.jarrelocator.JarRelocator
 import me.lucko.jarrelocator.Relocation
+import java.time.LocalDateTime
 
 buildscript {
     repositories {
@@ -32,6 +33,7 @@ val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
 val betterCommand = "1.4.1"
+val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -73,7 +75,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.11" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
+    version = "1.11" + (buildNumber?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -333,6 +335,7 @@ val fabricJar by tasks.creating(Jar::class.java) {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
     }))
     from(shadowJar())
+    setManifest()
     doLast {
         relocateAll()
     }
@@ -355,6 +358,7 @@ val pluginJar by tasks.creating(Jar::class.java) {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
+    setManifest()
     doLast {
         relocateAll()
     }
@@ -369,11 +373,26 @@ val velocityJar by tasks.creating(Jar::class.java) {
         from(it.jar())
     }
     from(shadowJar())
+    setManifest()
     doLast {
         relocateAll()
     }
 }
 
+fun Jar.setManifest() {
+    manifest {
+        attributes(
+            "Dev-Build" to (buildNumber != null),
+            "Version" to project.version,
+            "Author" to "toxicity188",
+            "Url" to "https://github.com/toxicity188/BetterHud",
+            "Created-By" to "Gradle ${gradle.gradleVersion}",
+            "Build-Jdk" to "${System.getProperty("java.vendor")} ${System.getProperty("java.version")}",
+            "Build-OS" to "${System.getProperty("os.arch")} ${System.getProperty("os.name")}",
+            "Build-Date" to LocalDateTime.now().toString()
+        )
+    }
+}
 fun Jar.relocateAll() {
     val file = archiveFile.get().asFile
     val tempFile = file.copyTo(File.createTempFile("jar-relocator", System.currentTimeMillis().toString()).apply {

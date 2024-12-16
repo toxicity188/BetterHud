@@ -168,14 +168,6 @@ public interface BetterHudBootstrap {
 
 
     /**
-     * Checks whether this build is dev version.
-     * @return whether this build is dev version
-     */
-    default boolean isDevVersion() {
-        return version().contains("DEV");
-    }
-
-    /**
      * Gets a command source based on console.
      * @return console command source.
      */

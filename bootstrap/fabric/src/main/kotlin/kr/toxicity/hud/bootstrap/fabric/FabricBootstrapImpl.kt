@@ -126,7 +126,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             scheduler.asyncTask {
                 if (!skipInitialReload) core.reload()
                 logger.info("Mod enabled.")
-                if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
+                if (core.isDevVersion) logger.warn("This build is dev version - be careful to use it!")
                 else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
                     HttpClient.newHttpClient().sendAsync(
                         HttpRequest.newBuilder()

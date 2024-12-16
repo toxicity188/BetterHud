@@ -20,7 +20,10 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import java.util.jar.Attributes
 import java.util.jar.JarFile
+import java.util.jar.Manifest
+import java.util.zip.ZipEntry
 
 @Suppress("UNUSED")
 class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
@@ -71,6 +74,11 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     private val reloadStartTask = ArrayList<() -> Unit>()
     private val reloadEndTask = ArrayList<(ReloadState) -> Unit>()
+    private val isDevVersion = JarFile(bootstrap.jarFile()).use {
+        it.getInputStream(ZipEntry("META-INF/MANIFEST.MF"))?.buffered()?.use { stream ->
+            Manifest(stream).mainAttributes.getValue(Attributes.Name("Dev-Build"))?.toBoolean()
+        }
+    } ?: false
 
     override fun addReloadStartTask(runnable: Runnable) {
         reloadStartTask += {
@@ -177,4 +185,5 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     override fun isOnReload(): Boolean = onReload.get()
     override fun getDefaultKey(): Key = DEFAULT_KEY
     override fun translate(locale: String, key: String): String? = TextManagerImpl.translate(locale, key)
+    override fun isDevVersion(): Boolean = isDevVersion
 }

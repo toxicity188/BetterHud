@@ -241,7 +241,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach {
             register(it)
         }
-        if (isDevVersion) warn("This build is dev version - be careful to use it!")
+        if (core.isDevVersion) warn("This build is dev version - be careful to use it!")
         else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
