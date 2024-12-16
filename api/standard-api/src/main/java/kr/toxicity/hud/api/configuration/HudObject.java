@@ -27,4 +27,21 @@ public interface HudObject {
     default List<WidthComponent> getComponentsByType(@NotNull HudPlayer hudPlayer) {
         return getType().invoke(this, hudPlayer);
     }
+
+    /**
+     * Adds this object to player.
+     * @param player target player
+     * @return whether to success or not
+     */
+    default boolean add(@NotNull HudPlayer player) {
+        return player.getHudObjects().add(this);
+    }
+    /**
+     * Removes this object to player.
+     * @param player target player
+     * @return whether to success or not
+     */
+    default boolean remove(@NotNull HudPlayer player) {
+        return player.getHudObjects().remove(this);
+    }
 }

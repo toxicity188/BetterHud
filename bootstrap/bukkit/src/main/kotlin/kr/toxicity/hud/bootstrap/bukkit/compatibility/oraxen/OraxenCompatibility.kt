@@ -12,6 +12,8 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
+import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.util.BOOTSTRAP
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
@@ -39,7 +41,7 @@ class OraxenCompatibility : Compatibility {
         registerListener(object : Listener {
             @EventHandler
             fun OraxenPackGeneratedEvent.generate() {
-                when (val state = PLUGIN.reload()) {
+                if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                     is Success -> {
                         val output = output
                         state.resourcePack.forEach {
