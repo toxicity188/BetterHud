@@ -30,6 +30,7 @@ class PolymerResourcePackCompatibility : Compatibility {
 
     override fun start() {
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register { builder ->
+            ConfigManagerImpl.preReload()
             if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                 is Success -> {
                     state.resourcePack.forEach {

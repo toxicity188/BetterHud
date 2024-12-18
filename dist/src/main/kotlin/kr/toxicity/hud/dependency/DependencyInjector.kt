@@ -15,7 +15,7 @@ import java.net.URLClassLoader
 
 class DependencyInjector(version: String, dataFolder: File, private val logger: BetterHudLogger, classLoader: URLClassLoader) {
     companion object {
-        private const val CENTERAL = "https://repo1.maven.org/maven2"
+        private const val CENTRAL = "https://repo1.maven.org/maven2"
     }
 
     private fun interface UrlProcessor : (URL) -> Unit
@@ -44,7 +44,7 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
         }
         if (!file.exists() || file.length() == 0L) {
             logger.info("Downloading ${dependency.name}-${dependency.version}...")
-            val connection = URI.create("$CENTERAL/${dependency.toPath()}").toURL().openConnection() as HttpURLConnection
+            val connection = URI.create("$CENTRAL/${dependency.toPath()}").toURL().openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.inputStream.buffered().use { input ->
                 if (dependency.isRelocate) {

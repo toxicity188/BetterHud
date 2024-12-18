@@ -28,6 +28,7 @@ import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.call
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
@@ -262,7 +263,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
         core.start()
         scheduler.asyncTask {
-            if (!skipInitialReload) core.reload()
+            if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
             log.info(
                 "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
                 "Plugin enabled."

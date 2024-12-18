@@ -41,6 +41,7 @@ class OraxenCompatibility : Compatibility {
         registerListener(object : Listener {
             @EventHandler
             fun OraxenPackGeneratedEvent.generate() {
+                ConfigManagerImpl.preReload()
                 if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                     is Success -> {
                         val output = output

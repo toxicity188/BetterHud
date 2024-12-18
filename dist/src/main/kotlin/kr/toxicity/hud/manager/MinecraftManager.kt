@@ -13,6 +13,9 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 import java.util.jar.JarFile
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 object MinecraftManager : BetterHudManager {
 
@@ -67,8 +70,8 @@ object MinecraftManager : BetterHudManager {
                 val file = File(cache, "$current.jar")
                 if (!file.exists() || file.length() == 0L) {
                     info("$current.jar doesn't exist. so download it...")
-                    file.outputStream().buffered().use { outputStream ->
-                        client.send(HttpRequest.newBuilder()
+                    ZipOutputStream(file.outputStream().buffered()).use { outputStream ->
+                        ZipInputStream(client.send(HttpRequest.newBuilder()
                             .uri(URI.create(InputStreamReader(client.send(HttpRequest.newBuilder()
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
@@ -83,8 +86,19 @@ object MinecraftManager : BetterHudManager {
                                 .getAsJsonObject("client")
                                 .getAsJsonPrimitive("url")
                                 .asString))
-                            .GET().build(), HttpResponse.BodyHandlers.ofInputStream()).body().buffered().use { inputStream ->
-                            inputStream.copyTo(outputStream)
+                            .GET().build(),
+                            HttpResponse.BodyHandlers.ofInputStream()
+                        ).body().buffered()).use { inputStream ->
+                            var entry: ZipEntry? = inputStream.nextEntry
+                            while (entry != null) {
+                                if (entry.name.startsWith(ASSETS_LOCATION)) {
+                                    outputStream.putNextEntry(entry)
+                                    outputStream.write(inputStream.readAllBytes())
+                                    outputStream.closeEntry()
+                                }
+                                inputStream.closeEntry()
+                                entry = inputStream.nextEntry
+                            }
                         }
                     }
                 }

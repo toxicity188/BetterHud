@@ -184,7 +184,7 @@ fun Project.bukkit() = dependency("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPS
     .dependency(rootProject.fileTree("shaded"))
 fun Project.velocity() = also {
     it.dependency("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
-        .dependency("io.netty:netty-all:5.0.0.Alpha2")
+        .dependency("io.netty:netty-all:4.1.115.Final")
         .dependency("org.bstats:bstats-velocity:$bStats")
     it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
     it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")

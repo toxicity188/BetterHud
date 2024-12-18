@@ -61,6 +61,38 @@ fun File.forEachAllYaml(sender: Audience, block: (File, String, YamlObject) -> U
     }
 }
 
+interface LoadedYaml {
+    val name: String
+    val yaml: YamlObject
+}
+
+class LoadedOtherYaml(
+    override val name: String,
+    override val yaml: YamlObject
+) : LoadedYaml
+
+class LoadedFileYaml(
+    val file: File,
+    override val name: String,
+    override val yaml: YamlObject
+) : LoadedYaml
+
+fun File.mapAllYaml(sender: Audience) = mapAllFolder().mapNotNull {
+    if (it.extension == "yml") {
+        runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
+            it.toYaml().mapNotNull { (k, v) ->
+                if (v is YamlObject) LoadedFileYaml(it, k, v)
+                else null
+            }
+        }.getOrElse {
+            null
+        }
+    } else {
+        sender.warn("This is not a yml file: ${it.path}")
+        null
+    }
+}.sum()
+
 fun YamlObject.toConditions(source: PlaceholderSource) = get("conditions")?.asObject()?.let {
     Conditions.parse(it, source)
 } ?: ConditionBuilder.alwaysTrue

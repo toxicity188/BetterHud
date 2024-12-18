@@ -14,8 +14,10 @@ import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.manager.CommandManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.util.asyncTask
 import kr.toxicity.hud.util.info
@@ -124,7 +126,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload) core.reload()
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
                 logger.info("Mod enabled.")
                 core.isOldVersion {
                     warn(

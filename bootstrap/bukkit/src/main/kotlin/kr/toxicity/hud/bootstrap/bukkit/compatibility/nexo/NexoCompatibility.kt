@@ -39,6 +39,7 @@ class NexoCompatibility : Compatibility {
         registerListener(object : Listener {
             @EventHandler
             fun NexoPrePackGenerateEvent.generate() {
+                ConfigManagerImpl.preReload()
                 if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                     is Success -> {
                         state.resourcePack.forEach {
