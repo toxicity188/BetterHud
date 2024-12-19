@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.player.HudPlayerHead
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.element.HeadElement
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.pack.PackGenerator
@@ -10,20 +11,25 @@ import kr.toxicity.hud.player.head.MineToolsProvider
 import kr.toxicity.hud.player.head.PlayerSkinProvider
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
+import net.jodah.expiringmap.ExpirationPolicy
+import net.jodah.expiringmap.ExpiringMap
 import net.kyori.adventure.text.format.TextColor
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
     private val headLock = Collections.synchronizedMap(WeakHashMap<String, HudPlayerHeadImpl>())
-    private val headCache = ConcurrentHashMap<String, CachedHead>()
+    private val headCache = ExpiringMap.builder()
+        .expiration(60, TimeUnit.SECONDS)
+        .expirationPolicy(ExpirationPolicy.ACCESSED)
+        .build<String, HudPlayerHeadImpl>()
     private val headMap = HashMap<String, HeadElement>()
 
     private val headNameComponent = ConcurrentHashMap<HudLayout.Identifier, String>()
@@ -34,21 +40,6 @@ object PlayerHeadManager : BetterHudManager {
     @Synchronized
     fun setHead(group: HudLayout.Identifier, string: String) {
         headNameComponent[group] = string
-    }
-
-    private class CachedHead(
-        val name: String,
-        private val head: HudPlayerHeadImpl
-    ) {
-        @Volatile
-        private var i = 60
-        fun update(): HudPlayerHeadImpl {
-            i = 60
-            return head
-        }
-        fun check(): Boolean {
-            return --i <= 0
-        }
     }
 
     private val loadingHeadMap = HashMap<String, HudPlayerHeadImpl>()
@@ -68,16 +59,6 @@ object PlayerHeadManager : BetterHudManager {
                 TextColor.color(image.getRGB(i % 8, i / 8))
             }, emptyMap())
         }
-        asyncTaskTimer(20, 20) {
-            val iterator = headCache.values.iterator()
-            while (iterator.hasNext()) {
-                val next = iterator.next()
-                if (next.check()) {
-                    iterator.remove()
-                    headLock.remove(next.name)
-                }
-            }
-        }
     }
 
     fun provideSkin(playerName: String): String {
@@ -93,10 +74,10 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     fun provideHead(playerName: String): HudPlayerHead {
-        return headCache[playerName]?.update() ?: run {
+        return headCache[playerName] ?: run {
             headLock.computeIfAbsent(playerName) {
                 CompletableFuture.runAsync {
-                    val head = CachedHead(playerName, HudPlayerHeadImpl.of(playerName))
+                    val head = HudPlayerHeadImpl.of(playerName)
                     headCache[playerName] = head
                     headLock.remove(playerName)
                 }
@@ -109,7 +90,7 @@ object PlayerHeadManager : BetterHudManager {
         headMap[name]
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         synchronized(this) {
             headMap.clear()
             headNameComponent.clear()
@@ -128,8 +109,8 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYaml(sender) { file, s, yamlObject ->
-            runWithExceptionHandling(sender, "Unable to load this head: $s in ${file.name}") {
+        DATA_FOLDER.subFolder("heads").forEachAllYaml(info.sender) { file, s, yamlObject ->
+            runWithExceptionHandling(info.sender, "Unable to load this head: $s in ${file.name}") {
                 headMap.putSync("head", s) {
                     val head = HeadElement(file.path, s, yamlObject)
                     val pixel = head.pixel

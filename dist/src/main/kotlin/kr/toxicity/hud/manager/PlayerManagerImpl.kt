@@ -4,9 +4,9 @@ import kr.toxicity.hud.api.manager.PlayerManager
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationProvider
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
-import net.kyori.adventure.audience.Audience
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -68,7 +68,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
         }
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         hudPlayer.values.forEach {
             it.resetElements()
         }

@@ -3,17 +3,21 @@ package kr.toxicity.hud.manager
 import com.google.gson.JsonArray
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.TextManager
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.manager.TextManagerImpl.TextSupplier
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.text.*
+import kr.toxicity.hud.text.BackgroundKey
+import kr.toxicity.hud.text.HudTextArray
+import kr.toxicity.hud.text.ImageTextScale
+import kr.toxicity.hud.text.TextScale
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.font.FontRenderContext
@@ -197,7 +201,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         synchronized(this) {
             fontIndex = 0
             textMap.clear()
@@ -246,8 +250,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
         }
 
         val suppliers = mutableListOf<Pair<String, TextSupplier>>()
-        DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
-            runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
+        DATA_FOLDER.subFolder("texts").forEachAllYaml(info.sender) { file, s, section ->
+            runWithExceptionHandling(info.sender, "Unable to load this text: $s in ${file.name}") {
                 val fontDir = section["file"]?.asString()?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }

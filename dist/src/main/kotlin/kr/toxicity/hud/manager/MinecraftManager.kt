@@ -1,10 +1,10 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.ImageTextScale
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
@@ -49,7 +49,7 @@ object MinecraftManager : BetterHudManager {
 
     private var previous = ""
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
             if (assetsMap.isEmpty() || previous != current) {
@@ -57,7 +57,7 @@ object MinecraftManager : BetterHudManager {
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling(sender, "Unable to load minecraft default textures.") {
+            runWithExceptionHandling(info.sender, "Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()

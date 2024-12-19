@@ -1,8 +1,8 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.resource.GlobalResource
-import net.kyori.adventure.audience.Audience
-import java.util.EnumMap
+import java.util.*
 
 object EncodeManager : BetterHudManager {
 
@@ -11,7 +11,7 @@ object EncodeManager : BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun postReload() {

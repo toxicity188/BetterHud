@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.manager.PlaceholderManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.placeholder.PlaceholderContainer
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.update.PopupUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlElement
@@ -14,9 +15,8 @@ import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
-import net.kyori.adventure.audience.Audience
 import java.text.DecimalFormat
-import java.util.Collections
+import java.util.*
 import java.util.function.Function
 import java.util.regex.Pattern
 
@@ -364,7 +364,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

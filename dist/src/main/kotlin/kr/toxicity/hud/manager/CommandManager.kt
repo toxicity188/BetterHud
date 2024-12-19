@@ -1,29 +1,23 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.command.impl.BetterCommand
 import kr.toxicity.command.BetterCommandSource
-import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.CommandListener
+import kr.toxicity.command.impl.BetterCommand
+import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.impl.CommandMessage
-import kr.toxicity.command.impl.annotation.Aliases
-import kr.toxicity.command.impl.annotation.Command
-import kr.toxicity.command.impl.annotation.Description
-import kr.toxicity.command.impl.annotation.Option
-import kr.toxicity.command.impl.annotation.Permission
-import kr.toxicity.command.impl.annotation.Source
+import kr.toxicity.command.impl.annotation.*
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationSource
-import kr.toxicity.hud.api.plugin.ReloadState.Failure
-import kr.toxicity.hud.api.plugin.ReloadState.OnReload
-import kr.toxicity.hud.api.plugin.ReloadState.Success
+import kr.toxicity.hud.api.plugin.ReloadFlagType
+import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.*
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.File
@@ -140,10 +134,10 @@ object CommandManager : BetterHudManager {
             @Description(key = "betterhud.reload.description", defaultValue = "Reload BetterHud.")
             @Aliases(aliases = ["re", "rl"])
             @Permission("hud.reload")
-            fun reload(@Source me: BetterCommandSource) {
+            fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
-                    when (val reload = PLUGIN.reload()) {
+                    when (val reload = PLUGIN.reload(me.audience(), *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
                         is Failure -> {
@@ -530,7 +524,7 @@ object CommandManager : BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         library.reload()
     }
 

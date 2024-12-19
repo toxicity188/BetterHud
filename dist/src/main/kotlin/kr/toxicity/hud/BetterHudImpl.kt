@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudBootstrap
 import kr.toxicity.hud.api.BetterHudDependency
 import kr.toxicity.hud.api.manager.*
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.plugin.ReloadState.Failure
 import kr.toxicity.hud.api.plugin.ReloadState.Success
@@ -12,7 +13,6 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import java.io.File
 import java.io.InputStream
@@ -100,7 +100,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     private val onReload = AtomicBoolean()
 
-    override fun reload(sender: Audience): ReloadState {
+    override fun reload(info: ReloadInfo): ReloadState {
         if (onReload.get()) return ReloadState.ON_RELOAD
         onReload.set(true)
         val time = System.currentTimeMillis()
@@ -108,19 +108,19 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
             reloadStartTask.forEach {
                 it()
             }
-            val result = runWithExceptionHandling(sender, "Unable to reload.") {
+            val result = runWithExceptionHandling(info.sender, "Unable to reload.") {
                 managers.forEach {
                     it.preReload()
                 }
                 val resource = GlobalResource()
                 managers.forEach {
                     debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.javaClass.simpleName}...")
-                    it.reload(sender, resource)
+                    it.reload(info, resource)
                 }
                 managers.forEach {
                     it.postReload()
                 }
-                Success(System.currentTimeMillis() - time, PackGenerator.generate(sender))
+                Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
             }.getOrElse {
                 Failure(it)
             }

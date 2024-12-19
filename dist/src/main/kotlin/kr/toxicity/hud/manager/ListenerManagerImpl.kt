@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.manager.ListenerManager
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.placeholder.PlaceholderSource
@@ -10,7 +11,6 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import net.jodah.expiringmap.ExpirationPolicy
 import net.jodah.expiringmap.ExpiringMap
-import net.kyori.adventure.audience.Audience
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
@@ -126,7 +126,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             }
         }
     }
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

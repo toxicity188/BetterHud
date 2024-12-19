@@ -26,7 +26,7 @@ fun <R> runWithExceptionHandling(sender: Audience, message: String, block: () ->
     }
 }
 
-fun <T, R> T.runWithExceptionHandling(sender: Audience, message: String, block: T.() -> R) = runCatching(block).onFailure {
+fun <T, R> T.runWithExceptionHandling(sender: Audience, flags: Set<String>, message: String, block: T.() -> R) = runCatching(block).onFailure {
     synchronized(sender) {
         sender.warn(message)
         sender.warn("Reason: ${it.message ?: it.javaClass.name}")

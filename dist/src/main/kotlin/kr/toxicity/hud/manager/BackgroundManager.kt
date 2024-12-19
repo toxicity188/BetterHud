@@ -1,11 +1,11 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.background.HudBackground
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import java.io.File
 
 //TODO replace it to proper background in the future.
@@ -18,12 +18,12 @@ object BackgroundManager : BetterHudManager {
 
     fun getBackground(name: String) = backgroundMap[name]
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         val folder = DATA_FOLDER.subFolder("backgrounds")
         backgroundMap.clear()
         folder.forEach {
             if (it.extension == "yml") {
-                runWithExceptionHandling(sender, "Unable to load this yml: ${it.name}") {
+                runWithExceptionHandling(info.sender, "Unable to load this yml: ${it.name}") {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)

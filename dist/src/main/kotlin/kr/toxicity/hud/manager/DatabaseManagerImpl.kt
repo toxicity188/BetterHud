@@ -6,14 +6,13 @@ import kr.toxicity.hud.api.database.HudDatabaseConnector
 import kr.toxicity.hud.api.manager.DatabaseManager
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import kr.toxicity.hud.yaml.YamlObjectImpl
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.sql.DriverManager
-import java.util.concurrent.CompletableFuture
 
 object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
@@ -201,25 +200,21 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
         return connectionMap.putIfAbsent(name, connector) == null
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
-        CompletableFuture.runAsync {
-            synchronized(this) {
-                runCatching {
-                    current.close()
-                    val db = PluginConfiguration.DATABASE.create()
-                    val type = db.get("type")?.asString().ifNull("type value not set.")
-                    val info = db.get("info")?.asObject().ifNull("info configuration not set.")
-                    current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
-                }.onFailure { e ->
-                    current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
-                    warn(
-                        "Unable to connect the database.",
-                        "Reason: ${e.message}"
-                    )
-                    if (ConfigManagerImpl.isDebug) e.printStackTrace()
-                }
-            }
-        }.join()
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+        runCatching {
+            current.close()
+            val db = PluginConfiguration.DATABASE.create()
+            val type = db.get("type")?.asString().ifNull("type value not set.")
+            val dbInfo = db.get("info")?.asObject().ifNull("info configuration not set.")
+            current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(dbInfo)
+        }.onFailure { e ->
+            current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
+            warn(
+                "Unable to connect the database.",
+                "Reason: ${e.message}"
+            )
+            if (ConfigManagerImpl.isDebug) e.printStackTrace()
+        }
     }
 
     override fun end() {

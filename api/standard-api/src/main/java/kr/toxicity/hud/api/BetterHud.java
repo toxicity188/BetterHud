@@ -1,6 +1,8 @@
 package kr.toxicity.hud.api;
 
 import kr.toxicity.hud.api.manager.*;
+import kr.toxicity.hud.api.plugin.ReloadFlagType;
+import kr.toxicity.hud.api.plugin.ReloadInfo;
 import kr.toxicity.hud.api.plugin.ReloadState;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
@@ -9,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -39,8 +43,17 @@ public interface BetterHud {
      * Executes reload.
      * @return result of reload.
      */
-    default @NotNull ReloadState reload() {
+    default @NotNull ReloadState reload(@NotNull String... args) {
         return reload(bootstrap().console());
+    }
+    /**
+     * Executes reload.
+     * @param sender log handler.
+     * @param args reload args.
+     * @return result of reload.
+     */
+    default @NotNull ReloadState reload(@NotNull Audience sender, @NotNull ReloadFlagType... args) {
+        return reload(new ReloadInfo(sender, new HashSet<>(List.of(args))));
     }
 
     /**
@@ -55,12 +68,13 @@ public interface BetterHud {
      */
     @NotNull BetterHudBootstrap bootstrap();
 
+
     /**
      * Executes reload.
-     * @param sender log handler.
+     * @param info reload info.
      * @return result of reload.
      */
-    @NotNull ReloadState reload(@NotNull Audience sender);
+    @NotNull ReloadState reload(@NotNull ReloadInfo info);
 
 
     /**
