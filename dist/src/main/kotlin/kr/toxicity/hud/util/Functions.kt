@@ -5,6 +5,8 @@ import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.audience.Audience
 
+fun interface Runner<T> : () -> T
+
 fun <T> T?.ifNull(message: String): T & Any {
     return this ?: throw RuntimeException(message)
 }
@@ -26,7 +28,7 @@ fun <R> runWithExceptionHandling(sender: Audience, message: String, block: () ->
     }
 }
 
-fun <T, R> T.runWithExceptionHandling(sender: Audience, flags: Set<String>, message: String, block: T.() -> R) = runCatching(block).onFailure {
+fun <T, R> T.runWithExceptionHandling(sender: Audience, message: String, block: T.() -> R) = runCatching(block).onFailure {
     synchronized(sender) {
         sender.warn(message)
         sender.warn("Reason: ${it.message ?: it.javaClass.name}")

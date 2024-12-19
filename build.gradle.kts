@@ -79,7 +79,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven("https://jitpack.io")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
         maven("https://repo.papermc.io/repository/maven-public/") //Paper
         maven("https://repo.opencollab.dev/main/")

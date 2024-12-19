@@ -50,6 +50,7 @@ class PopupImpl(
             }
         }
     }
+    private val tick = section.getAsLong("tick", 1)
 
     private val imageEncoded = "popup_${name}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     var array: JsonArray? = JsonArray()
@@ -130,6 +131,7 @@ class PopupImpl(
     }
 
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
+    override fun tick(): Long = tick
 
     override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? {

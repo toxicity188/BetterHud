@@ -7,11 +7,13 @@ import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.update.PopupUpdateEvent
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.util.Runner
+import kr.toxicity.hud.util.runByTick
 import java.util.*
 
 class PopupIteratorImpl(
     reason: UpdateEvent,
-    player: HudPlayer,
+    private val player: HudPlayer,
     layouts: List<PopupLayout>,
     private val parent: Popup,
     private val unique: Boolean,
@@ -26,28 +28,17 @@ class PopupIteratorImpl(
     private val condition: () -> Boolean,
     private val removeTask: () -> Unit,
 ) : PopupIterator {
-    private var tick = 0
+    private var tick = 0L
     private var i = -1
     private var removal = false
     private val id = UUID.randomUUID()
 
     private val valueMap = run {
         val newReason = PopupUpdateEvent(reason, this)
-        layouts
-            .asSequence()
-            .map {
-                it.getComponent(newReason)
+        layouts.map {
+            it.getComponent(newReason) {
+                tick
             }
-            .map {
-                { index: Int, frame: Int ->
-                    it(player, index, frame)
-                }
-            }
-            .toList()
-    }
-    private val mapper: (Int) -> List<WidthComponent> = { t ->
-        valueMap.map {
-            it(i, t)
         }
     }
 
@@ -73,8 +64,20 @@ class PopupIteratorImpl(
     override fun available() = condition()
     override fun getKey(): Any = key
 
+    private var _i = -1
+    private var _mapper = emptyList<Runner<WidthComponent>>()
     override fun next(): List<WidthComponent> {
-        return mapper(tick++)
+        if (_i != i) {
+            _i = i
+            _mapper = valueMap.map {
+                runByTick(parent.tick(), { tick }, it(player, _i))
+            }
+        }
+        val r = _mapper.map {
+            it()
+        }
+        tick++
+        return r
     }
 
     override fun markedAsRemoval(): Boolean = removal

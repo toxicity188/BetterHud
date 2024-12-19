@@ -22,6 +22,7 @@ import kr.toxicity.hud.player.head.HeadRenderType.FANCY
 import kr.toxicity.hud.player.head.HeadRenderType.STANDARD
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
+import kr.toxicity.hud.renderer.Renderer
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.text.BackgroundKey
@@ -45,37 +46,40 @@ class PopupLayout(
         PopupLayoutGroup(location, json)
     }
 
-    fun getComponent(reason: UpdateEvent): (HudPlayer, Int, Int) -> WidthComponent {
+    fun getComponent(reason: UpdateEvent, frameSupplier: (HudPlayer) -> Long = { it.tick }): (HudPlayer, Int) -> Runner<WidthComponent> {
         val build = layout.conditions build reason
         val map = groups.map {
-            it.getComponent(reason)
-        }
-        return { hudPlayer, index, frame ->
-            if (build(hudPlayer)) {
-                if (index > map.lastIndex) {
-                    EMPTY_WIDTH_COMPONENT
-                } else {
-                    val get = map[index](hudPlayer, frame)
-                    get[when (layout.animation.type) {
-                        AnimationType.LOOP -> frame % get.size
-                        AnimationType.PLAY_ONCE -> frame.coerceAtMost(get.lastIndex)
-                    }]
+            it.getComponent(reason, frameSupplier).let {
+                { player: HudPlayer ->
+                    if (build(player)) it(player) else Runner {
+                        EMPTY_WIDTH_COMPONENT
+                    }
                 }
-            } else EMPTY_WIDTH_COMPONENT
+            }
+        }
+        return { player, index ->
+            map[index](player)
         }
     }
 
     private inner class PopupLayoutGroup(pair: LocationGroup, val array: JsonArray) {
-        val elements = layout.animation.location.map { location ->
+        private val elements = layout.animation.location.map { location ->
             PopupElement(pair, array, location)
         }
-        fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> List<WidthComponent> {
-            val map = elements.map {
-                it.getComponent(reason)
-            }
-            return { p, f ->
-                map.map {
-                    it(p, f)
+        fun getComponent(reason: UpdateEvent, frameSupplier: (HudPlayer) -> Long): (HudPlayer) -> Runner<WidthComponent> {
+            return { p ->
+                val frame = {
+                    frameSupplier(p)
+                }
+                val m = elements.map {
+                    it.getComponent(reason, frame)(p)
+                }
+                Runner {
+                    val f = frame()
+                    m[when (layout.animation.type) {
+                        AnimationType.LOOP -> f % m.size
+                        AnimationType.PLAY_ONCE -> f.coerceAtMost(m.lastIndex.toLong())
+                    }.toInt()]()
                 }
             }
         }
@@ -84,28 +88,22 @@ class PopupLayout(
         private val elementGui = pair.gui + parent.gui + globalLocation
         private val elementPixel = globalPixel + location
 
-        fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> WidthComponent {
-            val imageProcessing = image.map {
-                it.getComponent(reason)
+        fun getComponent(reason: UpdateEvent, frameSupplier: () -> Long): (HudPlayer) -> Runner<WidthComponent> {
+            val providers = renderers.map {
+                it.render(reason)
             }
-            val textProcessing = texts.map {
-                it.getText(reason)
-            }
-            val headProcessing = heads.map {
-                it.getHead(reason)
-            }
-            return { hudPlayer, frame ->
-                LayoutComponentContainer(layout.offset, layout.align, max)
-                    .append(imageProcessing.map {
-                        it(hudPlayer, frame)
-                    })
-                    .append(textProcessing.map {
-                        it(hudPlayer)
-                    })
-                    .append(headProcessing.map {
-                        it(hudPlayer)
-                    })
-                    .build()
+            return { player ->
+                val result = providers.map {
+                    it(player)
+                }
+                Runner {
+                    val frame = frameSupplier()
+                    LayoutComponentContainer(layout.offset, layout.align, max)
+                        .append(result.map {
+                            it(frame)
+                        })
+                        .build()
+                }
             }
         }
 
@@ -348,5 +346,11 @@ class PopupLayout(
                 pixel.x
             )
         }
+
+        private val renderers: List<Renderer> = listOf(
+            image,
+            texts,
+            heads
+        ).sum()
     }
 }

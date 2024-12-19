@@ -17,6 +17,7 @@ interface HudLayout<T : HudElement> : ConditionSource, PlaceholderSource {
     val location: PixelLocation
     val cancelIfFollowerNotExists: Boolean
     val renderScale: RenderScale
+    val tick: Long
 
     interface Identifier {
         val name: String
@@ -35,5 +36,6 @@ interface HudLayout<T : HudElement> : ConditionSource, PlaceholderSource {
         override val location: PixelLocation = PixelLocation(yaml) + originalLoc + PixelLocation.hotBarHeight
         override val cancelIfFollowerNotExists: Boolean = yaml.getAsBoolean("cancel-if-follower-not-exists", true)
         override val renderScale = RenderScale.fromConfig(location, yaml)
+        override val tick: Long = yaml.getAsLong("tick", 1)
     }
 }

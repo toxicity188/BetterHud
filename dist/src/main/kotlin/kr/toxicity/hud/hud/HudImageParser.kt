@@ -15,7 +15,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
-class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
+class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) : HudSubParser {
 
     private val chars = run {
         val finalPixel = imageLayout.location + pixel
@@ -75,11 +75,11 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
                 throw RuntimeException("circular reference found in ${imageLayout.source.name}")
             }
         )
-        renderer.max() to renderer.getComponent(UpdateEvent.EMPTY)
+        renderer.max() to renderer.render(UpdateEvent.EMPTY)
     }
 
     val max = chars.first
 
-    fun getComponent(hudPlayer: HudPlayer): PixelComponent = chars.second(hudPlayer, (hudPlayer.tick % Int.MAX_VALUE).toInt())
+    override fun render(player: HudPlayer): (Long) -> PixelComponent = chars.second(player)
 
 }

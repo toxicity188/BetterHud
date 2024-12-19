@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.util.tickProvide
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
@@ -27,7 +28,7 @@ class TextRenderer(
     layout: TextLayout,
     private val data: HudTextData,
     private val x: Int,
-) : TextLayout by layout {
+) : TextLayout by layout, Renderer {
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
@@ -60,17 +61,17 @@ class TextRenderer(
         )
 
 
-    fun getText(reason: UpdateEvent): (HudPlayer) -> PixelComponent {
-        val buildPattern = parsedPatter(reason)
-        val cond = conditions build reason
+    override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
+        val buildPattern = parsedPatter(event)
+        val cond = conditions build event
 
-        val followTarget = followHudPlayer?.build(reason)
-        val colorApply = colorOverrides(reason)
+        val followTarget = followHudPlayer?.build(event)
+        val colorApply = colorOverrides(event)
 
-        return build@ { hudPlayer ->
-            var targetHudPlayer = hudPlayer
+        return tickProvide(tick) build@ { player, _ ->
+            var targetHudPlayer = player
             followTarget?.let {
-                PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
+                PlayerManagerImpl.getHudPlayer(it.value(player).toString())?.let { p ->
                     targetHudPlayer = p
                 } ?: run {
                     if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT

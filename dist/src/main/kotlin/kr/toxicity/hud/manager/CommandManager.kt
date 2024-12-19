@@ -182,7 +182,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             huds.forEach { hud ->
-                                val success = player.hudObjects.add(hud)
+                                val success = hud.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -207,7 +207,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             huds.forEach { hud ->
-                                val success = player.hudObjects.remove(hud)
+                                val success = hud.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -237,7 +237,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             compasses.forEach { compass ->
-                                val success = player.hudObjects.add(compass)
+                                val success = compass.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -262,7 +262,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             compasses.forEach { compass ->
-                                val success = player.hudObjects.remove(compass)
+                                val success = compass.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -292,7 +292,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = player.hudObjects.add(popup)
+                                val success = popup.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -317,7 +317,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = player.hudObjects.remove(popup)
+                                val success = popup.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),

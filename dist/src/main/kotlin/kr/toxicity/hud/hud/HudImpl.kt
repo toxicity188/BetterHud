@@ -1,7 +1,7 @@
 package kr.toxicity.hud.hud
 
 import com.google.gson.JsonArray
-import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudComponentSupplier
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
@@ -37,6 +37,7 @@ class HudImpl(
     private val spaces = HashMap<Int, String>()
     private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getAsBoolean("default", false)
     var textIndex = 0
+    private val tick = section.getAsLong("tick", 1)
 
     fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
         newChar
@@ -88,16 +89,23 @@ class HudImpl(
         return HudObjectType.HUD
     }
 
+    override fun tick(): Long = tick
+
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
 
-    override fun getComponents(player: HudPlayer): List<WidthComponent> {
-        if (!conditions(player)) return emptyList()
-        return elements.map {
-            val elements = it.elements
-            elements[when (it.animationType) {
-                AnimationType.LOOP -> (player.tick % elements.size).toInt()
-                AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(elements.lastIndex)
-            }].getComponent(player)
+    override fun getComponents(player: HudPlayer): HudComponentSupplier<Hud> {
+        val map = elements.map {
+            it.animationType to it.elements.map { p ->
+                runByTick(tick, { player.tick }, p.getComponent(player))
+            }
+        }
+        return HudComponentSupplier.of(this) {
+            if (conditions(player)) map.map { (type, element) ->
+                element[when (type) {
+                    AnimationType.LOOP -> (player.tick % element.size).toInt()
+                    AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(element.lastIndex)
+                }]()
+            } else emptyList()
         }
     }
 

@@ -1,10 +1,9 @@
 package kr.toxicity.hud.api.configuration;
 
-import kr.toxicity.hud.api.component.WidthComponent;
 import kr.toxicity.hud.api.player.HudPlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Objects;
 
 public interface HudObject {
     /**
@@ -23,9 +22,19 @@ public interface HudObject {
      */
     @NotNull HudObjectType<?> getType();
 
+    /**
+     * Gets object's frame time
+     * @return frame
+     */
+    long tick();
+
     @NotNull
-    default List<WidthComponent> getComponentsByType(@NotNull HudPlayer hudPlayer) {
-        return getType().invoke(this, hudPlayer);
+    default HudComponentSupplier<?> getComponentsByType(@NotNull HudPlayer player) {
+        return getType().invoke(this, player);
+    }
+
+    default @NotNull Identifier identifier() {
+        return new Identifier(this);
     }
 
     /**
@@ -34,7 +43,8 @@ public interface HudObject {
      * @return whether to success or not
      */
     default boolean add(@NotNull HudPlayer player) {
-        return player.getHudObjects().add(this);
+        var objects = player.getHudObjects();
+        return objects.putIfAbsent(identifier(), getComponentsByType(player)) == null;
     }
     /**
      * Removes this object to player.
@@ -42,6 +52,20 @@ public interface HudObject {
      * @return whether to success or not
      */
     default boolean remove(@NotNull HudPlayer player) {
-        return player.getHudObjects().remove(this);
+        var objects = player.getHudObjects();
+        return objects.remove(identifier()) != null;
+    }
+
+    record Identifier(@NotNull HudObject source) {
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Identifier that)) return false;
+            return source.getClass() == that.source.getClass() && Objects.equals(source.getName(), that.source.getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(source.getName().hashCode());
+        }
     }
 }

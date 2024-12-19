@@ -27,7 +27,7 @@ class HudTextParser(
     private val text: TextLayout,
     gui: GuiLocation,
     pixel: PixelLocation
-) {
+) : HudSubParser {
 
     private val renderer = run {
         val loc = text.location + pixel
@@ -133,7 +133,7 @@ class HudTextParser(
             ),
             loc.x
         )
-    }.getText(UpdateEvent.EMPTY)
+    }.render(UpdateEvent.EMPTY)
 
-    fun getText(hudPlayer: HudPlayer): PixelComponent = renderer(hudPlayer)
+    override fun render(player: HudPlayer): (Long) -> PixelComponent = renderer(player)
 }

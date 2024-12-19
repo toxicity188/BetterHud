@@ -15,7 +15,7 @@ import kotlin.math.roundToInt
 
 enum class ImageType {
     SINGLE {
-        override fun getComponent(listener: HudListener, frame: Int, component: ImageComponent, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * component.images.lastIndex).roundToInt()
             }
@@ -55,13 +55,13 @@ enum class ImageType {
 
     },
     LISTENER {
-        override fun getComponent(listener: HudListener, frame: Int, component: ImageComponent, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * component.images.lastIndex).roundToInt()
             }
             return if (get >= 0) component.images[get
                 .coerceAtLeast(0)
-                .coerceAtMost(component.images.lastIndex)] else component.images[frame % component.images.size]
+                .coerceAtMost(component.images.lastIndex)] else component.images[(frame % component.images.size).toInt()]
         }
 
         override fun createElement(
@@ -98,13 +98,13 @@ enum class ImageType {
         }
     },
     SEQUENCE {
-        override fun getComponent(listener: HudListener, frame: Int, component: ImageComponent, player: HudPlayer): PixelComponent {
+        override fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent {
             val get = listener.getValue(player).run {
                 if (isNaN()) 0 else (this * component.images.lastIndex).roundToInt()
             }
             return if (get >= 0) component.images[get
                 .coerceAtLeast(0)
-                .coerceAtMost(component.images.lastIndex)] else component.images[frame % component.images.size]
+                .coerceAtMost(component.images.lastIndex)] else component.images[(frame % component.images.size).toInt()]
         }
 
         override fun createElement(
@@ -151,6 +151,6 @@ enum class ImageType {
         private val multiFrameRegex = Pattern.compile("(?<name>(([a-zA-Z]|/|.|(_))+)):(?<frame>([0-9]+))")
     }
 
-    abstract fun getComponent(listener: HudListener, frame: Int, component: ImageComponent, player: HudPlayer): PixelComponent
+    abstract fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent
     abstract fun createElement(assets: File, sender: Audience, file: File, s: String, yamlObject: YamlObject): ImageElement
 }

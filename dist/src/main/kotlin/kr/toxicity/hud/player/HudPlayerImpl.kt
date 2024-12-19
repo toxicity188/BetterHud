@@ -2,6 +2,7 @@ package kr.toxicity.hud.player
 
 import kr.toxicity.command.SenderType
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudComponentSupplier
 import kr.toxicity.hud.api.configuration.HudObject
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.HudPlayerHead
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class HudPlayerImpl : HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
-    private val objectSet = HashSet<HudObject>()
+    private val componentMap = HashMap<HudObject.Identifier, HudComponentSupplier<*>>()
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -36,10 +37,17 @@ abstract class HudPlayerImpl : HudPlayer {
     private val locationProvide = asyncTaskTimer(20, 20) {
         PlayerManagerImpl.provideLocation(this)
     }
+
+    private fun Collection<HudObject>.addSupplier() {
+        forEach {
+            componentMap[it.identifier()] = it.getComponentsByType(this@HudPlayerImpl)
+        }
+    }
+
     protected fun inject() {
-        objectSet += HudManagerImpl.defaultHuds
-        objectSet += PopupManagerImpl.defaultPopups
-        objectSet += CompassManagerImpl.defaultCompasses
+        HudManagerImpl.defaultHuds.addSupplier()
+        PopupManagerImpl.defaultPopups.addSupplier()
+        CompassManagerImpl.defaultCompasses.addSupplier()
         startTick()
         VOLATILE_CODE.inject(this, ShaderManagerImpl.barColor)
     }
@@ -49,7 +57,8 @@ abstract class HudPlayerImpl : HudPlayer {
     final override fun setAdditionalComponent(component: WidthComponent?) {
         additionalComp = component
     }
-    final override fun getHudObjects(): MutableSet<HudObject> = objectSet
+
+    final override fun getHudObjects(): MutableMap<HudObject.Identifier, HudComponentSupplier<*>> = componentMap
 
     final override fun getBarColor(): BossBar.Color? = color
     final override fun setBarColor(color: BossBar.Color?) {
@@ -97,13 +106,13 @@ abstract class HudPlayerImpl : HudPlayer {
         val compList = ArrayList<WidthComponent>()
 
         if (enabled && !PLUGIN.isOnReload) {
-            objectSet.removeIf {
+            componentMap.entries.removeIf { (k, v) ->
                 runCatching {
-                    compList.addAll(it.getComponentsByType(this))
+                    compList.addAll(v.get())
                     false
                 }.onFailure { e ->
                     e.printStackTrace()
-                    warn("Unable to update ${it.type.name}. reason: ${e.message}")
+                    warn("Unable to update ${k}. reason: ${e.message}")
                 }.getOrDefault(true)
             }
             val popupGroupIterator = popupGroup.values.iterator()
@@ -127,7 +136,8 @@ abstract class HudPlayerImpl : HudPlayer {
             }
             var comp = NEGATIVE_ONE_SPACE_COMPONENT
             compList.forEach {
-                comp += it + (-it.width).toSpaceComponent()
+                comp += it
+                comp += (-it.width).toSpaceComponent()
             }
             last = comp.finalizeFont()
 
@@ -152,23 +162,25 @@ abstract class HudPlayerImpl : HudPlayer {
         }.map {
             it.name
         }
-        objectSet.clear()
-        objectSet += PopupManagerImpl.defaultPopups
-        objectSet += HudManagerImpl.defaultHuds
-        objectSet += CompassManagerImpl.defaultCompasses
+        popupKey.clear()
+        componentMap.clear()
+        popupGroup.clear()
+        PopupManagerImpl.defaultPopups.addSupplier()
+        HudManagerImpl.defaultHuds.addSupplier()
+        CompassManagerImpl.defaultCompasses.addSupplier()
         popupNames.forEach {
             PopupManagerImpl.getPopup(it)?.let { popup ->
-                if (!popup.isDefault) objectSet += popup
+                if (!popup.isDefault) popup.add(this)
             }
         }
         hudNames.forEach {
             HudManagerImpl.getHud(it)?.let { hud ->
-                if (!hud.isDefault) objectSet += hud
+                if (!hud.isDefault) hud.add(this)
             }
         }
         compassNames.forEach {
             CompassManagerImpl.getCompass(it)?.let { hud ->
-                if (!hud.isDefault) objectSet += hud
+                if (!hud.isDefault) hud.add(this)
             }
         }
     }

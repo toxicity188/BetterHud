@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.util.tickProvide
 import kr.toxicity.hud.layout.HeadLayout
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
@@ -28,7 +29,7 @@ class HeadRenderer(
     private val font: Key,
     private val pixel: Int,
     private val x: Int,
-) : HeadLayout by layout {
+) : HeadLayout by layout, Renderer {
     private interface HeadPixelGetter {
         fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder
     }
@@ -128,11 +129,11 @@ class HeadRenderer(
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
-    fun getHead(event: UpdateEvent): (HudPlayer) -> PixelComponent {
+    override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
         val cond = conditions build event
         val playerPlaceholder = followPlayer?.build(event)
         val colorApply = colorOverrides(event)
-        return build@ { player ->
+        return tickProvide(tick) build@ { player, _ ->
             var targetPlayer = player
             var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
