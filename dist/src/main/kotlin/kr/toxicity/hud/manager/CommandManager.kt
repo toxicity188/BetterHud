@@ -2,6 +2,7 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.CommandListener
+import kr.toxicity.command.SenderType
 import kr.toxicity.command.impl.BetterCommand
 import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.impl.CommandMessage
@@ -16,6 +17,7 @@ import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.*
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
@@ -148,6 +150,28 @@ object CommandManager : BetterHudManager {
                 }
             }
             //Reload
+
+            //Parse
+            private val parse_failure1 = library.registerKey(CommandMessage("betterhud.parse.message.failure.1", Component.text("Parse failed.")))
+            private val parse_failure2 = library.registerKey(CommandMessage("betterhud.parse.message.failure.2", Component.text("Cause: [cause]")))
+            @Command
+            @Description(key = "betterhud.reload.parse", defaultValue = "Reload BetterHud.")
+            @Aliases(aliases = ["p"])
+            @Permission("hud.parse")
+            @Sender(type = [SenderType.PLAYER])
+            fun parse(@Source me: HudPlayer, @Vararg argument: String) {
+                runCatching {
+                    me.audience().sendMessage(
+                        MiniMessage
+                            .miniMessage()
+                            .deserialize(PlaceholderManagerImpl.parse(argument, PlaceholderSource.empty)(UpdateEvent.EMPTY)(me))
+                    )
+                }.onFailure { e ->
+                    parse_failure1.send(me)
+                    parse_failure2.send(me, mapOf("cause" to Component.text("${e.javaClass.simpleName}: ${e.message}")))
+                }
+            }
+            //Parse
 
             //Generate
             private val generate_tryGenerate = library.registerKey(CommandMessage("betterhud.generate.message.try_generate", Component.text("Trying to generate. please wait...")))

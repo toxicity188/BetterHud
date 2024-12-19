@@ -203,7 +203,7 @@ class PopupLayout(
                     }
                     val textEncoded = "popup_${parent.name}_text_${globalIndex}_${index}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                     val key = createAdventureKey(textEncoded)
-                    var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + textLayout.imageCharMap.size
+                    var imageTextIndex = TEXT_IMAGE_START_CODEPOINT + scaledImageMap.size
                     scaledImageMap.forEach { (k, v) ->
                         createAscent(textShader, pixel.y + v.location.y + lineIndex * textLayout.lineWidth + v.ascent) { y ->
                             array += jsonObjectOf(

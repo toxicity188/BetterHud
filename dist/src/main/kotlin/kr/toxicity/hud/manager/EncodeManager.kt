@@ -6,7 +6,7 @@ import java.util.*
 
 object EncodeManager : BetterHudManager {
 
-    private val encodeMap = EnumMap<EncodeNamespace, MutableMap<String, Int>>(EncodeNamespace::class.java)
+    private val encodeMap = EnumMap<EncodeNamespace, MutableMap<String, String>>(EncodeNamespace::class.java)
 
     override fun start() {
     }
@@ -19,6 +19,7 @@ object EncodeManager : BetterHudManager {
     }
 
     override fun end() {
+        postReload()
     }
 
     enum class EncodeNamespace {
@@ -34,8 +35,8 @@ object EncodeManager : BetterHudManager {
         }
         return synchronized(map) {
             map.computeIfAbsent(name) {
-                map.size
-            }.encode()
+                map.size.encode()
+            }
         }
     }
 

@@ -12,5 +12,5 @@ class KeyResource(val namespace: String) {
     val legacySpaceKey = create("legacy_space".encodeKey(EncodeManager.EncodeNamespace.FONT))
     val defaultKey = create("default".encodeKey(EncodeManager.EncodeNamespace.FONT))
     val spacesTtfKey = create("spaces".encodeKey(EncodeManager.EncodeNamespace.FONT))
-    val splitterKey = create("splitter".encodeKey(EncodeManager.EncodeNamespace.FONT))
+    val splitterKey = create("splitter".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
 }
