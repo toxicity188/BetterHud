@@ -15,5 +15,5 @@ public interface Hud extends HudObject {
      * @param player target player
      * @return component of hud
      */
-    @NotNull HudComponentSupplier<Hud> getComponents(@NotNull HudPlayer player);
+    @NotNull HudComponentSupplier<Hud> createRenderer(@NotNull HudPlayer player);
 }

@@ -99,8 +99,8 @@ class NMSImpl : NMS {
         bossBarMap.remove(hudPlayer.uuid())?.remove()
     }
 
-    override fun reloadBossBar(hudPlayer: HudPlayer, color: BossBar.Color) {
-        bossBarMap[hudPlayer.uuid()]?.resetDummy(color)
+    override fun reloadBossBar(player: HudPlayer, color: BossBar.Color) {
+        bossBarMap[player.uuid()]?.resetDummy(color)
     }
 
     override fun getVersion(): NMSVersion {

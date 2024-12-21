@@ -17,6 +17,10 @@ public interface PlaceholderContainer<T> {
      */
     void addPlaceholder(@NotNull String name, @NotNull HudPlaceholder<T> placeholder);
 
+    /**
+     * Gets all placeholders.
+     * @return all placeholders
+     */
     @NotNull
     @Unmodifiable
     Map<String, HudPlaceholder<?>> getAllPlaceholders();

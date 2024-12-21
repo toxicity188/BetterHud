@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A BetterHud's library
+ */
 @Getter
 @SuppressWarnings("unused")
 public class BetterHudDependency {

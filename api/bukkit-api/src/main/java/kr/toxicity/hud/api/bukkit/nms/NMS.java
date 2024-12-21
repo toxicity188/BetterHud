@@ -4,11 +4,13 @@ import kr.toxicity.command.BetterCommandSource;
 import kr.toxicity.command.impl.CommandModule;
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents volatile code handler.
  */
+@ApiStatus.Internal
 public interface NMS extends VolatileCodeHandler {
     /**
      * Gets an instance that allows async access to getHandle()
@@ -24,5 +26,9 @@ public interface NMS extends VolatileCodeHandler {
      */
     @NotNull NMSVersion getVersion();
 
+    /**
+     * Registers brigadier command to server.
+     * @param module module
+     */
     void registerCommand(@NotNull CommandModule<BetterCommandSource> module);
 }

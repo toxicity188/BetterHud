@@ -88,8 +88,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
                 }.let {
                     { reason ->
                         (it build reason).let { placeholder ->
-                            { hudPlayer ->
-                                (placeholder(hudPlayer) as Number).toDouble()
+                            { player ->
+                                (placeholder(player) as Number).toDouble()
                             }
                         }
                     }

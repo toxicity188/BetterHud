@@ -43,8 +43,8 @@ class PopupImpl(
         }.let {
             { reason ->
                 (it build reason).let { placeholder ->
-                    { hudPlayer ->
-                        (placeholder(hudPlayer) as Number).toInt()
+                    { player ->
+                        (placeholder(player) as Number).toInt()
                     }
                 }
             }
@@ -99,8 +99,8 @@ class PopupImpl(
 
     init {
         val task = { event: UpdateEvent, uuid: UUID ->
-            PlayerManagerImpl.getHudPlayer(uuid)?.let { hudPlayer ->
-                show(event, hudPlayer)
+            PlayerManagerImpl.getHudPlayer(uuid)?.let { player ->
+                show(event, player)
             }
         }
         section["triggers"]?.asObject()?.forEachSubConfiguration { _, yamlObject ->

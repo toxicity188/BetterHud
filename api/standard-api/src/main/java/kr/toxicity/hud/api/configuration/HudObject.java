@@ -1,10 +1,14 @@
 package kr.toxicity.hud.api.configuration;
 
 import kr.toxicity.hud.api.player.HudPlayer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * An element that can be display for BetterHud
+ */
 public interface HudObject {
     /**
      * Gets an internal name of object.
@@ -28,11 +32,22 @@ public interface HudObject {
      */
     long tick();
 
+    /**
+     * Gets rendered component of this object.
+     * @param player target player
+     * @return component supplier
+     */
+    @ApiStatus.Internal
     @NotNull
     default HudComponentSupplier<?> getComponentsByType(@NotNull HudPlayer player) {
         return getType().invoke(this, player);
     }
 
+    /**
+     * Creates object identifier
+     * @return identifier
+     */
+    @ApiStatus.Internal
     default @NotNull Identifier identifier() {
         return new Identifier(this);
     }
@@ -56,6 +71,10 @@ public interface HudObject {
         return objects.remove(identifier()) != null;
     }
 
+    /**
+     * Identifier
+     * @param source source
+     */
     record Identifier(@NotNull HudObject source) {
         @Override
         public boolean equals(Object o) {

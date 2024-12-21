@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Event registry of BetterHud
+ * @param <T> event type
+ */
 public final class EventRegistry<T> {
 
     /**
@@ -19,6 +23,9 @@ public final class EventRegistry<T> {
      */
     public static final Unit UNIT = new Unit();
 
+    /**
+     * Unit class
+     */
     public static final class Unit {
         private Unit() {
         }
@@ -41,22 +48,37 @@ public final class EventRegistry<T> {
         return this;
     }
 
+    /**
+     * Registers temp listener
+     * @param consumer listener
+     * @return self
+     */
     @ApiStatus.Internal
     public @NotNull EventRegistry<T> registerTemp(@NotNull Consumer<? super T> consumer) {
         tempRegistry.add(consumer);
         return this;
     }
 
+    /**
+     * Clears all temp listener.
+     */
     @ApiStatus.Internal
     public void clear() {
         tempRegistry.clear();
     }
 
+    /**
+     * Clears all temp listener from all registries.
+     */
     @ApiStatus.Internal
     public static void clearAll() {
         REGISTRIES.forEach(EventRegistry::clear);
     }
 
+    /**
+     * Calls event.
+     * @param t event
+     */
     @ApiStatus.Internal
     public void call(@NotNull T t) {
         for (Consumer<? super T> consumer : registry) {

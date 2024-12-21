@@ -17,6 +17,9 @@ import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * A boot code of BetterHud.
+ */
 public interface BetterHudBootstrap {
     /**
      * Gets a logger.
@@ -84,6 +87,10 @@ public interface BetterHudBootstrap {
     @Nullable
     InputStream resource(@NotNull String path);
 
+    /**
+     * Gets BetterHud's boot classloader.
+     * @return class loader.
+     */
     @NotNull
     URLClassLoader loader();
 

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 object PlayerManagerImpl : BetterHudManager, PlayerManager {
 
-    private val hudPlayer = ConcurrentHashMap<UUID, HudPlayer>()
+    private val playerMap = ConcurrentHashMap<UUID, HudPlayer>()
     private val stringPlayer = ConcurrentHashMap<String, HudPlayer>()
 
     private val locationProviders = mutableListOf<PointedLocationProvider>(
@@ -38,19 +38,19 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     }
 
     fun addHudPlayer(uuid: UUID, player: () -> HudPlayerImpl) {
-        hudPlayer.computeIfAbsent(uuid) {
+        playerMap.computeIfAbsent(uuid) {
             player().apply {
                 stringPlayer[name()] = this
             }
         }
     }
-    fun removeHudPlayer(uuid: UUID) = hudPlayer.remove(uuid)?.apply {
+    fun removeHudPlayer(uuid: UUID) = playerMap.remove(uuid)?.apply {
         stringPlayer.remove(name())
     }
 
-    override fun getAllHudPlayer(): Collection<HudPlayer> = Collections.unmodifiableCollection(hudPlayer.values)
+    override fun getAllHudPlayer(): Collection<HudPlayer> = Collections.unmodifiableCollection(playerMap.values)
 
-    override fun getHudPlayer(uuid: UUID) = hudPlayer[uuid]
+    override fun getHudPlayer(uuid: UUID) = playerMap[uuid]
 
     fun getHudPlayer(name: String) = stringPlayer[name]
 
@@ -59,7 +59,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     }
 
     override fun preReload() {
-        hudPlayer.values.forEach {
+        playerMap.values.forEach {
             it.popupGroupIteratorMap.forEach { value ->
                 value.value.clear()
             }
@@ -69,20 +69,20 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     }
 
     override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        hudPlayer.values.forEach {
+        playerMap.values.forEach {
             it.resetElements()
         }
     }
 
     override fun postReload() {
-        hudPlayer.values.forEach {
+        playerMap.values.forEach {
             it.startTick()
         }
     }
 
     override fun end() {
-        val list = ArrayList(hudPlayer.values)
-        hudPlayer.clear()
+        val list = ArrayList(playerMap.values)
+        playerMap.clear()
         list.forEach {
             it.save()
         }

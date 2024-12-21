@@ -14,7 +14,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * Shader manager
+ */
 public interface ShaderManager {
+    /**
+     * Defines constant (#Define)
+     * @param key name
+     * @param value value
+     */
     void addConstant(@NotNull String key, @NotNull String value);
 
     /**
@@ -25,14 +33,28 @@ public interface ShaderManager {
      */
     void addTagSupplier(@NotNull ShaderType type, @NotNull ShaderManager.ShaderTagSupplier supplier);
 
+    /**
+     * Empty tag.
+     */
     ShaderTag EMPTY_TAG = newTag()
             .add("GenerateOtherMainMethod", Collections.emptyList())
             .add("GenerateOtherDefinedMethod", Collections.emptyList());
+    /**
+     * Empty tag supplier.
+     */
     ShaderTagSupplier EMPTY_SUPPLIER = () -> EMPTY_TAG;
 
 
+    /**
+     * A supplier of shader tag.
+     */
     @FunctionalInterface
     interface ShaderTagSupplier extends Supplier<ShaderTag> {
+        /**
+         * Pluses supplier with others.
+         * @param other other supplier
+         * @return new supplier
+         */
         default ShaderTagSupplier plus(@NotNull ShaderManager.ShaderTagSupplier other) {
             return () -> get().plus(other.get());
         }
@@ -46,6 +68,9 @@ public interface ShaderManager {
         return new ShaderTag();
     }
 
+    /**
+     * Shader tag.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     class ShaderTag {
         private final Map<String, List<String>> lines = new HashMap<>();
@@ -86,6 +111,11 @@ public interface ShaderManager {
             return newTag;
         }
 
+        /**
+         * Gets a list from name
+         * @param tagName name
+         * @return tag list or null
+         */
         @ApiStatus.Internal
         @Nullable
         public List<String> get(@NotNull String tagName) {
@@ -99,11 +129,29 @@ public interface ShaderManager {
     @RequiredArgsConstructor
     @Getter
     enum ShaderType {
+        /**
+         * text vsh
+         */
         TEXT_VERTEX("text.vsh"),
+        /**
+         * text fsh
+         */
         TEXT_FRAGMENT("text.fsh"),
+        /**
+         * item vsh
+         */
         ITEM_VERTEX("item.vsh"),
+        /**
+         * item fsh
+         */
         ITEM_FRAGMENT("item.fsh"),
+        /**
+         * block vsh
+         */
         BLOCK_VERTEX("block.vsh"),
+        /**
+         * block fsh
+         */
         BLOCK_FRAGMENT("block.fsh"),
 
         ;

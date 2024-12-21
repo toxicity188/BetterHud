@@ -129,19 +129,19 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
     }
 
-    fun update(hudPlayer: HudPlayer) {
+    fun update(player: HudPlayer) {
         val task = updateTask.filter {
-            hudPlayer.tick % it.tick == 0L
+            player.tick % it.tick == 0L
         }
         if (task.isNotEmpty()) {
             val syncTask = ArrayList<PlaceholderTask>()
             task.forEach {
-                if (it.async) it(hudPlayer) else syncTask.add(it)
+                if (it.async) it(player) else syncTask.add(it)
             }
             if (syncTask.isEmpty()) return
-            task(hudPlayer.location()) {
+            task(player.location()) {
                 syncTask.forEach {
-                    it(hudPlayer)
+                    it(player)
                 }
             }
         }
@@ -312,12 +312,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         metrics = null
     }
 
-    override fun sendResourcePack(hudPlayer: HudPlayer) {
+    override fun sendResourcePack(player: HudPlayer) {
         PackUploader.server?.let {
             if (nms.version >= NMSVersion.V1_20_R3) {
-                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
+                (player.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
             } else {
-                (hudPlayer.handle() as Player).setResourcePack(it.url, it.digest, null, false)
+                (player.handle() as Player).setResourcePack(it.url, it.digest, null, false)
             }
         }
     }

@@ -7,6 +7,9 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Set;
 
+/**
+ * Compass manager
+ */
 public interface CompassManager {
     /**
      * Gets compass by given name.

@@ -93,7 +93,7 @@ class HudImpl(
 
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
 
-    override fun getComponents(player: HudPlayer): HudComponentSupplier<Hud> {
+    override fun createRenderer(player: HudPlayer): HudComponentSupplier<Hud> {
         val map = elements.map {
             it.animationType to it.elements.map { p ->
                 runByTick(tick, { player.tick }, p.getComponent(player))

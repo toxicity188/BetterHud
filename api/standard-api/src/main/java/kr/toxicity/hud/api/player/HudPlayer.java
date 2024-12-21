@@ -25,12 +25,31 @@ import java.util.stream.Collectors;
  * Represents player data.
  */
 public interface HudPlayer extends BetterCommandSource {
+    /**
+     * Gets player uuid.
+     * @return uuid
+     */
     @NotNull
     UUID uuid();
+
+    /**
+     * Gets player scorebard name
+     * @return name
+     */
     @NotNull
     String name();
+
+    /**
+     * Gets player location
+     * @return location
+     */
     @NotNull
     LocationWrapper location();
+
+    /**
+     * Gets player world
+     * @return world
+     */
     @NotNull
     WorldWrapper world();
 

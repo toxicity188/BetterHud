@@ -39,6 +39,12 @@ public record PointedLocation(
         return Objects.hashCode(name);
     }
 
+
+    /**
+     * Finds location from yaml.
+     * @param data raw data
+     * @return location
+     */
     public static @NotNull PointedLocation deserialize(@NotNull YamlObject data) {
         return new PointedLocation(
                 PointedLocationSource.INTERNAL,
@@ -47,6 +53,11 @@ public record PointedLocation(
                 LocationWrapper.deserialize(Objects.requireNonNull(data.get("location"), "location").asObject())
         );
     }
+    /**
+     * Finds location from json.
+     * @param data raw data
+     * @return location
+     */
     public static @NotNull PointedLocation deserialize(@NotNull JsonObject data) {
         return new PointedLocation(
                 PointedLocationSource.INTERNAL,
@@ -55,6 +66,10 @@ public record PointedLocation(
                 LocationWrapper.deserialize(Objects.requireNonNull(data.getAsJsonObject("location"), "location"))
         );
     }
+    /**
+     * Serializes to map.
+     * @return map
+     */
     public @NotNull Map<String, Object> serialize() {
         var map = new LinkedHashMap<String, Object>();
         map.put("name", name);

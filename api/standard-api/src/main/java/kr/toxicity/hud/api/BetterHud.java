@@ -22,12 +22,30 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public interface BetterHud {
 
+    /**
+     * Default namespace.
+     */
     String DEFAULT_NAMESPACE = "betterhud";
+    /**
+     * Adventure api version.
+     */
     String ADVENTURE_VERSION = "4.17.0";
+    /**
+     * Adventure platform version.
+     */
     String PLATFORM_VERSION = "4.3.4";
+    /**
+     * Examination version.
+     */
     String EXAMINATION_VERSION = "1.3.0";
 
+    /**
+     * BStats id for Bukkit
+     */
     int BSTATS_ID_BUKKIT = 21287;
+    /**
+     * BStats id for Velocity
+     */
     int BSTATS_ID_VELOCITY = 23460;
 
 
@@ -41,6 +59,7 @@ public interface BetterHud {
 
     /**
      * Executes reload.
+     * @param args reload args
      * @return result of reload.
      */
     default @NotNull ReloadState reload(@NotNull String... args) {

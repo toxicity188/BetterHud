@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
  * @param pixel pixel
  */
 public record PixelComponent(@NotNull WidthComponent component, int pixel) {
+    /**
+     * Pluses component with others.
+     * @param other other
+     * @return new component
+     */
     public @NotNull PixelComponent plus(@NotNull WidthComponent other) {
         return new PixelComponent(
                 component.plus(other),

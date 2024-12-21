@@ -5,6 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Start of BetterHud API.
+ */
 public final class BetterHudAPI {
 
     //Private constructor for dummy class.
@@ -22,6 +25,10 @@ public final class BetterHudAPI {
         return Objects.requireNonNull(main);
     }
 
+    /**
+     * Sets a main instance of BetterHud.
+     * @param instance instance
+     */
     @ApiStatus.Internal
     public static void inst(@NotNull BetterHud instance) {
         if (main != null) throw new RuntimeException();
