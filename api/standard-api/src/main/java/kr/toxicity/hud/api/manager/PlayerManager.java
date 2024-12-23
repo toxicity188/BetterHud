@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * Player manager
+ */
 public interface PlayerManager {
     /**
      * Gets the player's data from bukkit player.

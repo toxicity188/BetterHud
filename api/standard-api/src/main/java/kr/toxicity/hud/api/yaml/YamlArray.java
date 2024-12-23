@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * Yaml array.
+ */
 public interface YamlArray extends Iterable<YamlElement>, YamlElement {
 
     /**

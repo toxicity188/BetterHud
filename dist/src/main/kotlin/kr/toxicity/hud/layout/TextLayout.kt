@@ -61,7 +61,7 @@ interface TextLayout : HudLayout<TextElement> {
 
     fun identifier(shader: HudShader, ascent: Int): HudLayout.Identifier {
         return TextIdentifier(
-            ShaderGroup(shader, source.name, ascent),
+            ShaderGroup(shader, source.id, ascent),
             this
         )
     }

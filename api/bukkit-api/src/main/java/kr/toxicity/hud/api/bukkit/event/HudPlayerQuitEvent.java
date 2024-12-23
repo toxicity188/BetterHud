@@ -11,17 +11,30 @@ import org.jetbrains.annotations.NotNull;
  * player quit event.
  */
 @Getter
-public class HudPlayerQuitEvent extends PlayerEvent implements BetterHudEvent {
+public class HudPlayerQuitEvent extends PlayerEvent implements HudPlayerEvent {
     private final @NotNull HudPlayer hudPlayer;
+
+    /**
+     * Player quited.
+     * @param hudPlayer target player
+     */
     public HudPlayerQuitEvent(@NotNull HudPlayer hudPlayer) {
         super((Player) hudPlayer.handle());
         this.hudPlayer = hudPlayer;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     @NotNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

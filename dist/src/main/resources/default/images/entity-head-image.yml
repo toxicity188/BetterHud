@@ -1,0 +1,235 @@
+player:
+  type: single
+  file: "entity/head/player.png"
+  setting:
+    scale: 2
+    follow: entity_type
+    children:
+      - allay
+      - axolotl
+      - bear
+      - bee
+      - breeze
+      - cat
+      - cow
+      - creaking
+      - creeper
+      - enderdragon
+      - enderman
+      - evoker
+      - fish
+      - fox
+      - ghast
+      - hoglin
+      - illusioner
+      - iron_golem
+      - panda
+      - pig
+      - piglin
+      - pillager
+      - ravager
+      - sheep
+      - shulker
+      - skeleton
+      - slime
+      - spider
+      - squid
+      - strider
+      - turtle
+      - vex
+      - villager
+      - vindicator
+      - warden
+      - wither
+      - zombie
+      - zombie_villager
+allay:
+  type: single
+  file: "entity/head/allay.png"
+  setting:
+    scale: 3.2
+axolotl:
+  type: single
+  file: "entity/head/axolotl.png"
+  setting:
+    scale: 2.0
+bear:
+  type: single
+  file: "entity/head/bear.png"
+  setting:
+    scale: 2.2857144
+bee:
+  type: single
+  file: "entity/head/bee.png"
+  setting:
+    scale: 0.25
+breeze:
+  type: single
+  file: "entity/head/breeze.png"
+  setting:
+    scale: 2.0
+cat:
+  type: single
+  file: "entity/head/cat.png"
+  setting:
+    scale: 3.2
+cow:
+  type: single
+  file: "entity/head/cow.png"
+  setting:
+    scale: 2.0
+creaking:
+  type: single
+  file: "entity/head/creaking.png"
+  setting:
+    scale: 1.6
+creeper:
+  type: single
+  file: "entity/head/creeper.png"
+  setting:
+    scale: 2.0
+enderdragon:
+  type: single
+  file: "entity/head/enderdragon.png"
+  setting:
+    scale: 1.0
+enderman:
+  type: single
+  file: "entity/head/enderman.png"
+  setting:
+    scale: 2.0
+evoker:
+  type: single
+  file: "entity/head/evoker.png"
+  setting:
+    scale: 1.6
+fish:
+  type: single
+  file: "entity/head/fish.png"
+  setting:
+    scale: 0.5
+fox:
+  type: single
+  file: "entity/head/fox.png"
+  setting:
+    scale: 1.6
+ghast:
+  type: single
+  file: "entity/head/ghast.png"
+  setting:
+    scale: 1.0
+hoglin:
+  type: single
+  file: "entity/head/hoglin.png"
+  setting:
+    scale: 0.64
+illusioner:
+  type: single
+  file: "entity/head/illusioner.png"
+  setting:
+    scale: 1.6
+iron_golem:
+  type: single
+  file: "entity/head/iron_golem.png"
+  setting:
+    scale: 2.0
+panda:
+  type: single
+  file: "entity/head/panda.png"
+  setting:
+    scale: 1.2307693
+pig:
+  type: single
+  file: "entity/head/pig.png"
+  setting:
+    scale: 2.0
+piglin:
+  type: single
+  file: "entity/head/piglin.png"
+  setting:
+    scale: 1.6
+pillager:
+  type: single
+  file: "entity/head/pillager.png"
+  setting:
+    scale: 1.6
+ravager:
+  type: single
+  file: "entity/head/ravager.png"
+  setting:
+    scale: 0.8888889
+sheep:
+  type: single
+  file: "entity/head/sheep.png"
+  setting:
+    scale: 2.6666667
+shulker:
+  type: single
+  file: "entity/head/shulker.png"
+  setting:
+    scale: 2.6666667
+skeleton:
+  type: single
+  file: "entity/head/skeleton.png"
+  setting:
+    scale: 2.0
+slime:
+  type: single
+  file: "entity/head/slime.png"
+  setting:
+    scale: 2.0
+spider:
+  type: single
+  file: "entity/head/spider.png"
+  setting:
+    scale: 1.6
+squid:
+  type: single
+  file: "entity/head/squid.png"
+  setting:
+    scale: 1.0
+strider:
+  type: single
+  file: "entity/head/strider.png"
+  setting:
+    scale: 1.0
+turtle:
+  type: single
+  file: "entity/head/turtle.png"
+  setting:
+    scale: 0.125
+vex:
+  type: single
+  file: "entity/head/vex.png"
+  setting:
+    scale: 3.2
+villager:
+  type: single
+  file: "entity/head/villager.png"
+  setting:
+    scale: 2.0
+vindicator:
+  type: single
+  file: "entity/head/vindicator.png"
+  setting:
+    scale: 1.6
+warden:
+  type: single
+  file: "entity/head/warden.png"
+  setting:
+    scale: 1.0
+wither:
+  type: single
+  file: "entity/head/wither.png"
+  setting:
+    scale: 2.0
+zombie:
+  type: single
+  file: "entity/head/zombie.png"
+  setting:
+    scale: 0.25
+zombie_villager:
+  type: single
+  file: "entity/head/zombie_villager.png"
+  setting:
+    scale: 2.0

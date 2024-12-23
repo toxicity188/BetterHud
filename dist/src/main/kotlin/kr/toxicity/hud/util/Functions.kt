@@ -5,6 +5,8 @@ import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.audience.Audience
 
+fun interface Runner<T> : () -> T
+
 fun <T> T?.ifNull(message: String): T & Any {
     return this ?: throw RuntimeException(message)
 }

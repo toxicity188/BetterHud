@@ -21,12 +21,13 @@ import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
 class HudTextParser(
+    globalIndex: Int,
     parent: HudImpl,
     resource: GlobalResource,
     private val text: TextLayout,
     gui: GuiLocation,
     pixel: PixelLocation
-) {
+) : HudSubParser {
 
     private val renderer = run {
         val loc = text.location + pixel
@@ -62,7 +63,7 @@ class HudTextParser(
                     }
                 }
                 var textIndex = TEXT_IMAGE_START_CODEPOINT + scaledImageMap.size
-                val textEncoded = "hud_${parent.name}_text_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
+                val textEncoded = "hud_${parent.name}_text_${globalIndex}_${index2 + 1}_${lineIndex + 1}".encodeKey(EncodeManager.EncodeNamespace.FONT)
                 val key = createAdventureKey(textEncoded)
                 scaledImageMap.forEach { (k, v) ->
                     createAscent(shader, loc.y + v.location.y + lineIndex * text.lineWidth + v.ascent) { y ->
@@ -86,14 +87,7 @@ class HudTextParser(
                             val result = (++textIndex).parseChar()
                             val height = (image.image.height.toDouble() * text.background.scale).roundToInt()
                             val div = height.toDouble() / image.image.height
-                            createAscent(HudShader(
-                                gui,
-                                render,
-                                text.layer - 1,
-                                false,
-                                loc.opacity * it.location.opacity,
-                                text.property
-                            ), loc.y + it.location.y + lineIndex * text.lineWidth) { y ->
+                            createAscent(shader.toBackground(it.location.opacity), loc.y + it.location.y + lineIndex * text.lineWidth) { y ->
                                 array += jsonObjectOf(
                                     "type" to "bitmap",
                                     "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -108,9 +102,9 @@ class HudTextParser(
                         }
                         BackgroundLayout(
                             it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                            getString(it.right, "background_${it.name}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                            getString(it.body, "background_${it.name}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
+                            getString(it.left, "background_${it.id}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.right, "background_${it.id}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.body, "background_${it.id}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
                         )
                     }
                 )
@@ -132,7 +126,7 @@ class HudTextParser(
             ),
             loc.x
         )
-    }.getText(UpdateEvent.EMPTY)
+    }.render(UpdateEvent.EMPTY)
 
-    fun getText(hudPlayer: HudPlayer): PixelComponent = renderer(hudPlayer)
+    override fun render(player: HudPlayer): (Long) -> PixelComponent = renderer(player)
 }

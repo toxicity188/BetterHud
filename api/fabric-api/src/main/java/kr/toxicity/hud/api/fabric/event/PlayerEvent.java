@@ -8,5 +8,9 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> registry type
  */
 public interface PlayerEvent<T extends FabricEvent<?>> extends FabricEvent<T> {
+    /**
+     * Gets triggered player.
+     * @return player
+     */
     @NotNull ServerPlayer player();
 }

@@ -3,17 +3,21 @@ package kr.toxicity.hud.manager
 import com.google.gson.JsonArray
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.TextManager
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.manager.TextManagerImpl.TextSupplier
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.text.*
+import kr.toxicity.hud.text.BackgroundKey
+import kr.toxicity.hud.text.HudTextArray
+import kr.toxicity.hud.text.ImageTextScale
+import kr.toxicity.hud.text.TextScale
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.font.FontRenderContext
@@ -197,7 +201,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         synchronized(this) {
             fontIndex = 0
             textMap.clear()
@@ -226,7 +230,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             configScale,
             fontConfig.getAsBoolean("use-unifont", false)
         )
-        val parseDefault = parseTTFFont("",  "default_$configScale", configScale, defaultProvider, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
+        val parseDefault = parseTTFFont("", "default_$configScale", configScale, defaultProvider, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
         } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)()
         parseDefault.charWidth.forEach {
@@ -245,9 +249,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
             jsonObjectOf("providers" to defaultArray).toByteArray()
         }
 
-        val suppliers = mutableListOf<Pair<String, TextSupplier>>()
-        DATA_FOLDER.subFolder("texts").forEachAllYaml(sender) { file, s, section ->
-            runWithExceptionHandling(sender, "Unable to load this text: $s in ${file.name}") {
+        val suppliers = mutableListOf<TextSupplier>()
+        DATA_FOLDER.subFolder("texts").forEachAllYaml(info.sender) { file, s, section ->
+            runWithExceptionHandling(info.sender, "Unable to load this text: $s in ${file.name}") {
                 val fontDir = section["file"]?.asString()?.let {
                     File(fontFolder, it).ifNotExist("this file doesn't exist: $it")
                 }
@@ -258,10 +262,10 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     scale,
                     section.getAsBoolean("use-unifont", false)
                 )
-                suppliers += s to when (section.getAsString("type", "ttf").lowercase()) {
+                suppliers += when (section.getAsString("type", "ttf").lowercase()) {
                     "ttf" -> {
                         parseTTFFont(
-                            file.path,
+                            s,
                             "${fontDir?.nameWithoutExtension ?: "default"}_$scale",
                             scale,
                             provider,
@@ -294,7 +298,6 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                     "bitmap" -> {
                         parseBitmapFont(
-                            file.path,
                             s,
                             resource.textures,
                             section["chars"].ifNull("Unable to find 'chars' array.").asObject().mapSubConfiguration { _, obj ->
@@ -312,8 +315,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 }
             }
         }
-        suppliers.forEachAsync { (n, s) ->
-            textMap.putSync("text", n) {
+        suppliers.forEachAsync { s ->
+            textMap.putSync("text") {
                 s()
             }
         }
@@ -435,7 +438,6 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
     private fun parseBitmapFont(
-        path: String,
         saveName: String,
         imageSaveFolder: List<String>,
         data: List<BitmapData>,
@@ -444,7 +446,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
                 TextSupplier {
-                    TextElement(path, saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                    TextElement(saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
                 }
             }
         } ?: run {
@@ -500,7 +502,6 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 }
                 debug(ConfigManager.DebugLevel.ASSETS, "Finalizing bitmap text $saveName...")
                 TextElement(
-                    path,
                     saveName,
                     null,
                     textArray,
@@ -532,7 +533,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private fun interface TextSupplier : () -> TextElement
 
     private fun parseTTFFont(
-        path: String,
+        internalName: String,
         saveName: String,
         scale: Int,
         fontProvider: FontBitmapProvider,
@@ -545,7 +546,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         return synchronized(textCacheMap) {
             textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
                 TextSupplier {
-                    TextElement(path, saveName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
+                    TextElement(internalName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
                 }
             }
         } ?: run {
@@ -648,9 +649,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                 }
                 debug(ConfigManager.DebugLevel.ASSETS, "Finalizing font text $saveName...")
-                val result = TextElement(path, saveName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
+                val result = TextElement(internalName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
                 synchronized(textCacheMap) {
-                    textCacheMap[TextCache(saveName, images.keys)] = result
+                    textCacheMap[TextCache(internalName, images.keys)] = result
                 }
                 result
             }

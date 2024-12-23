@@ -125,74 +125,74 @@ class NMSImpl : NMS {
         }
     }
 
-    override fun getFoliaAdaptedPlayer(hudPlayer: Player): Player {
-        val handle = (hudPlayer as CraftPlayer).handle
+    override fun getFoliaAdaptedPlayer(player: Player): Player {
+        val handle = (player as CraftPlayer).handle
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {
             override fun getPersistentDataContainer(): CraftPersistentDataContainer {
-                return hudPlayer.persistentDataContainer
+                return player.persistentDataContainer
             }
             override fun getHandle(): ServerPlayer {
                 return handle
             }
             override fun getHealth(): Double {
-                return hudPlayer.health
+                return player.health
             }
             override fun getScaledHealth(): Float {
-                return hudPlayer.scaledHealth
+                return player.scaledHealth
             }
             override fun getFirstPlayed(): Long {
-                return hudPlayer.firstPlayed
+                return player.firstPlayed
             }
             override fun getInventory(): PlayerInventory {
-                return hudPlayer.inventory
+                return player.inventory
             }
             override fun getEnderChest(): Inventory {
-                return hudPlayer.enderChest
+                return player.enderChest
             }
             override fun isOp(): Boolean {
-                return hudPlayer.isOp
+                return player.isOp
             }
             override fun getGameMode(): GameMode {
-                return hudPlayer.gameMode
+                return player.gameMode
             }
             override fun getEquipment(): EntityEquipment {
-                return hudPlayer.equipment
+                return player.equipment
             }
             override fun hasPermission(name: String): Boolean {
-                return hudPlayer.hasPermission(name)
+                return player.hasPermission(name)
             }
             override fun hasPermission(perm: Permission): Boolean {
-                return hudPlayer.hasPermission(perm)
+                return player.hasPermission(perm)
             }
             override fun isPermissionSet(name: String): Boolean {
-                return hudPlayer.isPermissionSet(name)
+                return player.isPermissionSet(name)
             }
             override fun isPermissionSet(perm: Permission): Boolean {
-                return hudPlayer.isPermissionSet(perm)
+                return player.isPermissionSet(perm)
             }
             override fun hasPlayedBefore(): Boolean {
-                return hudPlayer.hasPlayedBefore()
+                return player.hasPlayedBefore()
             }
             override fun getWorldBorder(): WorldBorder? {
-                return hudPlayer.getWorldBorder()
+                return player.getWorldBorder()
             }
             override fun showBossBar(bar: BossBar) {
-                hudPlayer.showBossBar(bar)
+                player.showBossBar(bar)
             }
             override fun hideBossBar(bar: BossBar) {
-                hudPlayer.hideBossBar(bar)
+                player.hideBossBar(bar)
             }
             override fun sendMessage(message: String) {
-                hudPlayer.sendMessage(message)
+                player.sendMessage(message)
             }
             override fun getLastDamageCause(): EntityDamageEvent? {
-                return hudPlayer.lastDamageCause
+                return player.lastDamageCause
             }
             override fun pointers(): Pointers {
-                return hudPlayer.pointers()
+                return player.pointers()
             }
             override fun spigot(): Player.Spigot {
-                return hudPlayer.spigot()
+                return player.spigot()
             }
         }
     }

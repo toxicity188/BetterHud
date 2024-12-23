@@ -10,7 +10,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.security.MessageDigest
 import java.util.*
 
 object PackUploader {
@@ -32,28 +31,17 @@ object PackUploader {
         return result
     }
 
-    fun upload(message: MessageDigest, byteArray: ByteArray) {
-        val hash = StringBuilder(40)
-        val digest = message.digest()
-        for (element in digest) {
-            val byte = element.toInt()
-            hash.append(Character.forDigit((byte shr 4) and 15, 16))
-                .append(Character.forDigit(byte and 15, 16))
-        }
-        val string = hash.toString()
-        var t = 0
-        val uuid = UUID.nameUUIDFromBytes(ByteArray(20) {
-            ((Character.digit(hash.codePointAt(t++), 16) shl 4) or Character.digit(hash.codePointAt(t++), 16)).toByte()
-        })
+    fun upload(packUUID: PackUUID, byteArray: ByteArray) {
         fun openServer(body: String) {
             val host = ConfigManagerImpl.selfHostPort
-            val url = "http://$body:$host/$string.zip"
+            val url = "http://$body:$host/${packUUID.hash}.zip"
             runWithExceptionHandling(CONSOLE, "Unable to open server.") {
                 server?.stop()
+                packUUID.save()
                 val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
                     createContext("/") { exec ->
                         exec.use { exchange ->
-                            if (exchange.requestURI.path != "/$string.zip") {
+                            if (exchange.requestURI.path != "/${packUUID.hash}.zip") {
                                 exchange.responseHeaders.set("Content-Type", "application/json")
                                 val byte = JsonPrimitive("Invalid file name.").toByteArray()
                                 exchange.sendResponseHeaders(200, byte.size.toLong())
@@ -72,9 +60,9 @@ object PackUploader {
                         http.stop(0)
                     }
 
-                    override val uuid: UUID = uuid
-                    override val digest: ByteArray = digest
-                    override val digestString: String = string
+                    override val uuid: UUID = packUUID.uuid
+                    override val digest: ByteArray = packUUID.digest
+                    override val digestString: String = packUUID.hash
                     override val url: String = url
                 }
                 BOOTSTRAP.sendResourcePack()

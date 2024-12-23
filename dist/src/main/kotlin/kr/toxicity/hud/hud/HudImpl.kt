@@ -1,7 +1,7 @@
 package kr.toxicity.hud.hud
 
 import com.google.gson.JsonArray
-import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudComponentSupplier
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.player.HudPlayer
@@ -20,8 +20,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 
 class HudImpl(
-    override val path: String,
-    private val internalName: String,
+    override val id: String,
     resource: GlobalResource,
     section: YamlObject
 ) : Hud, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
@@ -31,12 +30,13 @@ class HudImpl(
     val newChar
         get() = (++imageChar).parseChar()
 
-    private val imageEncoded = "hud_${internalName}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
+    private val imageEncoded = "hud_${id}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
     private val spaces = HashMap<Int, String>()
-    private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getAsBoolean("default", false)
+    private val default = ConfigManagerImpl.defaultHud.contains(id) || section.getAsBoolean("default", false)
     var textIndex = 0
+    private val tick = section.getAsLong("tick", 1)
 
     fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
         newChar
@@ -88,31 +88,38 @@ class HudImpl(
         return HudObjectType.HUD
     }
 
+    override fun tick(): Long = tick
+
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
 
-    override fun getComponents(player: HudPlayer): List<WidthComponent> {
-        if (!conditions(player)) return emptyList()
-        return elements.map {
-            val elements = it.elements
-            elements[when (it.animationType) {
-                AnimationType.LOOP -> (player.tick % elements.size).toInt()
-                AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(elements.lastIndex)
-            }].getComponent(player)
+    override fun createRenderer(player: HudPlayer): HudComponentSupplier<Hud> {
+        val map = elements.map {
+            it.animationType to it.elements.map { p ->
+                runByTick(tick, { player.tick }, p.getComponent(player))
+            }
+        }
+        return HudComponentSupplier.of(this) {
+            if (conditions(player)) map.map { (type, element) ->
+                element[when (type) {
+                    AnimationType.LOOP -> (player.tick % element.size).toInt()
+                    AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(element.lastIndex)
+                }]()
+            } else emptyList()
         }
     }
 
-    override fun getName(): String = internalName
+    override fun getName(): String = id
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as HudImpl
 
-        return internalName == other.internalName
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        return internalName.hashCode()
+        return id.hashCode()
     }
 
     override fun isDefault(): Boolean = default

@@ -20,9 +20,8 @@ import kr.toxicity.hud.util.*
 import java.util.*
 
 class PopupImpl(
-    override val path: String,
+    override val id: String,
     resource: GlobalResource,
-    val internalName: String,
     section: YamlObject
 ) : Popup, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
     val gui = GuiLocation(section)
@@ -30,12 +29,12 @@ class PopupImpl(
         EquationPairLocation(it)
     } ?: EquationPairLocation.zero
     private val duration = section.getAsInt("duration", -1)
-    private val group = section["group"]?.asString() ?: internalName
+    private val group = section["group"]?.asString() ?: id
     private val unique = section.getAsBoolean("unique", false)
     private val queue = duration > 0 && section.getAsBoolean("queue", false)
     private val push = !queue && section.getAsBoolean("push", false)
     private val alwaysCheckCondition = queue && section.getAsBoolean("always-check-condition", true)
-    private val default = ConfigManagerImpl.defaultPopup.contains(internalName) || section.getAsBoolean("default", false)
+    private val default = ConfigManagerImpl.defaultPopup.contains(id) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
         PlaceholderManagerImpl.find(it, this).apply {
@@ -43,13 +42,14 @@ class PopupImpl(
         }.let {
             { reason ->
                 (it build reason).let { placeholder ->
-                    { hudPlayer ->
-                        (placeholder(hudPlayer) as Number).toInt()
+                    { player ->
+                        (placeholder(player) as Number).toInt()
                     }
                 }
             }
         }
     }
+    private val tick = section.getAsLong("tick", 1)
 
     private val imageEncoded = "popup_${name}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     var array: JsonArray? = JsonArray()
@@ -71,6 +71,7 @@ class PopupImpl(
 
     private val layouts = section["layouts"]?.asObject()?.let {
         val json = array.ifNull("error is occurred.")
+        var i = 0
         it.mapSubConfiguration { _, yamlObject ->
             val layout = yamlObject["name"]?.asString().ifNull("name value not set.")
             var loc = GuiLocation(yamlObject)
@@ -78,6 +79,7 @@ class PopupImpl(
                 loc += GuiLocation(gui)
             }
             PopupLayout(
+                ++i,
                 json,
                 LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
                 this@PopupImpl,
@@ -96,8 +98,8 @@ class PopupImpl(
 
     init {
         val task = { event: UpdateEvent, uuid: UUID ->
-            PlayerManagerImpl.getHudPlayer(uuid)?.let { hudPlayer ->
-                show(event, hudPlayer)
+            PlayerManagerImpl.getHudPlayer(uuid)?.let { player ->
+                show(event, player)
             }
         }
         section["triggers"]?.asObject()?.forEachSubConfiguration { _, yamlObject ->
@@ -128,6 +130,7 @@ class PopupImpl(
     }
 
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
+    override fun tick(): Long = tick
 
     override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? {
@@ -181,7 +184,7 @@ class PopupImpl(
             lastIndex,
             key,
             sortType,
-            internalName,
+            id,
             queue,
             push,
             alwaysCheckCondition,
@@ -213,11 +216,11 @@ class PopupImpl(
 
         other as PopupImpl
 
-        return internalName == other.internalName
+        return id == other.id
     }
 
-    override fun getName(): String = internalName
+    override fun getName(): String = id
     override fun getGroupName(): String = group
-    override fun hashCode(): Int = internalName.hashCode()
+    override fun hashCode(): Int = id.hashCode()
     override fun isDefault(): Boolean = default
 }

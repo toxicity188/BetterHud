@@ -14,10 +14,15 @@ import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.manager.CommandManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.asyncTask
+import kr.toxicity.hud.util.info
+import kr.toxicity.hud.util.task
+import kr.toxicity.hud.util.warn
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -41,9 +46,6 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 import java.net.URLClassLoader
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -124,23 +126,14 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload) core.reload()
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
                 logger.info("Mod enabled.")
-                if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
-                else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
-                    HttpClient.newHttpClient().sendAsync(
-                        HttpRequest.newBuilder()
-                            .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                            .GET()
-                            .build(), HttpResponse.BodyHandlers.ofString()
-                    ).thenAccept { callback ->
-                        val v = callback.body()
-                        latestVersion = v
-                        if (version() != v) {
-                            warn("New version found: $v")
-                            warn("Download: https://modrinth.com/plugin/betterhud2")
-                        }
-                    }
+                core.isOldVersion {
+                    warn(
+                        "New version found: $it",
+                        "Download: https://modrinth.com/plugin/betterhud2"
+                    )
+                    latestVersion = it
                 }
             }
         }

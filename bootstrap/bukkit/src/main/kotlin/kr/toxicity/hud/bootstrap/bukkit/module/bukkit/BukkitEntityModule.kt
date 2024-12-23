@@ -76,6 +76,29 @@ class BukkitEntityModule : BukkitModule {
                     }
                 }
             },
+            "last_damage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function {
+                        (e.entity as? LivingEntity)?.lastDamage ?: 0.0
+                    }
+                }
+            },
+            "last_health" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function {
+                        (e.entity as? LivingEntity)?.let { le -> le.health + le.lastDamage } ?: 0.0
+                    }
+                }
+            },
+            "last_health_percentage" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    Function {
+                        (e.entity as? LivingEntity)?.let { le ->
+                            (le.health + le.lastDamage) / le.maximumHealth
+                        } ?: 0.0
+                    }
+                }
+            },
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
@@ -104,7 +127,7 @@ class BukkitEntityModule : BukkitModule {
             "type" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
-                        e.entity.type.name
+                        e.entity.type.key.key
                     }
                 }
             },

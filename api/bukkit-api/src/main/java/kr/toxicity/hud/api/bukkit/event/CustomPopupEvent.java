@@ -16,16 +16,30 @@ import java.util.Map;
 public class CustomPopupEvent extends PlayerEvent implements BetterHudEvent {
     private final String name;
     private final Map<String, String> variables = new HashMap<>();
+
+    /**
+     * Custom popup with name
+     * @param who player
+     * @param name identifier
+     */
     public CustomPopupEvent(@NotNull Player who, @NotNull String name) {
         super(who);
         this.name = name;
     }
 
+    /**
+     * Gets event handler
+     * @return handler
+     */
     @NotNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

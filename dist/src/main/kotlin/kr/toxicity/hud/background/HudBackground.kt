@@ -6,8 +6,7 @@ import kr.toxicity.hud.image.LoadedImage
 
 //TODO replace it to proper background in the future.
 class HudBackground(
-    override val path: String,
-    val name: String,
+    override val id: String,
 
     val left: LoadedImage,
     val right: LoadedImage,
@@ -21,15 +20,10 @@ class HudBackground(
 
         other as HudBackground
 
-        if (path != other.path) return false
-        if (name != other.name) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        var result = path.hashCode()
-        result = 31 * result + name.hashCode()
-        return result
+        return id.hashCode()
     }
 }

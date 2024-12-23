@@ -7,43 +7,41 @@ import kr.toxicity.hud.image.ImageComponent
 import kr.toxicity.hud.layout.ImageLayout
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
-import kr.toxicity.hud.util.EMPTY_PIXEL_COMPONENT
-import kr.toxicity.hud.util.append
-import kr.toxicity.hud.util.applyColor
+import kr.toxicity.hud.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class ImageRenderer(
     layout: ImageLayout,
     component: ImageComponent
-) : ImageLayout by layout {
+) : ImageLayout by layout, Renderer {
     private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
         }
     }
     private val component = component applyColor color
-    fun getComponent(reason: UpdateEvent): (HudPlayer, Int) -> PixelComponent {
-        val cond = conditions build reason
-        val listen = component.listener(reason)
-        val follow = followHudPlayer?.build(reason)
 
-        val stackGetter = stack?.build(reason)
-        val maxStackGetter = maxStack?.build(reason)
+    override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
+        val cond = conditions build event
+        val listen = component.listener(event)
+        val follow = followHudPlayer?.build(event)
 
-        val mapper = component mapper reason
-        val colorApply = colorOverrides(reason)
+        val stackGetter = stack?.build(event)
+        val maxStackGetter = maxStack?.build(event)
 
-        return build@ { hudPlayer, frame ->
+        val mapper = component mapper event
+        val colorApply = colorOverrides(event)
 
-            val selected = mapper(hudPlayer)
+        return tickProvide(tick) build@ { player, frame ->
+            val selected = mapper(player)
 
-            val stackFrame = (stackGetter?.value(hudPlayer) as? Number)?.toDouble() ?: 0.0
-            val maxStackFrame = (maxStackGetter?.value(hudPlayer) as? Number)?.toInt()?.coerceAtLeast(1) ?: ceil(stackFrame).toInt()
+            val stackFrame = (stackGetter?.value(player) as? Number)?.toDouble() ?: 0.0
+            val maxStackFrame = (maxStackGetter?.value(player) as? Number)?.toInt()?.coerceAtLeast(1) ?: ceil(stackFrame).toInt()
 
-            var target = hudPlayer
+            var target = player
             follow?.let {
-                PlayerManagerImpl.getHudPlayer(it.value(hudPlayer).toString())?.let { p ->
+                PlayerManagerImpl.getHudPlayer(it.value(player).toString())?.let { p ->
                     target = p
                 } ?: run {
                     if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT

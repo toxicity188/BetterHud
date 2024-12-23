@@ -31,6 +31,10 @@ subprojects {
         useGpgCmd()
     }
 
+    tasks.jar {
+        archiveBaseName = "betterhud-${project.name}"
+    }
+
     mavenPublishing {
         publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
         signAllPublications()

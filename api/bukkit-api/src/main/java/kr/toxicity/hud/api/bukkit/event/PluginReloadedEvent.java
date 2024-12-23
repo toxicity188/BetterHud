@@ -12,15 +12,28 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class PluginReloadedEvent extends Event implements BetterHudEvent {
     private final ReloadState state;
+
+    /**
+     * Plugin reload ended.
+     * @param state reload state
+     */
     public PluginReloadedEvent(@NotNull ReloadState state) {
         super(true);
         this.state = state;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     @NotNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

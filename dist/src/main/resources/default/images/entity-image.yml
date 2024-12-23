@@ -1,0 +1,24 @@
+entity_health_empty:
+  type: single
+  file: "entity/empty.png"
+
+entity_health_white:
+  type: listener
+  split-type: left
+  split: 25
+  file: "entity/white.png"
+  setting:
+    listener:
+      class: entity_health
+      lazy: true
+      delay: 10
+      initial-value: entity_last_health_percentage
+
+entity_health_red:
+  type: listener
+  split-type: left
+  split: 25
+  file: "entity/red.png"
+  setting:
+    listener:
+      class: entity_health

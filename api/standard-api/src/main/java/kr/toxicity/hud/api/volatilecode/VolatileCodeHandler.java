@@ -3,8 +3,13 @@ package kr.toxicity.hud.api.volatilecode;
 import kr.toxicity.hud.api.player.HudPlayer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Version-volatile code.
+ */
+@ApiStatus.Internal
 public interface VolatileCodeHandler {
     /**
      * Injects player.

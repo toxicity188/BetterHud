@@ -20,6 +20,10 @@ public interface ListenerManager {
      */
     void addListener(@NotNull String name, @NotNull Function<YamlObject, Function<UpdateEvent, HudListener>> listenerFunction);
 
+    /**
+     * Gets all listener name
+     * @return listener name
+     */
     @NotNull
     @Unmodifiable
     Set<String> getAllListenerKeys();

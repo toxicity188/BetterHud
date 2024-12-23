@@ -1,5 +1,6 @@
 package kr.toxicity.hud.bootstrap.fabric.module.fabric
 
+import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity
 import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -79,6 +80,23 @@ class FabricStandardModule : FabricModule {
             "health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.fabricPlayer.health
+                }
+            },
+            "last_damage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastDamage`()
+                }
+            },
+            "last_health" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastHealth`()
+                }
+            },
+            "last_health_percentage" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    (p.fabricPlayer as FabricLivingEntity).let {
+                        it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                    }
                 }
             },
             "vehicle_health" to HudPlaceholder.of { _, _ ->

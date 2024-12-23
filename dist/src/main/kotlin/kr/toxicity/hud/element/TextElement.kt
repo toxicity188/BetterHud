@@ -7,9 +7,8 @@ import kr.toxicity.hud.text.ImageTextScale
 import kr.toxicity.hud.text.TextScale
 
 class TextElement(
-    override val path: String,
-    override val name: String,
-    val scale: Int?,
+    override val id: String,
+    val textScale: Int?,
     val array: List<HudTextArray>,
     val charWidth: Map<Int, TextScale>,
     val imageTextScale: Map<Int, ImageTextScale>,

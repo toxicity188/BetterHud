@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Represents trigger manager.
+ * Trigger manager.
  */
 public interface TriggerManager {
     /**
@@ -19,6 +19,10 @@ public interface TriggerManager {
      */
     void addTrigger(@NotNull String name, @NotNull Function<YamlObject, HudTrigger<?>> trigger);
 
+    /**
+     * Gets all triggers name.
+     * @return name
+     */
     @NotNull
     @Unmodifiable
     Set<String> getAllTriggerKeys();

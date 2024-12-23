@@ -6,14 +6,13 @@ import kr.toxicity.hud.api.database.HudDatabaseConnector
 import kr.toxicity.hud.api.manager.DatabaseManager
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import kr.toxicity.hud.yaml.YamlObjectImpl
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.sql.DriverManager
-import java.util.concurrent.CompletableFuture
 
 object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
@@ -42,7 +41,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                         yaml.get(name)?.asArray()?.mapNotNull {
                             mapper(it.asString())
                         }?.forEach {
-                            if (!it.isDefault) player.hudObjects.add(it)
+                            if (!it.isDefault) it.add(player)
                         }
                     }
                     add("huds") {
@@ -112,21 +111,21 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
                 override fun isClosed(): Boolean = mysql.isClosed
 
-                override fun load(hudPlayer: HudPlayer) {
+                override fun load(player: HudPlayer) {
                     asyncTask {
-                        val uuid = hudPlayer.uuid().toString()
+                        val uuid = player.uuid().toString()
                         mysql.prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
                             val result = s.executeQuery()
                             while (result.next()) {
                                 when (result.getString("type")) {
                                     "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
-                                        if (!h.isDefault) hudPlayer.hudObjects.add(h)
+                                        if (!h.isDefault) h.add(player)
                                     }
                                     "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
-                                        if (!p.isDefault) hudPlayer.hudObjects.add(p)
+                                        if (!p.isDefault) p.add(player)
                                     }
-                                    "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { p ->
-                                        if (!p.isDefault) hudPlayer.hudObjects.add(p)
+                                    "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { c ->
+                                        if (!c.isDefault) c.add(player)
                                     }
                                 }
                             }
@@ -134,8 +133,8 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                         mysql.prepareStatement("SELECT value FROM enabled_pointed_location WHERE uuid = '$uuid';").use { s ->
                             val result = s.executeQuery()
                             while (result.next()) {
-                                runWithExceptionHandling(CONSOLE, "unable to load ${hudPlayer.name()}'s location.") {
-                                    hudPlayer.pointers().add(PointedLocation.deserialize(result.getString("value")
+                                runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
+                                    player.pointers().add(PointedLocation.deserialize(result.getString("value")
                                         .toBase64Json()
                                         .asJsonObject))
                                 }
@@ -201,25 +200,21 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
         return connectionMap.putIfAbsent(name, connector) == null
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
-        CompletableFuture.runAsync {
-            synchronized(this) {
-                runCatching {
-                    current.close()
-                    val db = PluginConfiguration.DATABASE.create()
-                    val type = db.get("type")?.asString().ifNull("type value not set.")
-                    val info = db.get("info")?.asObject().ifNull("info configuration not set.")
-                    current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(info)
-                }.onFailure { e ->
-                    current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
-                    warn(
-                        "Unable to connect the database.",
-                        "Reason: ${e.message}"
-                    )
-                    if (ConfigManagerImpl.isDebug) e.printStackTrace()
-                }
-            }
-        }.join()
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+        runCatching {
+            current.close()
+            val db = PluginConfiguration.DATABASE.create()
+            val type = db.get("type")?.asString().ifNull("type value not set.")
+            val dbInfo = db.get("info")?.asObject().ifNull("info configuration not set.")
+            current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(dbInfo)
+        }.onFailure { e ->
+            current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
+            warn(
+                "Unable to connect the database.",
+                "Reason: ${e.message}"
+            )
+            if (ConfigManagerImpl.isDebug) e.printStackTrace()
+        }
     }
 
     override fun end() {

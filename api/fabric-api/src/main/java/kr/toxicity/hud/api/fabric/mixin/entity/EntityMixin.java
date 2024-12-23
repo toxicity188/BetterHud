@@ -1,4 +1,4 @@
-package kr.toxicity.hud.bootstrap.fabric.mixin.entity;
+package kr.toxicity.hud.api.fabric.mixin.entity;
 
 import kr.toxicity.hud.api.fabric.event.entity.PlayerDeathEvent;
 import net.minecraft.core.Holder;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public class EntityMixin {
-    @Inject(method = "gameEvent(Lnet/minecraft/core/Holder;)V", at = @At("HEAD"))
+    @Inject(method = "gameEvent(Lnet/minecraft/core/Holder;)V", at = @At("TAIL"))
     private void gameEvent(Holder<GameEvent> event, CallbackInfo info) {
         if (GameEvent.ENTITY_DIE.is(event)) {
             if (((Object) this) instanceof ServerPlayer serverPlayer) {

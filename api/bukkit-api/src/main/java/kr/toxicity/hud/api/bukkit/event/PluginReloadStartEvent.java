@@ -10,14 +10,25 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 public class PluginReloadStartEvent extends Event implements BetterHudEvent {
+    /**
+     * Plugin reload started.
+     */
     public PluginReloadStartEvent() {
         super(true);
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     @NotNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
+    /**
+     * Gets event handler
+     * @return handler
+     */
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

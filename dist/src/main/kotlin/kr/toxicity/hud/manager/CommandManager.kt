@@ -1,29 +1,25 @@
 package kr.toxicity.hud.manager
 
-import kr.toxicity.command.impl.BetterCommand
 import kr.toxicity.command.BetterCommandSource
-import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.CommandListener
+import kr.toxicity.command.SenderType
+import kr.toxicity.command.impl.BetterCommand
+import kr.toxicity.command.impl.ClassSerializer
 import kr.toxicity.command.impl.CommandMessage
-import kr.toxicity.command.impl.annotation.Aliases
-import kr.toxicity.command.impl.annotation.Command
-import kr.toxicity.command.impl.annotation.Description
-import kr.toxicity.command.impl.annotation.Option
-import kr.toxicity.command.impl.annotation.Permission
-import kr.toxicity.command.impl.annotation.Source
+import kr.toxicity.command.impl.annotation.*
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationSource
-import kr.toxicity.hud.api.plugin.ReloadState.Failure
-import kr.toxicity.hud.api.plugin.ReloadState.OnReload
-import kr.toxicity.hud.api.plugin.ReloadState.Success
+import kr.toxicity.hud.api.plugin.ReloadFlagType
+import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.plugin.ReloadState.*
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.command.*
+import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.File
@@ -120,6 +116,9 @@ object CommandManager : BetterHudManager {
             .nullMessage(CommandMessage("betterhud.null.icon", Component.text("Unable to find this icon: [icon]")))
             .build()
         )
+        .silentLog {
+            !ConfigManagerImpl.isDebug
+        }
 
     @Suppress("UNUSED")
     val module = library.module<BetterCommandSource>("hud")
@@ -137,10 +136,10 @@ object CommandManager : BetterHudManager {
             @Description(key = "betterhud.reload.description", defaultValue = "Reload BetterHud.")
             @Aliases(aliases = ["re", "rl"])
             @Permission("hud.reload")
-            fun reload(@Source me: BetterCommandSource) {
+            fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
-                    when (val reload = PLUGIN.reload()) {
+                    when (val reload = PLUGIN.reload(me.audience(), *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
                         is Failure -> {
@@ -151,6 +150,28 @@ object CommandManager : BetterHudManager {
                 }
             }
             //Reload
+
+            //Parse
+            private val parse_failure1 = library.registerKey(CommandMessage("betterhud.parse.message.failure.1", Component.text("Parse failed.")))
+            private val parse_failure2 = library.registerKey(CommandMessage("betterhud.parse.message.failure.2", Component.text("Cause: [cause]")))
+            @Command
+            @Description(key = "betterhud.reload.parse", defaultValue = "Reload BetterHud.")
+            @Aliases(aliases = ["p"])
+            @Permission("hud.parse")
+            @Sender(type = [SenderType.PLAYER])
+            fun parse(@Source me: HudPlayer, @Vararg argument: String) {
+                runCatching {
+                    me.audience().sendMessage(
+                        MiniMessage
+                            .miniMessage()
+                            .deserialize(PlaceholderManagerImpl.parse(argument, PlaceholderSource.empty)(UpdateEvent.EMPTY)(me))
+                    )
+                }.onFailure { e ->
+                    parse_failure1.send(me)
+                    parse_failure2.send(me, mapOf("cause" to Component.text("${e.javaClass.simpleName}: ${e.message}")))
+                }
+            }
+            //Parse
 
             //Generate
             private val generate_tryGenerate = library.registerKey(CommandMessage("betterhud.generate.message.try_generate", Component.text("Trying to generate. please wait...")))
@@ -185,7 +206,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             huds.forEach { hud ->
-                                val success = player.hudObjects.add(hud)
+                                val success = hud.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -210,7 +231,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             huds.forEach { hud ->
-                                val success = player.hudObjects.remove(hud)
+                                val success = hud.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -240,7 +261,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             compasses.forEach { compass ->
-                                val success = player.hudObjects.add(compass)
+                                val success = compass.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -265,7 +286,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             compasses.forEach { compass ->
-                                val success = player.hudObjects.remove(compass)
+                                val success = compass.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -295,7 +316,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = player.hudObjects.add(popup)
+                                val success = popup.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -320,7 +341,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = player.hudObjects.remove(popup)
+                                val success = popup.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -527,7 +548,7 @@ object CommandManager : BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         library.reload()
     }
 

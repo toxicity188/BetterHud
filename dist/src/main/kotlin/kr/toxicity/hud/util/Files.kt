@@ -31,6 +31,9 @@ fun File.forEachAllFolder(block: (File) -> Unit) {
     }
 }
 
+fun File.mapAllFolder() = mutableListOf<File>().apply {
+    forEachAllFolder(this::add)
+}
 
 fun YamlObject.forEachSubConfiguration(block: (String, YamlObject) -> Unit) {
     forEach {

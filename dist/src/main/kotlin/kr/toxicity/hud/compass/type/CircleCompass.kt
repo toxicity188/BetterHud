@@ -1,7 +1,9 @@
 package kr.toxicity.hud.compass.type
 
 import com.google.gson.JsonArray
+import kr.toxicity.hud.api.compass.Compass
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudComponentSupplier
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
@@ -29,8 +31,7 @@ import kotlin.math.*
 class CircleCompass(
     resource: GlobalResource,
     assets: File,
-    override val path: String,
-    private val internalName: String,
+    override val id: String,
     section: YamlObject
 ) : CompassImpl, PlaceholderSource by PlaceholderSource.Impl(section) {
     companion object {
@@ -44,7 +45,7 @@ class CircleCompass(
     }
     private var resourceRef: GlobalResource? = resource
     private val length = section.getAsInt("length", 10).coerceAtLeast(20).coerceAtMost(360)
-    private val encode = "compass_$internalName".encodeKey(EncodeManager.EncodeNamespace.FONT)
+    private val encode = "compass_$id".encodeKey(EncodeManager.EncodeNamespace.FONT)
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
     private val applyOpacity = section.getAsBoolean("apply-opacity", false)
@@ -71,8 +72,8 @@ class CircleCompass(
     private var array: JsonArray? = JsonArray()
     private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
-    private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
-
+    private val isDefault = ConfigManagerImpl.defaultCompass.contains(id) || section.getAsBoolean("default", false)
+    private val tick = section.getAsLong("tick", 1)
 
     private inner class CompassComponent(
         val x: Int,
@@ -115,9 +116,10 @@ class CircleCompass(
         return CompassComponent(x, char, if (color.value() != NamedTextColor.WHITE.value()) color else null, (image.width.toDouble() * div).roundToInt())
     }
 
+    override fun tick(): Long = tick
     override fun getType(): HudObjectType<*> = HudObjectType.COMPASS
     override fun isDefault(): Boolean = isDefault
-    override fun getName(): String = internalName
+    override fun getName(): String = id
 
     private inner class CompassImage(assets: File, section: YamlObject) {
         val n = section["n"]?.asObject()?.let {
@@ -219,7 +221,7 @@ class CircleCompass(
                 (0..<div).associate { i ->
                     val reverse = div - i
                     CompassData(reverse) to getKey(
-                        "compass_image_${internalName}_${imageName}_${i + 1}",
+                        "compass_image_${id}_${imageName}_${i + 1}",
                         scaleEquation.evaluate(i.toDouble()).apply {
                             if (this < 0) throw RuntimeException("scale equation returns < 0")
                         },
@@ -231,7 +233,7 @@ class CircleCompass(
                 }
             } else (0..<div).associate { i ->
                 CompassData(div - i) to getKey(
-                    "compass_image_${internalName}_${imageName}_${i + 1}",
+                    "compass_image_${id}_${imageName}_${i + 1}",
                     scaleEquation.evaluate(i.toDouble()).apply {
                         if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
                     } * scale,
@@ -376,34 +378,39 @@ class CircleCompass(
 
 
 
-    override fun indicate(player: HudPlayer): WidthComponent {
-        if (!conditions(player)) return EMPTY_WIDTH_COMPONENT
-        val yaw =  player.location().yaw.toDouble()
-        var degree = yaw
-        if (degree < 0) degree += 360.0
-        val quarterDegree = degree / 90 * length
-        val div = ceil(quarterDegree).toInt()
-        val lengthDiv = length / 2
-        val mod = quarterDegree - div + 0.5
+    override fun indicate(player: HudPlayer): HudComponentSupplier<Compass> {
+        val task = runByTick(tick, { player.tick }) {
+            if (!conditions(player)) return@runByTick EMPTY_WIDTH_COMPONENT
+            val yaw =  player.location().yaw.toDouble()
+            var degree = yaw
+            if (degree < 0) degree += 360.0
+            val quarterDegree = degree / 90 * length
+            val div = ceil(quarterDegree).toInt()
+            val lengthDiv = length / 2
+            val mod = quarterDegree - div + 0.5
 
-        val builder = builder(yaw, mod)
+            val builder = builder(yaw, mod)
 
-        fun getKey(index: Int) = when (div - index + lengthDiv) {
-            (length * 0.5).roundToInt() -> images.sw
-            length * 1 -> images.w
-            (length * 1.5).roundToInt() -> images.nw
-            length * 2 -> images.n
-            (length * 2.5).roundToInt() -> images.ne
-            length * 3 -> images.e
-            (length * 3.5).roundToInt() -> images.se
-            0, length * 4 -> images.s
-            else -> images.chain
-        }?.map?.get(CompassData(if (index > lengthDiv) length - index else index))
-        //var comp = (-((getKey(length / 2)?.width ?: 0) + space)).toSpaceComponent()
-        for (i in 1..<length) {
-            builder append getKey(i)
+            fun getKey(index: Int) = when (div - index + lengthDiv) {
+                (length * 0.5).roundToInt() -> images.sw
+                length * 1 -> images.w
+                (length * 1.5).roundToInt() -> images.nw
+                length * 2 -> images.n
+                (length * 2.5).roundToInt() -> images.ne
+                length * 3 -> images.e
+                (length * 3.5).roundToInt() -> images.se
+                0, length * 4 -> images.s
+                else -> images.chain
+            }?.map?.get(CompassData(if (index > lengthDiv) length - index else index))
+            //var comp = (-((getKey(length / 2)?.width ?: 0) + space)).toSpaceComponent()
+            for (i in 1..<length) {
+                builder append getKey(i)
+            }
+            builder build player
         }
-        return builder build player
+        return HudComponentSupplier.of(this) {
+            listOf(task())
+        }
     }
 
     private fun absMin(d1: Double, d2: Double): Double {
@@ -416,10 +423,10 @@ class CircleCompass(
 
         other as CircleCompass
 
-        return internalName == other.internalName
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        return internalName.hashCode()
+        return id.hashCode()
     }
 }

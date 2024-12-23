@@ -2,6 +2,9 @@ package kr.toxicity.hud.api.yaml;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Yaml configuration.
+ */
 public interface YamlConfiguration extends Comparable<YamlConfiguration> {
 
     /**

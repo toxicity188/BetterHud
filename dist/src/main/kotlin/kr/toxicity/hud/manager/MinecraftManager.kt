@@ -1,10 +1,10 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.ImageTextScale
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
@@ -13,6 +13,9 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 import java.util.jar.JarFile
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 object MinecraftManager : BetterHudManager {
 
@@ -34,7 +37,7 @@ object MinecraftManager : BetterHudManager {
                 namespace.replace('/', '_'),
                 "minecraft:$namespace.png",
                 layout.emoji.location,
-                layout.source.scale?.let { it - height } ?: 0,
+                layout.source.textScale?.let { it - height } ?: 0,
                 width.toDouble(),
                 height.toDouble()
             )
@@ -46,7 +49,7 @@ object MinecraftManager : BetterHudManager {
 
     private var previous = ""
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
             if (assetsMap.isEmpty() || previous != current) {
@@ -54,7 +57,7 @@ object MinecraftManager : BetterHudManager {
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling(sender, "Unable to load minecraft default textures.") {
+            runWithExceptionHandling(info.sender, "Unable to load minecraft default textures.") {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -67,8 +70,8 @@ object MinecraftManager : BetterHudManager {
                 val file = File(cache, "$current.jar")
                 if (!file.exists() || file.length() == 0L) {
                     info("$current.jar doesn't exist. so download it...")
-                    file.outputStream().buffered().use { outputStream ->
-                        client.send(HttpRequest.newBuilder()
+                    ZipOutputStream(file.outputStream().buffered()).use { outputStream ->
+                        ZipInputStream(client.send(HttpRequest.newBuilder()
                             .uri(URI.create(InputStreamReader(client.send(HttpRequest.newBuilder()
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
@@ -83,8 +86,19 @@ object MinecraftManager : BetterHudManager {
                                 .getAsJsonObject("client")
                                 .getAsJsonPrimitive("url")
                                 .asString))
-                            .GET().build(), HttpResponse.BodyHandlers.ofInputStream()).body().buffered().use { inputStream ->
-                            inputStream.copyTo(outputStream)
+                            .GET().build(),
+                            HttpResponse.BodyHandlers.ofInputStream()
+                        ).body().buffered()).use { inputStream ->
+                            var entry: ZipEntry? = inputStream.nextEntry
+                            while (entry != null) {
+                                if (entry.name.startsWith(ASSETS_LOCATION)) {
+                                    outputStream.putNextEntry(entry)
+                                    outputStream.write(inputStream.readAllBytes())
+                                    outputStream.closeEntry()
+                                }
+                                inputStream.closeEntry()
+                                entry = inputStream.nextEntry
+                            }
                         }
                     }
                 }

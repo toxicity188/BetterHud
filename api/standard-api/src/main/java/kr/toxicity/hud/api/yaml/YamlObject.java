@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Map;
 
+/**
+ * Yaml map.
+ */
 public interface YamlObject extends Iterable<Map.Entry<String, YamlElement>>, YamlElement {
 
     /**

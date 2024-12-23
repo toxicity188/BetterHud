@@ -7,6 +7,13 @@ interface PlaceholderSource {
     val placeholderOption: YamlObject
     val stringPlaceholderFormat: YamlObject
 
+    companion object {
+        val empty = Impl(
+            YamlObjectImpl.empty,
+            YamlObjectImpl.empty
+        )
+    }
+
     class Impl(
         override val placeholderOption: YamlObject,
         override val stringPlaceholderFormat: YamlObject

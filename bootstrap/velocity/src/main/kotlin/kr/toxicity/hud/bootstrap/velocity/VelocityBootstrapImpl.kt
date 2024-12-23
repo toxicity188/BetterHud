@@ -31,7 +31,10 @@ import kr.toxicity.hud.manager.CommandManager
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackUploader
-import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.asyncTask
+import kr.toxicity.hud.util.info
+import kr.toxicity.hud.util.task
+import kr.toxicity.hud.util.warn
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -40,11 +43,7 @@ import org.bstats.velocity.Metrics.Factory
 import org.slf4j.Logger
 import java.io.File
 import java.io.InputStream
-import java.net.URI
 import java.net.URLClassLoader
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
@@ -131,21 +130,12 @@ class VelocityBootstrapImpl @Inject constructor(
 
     @Subscribe
     fun enable(e: ProxyInitializeEvent) {
-        if (isDevVersion) logger.warn("This build is dev version - be careful to use it!")
-        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
-            HttpClient.newHttpClient().sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val v = it.body()
-                latestVersion = v
-                if (version() != v) {
-                    warn("New version found: $v")
-                    warn("Download: https://www.spigotmc.org/resources/115559")
-                }
-            }
+        core.isOldVersion {
+            latestVersion = it
+            warn(
+                "New version found: $it",
+                "Download: https://hangar.papermc.io/toxicity188/BetterHud/channels"
+            )
         }
         proxyServer.allPlayers.forEach {
             register(it)

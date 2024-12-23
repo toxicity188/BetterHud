@@ -2,13 +2,13 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.io.File
@@ -62,8 +62,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var mergeOtherFolders = emptyList<String>()
         private set
 
-    var needToUpdatePack = false
-        private set
     var loadingHead = "random"
         private set
     private var debug = false
@@ -94,9 +92,10 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
         private set
 
     override fun start() {
+        preReload()
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
         if (removeDefaultHotbar) {
             PLUGIN.loadAssets("empty") { n, i ->
                 val read = i.readAllBytes()
@@ -118,7 +117,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             File(DATA_FOLDER, "version.txt").bufferedWriter().use {
                 it.write(BOOTSTRAP.version())
             }
-            needToUpdatePack = false
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getAsBoolean("debug", false)
             debugLevel = runCatching {
@@ -136,7 +134,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
                 it.asString()
             } ?: emptyList()
             yaml["default-font-name"]?.asString()?.let {
-                if (defaultFontName != it) needToUpdatePack = true
                 defaultFontName = it
             }
             yaml["pack-type"]?.asString()?.let {
@@ -161,7 +158,6 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             }
             if (bossbarResourcePackLine != newLine) {
                 bossbarResourcePackLine = newLine
-                needToUpdatePack = true
             }
             versionCheck = yaml.getAsBoolean("version-check", false)
             enableProtection = yaml.getAsBoolean("enable-protection", false)

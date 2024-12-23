@@ -14,7 +14,14 @@ public interface HudListener {
      * @return index range
      */
     double getValue(@NotNull HudPlayer player);
+
+    /**
+     * Always zero
+     */
     HudListener ZERO = p -> 0;
 
+    /**
+     * Ignored if below 0
+     */
     HudListener EMPTY = p -> -1;
 }

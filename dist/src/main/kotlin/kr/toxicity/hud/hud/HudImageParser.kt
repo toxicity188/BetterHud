@@ -15,7 +15,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import kotlin.math.roundToInt
 
-class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) {
+class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui: GuiLocation, pixel: PixelLocation) : HudSubParser {
 
     private val chars = run {
         val finalPixel = imageLayout.location + pixel
@@ -36,7 +36,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
             }
             image.forEach { pair ->
                 val fileName = "$NAME_SPACE_ENCODED:${pair.name}"
-                val height = (pair.image.image.height.toDouble() * imageLayout.scale).roundToInt()
+                val height = (pair.image.image.height.toDouble() * imageLayout.scale * scale).roundToInt()
                 val scale = height.toDouble() / pair.image.image.height
                 val ascent = finalPixel.y.coerceAtLeast(-HUD_ADD_HEIGHT).coerceAtMost(HUD_ADD_HEIGHT)
                 val component = image(imageLayout.identifier(shader, ascent, fileName)) {
@@ -72,14 +72,14 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
             try {
                 imageLayout.source.toComponent()
             } catch (_: StackOverflowError) {
-                throw RuntimeException("circular reference found in ${imageLayout.source.name}")
+                throw RuntimeException("circular reference found in ${imageLayout.source.id}")
             }
         )
-        renderer.max() to renderer.getComponent(UpdateEvent.EMPTY)
+        renderer.max() to renderer.render(UpdateEvent.EMPTY)
     }
 
     val max = chars.first
 
-    fun getComponent(hudPlayer: HudPlayer): PixelComponent = chars.second(hudPlayer, (hudPlayer.tick % Int.MAX_VALUE).toInt())
+    override fun render(player: HudPlayer): (Long) -> PixelComponent = chars.second(player)
 
 }

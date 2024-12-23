@@ -2,6 +2,9 @@ package kr.toxicity.hud.api.yaml;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Yaml element.
+ */
 public interface YamlElement extends YamlConfiguration {
     /**
      * Gets original raw object

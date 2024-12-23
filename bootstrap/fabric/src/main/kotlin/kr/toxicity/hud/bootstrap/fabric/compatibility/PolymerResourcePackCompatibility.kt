@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.util.PLUGIN
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
@@ -29,7 +30,8 @@ class PolymerResourcePackCompatibility : Compatibility {
 
     override fun start() {
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register { builder ->
-            when (val state = PLUGIN.reload()) {
+            ConfigManagerImpl.preReload()
+            if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                 is Success -> {
                     state.resourcePack.forEach {
                         builder.addData(it.key, it.value)

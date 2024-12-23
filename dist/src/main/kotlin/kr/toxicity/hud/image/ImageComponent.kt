@@ -42,7 +42,7 @@ class ImageComponent(
     private fun interface ImageMapper : (HudPlayer) -> ImageComponent
 
     private val childrenMapper: (ImageComponent, UpdateEvent) -> ImageMapper = original.childrenMapper?.map {
-        children[it.first].ifNull("This children doesn't exist in ${original.name}: ${it.first}") to it.second
+        children[it.first].ifNull("This children doesn't exist in ${original.id}: ${it.first}") to it.second
     }?.let {
         { root, event ->
             it.map { builder ->
@@ -70,8 +70,8 @@ class ImageComponent(
         val buildFollow = original.follow?.build(event)
         val mapperTree = ImageMapperTree(
             childrenMapper(this, event),
-            entries.associate {
-                it.key to it.value.childrenMapper(this, event)
+            entries.associate { (k, v) ->
+                k to v.childrenMapper(v, event)
             }
         )
         return { player ->

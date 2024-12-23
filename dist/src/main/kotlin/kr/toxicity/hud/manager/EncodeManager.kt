@@ -1,17 +1,17 @@
 package kr.toxicity.hud.manager
 
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.resource.GlobalResource
-import net.kyori.adventure.audience.Audience
-import java.util.EnumMap
+import java.util.*
 
 object EncodeManager : BetterHudManager {
 
-    private val encodeMap = EnumMap<EncodeNamespace, MutableMap<String, Int>>(EncodeNamespace::class.java)
+    private val encodeMap = EnumMap<EncodeNamespace, MutableMap<String, String>>(EncodeNamespace::class.java)
 
     override fun start() {
     }
 
-    override fun reload(sender: Audience, resource: GlobalResource) {
+    override fun reload(info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun postReload() {
@@ -19,6 +19,7 @@ object EncodeManager : BetterHudManager {
     }
 
     override fun end() {
+        postReload()
     }
 
     enum class EncodeNamespace {
@@ -34,8 +35,8 @@ object EncodeManager : BetterHudManager {
         }
         return synchronized(map) {
             map.computeIfAbsent(name) {
-                map.size
-            }.encode()
+                map.size.encode()
+            }
         }
     }
 

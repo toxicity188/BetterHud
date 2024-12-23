@@ -13,6 +13,7 @@ import kr.toxicity.hud.api.bukkit.event.PluginReloadStartEvent
 import kr.toxicity.hud.api.bukkit.event.PluginReloadedEvent
 import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
@@ -27,7 +28,9 @@ import kr.toxicity.hud.bootstrap.bukkit.player.location.GPSLocationProvider
 import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.call
+import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
 import kr.toxicity.hud.manager.*
+import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
@@ -48,14 +51,11 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.server.ServerLoadEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.InputStream
-import java.net.URI
 import java.net.URLClassLoader
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.function.Function
 
 @Suppress("UNUSED")
@@ -132,19 +132,19 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
     }
 
-    fun update(hudPlayer: HudPlayer) {
+    fun update(player: HudPlayer) {
         val task = updateTask.filter {
-            hudPlayer.tick % it.tick == 0L
+            player.tick % it.tick == 0L
         }
         if (task.isNotEmpty()) {
             val syncTask = ArrayList<PlaceholderTask>()
             task.forEach {
-                if (it.async) it(hudPlayer) else syncTask.add(it)
+                if (it.async) it(player) else syncTask.add(it)
             }
             if (syncTask.isEmpty()) return
-            task(hudPlayer.location()) {
+            task(player.location()) {
                 syncTask.forEach {
-                    it(hudPlayer)
+                    it(player)
                 }
             }
         }
@@ -241,46 +241,45 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach {
             register(it)
         }
-        if (isDevVersion) warn("This build is dev version - be careful to use it!")
-        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
-            HttpClient.newHttpClient().sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val body = it.body()
-                if (description.version != body) {
-                    warn("New version found: $body")
-                    warn("Download: https://www.spigotmc.org/resources/115559")
-                    Bukkit.getPluginManager().registerEvents(object : Listener {
-                        @EventHandler
-                        fun PlayerJoinEvent.join() {
-                            val player = player
-                            if (player.isOp && ConfigManagerImpl.versionCheck) {
-                                val audience = audiences.player(player)
-                                audience.info("New BetterHud version found: $body")
-                                audience.info(
-                                    Component.text("Download: https://www.spigotmc.org/resources/115559")
-                                    .clickEvent(
-                                        ClickEvent.clickEvent(
+        core.isOldVersion {
+            warn(
+                "New version found: $it",
+                "Download: https://www.spigotmc.org/resources/115559"
+            )
+            registerListener(object : Listener {
+                @EventHandler
+                fun PlayerJoinEvent.join() {
+                    val player = player
+                    if (player.isOp && ConfigManagerImpl.versionCheck) {
+                        val audience = audiences.player(player)
+                        audience.info("New BetterHud version found: $it")
+                        audience.info(
+                            Component.text("Download: https://www.spigotmc.org/resources/115559")
+                                .clickEvent(
+                                    ClickEvent.clickEvent(
                                         ClickEvent.Action.OPEN_URL,
                                         "https://www.spigotmc.org/resources/115559"
                                     )))
-                            }
-                        }
-                    }, this)
+                    }
                 }
-            }
+            })
         }
         core.start()
-        scheduler.asyncTask {
-            if (!skipInitialReload) core.reload()
-            log.info(
-                "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
-                "Plugin enabled."
-            )
-        }
+        registerListener(object : Listener {
+            @EventHandler
+            fun ServerLoadEvent.load() {
+                debug(ConfigManager.DebugLevel.MANAGER,"Initialized: $type")
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) {
+                    scheduler.asyncTask {
+                        core.reload()
+                    }
+                }
+                log.info(
+                    "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Plugin enabled."
+                )
+            }
+        })
     }
 
     override fun onDisable() {
@@ -324,12 +323,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         metrics = null
     }
 
-    override fun sendResourcePack(hudPlayer: HudPlayer) {
+    override fun sendResourcePack(player: HudPlayer) {
         PackUploader.server?.let {
             if (nms.version >= NMSVersion.V1_20_R3) {
-                (hudPlayer.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
+                (player.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
             } else {
-                (hudPlayer.handle() as Player).setResourcePack(it.url, it.digest, null, false)
+                (player.handle() as Player).setResourcePack(it.url, it.digest, null, false)
             }
         }
     }

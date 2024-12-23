@@ -29,7 +29,9 @@ dependencies {
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")!!)
+    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${properties["kyori_mod_implementation"]}")
+    modImplementation("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")
+    implementation(include(project(":api:fabric-api"))!!)
 }
 
 loom {
@@ -63,6 +65,9 @@ fabricModJson {
         "polymer-resource-pack" to listOf("*"),
         "polymer-autohost" to listOf("*"),
         "placeholder-api" to listOf("*")
+    )
+    mixins = listOf(
+        mixin("betterhud.mixins.json")
     )
 }
 

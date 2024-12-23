@@ -2,6 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import io.papermc.paperweight.tasks.RemapJar
 import me.lucko.jarrelocator.JarRelocator
 import me.lucko.jarrelocator.Relocation
+import java.time.LocalDateTime
 
 buildscript {
     repositories {
@@ -16,9 +17,9 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "1.7.6" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("org.jetbrains.dokka") version "2.0.0-Beta"
+    id("org.jetbrains.dokka") version "2.0.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("fabric-loom") version "1.9-SNAPSHOT" apply false
     id("com.modrinth.minotaur") version "2.+"
@@ -31,7 +32,8 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.4"
+val betterCommand = "1.4.1"
+val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
 val supportedMinecraftVersions = listOf(
     //1.17
@@ -73,11 +75,10 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.10.3" + (System.getenv("BUILD_NUMBER")?.let { ".DEV-$it" } ?: "")
+    version = "1.11.1" + (buildNumber?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
-        maven("https://jitpack.io")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
         maven("https://repo.papermc.io/repository/maven-public/") //Paper
         maven("https://repo.opencollab.dev/main/")
@@ -182,7 +183,7 @@ fun Project.bukkit() = dependency("org.spigotmc:spigot-api:$minecraft-R0.1-SNAPS
     .dependency(rootProject.fileTree("shaded"))
 fun Project.velocity() = also {
     it.dependency("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
-        .dependency("io.netty:netty-all:5.0.0.Alpha2")
+        .dependency("io.netty:netty-all:4.1.115.Final")
         .dependency("org.bstats:bstats-velocity:$bStats")
     it.dependencies.compileOnly("com.velocitypowered:velocity-proxy:$velocity-SNAPSHOT")
     it.dependencies.annotationProcessor("com.velocitypowered:velocity-api:$velocity-SNAPSHOT")
@@ -197,6 +198,7 @@ fun Project.library() = also {
         compileOnly("org.yaml:snakeyaml:2.3")
         compileOnly("com.google.code.gson:gson:2.11.0")
         compileOnly("net.objecthunter:exp4j:0.4.8")
+        compileOnly("net.jodah:expiringmap:0.5.11")
         implementation("me.lucko:jar-relocator:1.7") {
             exclude("org.ow2.asm")
         }
@@ -243,15 +245,14 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
 val apiShare = project("api:standard-api").adventure().legacy()
 val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
 val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
-val apiFabric = project("api:fabric-api").adventure().dependency(apiShare).also {
+project("api:fabric-api").dependency(apiShare).also {
     it.apply(plugin = "fabric-loom")
 }
 
 val api = listOf(
     apiShare,
     apiBukkit,
-    apiVelocity,
-    apiFabric
+    apiVelocity
 )
 
 fun Project.api() = dependency(api)
@@ -281,7 +282,7 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .dependency(allNmsVersion)
 
 val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
-val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).adventure().also {
+val fabricBootstrap = project("bootstrap:fabric").api().dependency(dist).also {
     it.apply(plugin = "fabric-loom")
 }
 
@@ -293,12 +294,6 @@ val bootstrap = listOf(
 
 allNmsVersion.forEach {
     it.apply(plugin = "io.papermc.paperweight.userdev")
-}
-
-dependencies {
-    implementation(dist)
-    implementation("org.bstats:bstats-bukkit:$bStats")
-    implementation("org.bstats:bstats-velocity:$bStats")
 }
 
 fun Project.jar() = zipTree(tasks.jar.map {
@@ -329,14 +324,11 @@ val javadocJar by tasks.creating(Jar::class.java) {
 val fabricJar by tasks.creating(Jar::class.java) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(apiShare.jar())
-    from(zipTree(apiFabric.tasks.named("remapJar").map {
-        (it as org.gradle.jvm.tasks.Jar).archiveFile
-    }))
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
         (it as org.gradle.jvm.tasks.Jar).archiveFile
     }))
     from(shadowJar())
+    setManifest()
     doLast {
         relocateAll()
     }
@@ -359,6 +351,7 @@ val pluginJar by tasks.creating(Jar::class.java) {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
+    setManifest()
     doLast {
         relocateAll()
     }
@@ -373,11 +366,26 @@ val velocityJar by tasks.creating(Jar::class.java) {
         from(it.jar())
     }
     from(shadowJar())
+    setManifest()
     doLast {
         relocateAll()
     }
 }
 
+fun Jar.setManifest() {
+    manifest {
+        attributes(
+            "Dev-Build" to (buildNumber != null),
+            "Version" to project.version,
+            "Author" to "toxicity188",
+            "Url" to "https://github.com/toxicity188/BetterHud",
+            "Created-By" to "Gradle ${gradle.gradleVersion}",
+            "Build-Jdk" to "${System.getProperty("java.vendor")} ${System.getProperty("java.version")}",
+            "Build-OS" to "${System.getProperty("os.arch")} ${System.getProperty("os.name")}",
+            "Build-Date" to LocalDateTime.now().toString()
+        )
+    }
+}
 fun Jar.relocateAll() {
     val file = archiveFile.get().asFile
     val tempFile = file.copyTo(File.createTempFile("jar-relocator", System.currentTimeMillis().toString()).apply {
@@ -389,6 +397,7 @@ fun Jar.relocateAll() {
         listOf(
             "kotlin",
             "net.objecthunter.exp4j",
+            "net.jodah.expiringmap",
             "org.bstats",
             "me.lucko.jarrelocator",
             "kr.toxicity.command.impl"
@@ -404,6 +413,9 @@ runPaper {
 }
 
 dependencies {
+    implementation(dist)
+    implementation("org.bstats:bstats-bukkit:$bStats")
+    implementation("org.bstats:bstats-velocity:$bStats")
     fun searchAll(target: Project) {
         val sub = target.subprojects
         if (sub.isNotEmpty()) sub.forEach {
@@ -451,7 +463,10 @@ fabricBootstrap.modrinthPublish(
     fabricJar,
     listOf(sourcesJar, javadocJar),
     listOf("fabric", "quilt"),
-    listOf(minecraft),
+    supportedMinecraftVersions.subList(
+        supportedMinecraftVersions.indexOf(properties["supported_version"]),
+        supportedMinecraftVersions.size
+    ),
     listOf("fabric-api"),
     listOf("luckperms", "placeholder-api", "polymer")
 )

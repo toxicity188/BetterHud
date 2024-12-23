@@ -24,6 +24,11 @@ public record LocationWrapper(
         float pitch,
         float yaw
 ) {
+    /**
+     * Finds location from yaml.
+     * @param data raw data
+     * @return location
+     */
     public static @NotNull LocationWrapper deserialize(@NotNull YamlObject data) {
         return new LocationWrapper(
                 WorldWrapper.deserialize(Objects.requireNonNull(data.get("world"), "world").asObject()),
@@ -34,6 +39,11 @@ public record LocationWrapper(
                 data.getAsFloat("yaw", 0)
         );
     }
+    /**
+     * Finds location from json.
+     * @param data raw data
+     * @return location
+     */
     public static @NotNull LocationWrapper deserialize(@NotNull JsonObject data) {
         return new LocationWrapper(
                 WorldWrapper.deserialize(Objects.requireNonNull(data.getAsJsonObject("world"), "world")),
@@ -44,6 +54,10 @@ public record LocationWrapper(
                 data.getAsJsonPrimitive("yaw").getAsFloat()
         );
     }
+    /**
+     * Serializes to map.
+     * @return map
+     */
     public @NotNull Map<String, Object> serialize() {
         return Map.ofEntries(
                 Map.entry("world", world.serialize()),

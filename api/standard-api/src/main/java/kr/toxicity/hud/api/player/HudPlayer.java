@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.adapter.LocationWrapper;
 import kr.toxicity.hud.api.adapter.WorldWrapper;
 import kr.toxicity.hud.api.compass.Compass;
 import kr.toxicity.hud.api.component.WidthComponent;
+import kr.toxicity.hud.api.configuration.HudComponentSupplier;
 import kr.toxicity.hud.api.configuration.HudObject;
 import kr.toxicity.hud.api.hud.Hud;
 import kr.toxicity.hud.api.popup.Popup;
@@ -24,12 +25,31 @@ import java.util.stream.Collectors;
  * Represents player data.
  */
 public interface HudPlayer extends BetterCommandSource {
+    /**
+     * Gets player uuid.
+     * @return uuid
+     */
     @NotNull
     UUID uuid();
+
+    /**
+     * Gets player scorebard name
+     * @return name
+     */
     @NotNull
     String name();
+
+    /**
+     * Gets player location
+     * @return location
+     */
     @NotNull
     LocationWrapper location();
+
+    /**
+     * Gets player world
+     * @return world
+     */
     @NotNull
     WorldWrapper world();
 
@@ -132,14 +152,14 @@ public interface HudPlayer extends BetterCommandSource {
      * Gets a current player's hud objects.
      * @return hud objects
      */
-    @NotNull Set<HudObject> getHudObjects();
+    @NotNull Map<HudObject.Identifier, HudComponentSupplier<?>> getHudObjects();
 
     /**
      * Gets a current player's popup.
      * @return popups
      */
     default @NotNull Set<Popup> getPopups() {
-        return getHudObjects().stream().map(o -> o instanceof Popup popup ? popup : null).filter(Objects::nonNull).collect(Collectors.toSet());
+        return getHudObjects().values().stream().map(o -> o.parent() instanceof Popup popup ? popup : null).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**
@@ -147,14 +167,14 @@ public interface HudPlayer extends BetterCommandSource {
      * @return hud
      */
     default @NotNull Set<Hud> getHuds() {
-        return getHudObjects().stream().map(o -> o instanceof Hud hud ? hud : null).filter(Objects::nonNull).collect(Collectors.toSet());
+        return getHudObjects().values().stream().map(o -> o.parent() instanceof Hud hud ? hud : null).filter(Objects::nonNull).collect(Collectors.toSet());
     }
     /**
      * Gets a current player's compass.
      * @return compass
      */
     default @NotNull Set<Compass> getCompasses() {
-        return getHudObjects().stream().map(o -> o instanceof Compass compass ? compass : null).filter(Objects::nonNull).collect(Collectors.toSet());
+        return getHudObjects().values().stream().map(o -> o.parent() instanceof Compass compass ? compass : null).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**

@@ -7,6 +7,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A player's head component.
+ */
 public interface HudPlayerHead {
     /**
      * Gets flat-layered head.

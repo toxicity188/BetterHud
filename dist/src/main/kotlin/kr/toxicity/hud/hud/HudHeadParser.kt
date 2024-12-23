@@ -1,5 +1,6 @@
 package kr.toxicity.hud.hud
 
+import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.location.PixelLocation
@@ -12,7 +13,7 @@ import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 
-class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) {
+class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocation, pixel: PixelLocation) : HudSubParser {
 
     private val renderer = run {
         val final = head.location + pixel
@@ -25,17 +26,6 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
             final.opacity,
             head.property
         )
-        val hair = when (head.type) {
-            STANDARD -> shader
-            FANCY -> HudShader(
-                gui,
-                render * 1.125,
-                head.layer + 1,
-                true,
-                final.opacity,
-                head.property
-            )
-        }
         HeadRenderer(
             head,
             parent.getOrCreateSpace(-1),
@@ -64,6 +54,7 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 when (head.type) {
                     STANDARD -> HeadKey(mainChar, mainChar)
                     FANCY -> {
+                        val hair = shader.toFancyHead()
                         HeadKey(
                             mainChar,
                             head(head.identifier(hair, ascent - head.source.pixel, fileName)) {
@@ -88,8 +79,8 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
             parent.imageKey,
             head.source.pixel * 8,
             final.x
-        ).getHead(UpdateEvent.EMPTY)
+        ).render(UpdateEvent.EMPTY)
     }
 
-    fun getHead(hudPlayer: HudPlayer) = renderer(hudPlayer)
+    override fun render(player: HudPlayer): (Long) -> PixelComponent = renderer(player)
 }
