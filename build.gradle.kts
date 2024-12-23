@@ -17,9 +17,9 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "1.7.6" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("org.jetbrains.dokka") version "2.0.0-Beta"
+    id("org.jetbrains.dokka") version "2.0.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("fabric-loom") version "1.9-SNAPSHOT" apply false
     id("com.modrinth.minotaur") version "2.+"
@@ -75,7 +75,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.11" + (buildNumber?.let { ".$it" } ?: "")
+    version = "1.11.1" + (buildNumber?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -296,12 +296,6 @@ allNmsVersion.forEach {
     it.apply(plugin = "io.papermc.paperweight.userdev")
 }
 
-dependencies {
-    implementation(dist)
-    implementation("org.bstats:bstats-bukkit:$bStats")
-    implementation("org.bstats:bstats-velocity:$bStats")
-}
-
 fun Project.jar() = zipTree(tasks.jar.map {
     it.archiveFile
 })
@@ -419,6 +413,9 @@ runPaper {
 }
 
 dependencies {
+    implementation(dist)
+    implementation("org.bstats:bstats-bukkit:$bStats")
+    implementation("org.bstats:bstats-velocity:$bStats")
     fun searchAll(target: Project) {
         val sub = target.subprojects
         if (sub.isNotEmpty()) sub.forEach {

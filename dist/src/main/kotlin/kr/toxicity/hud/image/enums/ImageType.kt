@@ -39,7 +39,6 @@ enum class ImageType {
                     .replace('/', File.separatorChar)
             )
             return ImageElement(
-                file.path,
                 s,
                 listOf(
                     targetFile
@@ -82,7 +81,6 @@ enum class ImageType {
                     .replace('/', File.separatorChar)
             )
             return ImageElement(
-                file.path,
                 s,
                 splitType.split(
                     getFile
@@ -116,7 +114,6 @@ enum class ImageType {
         ): ImageElement {
             val globalFrame = yamlObject.getAsInt("frame", 1).coerceAtLeast(1)
             return ImageElement(
-                file.path,
                 s,
                 (yamlObject["files"]?.asArray()?.map {
                     it.asString()

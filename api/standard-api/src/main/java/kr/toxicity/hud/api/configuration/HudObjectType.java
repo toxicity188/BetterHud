@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.update.UpdateEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.function.BiFunction;
 
 /**
@@ -35,10 +36,10 @@ public record HudObjectType<T extends HudObject>(@NotNull Class<T> clazz, @NotNu
     public static final HudObjectType<Popup> POPUP = new HudObjectType<>(
             Popup.class,
             "popup",
-            (popup, player) -> {
+            (popup, player) -> HudComponentSupplier.of(popup, () -> {
                 popup.show(UpdateEvent.EMPTY, player);
-                return HudComponentSupplier.empty(popup);
-            }
+                return Collections.emptyList();
+            })
     );
     /**
      * Compass type

@@ -14,8 +14,7 @@ import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.util.ifNull
 
 class ImageElement(
-    override val path: String,
-    override val name: String,
+    override val id: String,
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
@@ -24,7 +23,7 @@ class ImageElement(
         ListenerManagerImpl.getListener(it)
     }
     val scale = setting.getAsDouble("scale", 1.0).apply {
-        if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $name")
+        if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $id")
     }
 
     private val childrenList = when (val child = setting["children"]) {
@@ -33,17 +32,17 @@ class ImageElement(
         }
         is YamlElement -> listOf(child.asString())
         null -> emptyList()
-        else -> throw RuntimeException("Unsupported children section: $name")
+        else -> throw RuntimeException("Unsupported children section: $id")
     }
 
     val children by lazy {
-        fun String.toImagePair() = this to ImageManager.getImage(this).ifNull("This children image doesn't exist in $name: $this")
+        fun String.toImagePair() = this to ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
         when {
             childrenList.isEmpty() -> emptyMap()
             childrenList.size == 1 -> if (childrenList[0] == "*") ImageManager.allImage.filter {
-                it.name != name && !it.childrenList.contains(name)
+                it.id != id && !it.childrenList.contains(id)
             }.associateBy {
-                it.name
+                it.id
             } else mapOf(childrenList[0].toImagePair())
             else -> childrenList.associate {
                 it.toImagePair()
@@ -53,7 +52,7 @@ class ImageElement(
 
     val follow = setting["follow"]?.asString()?.let {
         PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $name: $it")
+            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $id: $it")
         }
     }
     val childrenMapper = setting["children-mapper"]?.asObject()?.map {

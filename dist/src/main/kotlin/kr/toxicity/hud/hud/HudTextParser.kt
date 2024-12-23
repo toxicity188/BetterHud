@@ -87,14 +87,7 @@ class HudTextParser(
                             val result = (++textIndex).parseChar()
                             val height = (image.image.height.toDouble() * text.background.scale).roundToInt()
                             val div = height.toDouble() / image.image.height
-                            createAscent(HudShader(
-                                gui,
-                                render,
-                                text.layer - 1,
-                                false,
-                                loc.opacity * it.location.opacity,
-                                text.property
-                            ), loc.y + it.location.y + lineIndex * text.lineWidth) { y ->
+                            createAscent(shader.toBackground(it.location.opacity), loc.y + it.location.y + lineIndex * text.lineWidth) { y ->
                                 array += jsonObjectOf(
                                     "type" to "bitmap",
                                     "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -109,9 +102,9 @@ class HudTextParser(
                         }
                         BackgroundLayout(
                             it.location.x,
-                            getString(it.left, "background_${it.name}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                            getString(it.right, "background_${it.name}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                            getString(it.body, "background_${it.name}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
+                            getString(it.left, "background_${it.id}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.right, "background_${it.id}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                            getString(it.body, "background_${it.id}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
                         )
                     }
                 )

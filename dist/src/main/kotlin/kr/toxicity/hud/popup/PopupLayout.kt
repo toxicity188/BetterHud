@@ -160,7 +160,7 @@ class PopupLayout(
                 try {
                     target.source.toComponent()
                 } catch (_: StackOverflowError) {
-                    throw RuntimeException("circular reference found in ${target.source.name}")
+                    throw RuntimeException("circular reference found in ${target.source.id}")
                 }
             )
         }
@@ -226,14 +226,7 @@ class PopupLayout(
                                 val result = (++imageTextIndex).parseChar()
                                 val height = (image.image.height.toDouble() * textLayout.background.scale).roundToInt()
                                 val div = height.toDouble() / image.image.height
-                                createAscent(HudShader(
-                                    elementGui,
-                                    render,
-                                    textLayout.layer - 1,
-                                    false,
-                                    pixel.opacity * it.location.opacity,
-                                    textLayout.property
-                                ), pixel.y + it.location.y + lineIndex * textLayout.lineWidth) { y ->
+                                createAscent(textShader.toBackground(it.location.opacity), pixel.y + it.location.y + lineIndex * textLayout.lineWidth) { y ->
                                     array += jsonObjectOf(
                                         "type" to "bitmap",
                                         "file" to "$NAME_SPACE_ENCODED:$file.png",
@@ -248,9 +241,9 @@ class PopupLayout(
                             }
                             BackgroundLayout(
                                 it.location.x,
-                                getString(it.left, "background_${it.name}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                                getString(it.right, "background_${it.name}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
-                                getString(it.body, "background_${it.name}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
+                                getString(it.left, "background_${it.id}_left".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                                getString(it.right, "background_${it.id}_right".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)),
+                                getString(it.body, "background_${it.id}_body".encodeKey(EncodeManager.EncodeNamespace.TEXTURES))
                             )
                         }
                     )
@@ -285,17 +278,6 @@ class PopupLayout(
                 pixel.opacity,
                 headLayout.property
             )
-            val hair = when (headLayout.type) {
-                STANDARD -> shader
-                FANCY -> HudShader(
-                    elementGui,
-                    render * 1.125,
-                    headLayout.layer + 1,
-                    true,
-                    pixel.opacity,
-                    headLayout.property
-                )
-            }
             HeadRenderer(
                 headLayout,
                 parent.getOrCreateSpace(-1),
@@ -322,11 +304,12 @@ class PopupLayout(
                     when (headLayout.type) {
                         STANDARD -> HeadKey(mainChar, mainChar)
                         FANCY -> {
+                            val fancy = shader.toFancyHead()
                             HeadKey(
                                 mainChar,
-                                head(headLayout.identifier(hair, ascent - headLayout.source.pixel, fileName)) {
+                                head(headLayout.identifier(fancy, ascent - headLayout.source.pixel, fileName)) {
                                     val twoChar = parent.newChar
-                                    createAscent(hair, ascent - headLayout.source.pixel) { y ->
+                                    createAscent(fancy, ascent - headLayout.source.pixel) { y ->
                                         array += jsonObjectOf(
                                             "type" to "bitmap",
                                             "file" to fileName,

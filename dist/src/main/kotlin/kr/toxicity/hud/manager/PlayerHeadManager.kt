@@ -111,8 +111,8 @@ object PlayerHeadManager : BetterHudManager {
         }
         DATA_FOLDER.subFolder("heads").forEachAllYaml(info.sender) { file, s, yamlObject ->
             runWithExceptionHandling(info.sender, "Unable to load this head: $s in ${file.name}") {
-                headMap.putSync("head", s) {
-                    val head = HeadElement(file.path, s, yamlObject)
+                headMap.putSync("head") {
+                    val head = HeadElement(s, yamlObject)
                     val pixel = head.pixel
                     PackGenerator.addTask(resource.textures + "${"pixel_$pixel".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
                         BufferedImage(pixel, pixel, BufferedImage.TYPE_INT_ARGB).apply {

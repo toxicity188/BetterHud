@@ -20,8 +20,7 @@ import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 
 class HudImpl(
-    override val path: String,
-    private val internalName: String,
+    override val id: String,
     resource: GlobalResource,
     section: YamlObject
 ) : Hud, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
@@ -31,11 +30,11 @@ class HudImpl(
     val newChar
         get() = (++imageChar).parseChar()
 
-    private val imageEncoded = "hud_${internalName}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
+    private val imageEncoded = "hud_${id}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
     private val spaces = HashMap<Int, String>()
-    private val default = ConfigManagerImpl.defaultHud.contains(internalName) || section.getAsBoolean("default", false)
+    private val default = ConfigManagerImpl.defaultHud.contains(id) || section.getAsBoolean("default", false)
     var textIndex = 0
     private val tick = section.getAsLong("tick", 1)
 
@@ -109,18 +108,18 @@ class HudImpl(
         }
     }
 
-    override fun getName(): String = internalName
+    override fun getName(): String = id
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as HudImpl
 
-        return internalName == other.internalName
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        return internalName.hashCode()
+        return id.hashCode()
     }
 
     override fun isDefault(): Boolean = default

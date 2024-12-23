@@ -31,8 +31,7 @@ import kotlin.math.*
 class CircleCompass(
     resource: GlobalResource,
     assets: File,
-    override val path: String,
-    private val internalName: String,
+    override val id: String,
     section: YamlObject
 ) : CompassImpl, PlaceholderSource by PlaceholderSource.Impl(section) {
     companion object {
@@ -46,7 +45,7 @@ class CircleCompass(
     }
     private var resourceRef: GlobalResource? = resource
     private val length = section.getAsInt("length", 10).coerceAtLeast(20).coerceAtMost(360)
-    private val encode = "compass_$internalName".encodeKey(EncodeManager.EncodeNamespace.FONT)
+    private val encode = "compass_$id".encodeKey(EncodeManager.EncodeNamespace.FONT)
     private val key = createAdventureKey(encode)
     private var center = 0xC0000
     private val applyOpacity = section.getAsBoolean("apply-opacity", false)
@@ -73,7 +72,7 @@ class CircleCompass(
     private var array: JsonArray? = JsonArray()
     private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
-    private val isDefault = ConfigManagerImpl.defaultCompass.contains(internalName) || section.getAsBoolean("default", false)
+    private val isDefault = ConfigManagerImpl.defaultCompass.contains(id) || section.getAsBoolean("default", false)
     private val tick = section.getAsLong("tick", 1)
 
     private inner class CompassComponent(
@@ -120,7 +119,7 @@ class CircleCompass(
     override fun tick(): Long = tick
     override fun getType(): HudObjectType<*> = HudObjectType.COMPASS
     override fun isDefault(): Boolean = isDefault
-    override fun getName(): String = internalName
+    override fun getName(): String = id
 
     private inner class CompassImage(assets: File, section: YamlObject) {
         val n = section["n"]?.asObject()?.let {
@@ -222,7 +221,7 @@ class CircleCompass(
                 (0..<div).associate { i ->
                     val reverse = div - i
                     CompassData(reverse) to getKey(
-                        "compass_image_${internalName}_${imageName}_${i + 1}",
+                        "compass_image_${id}_${imageName}_${i + 1}",
                         scaleEquation.evaluate(i.toDouble()).apply {
                             if (this < 0) throw RuntimeException("scale equation returns < 0")
                         },
@@ -234,7 +233,7 @@ class CircleCompass(
                 }
             } else (0..<div).associate { i ->
                 CompassData(div - i) to getKey(
-                    "compass_image_${internalName}_${imageName}_${i + 1}",
+                    "compass_image_${id}_${imageName}_${i + 1}",
                     scaleEquation.evaluate(i.toDouble()).apply {
                         if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
                     } * scale,
@@ -424,10 +423,10 @@ class CircleCompass(
 
         other as CircleCompass
 
-        return internalName == other.internalName
+        return id == other.id
     }
 
     override fun hashCode(): Int {
-        return internalName.hashCode()
+        return id.hashCode()
     }
 }

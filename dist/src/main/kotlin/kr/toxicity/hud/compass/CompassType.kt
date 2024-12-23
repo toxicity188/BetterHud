@@ -10,14 +10,13 @@ enum class CompassType {
         override fun build(
             resource: GlobalResource,
             assets: File,
-            path: String,
             name: String,
             section: YamlObject
         ): CompassImpl {
-            return CircleCompass(resource, assets, path, name, section)
+            return CircleCompass(resource, assets, name, section)
         }
     }
     ;
 
-    abstract fun build(resource: GlobalResource, assets: File, path: String, name: String, section: YamlObject): CompassImpl
+    abstract fun build(resource: GlobalResource, assets: File, name: String, section: YamlObject): CompassImpl
 }

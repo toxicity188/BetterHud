@@ -18,8 +18,8 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
         popupMap.clear()
         DATA_FOLDER.subFolder("popups").forEachAllYaml(info.sender) { file, s, yamlObject ->
             runCatching {
-                popupMap.putSync("popup", s) {
-                    PopupImpl(file.path, resource, s, yamlObject)
+                popupMap.putSync("popup") {
+                    PopupImpl(s, resource, yamlObject)
                 }
             }.onFailure { e ->
                 warn(

@@ -30,11 +30,20 @@ data class HudShader(
         return comparator.compare(this, other)
     }
 
-    fun toBackground() = HudShader(
+    fun toBackground(otherOpacity: Double) = HudShader(
         gui,
         renderScale,
         layer - 1,
         false,
+        opacity * otherOpacity,
+        property
+    )
+
+    fun toFancyHead() = HudShader(
+        gui,
+        renderScale * 1.125,
+        layer + 1,
+        true,
         opacity,
         property
     )

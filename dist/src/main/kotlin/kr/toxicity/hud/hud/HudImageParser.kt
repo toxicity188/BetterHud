@@ -72,7 +72,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
             try {
                 imageLayout.source.toComponent()
             } catch (_: StackOverflowError) {
-                throw RuntimeException("circular reference found in ${imageLayout.source.name}")
+                throw RuntimeException("circular reference found in ${imageLayout.source.id}")
             }
         )
         renderer.max() to renderer.render(UpdateEvent.EMPTY)

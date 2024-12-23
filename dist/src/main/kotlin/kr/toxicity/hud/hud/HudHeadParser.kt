@@ -26,17 +26,6 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
             final.opacity,
             head.property
         )
-        val hair = when (head.type) {
-            STANDARD -> shader
-            FANCY -> HudShader(
-                gui,
-                render * 1.125,
-                head.layer + 1,
-                true,
-                final.opacity,
-                head.property
-            )
-        }
         HeadRenderer(
             head,
             parent.getOrCreateSpace(-1),
@@ -65,6 +54,7 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 when (head.type) {
                     STANDARD -> HeadKey(mainChar, mainChar)
                     FANCY -> {
+                        val hair = shader.toFancyHead()
                         HeadKey(
                             mainChar,
                             head(head.identifier(hair, ascent - head.source.pixel, fileName)) {

@@ -43,7 +43,7 @@ object ImageManager : BetterHudManager {
                 val image = ImageType.valueOf(
                     yamlObject["type"]?.asString().ifNull("type value not set.").uppercase()
                 ).createElement(assets, info.sender, file, s, yamlObject)
-                imageMap.putSync("image", s) {
+                imageMap.putSync("image") {
                     image
                 }
             }

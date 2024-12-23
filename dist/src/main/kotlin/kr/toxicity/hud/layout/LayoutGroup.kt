@@ -11,7 +11,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 
 class LayoutGroup(
-    override val path: String,
+    override val id: String,
     sender: Audience,
     section: YamlObject
 ) : HudConfiguration, ConditionSource by ConditionSource.Impl(section) {
