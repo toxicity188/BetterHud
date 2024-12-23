@@ -50,7 +50,7 @@ Requires Java 17, 21 Eclipse Adoptium.
 - Build Velocity plugin: ./gradlew velocityJar
 - Build Fabric server side mod: ./gradlew fabricJar  
 - Build source code jar: ./gradlew sourceJar  
-- Build dokka-based docs jar: ./gradlew dokkaJar
+- Build dokka-based docs jar: ./gradlew javadocJar
 
 ### API
 Get from maven central
