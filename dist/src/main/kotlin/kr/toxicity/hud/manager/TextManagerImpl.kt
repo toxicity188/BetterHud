@@ -26,6 +26,7 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
@@ -539,7 +540,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         fontProvider: FontBitmapProvider,
         imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
-        supportedLanguage: List<String>,
+        supportedLanguage: List<String>?,
         mergeDefaultBitmap: Boolean,
         yamlObject: YamlObject
     ): TextSupplier {
@@ -576,17 +577,16 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 if (mergeDefaultBitmap) defaultBitmapImageMap.entries.toList().forEachAsync { (k, v) ->
                     addImage(CharImage(k, v))
                 }
-                val supportedCodepoint = HashSet<Int>()
-                supportedLanguage.forEach {
-                    languageCodepointRange[it]?.let { lang ->
-                        supportedCodepoint += lang
-                    }
-                }
                 var filter = { i: Int ->
                     !charWidthMap.containsKey(i)
                 }
-                if (supportedCodepoint.isNotEmpty()) {
-                    supportedCodepoint += defaultLatin
+                supportedLanguage?.let { lang ->
+                    val supportedCodepoint = HashSet(defaultLatin)
+                    lang.forEach {
+                        languageCodepointRange[it]?.let { lang ->
+                            supportedCodepoint += lang
+                        }
+                    }
                     val old = filter
                     filter = {
                         old(it) && supportedCodepoint.contains(it)
