@@ -27,7 +27,7 @@ plugins {
 }
 
 val minecraft = project.properties["minecraft_version"]!!.toString()
-val adventure = "4.17.0"
+val adventure = "4.18.0"
 val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
