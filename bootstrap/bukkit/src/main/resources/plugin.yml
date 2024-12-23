@@ -25,6 +25,7 @@ softdepend:
   - GPS
   - Nexo
   - Oraxen
+  - ModelRenderer
 permissions:
   betterhud.help:
     description: Access to help command.

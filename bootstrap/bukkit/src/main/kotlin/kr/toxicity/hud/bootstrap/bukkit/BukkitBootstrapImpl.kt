@@ -13,6 +13,7 @@ import kr.toxicity.hud.api.bukkit.event.PluginReloadStartEvent
 import kr.toxicity.hud.api.bukkit.event.PluginReloadedEvent
 import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
@@ -27,6 +28,7 @@ import kr.toxicity.hud.bootstrap.bukkit.player.location.GPSLocationProvider
 import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.call
+import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
@@ -49,6 +51,7 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.server.ServerLoadEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.InputStream
@@ -243,7 +246,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 "New version found: $it",
                 "Download: https://www.spigotmc.org/resources/115559"
             )
-            Bukkit.getPluginManager().registerEvents(object : Listener {
+            registerListener(object : Listener {
                 @EventHandler
                 fun PlayerJoinEvent.join() {
                     val player = player
@@ -259,16 +262,24 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                                     )))
                     }
                 }
-            }, this)
+            })
         }
         core.start()
-        scheduler.asyncTask {
-            if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
-            log.info(
-                "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
-                "Plugin enabled."
-            )
-        }
+        registerListener(object : Listener {
+            @EventHandler
+            fun ServerLoadEvent.load() {
+                debug(ConfigManager.DebugLevel.MANAGER,"Initialized: $type")
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) {
+                    scheduler.asyncTask {
+                        core.reload()
+                    }
+                }
+                log.info(
+                    "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Plugin enabled."
+                )
+            }
+        })
     }
 
     override fun onDisable() {

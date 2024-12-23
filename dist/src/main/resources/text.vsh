@@ -25,11 +25,16 @@ out float applyColor;
 
 #CreateConstant
 
-bool more(vec3 i1, vec3 i2) {
-    return (i1.x >= i2.x && i1.y >= i2.y && i1.z >= i2.z);
+bool range(float t, float m1, float m2) {
+    return t >= m1 && t <= m2;
 }
-bool less(vec3 i1, vec3 i2) {
-    return (i1.x <= i2.x && i1.y <= i2.y && i1.z <= i2.z);
+
+bool range(vec2 t, vec2 m1, vec2 m2) {
+    return range(t.x, m1.x, m2.x) && range(t.y, m1.y, m2.y);
+}
+
+bool range(vec3 t, vec3 m1, vec3 m2) {
+    return range(t.x, m1.x, m2.x) && range(t.y, m1.y, m2.y) && range(t.z, m1.z, m2.z);
 }
 
 float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
@@ -45,18 +50,11 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
 #GenerateOtherDefinedMethod
 
 void main() {
-
     vec3 pos = Position;
-
-    float scale = ProjMat[0][0]  * ScreenSize.x / 2.0;
-    vec2 ui = ceil(ScreenSize / scale);
-
+    vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
     vec3 color = Color.xyz;
-
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
-
     applyColor = 0;
-
     if (pos.y >= ui.y) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
@@ -118,7 +116,7 @@ void main() {
         }
     } else {
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
-//HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && ((more(color, exp / 256.0) && less(color , exp / 254.0)) || color == vec3(0))) {
+//HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
 //RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
