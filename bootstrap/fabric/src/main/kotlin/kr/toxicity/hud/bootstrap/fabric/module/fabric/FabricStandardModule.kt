@@ -63,7 +63,7 @@ class FabricStandardModule : FabricModule {
             "exp" to { _ ->
                 {
                     HudListener { p ->
-                        p.fabricPlayer.experienceLevel.toDouble()
+                        p.fabricPlayer.experienceProgress.toDouble()
                     }
                 }
             },
