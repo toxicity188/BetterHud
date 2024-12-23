@@ -31,30 +31,11 @@ import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
 
-    private class TextCache(
+    private data class TextCache(
         val name: String,
-        val imagesName: Set<String>
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as TextCache
-
-            if (name != other.name) return false
-            if (!imagesName.containsAll(other.imagesName) || imagesName.size != other.imagesName.size) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = name.hashCode()
-            imagesName.forEach {
-                result = 31 * result + it.hashCode()
-            }
-            return result
-        }
-    }
+        val imagesName: Set<String>,
+        val supportLanguage: Set<String>?
+    )
 
     private const val CHAR_LENGTH = 16
 
@@ -233,7 +214,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         )
         val parseDefault = parseTTFFont("", "default_$configScale", configScale, defaultProvider, resource.textures, emptyMap(), fontConfig.get("include")?.asArray()?.map {
             it.asString()
-        } ?: emptyList(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)()
+        }?.toSet(), fontConfig.getAsBoolean("merge-default-bitmap", true), fontConfig)()
         parseDefault.charWidth.forEach {
             textWidthMap[it.key] = (it.value.width * configHeight / it.value.height).roundToInt()
         }
@@ -292,7 +273,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                             },
                             section["include"]?.asArray()?.map {
                                 it.asString()
-                            } ?: emptyList(),
+                            }?.toSet(),
                             section.getAsBoolean("merge-default-bitmap", false),
                             section,
                         )
@@ -445,7 +426,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         yamlObject: YamlObject,
     ): TextSupplier {
         return synchronized(textCacheMap) {
-            textCacheMap[TextCache(saveName, emptySet())]?.let { old ->
+            textCacheMap[TextCache(saveName, emptySet(), emptySet())]?.let { old ->
                 TextSupplier {
                     TextElement(saveName, null, old.array, old.charWidth, old.imageTextScale, yamlObject)
                 }
@@ -540,12 +521,12 @@ object TextManagerImpl : BetterHudManager, TextManager {
         fontProvider: FontBitmapProvider,
         imageSaveFolder: List<String>,
         images: Map<String, LocatedImage>,
-        supportedLanguage: List<String>?,
+        supportedLanguage: Set<String>?,
         mergeDefaultBitmap: Boolean,
         yamlObject: YamlObject
     ): TextSupplier {
         return synchronized(textCacheMap) {
-            textCacheMap[TextCache(saveName, images.keys)]?.let { old ->
+            textCacheMap[TextCache(saveName, images.keys, supportedLanguage)]?.let { old ->
                 TextSupplier {
                     TextElement(internalName, scale, old.array, old.charWidth, old.imageTextScale, yamlObject)
                 }
@@ -651,7 +632,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 debug(ConfigManager.DebugLevel.ASSETS, "Finalizing font text $saveName...")
                 val result = TextElement(internalName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
                 synchronized(textCacheMap) {
-                    textCacheMap[TextCache(internalName, images.keys)] = result
+                    textCacheMap[TextCache(internalName, images.keys, supportedLanguage)] = result
                 }
                 result
             }
