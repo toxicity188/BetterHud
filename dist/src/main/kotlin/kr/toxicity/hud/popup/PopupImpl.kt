@@ -116,7 +116,7 @@ class PopupImpl(
             }
         }
         array?.let { arr ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) arr.add(jsonObjectOf(
+            if (spaces.isNotEmpty()) arr.add(jsonObjectOf(
                 "type" to "space",
                 "advances" to jsonObjectOf(*spaces.map {
                     it.value to it.key

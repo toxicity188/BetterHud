@@ -44,7 +44,7 @@ class HudImageParser(parent: HudImpl, private val imageLayout: ImageLayout, gui:
                     val comp = Component.text()
                         .font(parent.imageKey)
                     val finalWidth = WidthComponent(
-                        if (BOOTSTRAP.useLegacyFont()) comp.content(c).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else comp.content("$c$negativeSpace"),
+                        comp.content("$c$negativeSpace"),
                         (pair.image.image.width.toDouble() * scale).roundToInt()
                     )
                     parent.jsonArray?.let { array ->

@@ -202,8 +202,6 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     override fun volatileCode(): VolatileCodeHandler = volatileCode
     override fun resource(path: String): InputStream? = javaClass.getResourceAsStream("/$path")?.buffered()
 
-    override fun useLegacyFont(): Boolean = false
-
     override fun startMetrics() {
     }
 

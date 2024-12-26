@@ -35,22 +35,13 @@ class HeadRenderer(
     }
 
     private inner class StandardPixelGetter : HeadPixelGetter {
-        private val pixelGetter: (Int, TextColor) -> ComponentLike = if (!BOOTSTRAP.useLegacyFont()) {
-            { index, next ->
-                Component.text()
-                    .content(buildString {
-                        append(components[index / 8].bodyKey)
-                        append(if (index < 63 && index % 8 == 7) nextPage else space)
-                    })
-                    .color(next)
-            }
-        } else {
-            { index, next ->
-                Component.text()
-                    .content(components[index / 8].bodyKey)
-                    .color(next)
-                    .append((if (index < 63 && index % 8 == 7) (-pixel - 1).toSpaceComponent() else NEGATIVE_ONE_SPACE_COMPONENT).component)
-            }
+        private val pixelGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            Component.text()
+                .content(buildString {
+                    append(components[index / 8].bodyKey)
+                    append(if (index < 63 && index % 8 == 7) nextPage else space)
+                })
+                .color(next)
         }
         override fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder {
             val comp = Component.text().font(font)
@@ -66,39 +57,21 @@ class HeadRenderer(
     }
 
     private inner class FancyPixelGetter : HeadPixelGetter {
-        private val headGetter: (Int, TextColor) -> ComponentLike = if (!BOOTSTRAP.useLegacyFont()) {
-            { index, next ->
-                Component.text()
-                    .content(buildString {
-                        append(components[index / 8].bodyKey)
-                        append(negativePixel)
-                    })
-                    .color(next)
-            }
-        } else {
-            { index, next ->
-                Component.text()
-                    .content(components[index / 8].bodyKey)
-                    .color(next)
-                    .append((-pixel / 8 - 1).toSpaceComponent().component)
-            }
+        private val headGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            Component.text()
+                .content(buildString {
+                    append(components[index / 8].bodyKey)
+                    append(negativePixel)
+                })
+                .color(next)
         }
-        private val pixelGetter: (Int, TextColor, Boolean) -> ComponentLike = if (!BOOTSTRAP.useLegacyFont()) {
-            { index, next, isHair ->
-                Component.text()
-                    .content(buildString {
-                        append(if (isHair) components[index / 8].hairKey else components[index / 8].bodyKey)
-                        append(if (index < 63 && index % 8 == 7) nextPage else space)
-                    })
-                    .color(next)
-            }
-        } else {
-            { index, next, isHair ->
-                Component.text()
-                    .content(if (isHair) components[index / 8].hairKey else components[index / 8].bodyKey)
-                    .color(next)
-                    .append((if (index < 63 && index % 8 == 7) (-pixel - 1).toSpaceComponent() else NEGATIVE_ONE_SPACE_COMPONENT).component)
-            }
+        private val pixelGetter: (Int, TextColor, Boolean) -> ComponentLike = { index, next, isHair ->
+            Component.text()
+                .content(buildString {
+                    append(if (isHair) components[index / 8].hairKey else components[index / 8].bodyKey)
+                    append(if (index < 63 && index % 8 == 7) nextPage else space)
+                })
+                .color(next)
         }
         override fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder {
             val comp = Component.text().font(font)

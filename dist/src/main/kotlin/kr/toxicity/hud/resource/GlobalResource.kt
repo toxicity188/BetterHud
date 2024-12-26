@@ -25,12 +25,6 @@ class GlobalResource {
                 read
             }
         }
-        BOOTSTRAP.resource("spaces.ttf")?.buffered()?.use {
-            val read = it.readAllBytes()
-            PackGenerator.addTask(font + "${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf") {
-                read
-            }
-        }
         PackGenerator.addTask(font + "${ConfigManagerImpl.key.spaceKey.value()}.json") {
             val center = 0xD0000
             jsonObjectOf(
@@ -47,20 +41,6 @@ class GlobalResource {
                         "advances" to jsonObjectOf(*(-8192..8192).map { i ->
                             (center + i).parseChar() to i
                         }.toTypedArray())
-                    )
-                )
-            ).toByteArray()
-        }
-        PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json") {
-            jsonObjectOf(
-                "providers" to jsonArrayOf(
-                    jsonObjectOf(
-                        "type" to "ttf",
-                        "file" to "${key.spacesTtfKey.asString()}.ttf",
-                        "size" to 2.5,
-                        "oversample" to 1.0,
-                        "shift" to jsonArrayOf(0.0, 0.0),
-                        "skip" to jsonArrayOf()
                     )
                 )
             ).toByteArray()

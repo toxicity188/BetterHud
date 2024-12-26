@@ -36,13 +36,6 @@ val betterCommand = "1.4.2"
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
 val supportedMinecraftVersions = listOf(
-    //1.17
-    //"1.17",
-    //"1.17.1",
-    //1.18
-    //"1.18",
-    //"1.18.1",
-    "1.18.2",
     //1.19
     "1.19",
     "1.19.1",
@@ -136,9 +129,6 @@ subprojects {
 }
 
 val legacyNmsVersion = listOf(
-    //"v1_17_R1",
-    //"v1_18_R1",
-    "v1_18_R2",
     "v1_19_R1",
     "v1_19_R2",
     "v1_19_R3",

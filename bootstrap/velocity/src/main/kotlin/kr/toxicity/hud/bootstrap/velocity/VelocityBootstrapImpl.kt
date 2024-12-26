@@ -225,7 +225,6 @@ class VelocityBootstrapImpl @Inject constructor(
 
     override fun minecraftVersion(): String = "1.21.4"
     override fun mcmetaVersion(): Int = 46
-    override fun useLegacyFont(): Boolean = false
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()

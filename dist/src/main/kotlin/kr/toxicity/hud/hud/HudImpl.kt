@@ -70,7 +70,7 @@ class HudImpl(
     }
     init {
         jsonArray?.let { array ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) array += jsonObjectOf(
+            if (spaces.isNotEmpty()) array += jsonObjectOf(
                 "type" to "space",
                 "advances" to jsonObjectOf(*spaces.map {
                     it.value to it.key

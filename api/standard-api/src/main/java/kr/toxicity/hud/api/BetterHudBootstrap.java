@@ -118,13 +118,6 @@ public interface BetterHudBootstrap {
     boolean isFabric();
 
     /**
-     * Whether to use legacy space font.
-     * Bukkit - Under 1.19
-     * @return Whether to use legacy font
-     */
-    boolean useLegacyFont();
-
-    /**
      * Starts BStats metrics.
      */
     void startMetrics();

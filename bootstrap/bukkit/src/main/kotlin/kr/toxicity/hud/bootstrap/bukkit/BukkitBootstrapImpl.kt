@@ -177,9 +177,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.version1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
             MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
             MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
-            MinecraftVersion.version1_18_2 -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
-            //MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
-            //MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                 pluginManager.disablePlugin(this)
@@ -341,7 +338,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun minecraftVersion(): String = MinecraftVersion.current.toString()
     override fun mcmetaVersion(): Int = nms.version.metaVersion
     override fun triggerListener(): Listener = listener
-    override fun useLegacyFont(): Boolean = nms.version.version <= 18
 
     override fun world(name: String): WorldWrapper? {
         return Bukkit.getWorld(name)?.let {
