@@ -1,10 +1,10 @@
 package kr.toxicity.hud.api;
 
+import kr.toxicity.command.BetterCommandSource;
 import kr.toxicity.hud.api.manager.*;
 import kr.toxicity.hud.api.plugin.ReloadFlagType;
 import kr.toxicity.hud.api.plugin.ReloadInfo;
 import kr.toxicity.hud.api.plugin.ReloadState;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +63,7 @@ public interface BetterHud {
      * @return result of reload.
      */
     default @NotNull ReloadState reload(@NotNull String... args) {
-        return reload(bootstrap().console());
+        return reload(bootstrap().consoleSource());
     }
     /**
      * Executes reload.
@@ -71,7 +71,7 @@ public interface BetterHud {
      * @param args reload args.
      * @return result of reload.
      */
-    default @NotNull ReloadState reload(@NotNull Audience sender, @NotNull ReloadFlagType... args) {
+    default @NotNull ReloadState reload(@NotNull BetterCommandSource sender, @NotNull ReloadFlagType... args) {
         return reload(new ReloadInfo(sender, new HashSet<>(List.of(args))));
     }
 

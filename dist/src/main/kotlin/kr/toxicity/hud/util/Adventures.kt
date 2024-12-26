@@ -20,7 +20,7 @@ const val TEXT_SPACE_KEY_CODEPOINT = 0xC0000
 const val TEXT_IMAGE_START_CODEPOINT = 0xC0000
 
 val CONSOLE
-    get() = BOOTSTRAP.console()
+    get() = BOOTSTRAP.consoleSource()
 
 val SPACE_KEY
     get() = ConfigManagerImpl.key.spaceKey

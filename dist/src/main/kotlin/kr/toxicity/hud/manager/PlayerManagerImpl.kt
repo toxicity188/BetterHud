@@ -37,8 +37,8 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
         }
     }
 
-    fun addHudPlayer(uuid: UUID, player: () -> HudPlayerImpl) {
-        playerMap.computeIfAbsent(uuid) {
+    fun addHudPlayer(uuid: UUID, player: () -> HudPlayerImpl): HudPlayer {
+        return playerMap.computeIfAbsent(uuid) {
             player().apply {
                 stringPlayer[name()] = this
             }
@@ -70,7 +70,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
 
     override fun reload(info: ReloadInfo, resource: GlobalResource) {
         playerMap.values.forEach {
-            it.resetElements()
+            it.reload()
         }
     }
 

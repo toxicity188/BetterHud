@@ -5,7 +5,9 @@ import kr.toxicity.hud.api.bukkit.trigger.HudBukkitEventTrigger
 import kr.toxicity.hud.api.bukkit.update.BukkitEventUpdateEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
+import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.ifNull
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -18,6 +20,9 @@ import java.util.function.BiConsumer
 
 val HudPlayer.bukkitPlayer
     get() = handle() as Player
+
+val Player.hudPlayer
+    get() = PlayerManagerImpl.getHudPlayer(uniqueId).ifNull("Unable to find this player: $name")
 
 fun Event.call(): Boolean {
     Bukkit.getPluginManager().callEvent(this)

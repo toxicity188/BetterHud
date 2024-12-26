@@ -32,7 +32,7 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.4.1"
+val betterCommand = "1.4.2"
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
 val supportedMinecraftVersions = listOf(

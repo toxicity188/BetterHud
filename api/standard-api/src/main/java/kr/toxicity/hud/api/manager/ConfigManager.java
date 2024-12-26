@@ -7,6 +7,11 @@ import org.jetbrains.annotations.NotNull;
  * Config manager
  */
 public interface ConfigManager {
+    boolean debug();
+    /**
+     * Gets debug level
+     * @return level
+     */
     /**
      * Gets used bossbar line
      * @return line
@@ -16,11 +21,6 @@ public interface ConfigManager {
     /**
      * Gets whether to enable debug or not
      * @return whether to enable debug or not
-     */
-    boolean isDebug();
-    /**
-     * Gets debug level
-     * @return level
      */
     @NotNull DebugLevel getDebugLevel();
 
@@ -52,6 +52,6 @@ public interface ConfigManager {
      */
     static boolean checkAvailable(@NotNull DebugLevel debugLevel) {
         var manager = BetterHudAPI.inst().getConfigManager();
-        return manager.isDebug() && manager.getDebugLevel().ordinal() >= debugLevel.ordinal();
+        return manager.debug() && manager.getDebugLevel().ordinal() >= debugLevel.ordinal();
     }
 }

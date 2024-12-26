@@ -159,23 +159,11 @@ class VelocityBootstrapImpl @Inject constructor(
 
     @Subscribe
     fun login(e: PostLoginEvent) {
-        latestVersion?.let { latest ->
-            if (version() != latest) {
-                e.player.info("New BetterHud version found: $latest")
-                e.player.info(
-                    Component.text("Download: https://www.spigotmc.org/resources/115559")
-                        .clickEvent(
-                            ClickEvent.clickEvent(
-                                ClickEvent.Action.OPEN_URL,
-                                "https://www.spigotmc.org/resources/115559"
-                            )))
-            }
-        }
         register(e.player)
     }
 
     private fun register(player: Player) {
-        PlayerManagerImpl.addHudPlayer(player.uniqueId) {
+        val audience = PlayerManagerImpl.addHudPlayer(player.uniqueId) {
             val impl = HudPlayerVelocity(player)
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
@@ -184,6 +172,18 @@ class VelocityBootstrapImpl @Inject constructor(
                 }
             }
             impl
+        }
+        latestVersion?.let { latest ->
+            if (version() != latest) {
+                audience.info("New BetterHud version found: $latest")
+                audience.info(
+                    Component.text("Download: https://www.spigotmc.org/resources/115559")
+                        .clickEvent(
+                            ClickEvent.clickEvent(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://www.spigotmc.org/resources/115559"
+                            )))
+            }
         }
     }
 

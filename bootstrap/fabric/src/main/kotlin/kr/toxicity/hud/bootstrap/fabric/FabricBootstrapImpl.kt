@@ -143,19 +143,6 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             logger.info("Mod disabled.")
         }
         ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler, _, _ ->
-            latestVersion?.let { latest ->
-                if (version() != latest) {
-                    val audience = handler.player
-                    audience.info("New BetterHud version found: $latest")
-                    audience.info(
-                        Component.text("Download: https://modrinth.com/plugin/betterhud2")
-                            .clickEvent(
-                                ClickEvent.clickEvent(
-                                    ClickEvent.Action.OPEN_URL,
-                                    "https://modrinth.com/plugin/betterhud2"
-                                )))
-                }
-            }
             register(handler)
         })
         ServerPlayConnectionEvents.DISCONNECT.register(ServerPlayConnectionEvents.Disconnect { handler, _ ->
@@ -164,7 +151,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     }
 
     private fun register(listener: ServerGamePacketListenerImpl) {
-        PlayerManagerImpl.addHudPlayer(listener.player.uuid) {
+        val audience = PlayerManagerImpl.addHudPlayer(listener.player.uuid) {
             val impl = HudPlayerFabric(server, listener)
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
@@ -173,6 +160,18 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                 }
             }
             impl
+        }
+        latestVersion?.let { latest ->
+            if (version() != latest) {
+                audience.info("New BetterHud version found: $latest")
+                audience.info(
+                    Component.text("Download: https://modrinth.com/plugin/betterhud2")
+                        .clickEvent(
+                            ClickEvent.clickEvent(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://modrinth.com/plugin/betterhud2"
+                            )))
+            }
         }
     }
     private fun disconnect(player: ServerPlayer) {

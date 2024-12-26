@@ -43,7 +43,7 @@ class PolymerResourcePackCompatibility : Compatibility {
                         "Fail to merge the resource pack with Polymer.",
                         "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
                     )
-                    if (ConfigManagerImpl.isDebug) {
+                    if (ConfigManagerImpl.debug()) {
                         reason.add(state.throwable.stackTraceToString())
                     }
                     warn(*reason.toTypedArray())

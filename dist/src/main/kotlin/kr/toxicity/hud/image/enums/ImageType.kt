@@ -1,5 +1,6 @@
 package kr.toxicity.hud.image.enums
 
+import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.player.HudPlayer
@@ -8,7 +9,6 @@ import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.image.ImageComponent
 import kr.toxicity.hud.util.*
 import kr.toxicity.hud.yaml.YamlObjectImpl
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -28,7 +28,7 @@ enum class ImageType {
 
         override fun createElement(
             assets: File,
-            sender: Audience,
+            sender: BetterCommandSource,
             file: File,
             s: String,
             yamlObject: YamlObject
@@ -65,7 +65,7 @@ enum class ImageType {
 
         override fun createElement(
             assets: File,
-            sender: Audience,
+            sender: BetterCommandSource,
             file: File,
             s: String,
             yamlObject: YamlObject
@@ -107,7 +107,7 @@ enum class ImageType {
 
         override fun createElement(
             assets: File,
-            sender: Audience,
+            sender: BetterCommandSource,
             file: File,
             s: String,
             yamlObject: YamlObject
@@ -149,5 +149,5 @@ enum class ImageType {
     }
 
     abstract fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent
-    abstract fun createElement(assets: File, sender: Audience, file: File, s: String, yamlObject: YamlObject): ImageElement
+    abstract fun createElement(assets: File, sender: BetterCommandSource, file: File, s: String, yamlObject: YamlObject): ImageElement
 }
