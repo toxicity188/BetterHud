@@ -44,10 +44,8 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
 
 void main() {
     vec3 pos = Position;
-//RemapHotBar    float scale = ProjMat[0][0]  * ScreenSize.x / 2.0;
-//RemapHotBar    vec2 ui = ceil(ScreenSize / scale);
-//RemapHotBar    vec2 scr = 2 / vec2(ProjMat[0][0], -ProjMat[1][1]);
-//RemapHotBar    if (ProjMat[3].x <= -1 && scr.y - pos.y <= 25) {
+//RemapHotBar    vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
+//RemapHotBar    if (ProjMat[3].x <= -1 && ui.y - pos.y <= 25) {
 //RemapHotBar        float hotbarX = 0;
 //RemapHotBar        float hotbarY = 0;
 //RemapHotBar

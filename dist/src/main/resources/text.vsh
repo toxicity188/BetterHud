@@ -55,7 +55,7 @@ void main() {
     vec3 color = Color.xyz;
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     applyColor = 0;
-    if (pos.y >= ui.y) {
+    if (pos.y >= ui.y && ProjMat[3].x == -1 && (int(pos.z) == 1000 || int(pos.z) == 0)) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
         if (((bit >> MAX_BIT) & 1) == 1) {
@@ -119,8 +119,7 @@ void main() {
 //HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
-//RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
-//RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && scr.y - pos.y <= 20) {
+//RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && ui.y - pos.y <= 20) {
 //RemapHotBar            float hotbarX = 0;
 //RemapHotBar            float hotbarY = 0;
 //RemapHotBar

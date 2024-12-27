@@ -243,6 +243,11 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.name
                 }
             },
+            "world" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.world.name
+                }
+            },
             "gamemode" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.gameMode.name
