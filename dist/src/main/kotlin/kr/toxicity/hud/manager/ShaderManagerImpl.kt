@@ -184,7 +184,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 val tagSupplier = (tagSupplierMap[shader.first] ?: EMPTY_SUPPLIER).get()
                 val byte = buildString {
                     shader.second.forEach write@{ string ->
-                        var s = string.substringBeforeLast("//")
+                        var s = string
                         val deactivateMatcher = deactivatePattern.matcher(s)
                         if (deactivateMatcher.find()) {
                             if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
@@ -209,7 +209,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                             if (isEmpty() || last() != '\n') s = '\n' + s
                             s += '\n'
                         }
-                        append(s.replace("  ", ""))
+                        append(s.substringBeforeLast("//").replace("  ", ""))
                     }
                 }.toByteArray()
                 PackGenerator.addTask(resource.core + shader.first.fileName) {

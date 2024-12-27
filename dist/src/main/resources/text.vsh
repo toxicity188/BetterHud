@@ -44,6 +44,12 @@ bool checkElement(float z) {
     return false;
 }
 
+bool checkExp(float z) {
+    if (z == 0) return true; //<=1.20.4 vanilla
+    else if (z == 600) return true; //>=1.20.5 vanilla
+    return false;
+}
+
 float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
     if (shape == 0) {
         return length((modelViewMat * vec4(pos, 1.0)).xyz);
@@ -124,7 +130,7 @@ void main() {
         }
     } else {
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
-//HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
+//HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && checkExp(pos.z) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
 //RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && ui.y - pos.y <= 20) {
