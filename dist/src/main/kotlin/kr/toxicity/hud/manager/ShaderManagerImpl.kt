@@ -184,7 +184,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 val tagSupplier = (tagSupplierMap[shader.first] ?: EMPTY_SUPPLIER).get()
                 val byte = buildString {
                     shader.second.forEach write@{ string ->
-                        var s = string
+                        var s = string.substringBeforeLast("//")
                         val deactivateMatcher = deactivatePattern.matcher(s)
                         if (deactivateMatcher.find()) {
                             if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
