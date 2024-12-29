@@ -45,10 +45,6 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
         bossBarMap.remove(player.uuid())?.remove()
     }
 
-    override fun reloadBossBar(player: HudPlayer, color: BossBar.Color) {
-        bossBarMap[player.uuid()]?.resetDummy(color)
-    }
-
     override fun getTextureValue(player: HudPlayer): String {
         return (player.handle() as ConnectedPlayer).gameProfile.properties.first {
             it.name == "textures"
@@ -91,19 +87,7 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
             last = bossBar
             listener.write(bossBar.createUpdateNamePacket(component))
         }
-        
-        fun resetDummy(color: BossBar.Color) {
-            listener.write(uuidHud.createRemovePacket())
-            dummy.dummyBars.forEach {
-                listener.write(it.createRemovePacket())
-            }
-            dummy = PlayerDummyBossBar(color)
-            dummy.dummyBars.forEach { 
-                listener.write(it.createAddPacket())
-            }
-            listener.write(last.createAddPacket())
-            originalColor = color
-        }
+
 
         fun remove() {
             val channel = listener.channel

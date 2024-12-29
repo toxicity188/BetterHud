@@ -293,7 +293,7 @@ fun Project.shadowJar() = zipTree(tasks.shadowJar.map {
     it.archiveFile
 })
 
-val sourcesJar by tasks.creating(Jar::class.java) {
+val sourcesJar by tasks.registering(Jar::class) {
     dependsOn(tasks.classes)
     fun getProjectSource(project: Project): Array<File> {
         return if (project.subprojects.isEmpty()) project.sourceSets.main.get().allSource.srcDirs.toTypedArray() else ArrayList<File>().apply {
@@ -306,12 +306,12 @@ val sourcesJar by tasks.creating(Jar::class.java) {
     from(*getProjectSource(project))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-val javadocJar by tasks.creating(Jar::class.java) {
+val javadocJar by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaGenerate)
     archiveClassifier = "javadoc"
     from(layout.buildDirectory.dir("dokka/html").orNull?.asFile)
 }
-val fabricJar by tasks.creating(Jar::class.java) {
+val fabricJar by tasks.registering(Jar::class) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
@@ -323,7 +323,7 @@ val fabricJar by tasks.creating(Jar::class.java) {
         relocateAll()
     }
 }
-val pluginJar by tasks.creating(Jar::class.java) {
+val pluginJar by tasks.registering(Jar::class) {
     archiveClassifier = "bukkit"
     (listOf(
         apiShare,
@@ -346,7 +346,7 @@ val pluginJar by tasks.creating(Jar::class.java) {
         relocateAll()
     }
 }
-val velocityJar by tasks.creating(Jar::class.java) {
+val velocityJar by tasks.registering(Jar::class) {
     archiveClassifier = "velocity"
     listOf(
         apiShare,
@@ -418,7 +418,7 @@ dependencies {
 tasks {
     runServer {
         version(minecraft)
-        pluginJars(pluginJar.archiveFile)
+        pluginJars(pluginJar.get().archiveFile)
         pluginJars(fileTree("plugins"))
     }
     build {
@@ -433,8 +433,8 @@ tasks {
 }
 
 bukkitBootstrap.modrinthPublish(
-    pluginJar,
-    listOf(sourcesJar, javadocJar),
+    pluginJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("bukkit", "spigot", "paper", "purpur", "folia"),
     supportedMinecraftVersions,
     listOf(),
@@ -442,16 +442,16 @@ bukkitBootstrap.modrinthPublish(
 )
 
 velocityBootstrap.modrinthPublish(
-    velocityJar,
-    listOf(sourcesJar, javadocJar),
+    velocityJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("velocity"),
     supportedMinecraftVersions,
     listOf(),
     listOf()
 )
 fabricBootstrap.modrinthPublish(
-    fabricJar,
-    listOf(sourcesJar, javadocJar),
+    fabricJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("fabric", "quilt"),
     supportedMinecraftVersions.subList(
         supportedMinecraftVersions.indexOf(properties["supported_version"]),
@@ -461,7 +461,7 @@ fabricBootstrap.modrinthPublish(
     listOf("luckperms", "placeholder-api", "polymer")
 )
 
-tasks.create("modrinthPublish") {
+tasks.register("modrinthPublish") {
     dependsOn(*bootstrap.map {
         it.tasks.modrinth
     }.toTypedArray())

@@ -73,6 +73,19 @@ class FoliaScheduler(
         }
     }
 
+    override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+        val task = Bukkit.getAsyncScheduler().runDelayed(plugin, {
+            runnable.run()
+        }, delay * 50, TimeUnit.MILLISECONDS)
+        return object : HudTask {
+            override fun isCancelled(): Boolean {
+                return task.isCancelled
+            }
+            override fun cancel() {
+                task.cancel()
+            }
+        }
+    }
     override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
         val task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, {
             runnable.run()

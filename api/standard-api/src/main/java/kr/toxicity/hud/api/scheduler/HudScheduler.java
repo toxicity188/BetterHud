@@ -35,6 +35,13 @@ public interface HudScheduler {
     @NotNull HudTask asyncTask(@NotNull Runnable runnable);
     /**
      * Executes async task.
+     * @param delay delay
+     * @param runnable task
+     * @return scheduled task.
+     */
+    @NotNull HudTask asyncTaskLater(long delay, @NotNull Runnable runnable);
+    /**
+     * Executes async task.
      * @param runnable task
      * @param delay delay
      * @param period period

@@ -74,7 +74,6 @@ abstract class HudPlayerImpl : HudPlayer {
 
     final override fun startTick() {
         cancelTick()
-        VOLATILE_CODE.reloadBossBar(this, ShaderManagerImpl.barColor)
         val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
@@ -146,7 +145,7 @@ abstract class HudPlayerImpl : HudPlayer {
     }
 
     @Synchronized
-    final override fun reload() {
+    override fun reload() {
         autoSave = asyncTaskTimer(ConfigManagerImpl.autoSaveTime, ConfigManagerImpl.autoSaveTime) {
             save()
         }

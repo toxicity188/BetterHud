@@ -6,6 +6,7 @@ import kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.asyncTaskLater
 import net.kyori.adventure.audience.Audience
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.bossevents.CustomBossEvent
@@ -13,23 +14,37 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import java.util.*
 
 class HudPlayerFabric(
-    server: MinecraftServer,
+    private val server: MinecraftServer,
     private val listener: ServerGamePacketListenerImpl
 ) : HudPlayerImpl() {
 
-    init {
+    private fun initBossBar(action: () -> Unit) {
         val event = ArrayList<CustomBossEvent>()
         server.customBossEvents.events.forEach {
             if (it.players.any { p ->
                 p.uuid == listener.player.uuid
             }) {
                 it.removePlayer(listener.player)
-                event.add(it)
+                event += it
             }
         }
-        inject()
-        event.forEach {
-            it.addPlayer(listener.player)
+        action()
+        asyncTaskLater(20) {
+            event.forEach {
+                it.addPlayer(listener.player)
+            }
+        }
+    }
+
+    init {
+        initBossBar {
+            inject()
+        }
+    }
+
+    override fun reload() {
+        initBossBar {
+            super.reload()
         }
     }
 

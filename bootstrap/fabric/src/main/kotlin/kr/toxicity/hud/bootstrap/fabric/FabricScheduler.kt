@@ -141,6 +141,12 @@ class FabricScheduler : HudScheduler {
         )
     }
 
+    override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+        return AsyncFabricTask(
+            executors.schedule(runnable, delay * 50, TimeUnit.MILLISECONDS)
+        )
+    }
+
     override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
         if (delay < 0) throw RuntimeException("delay < 0")
         if (period < 1) throw RuntimeException("period < 1")

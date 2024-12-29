@@ -21,8 +21,8 @@ dependencies {
         parchment("org.parchmentmc.data:${properties["parchment"]}")
     })
     //Other mod dependency
-    modCompileOnly("eu.pb4:polymer-resource-pack:0.11.1+1.21.4")
-    modCompileOnly("eu.pb4:polymer-autohost:0.11.1+1.21.4")
+    modCompileOnly("eu.pb4:polymer-resource-pack:0.11.3+1.21.4")
+    modCompileOnly("eu.pb4:polymer-autohost:0.11.3+1.21.4")
     modCompileOnly("eu.pb4:placeholder-api:2.5.1+1.21.3")
     modCompileOnly("net.luckperms:api:5.4")
 
@@ -44,7 +44,7 @@ fabricModJson {
     id = "betterhud"
     name = rootProject.name
     version = project.version.toString()
-    description = "Make a hud in minecraft!"
+    description = "A multi-platform server-side implementation of HUD in Minecraft."
     authors.set(listOf(person("toxicity") {
         contact.sources = "https://github.com/toxicity188/BetterHud"
     }))

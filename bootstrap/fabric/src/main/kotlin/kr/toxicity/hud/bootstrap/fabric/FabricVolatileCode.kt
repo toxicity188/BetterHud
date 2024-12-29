@@ -103,10 +103,6 @@ class FabricVolatileCode : VolatileCodeHandler {
         bossBarMap.remove(player.uuid())?.remove()
     }
 
-    override fun reloadBossBar(player: HudPlayer, color: BossBar.Color) {
-        bossBarMap[player.uuid()]?.resetDummy(color)
-    }
-
     override fun getTextureValue(player: HudPlayer): String {
         return (player.handle() as ServerPlayer).gameProfile.properties.get("textures").first().value
     }
@@ -145,18 +141,6 @@ class FabricVolatileCode : VolatileCodeHandler {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
-        }
-        
-        fun resetDummy(color: BossBar.Color) {
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummy.dummyBarsUUID.forEach {
-                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
-            }
-            dummy = PlayerDummyBossBar(color)
-            dummy.dummyBars.forEach { 
-                listener.send(ClientboundBossEventPacket.createAddPacket(it))
-            }
-            listener.send(ClientboundBossEventPacket.createAddPacket(last))
         }
 
         fun remove() {

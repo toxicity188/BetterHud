@@ -69,14 +69,12 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     }
 
     override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        playerMap.values.forEach {
-            it.reload()
-        }
     }
 
     override fun postReload() {
         playerMap.values.forEach {
             it.startTick()
+            it.reload()
         }
     }
 

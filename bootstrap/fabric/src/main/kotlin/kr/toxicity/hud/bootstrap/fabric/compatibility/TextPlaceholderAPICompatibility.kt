@@ -9,6 +9,7 @@ import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
+import kr.toxicity.hud.bootstrap.fabric.util.toMiniMessageString
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents
 import java.util.function.Function
@@ -29,7 +30,7 @@ class TextPlaceholderAPICompatibility : Compatibility {
                 override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
                     val comp = MutableComponent.create(LiteralContents("%${args[0]}%"))
                     return Function {
-                        Placeholders.parseText(comp, PlaceholderContext.of(it.fabricPlayer)).string
+                        Placeholders.parseText(comp, PlaceholderContext.of(it.fabricPlayer)).toMiniMessageString()
                     }
                 }
 
