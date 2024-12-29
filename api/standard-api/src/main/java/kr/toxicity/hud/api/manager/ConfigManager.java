@@ -7,11 +7,11 @@ import org.jetbrains.annotations.NotNull;
  * Config manager
  */
 public interface ConfigManager {
-    boolean debug();
     /**
      * Gets debug level
      * @return level
      */
+    boolean debug();
     /**
      * Gets used bossbar line
      * @return line

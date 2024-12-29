@@ -85,6 +85,13 @@ class VelocityBootstrapImpl @Inject constructor(
 
         override fun asyncTask(runnable: Runnable): HudTask = task(runnable)
 
+        override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+            return proxyServer.scheduler.buildTask(this@VelocityBootstrapImpl, runnable)
+                .delay(delay * 50, TimeUnit.MILLISECONDS)
+                .schedule()
+                .toHud()
+        }
+
         override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
             return proxyServer.scheduler.buildTask(this@VelocityBootstrapImpl, runnable)
                 .delay(delay * 50, TimeUnit.MILLISECONDS)
@@ -92,7 +99,6 @@ class VelocityBootstrapImpl @Inject constructor(
                 .schedule()
                 .toHud()
         }
-
     }
 
     private val log = object : BetterHudLogger {

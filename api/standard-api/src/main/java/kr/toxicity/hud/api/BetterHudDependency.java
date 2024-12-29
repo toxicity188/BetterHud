@@ -38,10 +38,17 @@ public class BetterHudDependency {
         DEPENDENCIES.add(this);
     }
 
+    /**
+     * Gets all dependencies
+     * @return dependencies
+     */
     public static @NotNull @Unmodifiable List<BetterHudDependency> dependencies() {
         return Collections.unmodifiableList(DEPENDENCIES);
     }
 
+    /**
+     * Gson
+     */
     public static final BetterHudDependency GSON = new BetterHudDependency(
             "com{}google{}code{}gson",
             "gson",
@@ -49,6 +56,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.VELOCITY)
     );
+    /**
+     * Snakeyaml
+     */
     public static final BetterHudDependency SNAKEYAML = new BetterHudDependency(
             "org{}yaml",
             "snakeyaml",
@@ -56,6 +66,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
     );
+    /**
+     * Mysql connector
+     */
     public static final BetterHudDependency MYSQL_CONNECTOR_J = new BetterHudDependency(
             "com{}mysql",
             "mysql-connector-j",
@@ -63,6 +76,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
     );
+    /**
+     * Asm commons
+     */
     public static final BetterHudDependency ASM_COMMONS = new BetterHudDependency(
             "org{}ow2{}asm",
             "asm-commons",
@@ -70,6 +86,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Exp4j
+     */
     public static final BetterHudDependency EXP4J = new BetterHudDependency(
             "net{}objecthunter",
             "exp4j",
@@ -77,6 +96,9 @@ public class BetterHudDependency {
             true,
             BetterHudPlatform.ALL
     );
+    /**
+     * Expiring map
+     */
     public static final BetterHudDependency EXPIRING_MAP = new BetterHudDependency(
             "net{}jodah",
             "expiringmap",
@@ -85,7 +107,9 @@ public class BetterHudDependency {
             BetterHudPlatform.ALL
     );
 
-
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_API = new BetterHudDependency(
             "net{}kyori",
             "adventure-api",
@@ -93,6 +117,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_KEY = new BetterHudDependency(
             "net{}kyori",
             "adventure-key",
@@ -100,6 +127,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_LOGGER_SLF4J = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-logger-slf4j",
@@ -107,6 +137,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_ANSI = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-ansi",
@@ -114,6 +147,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_GSON = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-gson",
@@ -121,6 +157,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_PLAIN = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-plain",
@@ -128,6 +167,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_LEGACY = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-legacy",
@@ -135,6 +177,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.FABRIC)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_JSON = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-json",
@@ -142,6 +187,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_MINIMESSAGE = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-minimessage",
@@ -149,6 +197,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Examination
+     */
     public static final BetterHudDependency EXAMINATION_API = new BetterHudDependency(
             "net{}kyori",
             "examination-api",
@@ -156,6 +207,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Examination
+     */
     public static final BetterHudDependency EXAMINATION_STRING = new BetterHudDependency(
             "net{}kyori",
             "examination-string",
@@ -163,6 +217,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Option
+     */
     public static final BetterHudDependency OPTION = new BetterHudDependency(
             "net{}kyori",
             "option",
@@ -170,6 +227,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_NBT = new BetterHudDependency(
             "net{}kyori",
             "adventure-nbt",
@@ -177,6 +237,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_GSON_LEGACY_IMPL = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-gson-legacy-impl",
@@ -184,6 +247,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
     );
+    /**
+     * Adventure
+     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_JSON_LEGACY_IMPL = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-json-legacy-impl",
@@ -191,6 +257,10 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
     );
+
+    /**
+     * Adventure-platform
+     */
     public static final BetterHudDependency ADVENTURE_PLATFORM_BUKKIT = new BetterHudDependency(
             "net{}kyori",
             "adventure-platform-bukkit",
@@ -198,6 +268,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
     );
+    /**
+     * Adventure-platform
+     */
     public static final BetterHudDependency ADVENTURE_PLATFORM_API = new BetterHudDependency(
             "net{}kyori",
             "adventure-platform-api",
@@ -205,6 +278,9 @@ public class BetterHudDependency {
             false,
             List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
     );
+    /**
+     * Adventure-platform
+     */
     public static final BetterHudDependency ADVENTURE_PLATFORM_FACET = new BetterHudDependency(
             "net{}kyori",
             "adventure-platform-facet",
