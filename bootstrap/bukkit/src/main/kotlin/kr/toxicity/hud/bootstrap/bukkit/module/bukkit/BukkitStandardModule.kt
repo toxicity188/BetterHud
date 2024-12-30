@@ -186,9 +186,9 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.inventory.heldItemSlot
                 }
             },
-            "potion_effect_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+            "potion_effect_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val potion = runCatching {
                         NamespacedKey.fromString(args[0])?.let { key ->
                             Registry.EFFECT.get(key)
@@ -197,29 +197,29 @@ class BukkitStandardModule : BukkitModule {
                         @Suppress("DEPRECATION")
                         PotionEffectType.getByName(args[0])
                     }.getOrNull() ?: throw RuntimeException("this potion effect doesn't exist: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         p.bukkitPlayer.getPotionEffect(potion)?.duration ?: 0
                     }
                 }
-            },
-            "total_amount" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                .build(),
+            "total_amount" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val item = Material.valueOf(args[0].uppercase())
-                    return Function { p ->
+                    Function { p ->
                         p.bukkitPlayer.totalAmount(item)
                     }
                 }
-            },
-            "storage" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+                .build(),
+            "storage" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val item = Material.valueOf(args[0].uppercase())
-                    return Function { p ->
+                    Function { p ->
                         p.bukkitPlayer.storage(item)
                     }
                 }
-            },
+                .build(),
             "absorption" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.bukkitPlayer.absorptionAmount
@@ -253,17 +253,17 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.gameMode.name
                 }
             },
-            "custom_variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            "custom_variable" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
                     val key = args[0]
-                    return reason.unwrap { e: CustomPopupEvent ->
+                    reason.unwrap { e: CustomPopupEvent ->
                         Function { _ ->
                             e.variables[key] ?: "<none>"
                         }
                     }
                 }
-            }
+                .build()
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
@@ -287,14 +287,13 @@ class BukkitStandardModule : BukkitModule {
                     it.bukkitPlayer.inventory.itemInMainHand.type != Material.AIR
                 }
             },
-            "has_permission" to object : HudPlaceholder<Boolean> {
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return Function {
+            "has_permission" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function {
                         it.bukkitPlayer.hasPermission(args[0])
                     }
                 }
-
-                override fun getRequiredArgsLength(): Int = 1
-            }
+                .build()
         )
 }

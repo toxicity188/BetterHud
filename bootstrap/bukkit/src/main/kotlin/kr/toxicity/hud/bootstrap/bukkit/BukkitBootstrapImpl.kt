@@ -219,17 +219,17 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlayerHeadManager.addSkinProvider(HttpSkinProvider())
         }
         if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
-            PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val format = "%${args.joinToString(",")}%"
-                    return Function { player ->
+                    Function { player ->
                         runCatching {
                             PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
                         }.getOrDefault("<error>")
                     }
                 }
-            })
+                .build())
         }
         ModuleManager.start()
         CompatibilityManager.start()

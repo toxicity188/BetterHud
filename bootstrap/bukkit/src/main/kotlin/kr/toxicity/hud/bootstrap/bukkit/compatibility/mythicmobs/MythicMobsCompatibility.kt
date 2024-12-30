@@ -10,7 +10,6 @@ import io.lumine.mythic.core.players.PlayerData
 import io.lumine.mythic.core.skills.AbstractSkill
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
@@ -38,13 +37,13 @@ class MythicMobsCompatibility : Compatibility {
         get() = mapOf()
     override val numbers: Map<String, HudPlaceholder<Number>>
         get() = mapOf(
-            "current_cooldown" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+            "current_cooldown" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MythicBukkit.inst().skillManager.getSkill(args[0]).orElseThrow {
                         RuntimeException("this skill doesn't exist: ${args[0]}")
                     } as AbstractSkill
-                    return Function { p ->
+                    Function { p ->
                         skill.getCooldown(object : SkillCaster {
                             override fun getEntity(): AbstractEntity = BukkitAdapter.adapt(p.bukkitPlayer)
                             override fun setUsingDamageSkill(p0: Boolean) {}
@@ -52,39 +51,39 @@ class MythicMobsCompatibility : Compatibility {
                         })
                     }
                 }
-            },
-            "aura_stack" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
+                .build(),
+            "aura_stack" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).getAuraStacks(args[0])
                     }
                 }
-            },
-            "aura_max_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
+                .build(),
+            "aura_max_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
                             it.startDuration
                         } ?: 0
                     }
                 }
-            },
-            "aura_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
+                .build(),
+            "aura_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
                             it.ticksRemaining
                         } ?: 0
                     }
                 }
-            },
-            "aura_duration_reversed" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
+                .build(),
+            "aura_duration_reversed" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxByOrNull {
                             it.startDuration
                         }?.let {
@@ -92,12 +91,12 @@ class MythicMobsCompatibility : Compatibility {
                         } ?: 0
                     }
                 }
-            },
+                .build(),
             // entity
-            "entity_current_cooldown" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return reason.unwrap { event: EntityEvent ->
+            "entity_current_cooldown" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         val skill = MythicBukkit.inst().skillManager.getSkill(args[0]).orElseThrow {
                             RuntimeException("this skill doesn't exist: ${args[0]}")
                         } as AbstractSkill
@@ -110,21 +109,21 @@ class MythicMobsCompatibility : Compatibility {
                         }
                     }
                 }
-            },
-            "entity_aura_stack" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return reason.unwrap { event: EntityEvent ->
+                .build(),
+            "entity_aura_stack" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         Function get@ {
                             (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).getAuraStacks(args[0])
                         }
                     }
                 }
-            },
-            "entity_aura_max_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return reason.unwrap { event: EntityEvent ->
+                .build(),
+            "entity_aura_max_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         Function get@ {
                             (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
                                 aura.startDuration
@@ -132,11 +131,11 @@ class MythicMobsCompatibility : Compatibility {
                         }
                     }
                 }
-            },
-            "entity_aura_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return reason.unwrap { event: EntityEvent ->
+                .build(),
+            "entity_aura_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         Function get@ {
                             (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
                                 aura.ticksRemaining
@@ -144,11 +143,11 @@ class MythicMobsCompatibility : Compatibility {
                         }
                     }
                 }
-            },
-            "entity_aura_duration_reversed" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return reason.unwrap { event: EntityEvent ->
+                .build(),
+            "entity_aura_duration_reversed" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         Function get@ {
                             (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get -1).auraRegistry.auras[args[0]]?.maxOfOrNull { aura ->
                                 aura.startDuration - aura.ticksRemaining
@@ -156,15 +155,15 @@ class MythicMobsCompatibility : Compatibility {
                         }
                     }
                 }
-            }
+                .build()
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
-            "caster_variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            "caster_variable" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
                     val value = args[0]
-                    return reason.unwrap { e: MythicMobsPopupEvent ->
+                    reason.unwrap { e: MythicMobsPopupEvent ->
                         val registry = when (val caster = e.caster) {
                             is PlayerData -> caster.variables.get(value)
                             is ActiveMob -> MythicBukkit.inst().variableManager.getRegistry(caster).get(value)
@@ -175,39 +174,39 @@ class MythicMobsCompatibility : Compatibility {
                         }
                     }
                 }
-            },
-            "target_variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                .build(),
+            "target_variable" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
                     val value = args[0]
-                    return reason.unwrap { e: MythicMobsPopupEvent ->
+                    reason.unwrap { e: MythicMobsPopupEvent ->
                         val registry = MythicBukkit.inst().playerManager.getProfile(e.target).variables.get(value)
                         Function {
                             registry?.get()?.toString() ?: "<none>"
                         }
                     }
                 }
-            },
-            "world_variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                .build(),
+            "world_variable" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val registry = MythicBukkit.inst().variableManager.globalRegistry.get(args[0])
-                    return Function {
+                    Function {
                         registry?.get()?.toString() ?: "<none>"
                     }
                 }
-            },
+                .build(),
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
-            "has_aura" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return Function { p ->
+            "has_aura" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.hasAura(args[0])
                     }
                 }
-            },
+                .build(),
             "is_mythicmob" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
@@ -215,16 +214,16 @@ class MythicMobsCompatibility : Compatibility {
                     }
                 }
             },
-            "entity_has_aura" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return reason.unwrap { event: EntityEvent ->
+            "entity_has_aura" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
                         Function get@ { _ ->
                             (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get false).auraRegistry.hasAura(args[0])
                         }
                     }
                 }
-            }
+                .build()
         )
 
     override fun start() {

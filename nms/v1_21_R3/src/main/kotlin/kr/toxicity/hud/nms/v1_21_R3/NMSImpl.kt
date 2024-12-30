@@ -40,15 +40,15 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.util.CraftChatMessage
+import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.inventory.EntityEquipment
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.PlayerInventory
+import org.bukkit.inventory.*
 import org.bukkit.permissions.Permission
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.function.Consumer
 
 class NMSImpl : NMS {
     companion object {
@@ -136,6 +136,18 @@ class NMSImpl : NMS {
             }
             override fun getHandle(): ServerPlayer {
                 return handle
+            }
+            override fun dropItem(dropAll: Boolean): Boolean {
+                return player.dropItem(dropAll)
+            }
+            override fun dropItem(p0: Int, p1: Int, p2: Boolean, p3: Consumer<Item>?): Item? {
+                return player.dropItem(p0, p1, p2, p3)
+            }
+            override fun dropItem(p0: EquipmentSlot, p1: Int, p2: Boolean, p3: Consumer<Item>?): Item? {
+                return player.dropItem(p0, p1, p2, p3)
+            }
+            override fun dropItem(p0: ItemStack, p1: Boolean, p2: Consumer<Item>?): Item? {
+                return player.dropItem(p0, p1, p2)
             }
             override fun getHealth(): Double {
                 return player.health

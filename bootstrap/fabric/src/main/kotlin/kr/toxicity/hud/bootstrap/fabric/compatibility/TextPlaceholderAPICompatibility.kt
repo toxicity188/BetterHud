@@ -4,7 +4,6 @@ import eu.pb4.placeholders.api.PlaceholderContext
 import eu.pb4.placeholders.api.Placeholders
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
@@ -26,16 +25,15 @@ class TextPlaceholderAPICompatibility : Compatibility {
         get() = mapOf()
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
-            "parse" to object : HudPlaceholder<String> {
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            "parse" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val comp = MutableComponent.create(LiteralContents("%${args[0]}%"))
-                    return Function {
+                    Function {
                         Placeholders.parseText(comp, PlaceholderContext.of(it.fabricPlayer)).toMiniMessageString()
                     }
                 }
-
-                override fun getRequiredArgsLength(): Int = 1
-            }
+                .build()
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf()

@@ -69,11 +69,11 @@ class SkriptCompatibility : Compatibility {
         get() = mapOf()
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
-            "variable" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            "variable" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, reason ->
                     val value = VariableString.newInstance(args.joinToString(",")).ifNull("Invalid variable.")
-                    return if (reason.type == UpdateReason.EMPTY) {
+                    if (reason.type == UpdateReason.EMPTY) {
                         Function {
                             value.getSingle(kr.toxicity.hud.api.bukkit.event.HudUpdateEvent(it)) ?: "<none>"
                         }
@@ -83,7 +83,7 @@ class SkriptCompatibility : Compatibility {
                         }
                     }
                 }
-            }
+                .build()
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf()

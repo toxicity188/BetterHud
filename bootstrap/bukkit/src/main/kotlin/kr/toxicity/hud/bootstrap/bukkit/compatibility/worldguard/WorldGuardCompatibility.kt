@@ -26,14 +26,14 @@ class WorldGuardCompatibility : Compatibility {
         get() = mapOf()
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
-            "in_region" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return Function { p ->
+            "in_region" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         val loc = p.bukkitPlayer.location
                         WorldGuard.getInstance().platform.regionContainer.get(BukkitAdapter.adapt(loc.world))?.getRegion(args[0])?.contains(loc.blockX, loc.blockY, loc.blockZ) ?: false
                     }
                 }
-            }
+                .build()
         )
 }
