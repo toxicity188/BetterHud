@@ -17,7 +17,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.10" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.11" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"

@@ -3,6 +3,7 @@ package kr.toxicity.hud.popup
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
+import kr.toxicity.hud.api.popup.Popup.FrameType.*
 import kr.toxicity.hud.api.popup.PopupIterator
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.update.PopupUpdateEvent
@@ -70,7 +71,10 @@ class PopupIteratorImpl(
         if (_i != i) {
             _i = i
             _mapper = valueMap.map {
-                runByTick(parent.tick(), { tick }, it(player, _i))
+                runByTick(parent.tick(), when (parent.frameType()) {
+                    GLOBAL -> { { player.tick } }
+                    LOCAL -> { { tick } }
+                }, it(player, _i))
             }
         }
         val r = _mapper.map {

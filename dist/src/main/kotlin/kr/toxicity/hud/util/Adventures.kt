@@ -120,7 +120,13 @@ private fun Style.parseDecoration(decoration: TextDecoration, default: Boolean):
     TextDecoration.State.TRUE -> true
 }
 
-fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
+data class SplitOption(
+    val endWidth: Int,
+    val space: Int,
+    val forceSplit: Boolean
+)
+
+fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
     var i = 0
     val list = ArrayList<WidthComponent>()
     val topBuilder = SplitBuilder {
@@ -158,11 +164,11 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                 sb.appendCodePoint(codepoint)
                 i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
                 i += add
-                if (space > 0) {
+                if (option.space > 0) {
                     sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
-                    i += space + add
+                    i += option.space + add
                 }
-                if (i >= endWidth && (i >= (1.25 * endWidth).roundToInt() || ' '.code == codepoint)) end()
+                if (i >= option.endWidth && (i >= (1.25 * option.endWidth).roundToInt() || ' '.code == codepoint) || option.forceSplit) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
                 style(style).content(sb.toString())

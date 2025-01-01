@@ -112,7 +112,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 managers.forEach {
                     it.preReload()
                 }
-                val resource = GlobalResource()
+                val resource = GlobalResource(info)
                 managers.forEach {
                     debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.javaClass.simpleName}...")
                     it.reload(info, resource)

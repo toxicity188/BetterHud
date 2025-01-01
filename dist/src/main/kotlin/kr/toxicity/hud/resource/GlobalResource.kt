@@ -1,10 +1,14 @@
 package kr.toxicity.hud.resource
 
+import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.util.*
 
-class GlobalResource {
+class GlobalResource(
+    val info: ReloadInfo
+) : BetterCommandSource by info.sender {
     private val assets = listOf("assets")
 
     private val hud = assets + NAME_SPACE_ENCODED
