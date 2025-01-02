@@ -65,6 +65,7 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
 void main() {
     vec3 pos = Position;
     vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
+    vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     applyColor = 0;
