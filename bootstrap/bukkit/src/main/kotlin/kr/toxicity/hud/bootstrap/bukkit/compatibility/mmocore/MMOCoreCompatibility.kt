@@ -4,7 +4,6 @@ import io.lumine.mythic.lib.api.stat.modifier.StatModifier
 import io.lumine.mythic.lib.player.modifier.ModifierSource
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
@@ -162,12 +161,9 @@ class MMOCoreCompatibility : Compatibility {
                     (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).level
                 }
             },
-            "stat" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+            "stat" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(2)
+                .function { args, _ ->
                     val getter: (PlayerStats) -> Number = if (args.size > 1) {
                         { stats: PlayerStats ->
                             stats.map.getInstance(args[0]).getFilteredTotal {
@@ -179,17 +175,14 @@ class MMOCoreCompatibility : Compatibility {
                             stats.getStat(args[0])
                         }
                     }
-                    return Function { p ->
+                    Function { p ->
                         getter((p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats)
                     }
                 }
-            },
-            "temp_stat" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "temp_stat" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(2)
+                .function { args, _ ->
                     val predicate: (StatModifier) -> Boolean = if (args.size > 1) {
                         { stat: StatModifier ->
                             stat.source == ModifierSource.OTHER && stat.key == args[1]
@@ -199,126 +192,99 @@ class MMOCoreCompatibility : Compatibility {
                             stat.source == ModifierSource.OTHER
                         }
                     }
-                    return Function { p ->
+                    Function { p ->
                         (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).stats.map.getInstance(args[0]).getFilteredTotal(predicate)
                     }
                 }
-            },
-            "claims" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
-                    return Function { p ->
+                .build(),
+            "claims" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).getClaims(args[0])
                     }
                 }
-            },
-            "claims" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "claims" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val i = args[0].toInt()
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.getBoundSkill(i)?.skill?.let {
                             it.getModifier("cooldown", mmo.getSkillLevel(it))
                         } ?: -1
                     }
                 }
-            },
-            "current_cooldown_slot" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "current_cooldown_slot" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val i = args[0].toInt()
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.getBoundSkill(i)?.skill?.let {
                             it.getModifier("cooldown", mmo.getSkillLevel(it))
                         } ?: -1
                     }
                 }
-            },
-            "current_cooldown_skill" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "current_cooldown_skill" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         mmo.cooldownMap.getCooldown("skill_" + skill.handler.id)
                     }
                 }
-            },
-            "required_mana_skill" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "required_mana_skill" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         skill.getModifier("mana", mmo.getSkillLevel(skill))
                     }
                 }
-            },
-            "required_stamina_skill" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "required_stamina_skill" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         skill.getModifier("stamina", mmo.getSkillLevel(skill))
                     }
                 }
-            },
-            "skill_bound_index" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "skill_bound_index" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         (0..8).firstOrNull {
                             mmo.getBoundSkill(it)?.skill?.handler?.id == skill.handler.id
                         } ?: -1
                     }
                 }
-            },
-            "skill_level" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "skill_level" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).getSkillLevel(skill)
                     }
                 }
-            },
-            "casting_slot" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Number> {
+                .build(),
+            "casting_slot" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val skill = MMOCore.plugin.skillManager.getSkill(args[0]) ?: throw RuntimeException("Unable to find that skill: ${args[0]}")
-                    return Function { p ->
+                    Function { p ->
                         val bar = p.bukkitPlayer.inventory.heldItemSlot
                         var i = 0
                         for ((index, entry) in (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).boundSkills.entries.withIndex()) {
@@ -331,7 +297,7 @@ class MMOCoreCompatibility : Compatibility {
                         i
                     }
                 }
-            },
+                .build(),
         )
     override val strings: Map<String, HudPlaceholder<String>>
         get() = mapOf(
@@ -350,24 +316,21 @@ class MMOCoreCompatibility : Compatibility {
                     (p.bukkitPlayer.toMMOCore() ?: return@Function "<none>").guild?.name ?: "<none>"
                 }
             },
-            "skill_name" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, String> {
+            "skill_name" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val i = args[0].toInt()
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function "<none>"
                         mmo.getBoundSkill(i)?.skill?.name ?: "<none>"
                     }
                 }
-            },
-            "party_member" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                .build(),
+            "party_member" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val index = args[0].toInt()
-                    return Function get@ { p ->
+                    Function get@ { p ->
                         val mmo = (p.bukkitPlayer.toMMOCore() ?: return@get "<none>")
                         mmo.party?.onlineMembers?.let {
                             return@get if (index < it.size) it[index].player.name else "<none>"
@@ -375,12 +338,12 @@ class MMOCoreCompatibility : Compatibility {
                         return@get "<none>"
                     }
                 }
-            },
-            "party_member_exclude_mine" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+                .build(),
+            "party_member_exclude_mine" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val index = args[0].toInt()
-                    return Function get@ { p ->
+                    Function get@ { p ->
                         val mmo = (p.bukkitPlayer.toMMOCore() ?: return@get "<none>")
                         val uuid = p.bukkitPlayer.uniqueId
                         mmo.party?.onlineMembers?.filter {
@@ -391,7 +354,7 @@ class MMOCoreCompatibility : Compatibility {
                         return@get "<none>"
                     }
                 }
-            }
+                .build()
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
@@ -401,32 +364,26 @@ class MMOCoreCompatibility : Compatibility {
                     mmo.isCasting
                 }
             },
-            "bounded_skill" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Boolean> {
-                    return Function { p ->
+            "bounded_skill" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                         mmo.boundSkills.any {
                             it.value.classSkill.skill.handler.id == args[0]
                         }
                     }
                 }
-            },
-            "bounded_slot" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(
-                    args: MutableList<String>,
-                    reason: UpdateEvent
-                ): Function<HudPlayer, Boolean> {
+                .build(),
+            "bounded_slot" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val i = args[0].toInt()
-                    return Function { p ->
+                    Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                         mmo.getBoundSkill(i) != null
                     }
                 }
-            }
+                .build()
         )
 }

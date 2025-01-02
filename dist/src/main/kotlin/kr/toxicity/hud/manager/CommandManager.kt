@@ -30,7 +30,7 @@ object CommandManager : BetterHudManager {
     private val numberDecimal = DecimalFormat("#,###")
     private fun Number.withDecimal() = Component.text(numberDecimal.format(this))
 
-    private val library = BetterCommand(DATA_FOLDER.subFolder("lang").apply {
+    val library = BetterCommand(DATA_FOLDER.subFolder("lang").apply {
         PLUGIN.loadAssets("lang") { name, stream ->
             val file = File(this, name)
             if (!file.exists()) file.outputStream().buffered().use {
@@ -39,7 +39,7 @@ object CommandManager : BetterHudManager {
         }
     }, MiniMessage.miniMessage(), BOOTSTRAP.logger())
         .exceptionHandler {
-            if (ConfigManagerImpl.isDebug) {
+            if (ConfigManagerImpl.debug()) {
                 warn(
                     "Stack trace:",
                     it.stackTraceToString()
@@ -117,7 +117,7 @@ object CommandManager : BetterHudManager {
             .build()
         )
         .silentLog {
-            !ConfigManagerImpl.isDebug
+            !ConfigManagerImpl.debug()
         }
 
     @Suppress("UNUSED")
@@ -139,7 +139,7 @@ object CommandManager : BetterHudManager {
             fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
-                    when (val reload = PLUGIN.reload(me.audience(), *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
+                    when (val reload = PLUGIN.reload(me, *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
                         is Failure -> {

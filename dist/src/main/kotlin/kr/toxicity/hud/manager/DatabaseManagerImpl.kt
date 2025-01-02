@@ -213,7 +213,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                 "Unable to connect the database.",
                 "Reason: ${e.message}"
             )
-            if (ConfigManagerImpl.isDebug) e.printStackTrace()
+            if (ConfigManagerImpl.debug()) e.printStackTrace()
         }
     }
 

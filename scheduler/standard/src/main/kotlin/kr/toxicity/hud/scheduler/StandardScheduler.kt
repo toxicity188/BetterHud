@@ -47,6 +47,18 @@ class StandardScheduler(
         }
     }
 
+    override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+        val task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay)
+        return object : HudTask {
+            override fun isCancelled(): Boolean {
+                return task.isCancelled
+            }
+            override fun cancel() {
+                task.cancel()
+            }
+        }
+    }
+
     override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
         val task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period)
         return object : HudTask {

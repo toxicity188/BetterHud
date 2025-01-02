@@ -1,4 +1,6 @@
 debug: false
+auto-save-time: 300
+location-provide-time: 1
 debug-level: assets
 metrics: true
 version-check: true

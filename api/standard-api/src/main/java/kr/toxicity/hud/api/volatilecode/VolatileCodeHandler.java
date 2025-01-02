@@ -39,11 +39,4 @@ public interface VolatileCodeHandler {
      * @return textures value
      */
     @NotNull String getTextureValue(@NotNull HudPlayer player);
-
-    /**
-     * Reloads player's boss bar.
-     * @param player target player
-     * @param color color
-     */
-    void reloadBossBar(@NotNull HudPlayer player, @NotNull BossBar.Color color);
 }

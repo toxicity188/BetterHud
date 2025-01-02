@@ -3,7 +3,7 @@ version: ${version}
 name: BetterHud
 api-version: 1.17
 author: toxicity
-description: Make a hud in minecraft!
+description: A multi-platform server-side implementation of HUD in Minecraft.
 folia-supported: true
 website: "https://www.spigotmc.org/resources/115559"
 softdepend:
@@ -25,7 +25,7 @@ softdepend:
   - GPS
   - Nexo
   - Oraxen
-  - ModelRenderer
+  - BetterModel
 permissions:
   betterhud.help:
     description: Access to help command.

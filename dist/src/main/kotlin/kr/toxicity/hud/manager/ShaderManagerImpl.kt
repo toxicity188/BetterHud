@@ -40,7 +40,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         fun applyScale(offset: Int, scale: Double, pos: String) {
                             if (scale != 1.0 || static) {
                                 val scaleFloat = scale.toFloat()
-                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * ui.$pos / ScreenSize.$pos" else scaleFloat} + (${offset});")
+                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset} * uiScreen.$pos);")
                             }
                         }
                         applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")
@@ -209,7 +209,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                             if (isEmpty() || last() != '\n') s = '\n' + s
                             s += '\n'
                         }
-                        append(s.replace("  ", ""))
+                        append(s.substringBeforeLast("//").replace("  ", ""))
                     }
                 }.toByteArray()
                 PackGenerator.addTask(resource.core + shader.first.fileName) {

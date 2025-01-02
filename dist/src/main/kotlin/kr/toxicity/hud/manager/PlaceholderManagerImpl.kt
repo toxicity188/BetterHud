@@ -43,14 +43,14 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     it.tick
                 }
             },
-            "number" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
-                    return Function { p ->
+            "number" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         p.variableMap[args[0]]?.toDoubleOrNull() ?: 0.0
                     }
                 }
-            },
+                .build(),
             "popup_index" to HudPlaceholder.of { _, u ->
                 val iterator = (u as PopupUpdateEvent).iterator
                 Function {
@@ -78,14 +78,14 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         java.lang.String::class.java,
         "<none>",
         mapOf(
-            "string" to object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, String> {
-                    return Function { p ->
+            "string" to HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         p.variableMap[args[0]] ?: "<none>"
                     }
                 }
-            },
+                .build(),
         ),
         {
             val matcher = stringPattern.matcher(it)
@@ -124,14 +124,14 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         java.lang.Boolean::class.java,
         false,
         mapOf(
-            "boolean" to object : HudPlaceholder<Boolean> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return Function { p ->
+            "boolean" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function { p ->
                         p.variableMap[args[0]] == "true"
                     }
                 }
-            }
+                .build()
         ),
         {
             when (it) {

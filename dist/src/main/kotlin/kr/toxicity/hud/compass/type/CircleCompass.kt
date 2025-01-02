@@ -254,17 +254,15 @@ class CircleCompass(
 
     init {
         array?.let {
-            if (!BOOTSTRAP.useLegacyFont()) {
-                val max = images.max + 2 * space + length
-                val center = CURRENT_CENTER_SPACE_CODEPOINT
-                it += buildJsonObject {
-                    addProperty("type", "space")
-                    add("advances", buildJsonObject {
-                        for (i in -max..max) {
-                            addProperty((center + i).parseChar(), i)
-                        }
-                    })
-                }
+            val max = images.max + 2 * space + length
+            val center = CENTER_SPACE_CODEPOINT
+            it += buildJsonObject {
+                addProperty("type", "space")
+                add("advances", buildJsonObject {
+                    for (i in -max..max) {
+                        addProperty((center + i).parseChar(), i)
+                    }
+                })
             }
             PackGenerator.addTask(resource.font + "$encode.json") {
                 jsonObjectOf("providers" to it).toByteArray()
@@ -277,50 +275,8 @@ class CircleCompass(
         infix fun build(player: HudPlayer): WidthComponent
     }
 
-    private fun builder(yaw: Double, mod: Double) = if (BOOTSTRAP.useLegacyFont()) LegacyComponentBuilder(yaw, mod) else CurrentComponentBuilder(yaw, mod)
+    private fun builder(yaw: Double, mod: Double) = CurrentComponentBuilder(yaw, mod)
 
-    //<=1.18
-    private inner class LegacyComponentBuilder(
-        private val yaw: Double,
-        private val mod: Double
-    ) : CompassComponentBuilder {
-
-        private var comp = (-(images.max / 2 + space)).toSpaceComponent()
-
-        override fun append(component: CompassComponent?) {
-            comp += component?.let {
-                val build = it.toWidthComponent()
-                val move = (mod * (space * 2 + build.width)).roundToInt()
-                (space + move).toSpaceComponent() + build + (space - move).toSpaceComponent()
-            } ?: (space * 2).toSpaceComponent()
-        }
-
-        override fun build(player: HudPlayer): WidthComponent {
-            val loc = player.location()
-            val world = player.world()
-            player.pointedLocation.forEach {
-                val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
-
-                val targetLoc = it.location
-                if (targetLoc.world.uuid != world.uuid) return@forEach
-                var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
-                if (get < 0) get += 2
-                var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180
-                if (yawCal < 0) yawCal += 2
-
-                val min = absMin(get - yawCal, -(yawCal - get))
-                val minus = absMin(if (min > 0) -(2 - min) else 2 + min, min)
-
-                selectedPointer.map[CompassData(ceil((length - abs(minus * length)) / 2).toInt())]?.let { pointComponent ->
-                    val build = pointComponent.toWidthComponent()
-                    val value = (minus * comp.width / 2 - comp.width / 2).roundToInt()
-                    val halfPoint = build.width.toDouble() / 2
-                    comp += (value - floor(halfPoint).toInt()).toSpaceComponent() + build + (-value - ceil(halfPoint).toInt()).toSpaceComponent()
-                }
-            }
-            return (-comp.width / 2).toSpaceComponent() + comp
-        }
-    }
     private inner class CurrentComponentBuilder(
         private val yaw: Double,
         private val mod: Double
@@ -328,7 +284,7 @@ class CircleCompass(
 
         private var comp = (-(images.max / 2 + space)).toSpaceComponent()
         private var append = EMPTY_WIDTH_COMPONENT
-        private fun Int.spaceChar() = (CURRENT_CENTER_SPACE_CODEPOINT + this).parseChar()
+        private fun Int.spaceChar() = (CENTER_SPACE_CODEPOINT + this).parseChar()
 
         override fun append(component: CompassComponent?) {
             append += component?.let {

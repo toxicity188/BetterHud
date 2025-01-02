@@ -25,10 +25,7 @@ import kr.toxicity.hud.bootstrap.bukkit.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.bukkit.player.HudPlayerBukkit
 import kr.toxicity.hud.bootstrap.bukkit.player.head.SkinsRestorerSkinProvider
 import kr.toxicity.hud.bootstrap.bukkit.player.location.GPSLocationProvider
-import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
-import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
-import kr.toxicity.hud.bootstrap.bukkit.util.call
-import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
+import kr.toxicity.hud.bootstrap.bukkit.util.*
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
@@ -153,6 +150,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     private lateinit var bedrockAdapter: BedrockAdapter
     private lateinit var nms: NMS
     private lateinit var audiences: BukkitAudiences
+    private var latest: String? = null
 
     override fun isFolia(): Boolean = isFolia
     override fun volatileCode(): NMS = nms
@@ -179,9 +177,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.version1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
             MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
             MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
-            MinecraftVersion.version1_18_2 -> kr.toxicity.hud.nms.v1_18_R2.NMSImpl()
-            //MinecraftVersion.version1_18, MinecraftVersion.version1_18_1 -> kr.toxicity.hud.nms.v1_18_R1.NMSImpl()
-            //MinecraftVersion.version1_17, MinecraftVersion.version1_17_1 -> kr.toxicity.hud.nms.v1_17_R1.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: ${MinecraftVersion.current}")
                 pluginManager.disablePlugin(this)
@@ -224,17 +219,17 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlayerHeadManager.addSkinProvider(HttpSkinProvider())
         }
         if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
-            PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", object : HudPlaceholder<String> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: List<String>, reason: UpdateEvent): Function<HudPlayer, String> {
+            PlaceholderManagerImpl.stringContainer.addPlaceholder("papi", HudPlaceholder.builder<String>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val format = "%${args.joinToString(",")}%"
-                    return Function { player ->
+                    Function { player ->
                         runCatching {
                             PlaceholderAPI.setPlaceholders(player.bukkitPlayer, format)
                         }.getOrDefault("<error>")
                     }
                 }
-            })
+                .build())
         }
         ModuleManager.start()
         CompatibilityManager.start()
@@ -246,23 +241,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 "New version found: $it",
                 "Download: https://www.spigotmc.org/resources/115559"
             )
-            registerListener(object : Listener {
-                @EventHandler
-                fun PlayerJoinEvent.join() {
-                    val player = player
-                    if (player.isOp && ConfigManagerImpl.versionCheck) {
-                        val audience = audiences.player(player)
-                        audience.info("New BetterHud version found: $it")
-                        audience.info(
-                            Component.text("Download: https://www.spigotmc.org/resources/115559")
-                                .clickEvent(
-                                    ClickEvent.clickEvent(
-                                        ClickEvent.Action.OPEN_URL,
-                                        "https://www.spigotmc.org/resources/115559"
-                                    )))
-                    }
-                }
-            })
+            latest = it
         }
         core.start()
         registerListener(object : Listener {
@@ -292,7 +271,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     fun register(player: Player) {
         if (ConfigManagerImpl.disableToBedrockPlayer && bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
-        PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
+        val audience = PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
             val impl = HudPlayerBukkit(adaptedPlayer, if (player is Audience) player else audiences.player(player))
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
@@ -303,6 +282,16 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
             }
             impl
+        }
+        if (player.isOp && ConfigManagerImpl.versionCheck && latest != null) {
+            audience.info("New BetterHud version found: $latest")
+            audience.info(
+                Component.text("Download: https://www.spigotmc.org/resources/115559")
+                    .clickEvent(
+                        ClickEvent.clickEvent(
+                            ClickEvent.Action.OPEN_URL,
+                            "https://www.spigotmc.org/resources/115559"
+                        )))
         }
     }
 
@@ -349,7 +338,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun minecraftVersion(): String = MinecraftVersion.current.toString()
     override fun mcmetaVersion(): Int = nms.version.metaVersion
     override fun triggerListener(): Listener = listener
-    override fun useLegacyFont(): Boolean = nms.version.version <= 18
 
     override fun world(name: String): WorldWrapper? {
         return Bukkit.getWorld(name)?.let {

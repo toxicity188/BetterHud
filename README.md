@@ -22,7 +22,7 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(including Folia) 1.18.2-1.21.4
+- Bukkit(including Folia) 1.19-1.21.4
 - Velocity 3.3-3.4
 - Fabric server 1.21.4
 
@@ -31,7 +31,6 @@ This project implements a server-side HUD.
 - [adventure](https://github.com/KyoriPowered/adventure): Implements multi-platform component.
 - [bstats](https://bstats.org/getting-started/include-metrics): Implements metrics.
 - [exp4j](https://github.com/fasseg/exp4j): Implements equation.
-- [negative space font](https://github.com/AmberWat/NegativeSpaceFont): Implements space font in minecraft legacy version.
 - [snakeyaml](https://github.com/snakeyaml): Implements yaml parser.
 - [gson](https://github.com/google/gson): Implements json parser/writer.
 - [better command](https://github.com/toxicity188/BetterCommand): Implements multi-platform supporting command.

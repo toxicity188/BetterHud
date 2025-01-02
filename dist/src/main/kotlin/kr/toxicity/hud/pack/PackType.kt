@@ -147,25 +147,23 @@ enum class PackType {
                         info(
                                 "File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(finalByte.size.toLong())}" else mbFormat(finalByte.size.toLong())}",
                         )
-                        if (message == null || !host) return
-                        val previousUUID = PackUUID.previous
+                        if (message == null) return warn("Unable to find SHA-1 algorithm, skipped.")
+                        var previousUUID = PackUUID.previous
                         if (previousUUID == null || ConfigManagerImpl.forceUpdate || beforeByte != finalByte.size.toLong() || info.has(ReloadFlagType.FORCE_GENERATE_RESOURCE_PACK)) {
                             beforeByte = finalByte.size.toLong()
                             DigestOutputStream(file.outputStream(), message).buffered().use {
                                 it.write(finalByte)
                             }
-                            val uuid = PackUUID.from(message)
+                            previousUUID = PackUUID.from(message)
                             info(
                                 "File zipped: ${mbFormat(file.length())}"
                             )
-                            PackUploader.upload(uuid, file.inputStream().buffered().use {
-                                it.readAllBytes()
-                            })
-                        } else {
+                        }
+                        if (host) {
                             PackUploader.upload(previousUUID , file.inputStream().buffered().use {
                                 it.readAllBytes()
                             })
-                        }
+                        } else previousUUID.save()
                     }
                 }
 

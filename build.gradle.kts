@@ -17,7 +17,7 @@ plugins {
     `java-library`
     kotlin("jvm") version "2.1.0"
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.11" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.0.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
@@ -32,17 +32,10 @@ val platform = "4.3.4"
 val targetJavaVersion = 21
 val velocity = "3.4.0"
 val bStats = "3.1.0"
-val betterCommand = "1.4.1"
+val betterCommand = "1.4.2"
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
 val supportedMinecraftVersions = listOf(
-    //1.17
-    //"1.17",
-    //"1.17.1",
-    //1.18
-    //"1.18",
-    //"1.18.1",
-    "1.18.2",
     //1.19
     "1.19",
     "1.19.1",
@@ -75,7 +68,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.11.1" + (buildNumber?.let { ".$it" } ?: "")
+    version = "1.11.2" + (buildNumber?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()
@@ -136,9 +129,6 @@ subprojects {
 }
 
 val legacyNmsVersion = listOf(
-    //"v1_17_R1",
-    //"v1_18_R1",
-    "v1_18_R2",
     "v1_19_R1",
     "v1_19_R2",
     "v1_19_R3",
@@ -303,7 +293,7 @@ fun Project.shadowJar() = zipTree(tasks.shadowJar.map {
     it.archiveFile
 })
 
-val sourcesJar by tasks.creating(Jar::class.java) {
+val sourcesJar by tasks.registering(Jar::class) {
     dependsOn(tasks.classes)
     fun getProjectSource(project: Project): Array<File> {
         return if (project.subprojects.isEmpty()) project.sourceSets.main.get().allSource.srcDirs.toTypedArray() else ArrayList<File>().apply {
@@ -316,12 +306,12 @@ val sourcesJar by tasks.creating(Jar::class.java) {
     from(*getProjectSource(project))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-val javadocJar by tasks.creating(Jar::class.java) {
+val javadocJar by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaGenerate)
     archiveClassifier = "javadoc"
     from(layout.buildDirectory.dir("dokka/html").orNull?.asFile)
 }
-val fabricJar by tasks.creating(Jar::class.java) {
+val fabricJar by tasks.registering(Jar::class) {
     archiveClassifier = "fabric+$minecraft"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(zipTree(fabricBootstrap.tasks.named("remapJar").map {
@@ -333,7 +323,7 @@ val fabricJar by tasks.creating(Jar::class.java) {
         relocateAll()
     }
 }
-val pluginJar by tasks.creating(Jar::class.java) {
+val pluginJar by tasks.registering(Jar::class) {
     archiveClassifier = "bukkit"
     (listOf(
         apiShare,
@@ -356,7 +346,7 @@ val pluginJar by tasks.creating(Jar::class.java) {
         relocateAll()
     }
 }
-val velocityJar by tasks.creating(Jar::class.java) {
+val velocityJar by tasks.registering(Jar::class) {
     archiveClassifier = "velocity"
     listOf(
         apiShare,
@@ -428,7 +418,7 @@ dependencies {
 tasks {
     runServer {
         version(minecraft)
-        pluginJars(pluginJar.archiveFile)
+        pluginJars(pluginJar.get().archiveFile)
         pluginJars(fileTree("plugins"))
     }
     build {
@@ -443,8 +433,8 @@ tasks {
 }
 
 bukkitBootstrap.modrinthPublish(
-    pluginJar,
-    listOf(sourcesJar, javadocJar),
+    pluginJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("bukkit", "spigot", "paper", "purpur", "folia"),
     supportedMinecraftVersions,
     listOf(),
@@ -452,16 +442,16 @@ bukkitBootstrap.modrinthPublish(
 )
 
 velocityBootstrap.modrinthPublish(
-    velocityJar,
-    listOf(sourcesJar, javadocJar),
+    velocityJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("velocity"),
     supportedMinecraftVersions,
     listOf(),
     listOf()
 )
 fabricBootstrap.modrinthPublish(
-    fabricJar,
-    listOf(sourcesJar, javadocJar),
+    fabricJar.get(),
+    listOf(sourcesJar.get(), javadocJar.get()),
     listOf("fabric", "quilt"),
     supportedMinecraftVersions.subList(
         supportedMinecraftVersions.indexOf(properties["supported_version"]),
@@ -471,7 +461,7 @@ fabricBootstrap.modrinthPublish(
     listOf("luckperms", "placeholder-api", "polymer")
 )
 
-tasks.create("modrinthPublish") {
+tasks.register("modrinthPublish") {
     dependsOn(*bootstrap.map {
         it.tasks.modrinth
     }.toTypedArray())

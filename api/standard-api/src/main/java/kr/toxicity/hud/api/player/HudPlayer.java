@@ -184,9 +184,9 @@ public interface HudPlayer extends BetterCommandSource {
     @NotNull Set<PointedLocation> getPointedLocation();
 
     /**
-     * Resets all hud and popup.
+     * Reloads this player.
      */
-    void resetElements();
+    void reload();
 
     /**
      * Save this data by current database.

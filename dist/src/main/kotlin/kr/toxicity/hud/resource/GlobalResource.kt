@@ -1,10 +1,14 @@
 package kr.toxicity.hud.resource
 
+import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.util.*
 
-class GlobalResource {
+class GlobalResource(
+    val info: ReloadInfo
+) : BetterCommandSource by info.sender {
     private val assets = listOf("assets")
 
     private val hud = assets + NAME_SPACE_ENCODED
@@ -25,12 +29,6 @@ class GlobalResource {
                 read
             }
         }
-        BOOTSTRAP.resource("spaces.ttf")?.buffered()?.use {
-            val read = it.readAllBytes()
-            PackGenerator.addTask(font + "${ConfigManagerImpl.key.spacesTtfKey.value()}.ttf") {
-                read
-            }
-        }
         PackGenerator.addTask(font + "${ConfigManagerImpl.key.spaceKey.value()}.json") {
             val center = 0xD0000
             jsonObjectOf(
@@ -47,20 +45,6 @@ class GlobalResource {
                         "advances" to jsonObjectOf(*(-8192..8192).map { i ->
                             (center + i).parseChar() to i
                         }.toTypedArray())
-                    )
-                )
-            ).toByteArray()
-        }
-        PackGenerator.addTask(font + "${ConfigManagerImpl.key.legacySpaceKey.value()}.json") {
-            jsonObjectOf(
-                "providers" to jsonArrayOf(
-                    jsonObjectOf(
-                        "type" to "ttf",
-                        "file" to "${key.spacesTtfKey.asString()}.ttf",
-                        "size" to 2.5,
-                        "oversample" to 1.0,
-                        "shift" to jsonArrayOf(0.0, 0.0),
-                        "skip" to jsonArrayOf()
                     )
                 )
             ).toByteArray()

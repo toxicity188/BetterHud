@@ -99,10 +99,6 @@ class NMSImpl : NMS {
         bossBarMap.remove(player.uuid())?.remove()
     }
 
-    override fun reloadBossBar(player: HudPlayer, color: BossBar.Color) {
-        bossBarMap[player.uuid()]?.resetDummy(color)
-    }
-
     override fun getVersion(): NMSVersion {
         return NMSVersion.V1_19_R1
     }
@@ -233,18 +229,6 @@ class NMSImpl : NMS {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
-        }
-        
-        fun resetDummy(color: BossBar.Color) {
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummy.dummyBarsUUID.forEach {
-                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
-            }
-            dummy = PlayerDummyBossBar(color)
-            dummy.dummyBars.forEach { 
-                listener.send(ClientboundBossEventPacket.createAddPacket(it))
-            }
-            listener.send(ClientboundBossEventPacket.createAddPacket(last))
         }
 
         fun remove() {

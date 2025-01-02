@@ -10,18 +10,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum NMSVersion {
     /**
-     * 1.17-1.17.1
-     */
-    V1_17_R1(17,1, 7),
-    /**
-     * 1.18-1.18.1
-     */
-    V1_18_R1(18,1, 8),
-    /**
-     * 1.18.2
-     */
-    V1_18_R2(18,2, 8),
-    /**
      * 1.19-1.19.1
      */
     V1_19_R1(19,1, 9),

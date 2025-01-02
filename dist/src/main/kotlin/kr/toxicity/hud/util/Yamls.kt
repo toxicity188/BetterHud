@@ -1,5 +1,6 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
@@ -10,7 +11,6 @@ import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.yaml.YamlArrayImpl
 import kr.toxicity.hud.yaml.YamlElementImpl
 import kr.toxicity.hud.yaml.YamlObjectImpl
-import net.kyori.adventure.audience.Audience
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.InputStream
@@ -46,7 +46,7 @@ fun Map<String, Any>.saveToYaml(file: File) {
 }
 
 
-fun File.forEachAllYaml(sender: Audience, block: (File, String, YamlObject) -> Unit) {
+fun File.forEachAllYaml(sender: BetterCommandSource, block: (File, String, YamlObject) -> Unit) {
     forEachAllFolder {
         if (it.extension == "yml") {
             runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
@@ -77,21 +77,6 @@ class LoadedFileYaml(
     override val yaml: YamlObject
 ) : LoadedYaml
 
-fun File.mapAllYaml(sender: Audience) = mapAllFolder().mapNotNull {
-    if (it.extension == "yml") {
-        runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
-            it.toYaml().mapNotNull { (k, v) ->
-                if (v is YamlObject) LoadedFileYaml(it, k, v)
-                else null
-            }
-        }.getOrElse {
-            null
-        }
-    } else {
-        sender.warn("This is not a yml file: ${it.path}")
-        null
-    }
-}.sum()
 
 fun YamlObject.toConditions(source: PlaceholderSource) = get("conditions")?.asObject()?.let {
     Conditions.parse(it, source)

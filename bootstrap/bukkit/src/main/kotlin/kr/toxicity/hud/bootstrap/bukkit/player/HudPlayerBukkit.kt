@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.bootstrap.bukkit.BukkitBootstrapImpl
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.asyncTaskLater
 import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
 import org.bukkit.boss.BossBar
@@ -47,19 +48,33 @@ class HudPlayerBukkit(
         (BOOTSTRAP as BukkitBootstrapImpl).update(this)
     }
 
+    override fun reload() {
+        initBossBar {
+            super.reload()
+        }
+    }
+
     init {
+        initBossBar {
+            inject()
+        }
+    }
+
+    private fun initBossBar(action: () -> Unit) {
         val bars = ArrayList<BossBar>()
         for (bossBar in Bukkit.getBossBars()) {
             if (bossBar.players.any {
                 it.uniqueId == player.uniqueId
             }) {
                 bossBar.removePlayer(player)
-                bars.add(bossBar)
+                bars += bossBar
             }
         }
-        inject()
-        bars.forEach {
-            it.addPlayer(player)
+        action()
+        asyncTaskLater(20) {
+            bars.forEach {
+                it.addPlayer(player)
+            }
         }
     }
 

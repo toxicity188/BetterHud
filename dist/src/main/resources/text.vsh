@@ -37,6 +37,19 @@ bool range(vec3 t, vec3 m1, vec3 m2) {
     return range(t.x, m1.x, m2.x) && range(t.y, m1.y, m2.y) && range(t.z, m1.z, m2.z);
 }
 
+bool checkElement(float z) {
+    if (z == 0) return true; //<=1.20.4 vanilla
+    else if (z == 1000) return true; //>=1.20.5 vanilla
+    else if (z == -90) return true; //<=1.20.4 forge
+    return false;
+}
+
+bool checkExp(float z) {
+    if (z == 0) return true; //<=1.20.4 vanilla
+    else if (z == 600) return true; //>=1.20.5 vanilla
+    return false;
+}
+
 float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
     if (shape == 0) {
         return length((modelViewMat * vec4(pos, 1.0)).xyz);
@@ -52,10 +65,12 @@ float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
 void main() {
     vec3 pos = Position;
     vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
+    vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     applyColor = 0;
-    if (pos.y >= ui.y) {
+    bool isElement = checkElement(pos.z);
+    if (pos.y >= ui.y && ProjMat[3].x == -1 && (isElement || checkElement(pos.z - 0.03))) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
         if (((bit >> MAX_BIT) & 1) == 1) {
@@ -76,7 +91,7 @@ void main() {
                 #CreateLayout
             }
 
-            vertexColor = ((pos.z == 0 || ceil(pos.z * 100) == 100000) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
+            vertexColor = (isElement && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
             vertexColor.a = max(vertexColor.a, 1 / 255);
 
             //Wave
@@ -116,11 +131,10 @@ void main() {
         }
     } else {
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
-//HideExp        if ((int(pos.z) == 0 || int(pos.z) == 600) && ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
+//HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && checkExp(pos.z) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
-//RemapHotBar        vec2 scr = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
-//RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && scr.y - pos.y <= 20) {
+//RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && ui.y - pos.y <= 20) {
 //RemapHotBar            float hotbarX = 0;
 //RemapHotBar            float hotbarY = 0;
 //RemapHotBar

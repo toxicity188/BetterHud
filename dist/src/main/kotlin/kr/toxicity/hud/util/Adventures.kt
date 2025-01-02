@@ -20,12 +20,10 @@ const val TEXT_SPACE_KEY_CODEPOINT = 0xC0000
 const val TEXT_IMAGE_START_CODEPOINT = 0xC0000
 
 val CONSOLE
-    get() = BOOTSTRAP.console()
+    get() = BOOTSTRAP.consoleSource()
 
 val SPACE_KEY
     get() = ConfigManagerImpl.key.spaceKey
-val LEGACY_SPACE_KEY
-    get() = ConfigManagerImpl.key.legacySpaceKey
 val DEFAULT_KEY
     get() = ConfigManagerImpl.key.defaultKey
 
@@ -48,19 +46,10 @@ val EMPTY_WIDTH_COMPONENT
 val EMPTY_PIXEL_COMPONENT
     get() = PixelComponent(EMPTY_WIDTH_COMPONENT, 0)
 
-const val LEGACY_CENTER_SPACE_CODEPOINT = 0xFFC00
-const val CURRENT_CENTER_SPACE_CODEPOINT = 0xD0000
+const val CENTER_SPACE_CODEPOINT = 0xD0000
 
-private val LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((LEGACY_CENTER_SPACE_CODEPOINT - 1).parseChar()), 0)
-private val CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
-    get() = WidthComponent(Component.text().content((CURRENT_CENTER_SPACE_CODEPOINT - 1).parseChar()), 0)
 val NEGATIVE_ONE_SPACE_COMPONENT
-    get() = if (BOOTSTRAP.useLegacyFont()) {
-        LEGACY_NEGATIVE_ONE_SPACE_COMPONENT
-    } else {
-        CURRENT_NEGATIVE_ONE_SPACE_COMPONENT
-    }
+    get() = WidthComponent(Component.text().content((CENTER_SPACE_CODEPOINT - 1).parseChar()), 0)
 
 fun String.toTextColor() = if (startsWith('#') && length == 7) {
     TextColor.fromHexString(this)
@@ -87,30 +76,14 @@ fun Int.parseChar(): String {
 }
 
 fun Int.toSpaceComponent() = toSpaceComponent(this)
-fun Int.toSpaceComponent(width: Int) = if (BOOTSTRAP.useLegacyFont()) {
-    val abs = abs(this)
-    if (abs > 256) {
-        val i = if (this > 0) 1 else -1
-        WidthComponent(
-            Component.text()
-                .content("${((abs / 256 + 255) * i + 0xFFC00).parseChar()}${(abs % 256 * i + 0xFFC00).parseChar()}"),
-            width
-        )
-    } else WidthComponent(
-        Component.text()
-            .content((this + 0xFFC00).parseChar()),
-        width
-    )
-} else {
-    WidthComponent(
-        Component.text()
-            .content((this + 0xD0000).parseChar()),
-        width
-    )
-}
+fun Int.toSpaceComponent(width: Int) = WidthComponent(
+    Component.text()
+        .content((this + 0xD0000).parseChar()),
+    width
+)
 
 fun WidthComponent.finalizeFont() = apply {
-    if (BOOTSTRAP.useLegacyFont()) component.font(LEGACY_SPACE_KEY) else component.font(SPACE_KEY)
+    component.font(SPACE_KEY)
 }
 
 private class SplitBuilder(
@@ -147,7 +120,13 @@ private fun Style.parseDecoration(decoration: TextDecoration, default: Boolean):
     TextDecoration.State.TRUE -> true
 }
 
-fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
+data class SplitOption(
+    val endWidth: Int,
+    val space: Int,
+    val forceSplit: Boolean
+)
+
+fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
     var i = 0
     val list = ArrayList<WidthComponent>()
     val topBuilder = SplitBuilder {
@@ -185,12 +164,11 @@ fun Component.split(endWidth: Int, space: Int, charWidth: (Pair<Style, Int>) -> 
                 sb.appendCodePoint(codepoint)
                 i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
                 i += add
-                if (space > 0) {
-                    if (BOOTSTRAP.useLegacyFont()) subBuilder.append(space.toSpaceComponent().component)
-                    else sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
-                    i += space + add
+                if (option.space > 0) {
+                    sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
+                    i += option.space + add
                 }
-                if (i >= endWidth && (i >= (1.25 * endWidth).roundToInt() || ' '.code == codepoint)) end()
+                if (i >= option.endWidth && (i >= (1.25 * option.endWidth).roundToInt() || ' '.code == codepoint) || option.forceSplit) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
                 style(style).content(sb.toString())

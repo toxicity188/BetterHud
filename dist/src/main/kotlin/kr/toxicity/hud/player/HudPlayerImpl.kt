@@ -31,10 +31,10 @@ abstract class HudPlayerImpl : HudPlayer {
     private val pointers: MutableSet<PointedLocation> = OverridableSet(keyMapper = {
         it.name
     })
-    private val autoSave = asyncTaskTimer(6000, 6000) {
+    private var autoSave = asyncTaskTimer(ConfigManagerImpl.autoSaveTime, ConfigManagerImpl.autoSaveTime) {
         save()
     }
-    private val locationProvide = asyncTaskTimer(20, 20) {
+    private var locationProvide = asyncTaskTimer(ConfigManagerImpl.locationProvideTime, ConfigManagerImpl.locationProvideTime) {
         PlayerManagerImpl.provideLocation(this)
     }
 
@@ -74,7 +74,6 @@ abstract class HudPlayerImpl : HudPlayer {
 
     final override fun startTick() {
         cancelTick()
-        VOLATILE_CODE.reloadBossBar(this, ShaderManagerImpl.barColor)
         val speed = ConfigManagerImpl.tickSpeed
         if (speed > 0) task = asyncTaskTimer(1, speed) {
             update()
@@ -146,7 +145,13 @@ abstract class HudPlayerImpl : HudPlayer {
     }
 
     @Synchronized
-    final override fun resetElements() {
+    override fun reload() {
+        autoSave = asyncTaskTimer(ConfigManagerImpl.autoSaveTime, ConfigManagerImpl.autoSaveTime) {
+            save()
+        }
+        locationProvide = asyncTaskTimer(ConfigManagerImpl.locationProvideTime, ConfigManagerImpl.locationProvideTime) {
+            PlayerManagerImpl.provideLocation(this)
+        }
         val popupNames = popups.filter {
             !it.isDefault
         }.map {

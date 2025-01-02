@@ -85,6 +85,13 @@ class VelocityBootstrapImpl @Inject constructor(
 
         override fun asyncTask(runnable: Runnable): HudTask = task(runnable)
 
+        override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+            return proxyServer.scheduler.buildTask(this@VelocityBootstrapImpl, runnable)
+                .delay(delay * 50, TimeUnit.MILLISECONDS)
+                .schedule()
+                .toHud()
+        }
+
         override fun asyncTaskTimer(delay: Long, period: Long, runnable: Runnable): HudTask {
             return proxyServer.scheduler.buildTask(this@VelocityBootstrapImpl, runnable)
                 .delay(delay * 50, TimeUnit.MILLISECONDS)
@@ -92,7 +99,6 @@ class VelocityBootstrapImpl @Inject constructor(
                 .schedule()
                 .toHud()
         }
-
     }
 
     private val log = object : BetterHudLogger {
@@ -159,23 +165,11 @@ class VelocityBootstrapImpl @Inject constructor(
 
     @Subscribe
     fun login(e: PostLoginEvent) {
-        latestVersion?.let { latest ->
-            if (version() != latest) {
-                e.player.info("New BetterHud version found: $latest")
-                e.player.info(
-                    Component.text("Download: https://www.spigotmc.org/resources/115559")
-                        .clickEvent(
-                            ClickEvent.clickEvent(
-                                ClickEvent.Action.OPEN_URL,
-                                "https://www.spigotmc.org/resources/115559"
-                            )))
-            }
-        }
         register(e.player)
     }
 
     private fun register(player: Player) {
-        PlayerManagerImpl.addHudPlayer(player.uniqueId) {
+        val audience = PlayerManagerImpl.addHudPlayer(player.uniqueId) {
             val impl = HudPlayerVelocity(player)
             asyncTask {
                 DatabaseManagerImpl.currentDatabase.load(impl)
@@ -184,6 +178,18 @@ class VelocityBootstrapImpl @Inject constructor(
                 }
             }
             impl
+        }
+        latestVersion?.let { latest ->
+            if (version() != latest) {
+                audience.info("New BetterHud version found: $latest")
+                audience.info(
+                    Component.text("Download: https://www.spigotmc.org/resources/115559")
+                        .clickEvent(
+                            ClickEvent.clickEvent(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://www.spigotmc.org/resources/115559"
+                            )))
+            }
         }
     }
 
@@ -225,7 +231,6 @@ class VelocityBootstrapImpl @Inject constructor(
 
     override fun minecraftVersion(): String = "1.21.4"
     override fun mcmetaVersion(): Int = 46
-    override fun useLegacyFont(): Boolean = false
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()

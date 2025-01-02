@@ -45,6 +45,7 @@ interface TextLayout : HudLayout<TextElement> {
     val line: Int
     val splitWidth: Int
     val lineWidth: Int
+    val forceSplit: Boolean
 
     val background: BackgroundInfo
     val emoji: EmojiInfo
@@ -166,6 +167,7 @@ interface TextLayout : HudLayout<TextElement> {
             if (this < 1) throw RuntimeException("split-width cannot be < 1: $s")
         }
         override val lineWidth = yamlObject.getAsInt("line-width", 10)
+        override val forceSplit: Boolean = yamlObject.getAsBoolean("force-split", false)
         override val imageCharMap: Map<Int, ImageTextScale> = run {
             val map = source.imageTextScale.toMutableMap()
             var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size

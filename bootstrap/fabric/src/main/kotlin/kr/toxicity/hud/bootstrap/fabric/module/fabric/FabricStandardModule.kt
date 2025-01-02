@@ -4,7 +4,6 @@ import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity
 import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
-import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.fabric.module.FabricModule
@@ -158,17 +157,17 @@ class FabricStandardModule : FabricModule {
                     p.fabricPlayer.inventory.selected
                 }
             },
-            "potion_effect_duration" to object : HudPlaceholder<Number> {
-                override fun getRequiredArgsLength(): Int = 1
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Number> {
+            "potion_effect_duration" to HudPlaceholder.builder<Number>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
                     val location = ResourceLocation.withDefaultNamespace(args[0])
-                    return Function { p ->
-                        p.fabricPlayer.activeEffects.firstOrNull { 
+                    Function { p ->
+                        p.fabricPlayer.activeEffects.firstOrNull {
                             it.effect.`is`(location)
                         }?.duration ?: 0
                     }
                 }
-            },
+                .build(),
             "air" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     p.fabricPlayer.airSupply
@@ -220,14 +219,14 @@ class FabricStandardModule : FabricModule {
                     p.fabricPlayer.isFreezing
                 }
             },
-            "has_permission" to object : HudPlaceholder<Boolean> {
-                override fun invoke(args: MutableList<String>, reason: UpdateEvent): Function<HudPlayer, Boolean> {
-                    return Function {
+            "has_permission" to HudPlaceholder.builder<Boolean>()
+                .requiredArgsLength(1)
+                .function { args, _ ->
+                    Function {
                         it.fabricPlayer.hasPermission(args[0])
                     }
                 }
-                override fun getRequiredArgsLength(): Int = 1
-            },
+                .build(),
             "has_main_hand" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     !p.fabricPlayer.mainHandItem.`is`(ItemStack.EMPTY.item)

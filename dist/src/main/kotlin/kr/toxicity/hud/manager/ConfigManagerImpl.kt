@@ -9,18 +9,18 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
 import kr.toxicity.hud.util.*
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import java.io.File
 import java.text.DecimalFormat
 
 object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var key = KeyResource(NAME_SPACE)
         private set
-
-    val info = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.GOLD))
-    val warn = EMPTY_COMPONENT.append(Component.text("[!] ").color(NamedTextColor.RED))
     private var line = 1
+
+    var autoSaveTime = 300L * 20
+        private set
+    var locationProvideTime = 20L * 20
+        private set
 
     var bossbarResourcePackLine = line
         private set
@@ -119,6 +119,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             }
             val yaml = PluginConfiguration.CONFIG.create()
             debug = yaml.getAsBoolean("debug", false)
+            autoSaveTime = yaml.getAsLong("auto-save-time", 300) * 20
+            locationProvideTime = yaml.getAsLong("location-provide-time", 1) * 20
             debugLevel = runCatching {
                 DebugLevel.valueOf(yaml.getAsString("debug-level", "asset").uppercase())
             }.getOrElse {
@@ -207,5 +209,5 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
 
     override fun getBossbarLine(): Int = line
     override fun getDebugLevel(): DebugLevel = debugLevel
-    override fun isDebug(): Boolean = debug
+    override fun debug(): Boolean = debug
 }

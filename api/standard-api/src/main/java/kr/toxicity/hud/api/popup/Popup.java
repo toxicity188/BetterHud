@@ -52,4 +52,24 @@ public interface Popup extends HudObject {
     default int getLastIndex() {
         return getMaxStack() - 1;
     }
+
+    /**
+     * Gets frame type.
+     * @return frame type
+     */
+    @NotNull FrameType frameType();
+
+    /**
+     * Frame type
+     */
+    enum FrameType {
+        /**
+         * Global tick
+         */
+        GLOBAL,
+        /**
+         * Popup local tick
+         */
+        LOCAL
+    }
 }

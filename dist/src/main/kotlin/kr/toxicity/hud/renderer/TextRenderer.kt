@@ -29,6 +29,7 @@ class TextRenderer(
     private val data: HudTextData,
     private val x: Int,
 ) : TextLayout by layout, Renderer {
+
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")
         private val allPattern = Pattern.compile(".+")
@@ -49,8 +50,7 @@ class TextRenderer(
         .addFunction(
             { (style, codepoint) ->
                 when (style.font()) {
-                    SPACE_KEY -> codepoint - CURRENT_CENTER_SPACE_CODEPOINT
-                    LEGACY_SPACE_KEY -> codepoint - LEGACY_CENTER_SPACE_CODEPOINT
+                    SPACE_KEY -> codepoint - CENTER_SPACE_CODEPOINT
                     null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
                         else -> data.codepoint[codepoint]?.let { c -> c + 1 }
@@ -60,6 +60,11 @@ class TextRenderer(
             }
         )
 
+    private val splitOption = SplitOption(
+        data.splitWidth,
+        space,
+        forceSplit
+    )
 
     override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
         val buildPattern = parsedPatter(event)
@@ -83,7 +88,7 @@ class TextRenderer(
 
             val compList = buildPattern(targetHudPlayer)
                 .parseToComponent()
-                .split(data.splitWidth, space, widthViewer)
+                .split(splitOption, widthViewer)
             var max = 0
             compList.forEachIndexed { index, comp ->
                 if (data.font.lastIndex < index) return@forEachIndexed

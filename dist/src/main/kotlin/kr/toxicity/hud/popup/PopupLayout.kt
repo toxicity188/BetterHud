@@ -144,7 +144,7 @@ class PopupLayout(
                         val build = Component.text()
                             .font(parent.imageKey)
                         val comp = WidthComponent(
-                            if (BOOTSTRAP.useLegacyFont()) build.content(char).append(NEGATIVE_ONE_SPACE_COMPONENT.component) else build.content("$char$negativeSpace"),
+                            build.content("$char$negativeSpace"),
                             xWidth
                         )
                         comp

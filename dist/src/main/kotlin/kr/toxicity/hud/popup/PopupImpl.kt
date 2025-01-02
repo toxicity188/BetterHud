@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.popup.Popup
+import kr.toxicity.hud.api.popup.Popup.FrameType
 import kr.toxicity.hud.api.popup.PopupSortType
 import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.api.update.UpdateEvent
@@ -50,6 +51,9 @@ class PopupImpl(
         }
     }
     private val tick = section.getAsLong("tick", 1)
+    private val frameType = section.getAsString("frame-type", "local").uppercase().run {
+        FrameType.valueOf(this)
+    }
 
     private val imageEncoded = "popup_${name}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     var array: JsonArray? = JsonArray()
@@ -116,7 +120,7 @@ class PopupImpl(
             }
         }
         array?.let { arr ->
-            if (spaces.isNotEmpty() && !BOOTSTRAP.useLegacyFont()) arr.add(jsonObjectOf(
+            if (spaces.isNotEmpty()) arr.add(jsonObjectOf(
                 "type" to "space",
                 "advances" to jsonObjectOf(*spaces.map {
                     it.value to it.key
@@ -131,6 +135,7 @@ class PopupImpl(
 
     override fun getType(): HudObjectType<*> = HudObjectType.POPUP
     override fun tick(): Long = tick
+    override fun frameType(): FrameType = frameType
 
     override fun getMaxStack(): Int = move.locations.size
     override fun show(reason: UpdateEvent, player: HudPlayer): PopupUpdater? {
