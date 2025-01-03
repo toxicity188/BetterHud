@@ -19,7 +19,7 @@ import java.util.function.BiConsumer
 
 private val PERMISSION_GETTER: (ServerPlayer, String) -> Boolean = if (FabricLoader.getInstance().isModLoaded("luckperms")) LuckPermsProvider.get().let {
     { player: ServerPlayer, perm: String ->
-        it.userManager.getUser(player.uuid)?.cachedData?.permissionData?.checkPermission(perm)?.asBoolean() ?: false
+        it.userManager.getUser(player.uuid)?.cachedData?.permissionData?.checkPermission(perm)?.asBoolean() == true
     }
 } else {
     { player: ServerPlayer, _: String ->

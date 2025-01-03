@@ -32,7 +32,6 @@ class ImageElement(
         }
         is YamlElement -> listOf(child.asString())
         null -> emptyList()
-        else -> throw RuntimeException("Unsupported children section: $id")
     }
 
     val children by lazy {

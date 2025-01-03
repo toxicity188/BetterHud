@@ -61,7 +61,7 @@ class FabricEntityModule : FabricModule {
             "health" to {
                 { event ->
                     event.unwrap ref@ { target: EntityEvent<*> ->
-                        val entity = target.entity() as? LivingEntity ?: return@ref HudListener.EMPTY
+                        val entity = target.entity()
                         entity.getAttribute(Attributes.MAX_HEALTH)?.value?.let { maxHealth ->
                             HudListener {
                                 entity.health / maxHealth
@@ -76,7 +76,7 @@ class FabricEntityModule : FabricModule {
             "health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? LivingEntity)?.health ?: 0.0
+                        e.entity().health
                     }
                 }
             },
@@ -106,14 +106,14 @@ class FabricEntityModule : FabricModule {
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? LivingEntity)?.maxHealth ?: 0.0
+                        e.entity().maxHealth
                     }
                 }
             },
             "health_percentage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function get@ {
-                        val entity = e.entity() as? LivingEntity ?: return@get 0.0
+                        val entity = e.entity()
                         entity.health / entity.maxHealth
                     }
                 }

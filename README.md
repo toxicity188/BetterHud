@@ -24,16 +24,17 @@ This project implements a server-side HUD.
 ### Platform
 - Bukkit(including Folia) 1.19-1.21.4
 - Velocity 3.3-3.4
-- Fabric server 1.21.4
+- Fabric server 1.21.2-1.21.4
 
 ### Library
 - [kotlin stdlib](https://github.com/JetBrains/kotlin): Implements better functional programming.
 - [adventure](https://github.com/KyoriPowered/adventure): Implements multi-platform component.
 - [bstats](https://bstats.org/getting-started/include-metrics): Implements metrics.
 - [exp4j](https://github.com/fasseg/exp4j): Implements equation.
-- [snakeyaml](https://github.com/snakeyaml): Implements yaml parser.
+- [snakeyaml](https://github.com/snakeyaml/snakeyaml): Implements yaml parser.
 - [gson](https://github.com/google/gson): Implements json parser/writer.
 - [better command](https://github.com/toxicity188/BetterCommand): Implements multi-platform supporting command.
+- [expiring map](https://github.com/jhalterman/expiringmap): Implements cache map.
 
 
 ### Dependency
@@ -48,7 +49,7 @@ Requires Java 17, 21 Eclipse Adoptium.
 - Build Bukkit plugin: ./gradlew pluginJar
 - Build Velocity plugin: ./gradlew velocityJar
 - Build Fabric server side mod: ./gradlew fabricJar  
-- Build source code jar: ./gradlew sourceJar  
+- Build source code jar: ./gradlew sourcesJar  
 - Build dokka-based docs jar: ./gradlew javadocJar
 
 ### API

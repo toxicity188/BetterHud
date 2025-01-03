@@ -115,7 +115,7 @@ class PopupImpl(
             TriggerManagerImpl.getTrigger(yamlObject).registerEvent { t, u ->
                 PlayerManagerImpl.getHudPlayer(t)?.let {
                     hide(it)
-                } ?: false
+                } == true
                 task(u, t)
             }
         }

@@ -9,6 +9,6 @@ velocityPluginJson {
     name = "BetterHud"
     authors = listOf("toxicity")
     description = "Make a hud in minecraft!"
-    url = "https://www.spigotmc.org/resources/115559"
+    url = "https://hangar.papermc.io/toxicity188/BetterHud"
 }
 

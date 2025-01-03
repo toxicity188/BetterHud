@@ -68,7 +68,7 @@ allprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     group = "kr.toxicity.hud"
-    version = "1.11.2" + (buildNumber?.let { ".$it" } ?: "")
+    version = "1.11.3" + (buildNumber?.let { ".$it" } ?: "")
 
     repositories {
         mavenCentral()

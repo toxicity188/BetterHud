@@ -10,7 +10,6 @@ import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.manager.TextManagerImpl.TextSupplier
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.BackgroundKey
@@ -26,7 +25,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {

@@ -88,7 +88,7 @@ class DependencyInjector(version: String, dataFolder: File, private val logger: 
                 val ucp: Any = fetchField(URLClassLoader::class.java, classLoader, "ucp")
                 unopenedURLs = fetchField(ucp.javaClass, ucp, "unopenedUrls") as MutableCollection<URL>
                 pathURLs = fetchField(ucp.javaClass, ucp, "path") as MutableCollection<URL>
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 throw RuntimeException("Unsupported jdk.")
             }
         }
