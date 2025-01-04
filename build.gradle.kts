@@ -407,6 +407,12 @@ tasks {
         version(minecraft)
         pluginJars(pluginJar.get().archiveFile)
         pluginJars(fileTree("plugins"))
+        downloadPlugins {
+            hangar("ViaVersion", "5.2.1")
+            hangar("ViaBackwards", "5.2.1")
+            hangar("PlaceholderAPI", "2.11.6")
+            hangar("Skript", "2.9.5")
+        }
     }
     build {
         finalizedBy(sourcesJar, javadocJar, pluginJar, velocityJar, fabricJar)
