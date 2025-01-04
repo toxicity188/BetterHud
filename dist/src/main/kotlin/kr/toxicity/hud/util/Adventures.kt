@@ -174,15 +174,14 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
                     end()
                     continue
                 }
-                val length = (if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue) + add
+                val length = (if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue) + add + (if (shouldApplySpace) option.space + add else 0)
                 val shouldCombine = COMBINE.contains(Character.getType(codepoint))
                 if (shouldCombine) {
-                    add((-length - (if (shouldApplySpace) option.space + add else 0)).toSpaceComponent().finalizeFont().component)
+                    add((-length).toSpaceComponent().finalizeFont().component)
                 } else i += length
                 sb.appendCodePoint(codepoint)
                 if (shouldApplySpace) {
                     sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
-                    i += option.space + add
                 }
                 if (i >= option.endWidth && (i >= (1.25 * option.endWidth).roundToInt() || ' '.code == codepoint) || option.forceSplit) end()
             }
