@@ -89,13 +89,7 @@ allprojects {
             useJUnitPlatform()
         }
         compileJava {
-            options.compilerArgs.addAll(listOf("-source", "17", "-target", "17"))
             options.encoding = Charsets.UTF_8.name()
-        }
-        compileKotlin {
-            compilerOptions {
-                freeCompilerArgs.addAll(listOf("-jvm-target", "17", "-java-parameters"))
-            }
         }
     }
     java {
@@ -137,8 +131,6 @@ val legacyNmsVersion = listOf(
     "v1_20_R3",
 ).map {
     project("nms:$it")
-}.onEach {
-    it.legacy()
 }
 
 val currentNmsVersion = listOf(
@@ -197,11 +189,6 @@ fun Project.library() = also {
 }
 fun Project.bukkitAudience() = dependency("net.kyori:adventure-platform-bukkit:$platform")
 
-fun Project.legacy() = also {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: List<String>, versionList: List<String>, requiredDependency: List<String>, softDependency: List<String>) {
     apply(plugin = "com.modrinth.minotaur")
     modrinth {
@@ -232,9 +219,9 @@ fun Project.modrinthPublish(depend: Jar, additionalJar: List<Jar>, loadersList: 
     }
 }
 
-val apiShare = project("api:standard-api").adventure().legacy()
-val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare).legacy()
-val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare).legacy()
+val apiShare = project("api:standard-api").adventure()
+val apiBukkit = project("api:bukkit-api").adventure().bukkit().dependency(apiShare)
+val apiVelocity = project("api:velocity-api").velocity().dependency(apiShare)
 project("api:fabric-api").dependency(apiShare).also {
     it.apply(plugin = "fabric-loom")
 }

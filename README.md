@@ -43,7 +43,7 @@ This project implements a server-side HUD.
 - Fabric server: [Fabric API](https://modrinth.com/mod/fabric-api)
 
 ### Build
-Requires Java 17, 21 Eclipse Adoptium.
+Requires Java 21 Eclipse Adoptium.
 
 - Build all available jar: ./gradlew build  
 - Build Bukkit plugin: ./gradlew pluginJar
