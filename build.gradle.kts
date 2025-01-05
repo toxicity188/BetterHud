@@ -74,8 +74,8 @@ allprojects {
         mavenCentral()
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
         maven("https://repo.papermc.io/repository/maven-public/") //Paper
-        maven("https://repo.opencollab.dev/main/")
         maven("https://repo.codemc.org/repository/maven-public/")
+        maven("https://repo.opencollab.dev/main/")
         maven("https://maven.fabricmc.net/") //Fabric
     }
 
@@ -236,7 +236,9 @@ fun Project.api() = dependency(api)
 
 val dist = project("dist").adventure().library().api()
 val scheduler = project("scheduler")
-val bedrock = project("bedrock")
+val bedrock = project("bedrock").subprojects.onEach {
+    it.api()
+}
 
 allNmsVersion.forEach {
     it.dependency(apiShare)
@@ -255,7 +257,7 @@ val bukkitBootstrap = project("bootstrap:bukkit")
     .dependency(dist)
     .bukkitAudience()
     .dependency(scheduler.subprojects)
-    .dependency(bedrock.subprojects)
+    .dependency(bedrock)
     .dependency(allNmsVersion)
 
 val velocityBootstrap = project("bootstrap:velocity").velocity().api().dependency(dist)
@@ -316,7 +318,7 @@ val pluginJar by tasks.registering(Jar::class) {
         apiShare,
         apiBukkit,
         bukkitBootstrap
-    ) + scheduler.subprojects + bedrock.subprojects).forEach {
+    ) + scheduler.subprojects + bedrock).forEach {
         from(it.jar())
     }
     allNmsVersion.forEach {

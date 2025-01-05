@@ -1,3 +1,3 @@
 dependencies {
-    compileOnly("org.geysermc.geyser:api:2.4.2-SNAPSHOT")
+    compileOnly("org.geysermc.geyser:api:2.6.0-SNAPSHOT")
 }

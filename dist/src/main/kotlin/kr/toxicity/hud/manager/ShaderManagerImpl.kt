@@ -20,7 +20,6 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         private set
 
     private val tagPattern = Pattern.compile("#(?<name>[a-zA-Z]+)")
-    private val deactivatePattern = Pattern.compile("//(?<name>[a-zA-Z]+)")
     private val tagBuilders: MutableMap<String, () -> List<String>> = mutableMapOf(
         "CreateConstant" to {
             constants.map {
@@ -185,11 +184,6 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 val byte = buildString {
                     shader.second.forEach write@{ string ->
                         var s = string
-                        val deactivateMatcher = deactivatePattern.matcher(s)
-                        if (deactivateMatcher.find()) {
-                            if (replaceList.contains(deactivateMatcher.group("name"))) s = deactivateMatcher.replaceAll("")
-                            else return@write
-                        }
                         if (s.isEmpty() || s.startsWith("//")) return@write
                         val tagMatcher = tagPattern.matcher(s)
                         if (tagMatcher.find()) {
@@ -205,8 +199,8 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                                 return@write
                             }
                         }
-                        if (s.first() == '#') {
-                            if (isEmpty() || last() != '\n') s = '\n' + s
+                        if (isNotEmpty() && s.first() == '#') {
+                            if (last() != '\n') s = '\n' + s
                             s += '\n'
                         }
                         append(s.substringBeforeLast("//").replace("  ", ""))

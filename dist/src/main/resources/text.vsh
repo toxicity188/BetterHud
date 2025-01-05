@@ -41,6 +41,7 @@ bool checkElement(float z) {
     if (z == 0) return true; //<=1.20.4 vanilla
     else if (z == 1000) return true; //>=1.20.5 vanilla
     else if (z == -90) return true; //<=1.20.4 forge
+    else if (z == 2800) return true; //neoforge
     return false;
 }
 
@@ -50,12 +51,12 @@ bool checkExp(float z) {
     return false;
 }
 
-float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
+float getDistance(vec3 pos, int shape) {
     if (shape == 0) {
-        return length((modelViewMat * vec4(pos, 1.0)).xyz);
+        return length(pos);
     } else {
-        float distXZ = length((modelViewMat * vec4(pos.x, 0.0, pos.z, 1.0)).xyz);
-        float distY = length((modelViewMat * vec4(0.0, pos.y, 0.0, 1.0)).xyz);
+        float distXZ = length(pos.xz);
+        float distY = abs(pos.y);
         return max(distXZ, distY);
     }
 }
@@ -67,7 +68,6 @@ void main() {
     vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
     vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
-    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     applyColor = 0;
     bool isElement = checkElement(pos.z);
     if (pos.y >= ui.y && ProjMat[3].x == -1 && (isElement || checkElement(pos.z - 0.03))) {
@@ -92,7 +92,6 @@ void main() {
             }
 
             vertexColor = (isElement && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
-            vertexColor.a = max(vertexColor.a, 1 / 255);
 
             //Wave
             if ((property & 1) > 0) {
@@ -130,6 +129,7 @@ void main() {
 
         }
     } else {
+        vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
 //HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && checkExp(pos.z) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
@@ -199,7 +199,7 @@ void main() {
 
 #GenerateOtherMainMethod
 
-    vertexDistance = getDistance(ModelViewMat, pos, FogShape);
+    vertexDistance = getDistance(pos, FogShape);
     texCoord0 = UV0;
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 }
