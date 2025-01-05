@@ -165,7 +165,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
                 sb.setLength(0)
             }
             fun add(component: ComponentLike) {
-                subBuilder.append(Component.text(sb.toString()))
+                subBuilder.append(Component.text().style(style).content(sb.toString()))
                 subBuilder.append(component)
                 sb.setLength(0)
             }
