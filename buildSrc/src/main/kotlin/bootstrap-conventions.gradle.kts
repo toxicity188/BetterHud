@@ -52,8 +52,5 @@ beforeEvaluate {
         token = System.getenv("MODRINTH_API_TOKEN")
         projectId = "betterhud2"
         versionNumber = project.version as String
-        additionalFiles = listOf(
-            rootProject.layout.buildDirectory.file("libs")
-        )
     }
 }
