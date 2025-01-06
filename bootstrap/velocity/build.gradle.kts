@@ -33,11 +33,10 @@ tasks.jar {
     }
 }
 
-beforeEvaluate {
-    modrinth {
-        uploadFile.set(tasks.jar)
-        versionName = "BetterHud ${project.version} for velocity"
-        gameVersions = SUPPORTED_MINECRAFT_VERSION
-        loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")
-    }
+
+modrinth {
+    uploadFile.set(tasks.jar)
+    versionName = "BetterHud ${project.version} for velocity"
+    gameVersions = SUPPORTED_MINECRAFT_VERSION
+    loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")
 }

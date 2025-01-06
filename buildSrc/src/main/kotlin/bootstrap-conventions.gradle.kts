@@ -39,18 +39,16 @@ tasks {
     }
 }
 
-beforeEvaluate {
-    modrinth {
-        val log = System.getenv("COMMIT_MESSAGE")
-        if (log != null) {
-            versionType = "alpha"
-            changelog = log
-        } else {
-            versionType = "release"
-            changelog = rootProject.file("changelog/${project.version}.md").readText()
-        }
-        token = System.getenv("MODRINTH_API_TOKEN")
-        projectId = "betterhud2"
-        versionNumber = project.version as String
+modrinth {
+    val log = System.getenv("COMMIT_MESSAGE")
+    if (log != null) {
+        versionType = "alpha"
+        changelog = log
+    } else {
+        versionType = "release"
+        changelog = rootProject.file("changelog/${project.version}.md").readText()
     }
+    token = System.getenv("MODRINTH_API_TOKEN")
+    projectId = "betterhud2"
+    versionNumber = project.version as String
 }

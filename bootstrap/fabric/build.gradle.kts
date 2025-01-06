@@ -93,16 +93,15 @@ tasks {
     }
 }
 
-beforeEvaluate {
-    modrinth {
-        uploadFile.set(tasks.remapJar)
-        versionName = "BetterHud ${project.version} for fabric"
-        gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
-            SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),
-            SUPPORTED_MINECRAFT_VERSION.size
-        )
-        loaders = listOf("fabric", "quilt")
-        required.project("fabric-api")
-        optional.project("polymer", "placeholder-api", "luckperms")
-    }
+
+modrinth {
+    uploadFile.set(tasks.remapJar)
+    versionName = "BetterHud ${project.version} for fabric"
+    gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
+        SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),
+        SUPPORTED_MINECRAFT_VERSION.size
+    )
+    loaders = listOf("fabric", "quilt")
+    required.project("fabric-api")
+    optional.project("polymer", "placeholder-api", "luckperms")
 }
