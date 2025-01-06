@@ -157,16 +157,12 @@ tasks.jar {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot"
     }
-    setManifest()
-    doLast {
-        relocateAll()
-    }
 }
 
 
 modrinth {
     uploadFile.set(tasks.jar)
-    versionName = "BetterHud ${project.version} for bukkit"
+    versionName = "BetterHud ${project.version} for Bukkit"
     gameVersions = SUPPORTED_MINECRAFT_VERSION
     loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")
 }

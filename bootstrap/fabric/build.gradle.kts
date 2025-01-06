@@ -77,16 +77,12 @@ fabricModJson {
 tasks {
     jar {
         archiveClassifier = "dev"
-        doLast {
-            relocateAll()
-        }
     }
     remapJar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveBaseName = "${rootProject.name}-fabric+$minecraft"
         destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
         archiveClassifier = ""
-        setManifest()
     }
     runServer {
         enabled = false
@@ -96,7 +92,7 @@ tasks {
 
 modrinth {
     uploadFile.set(tasks.remapJar)
-    versionName = "BetterHud ${project.version} for fabric"
+    versionName = "BetterHud ${project.version} for Fabric"
     gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
         SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),
         SUPPORTED_MINECRAFT_VERSION.size

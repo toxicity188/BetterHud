@@ -8,6 +8,8 @@ plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
+val minecraft = property("minecraft_version")!!.toString()
+
 dependencies {
     fun searchAll(target: Project) {
         val sub = target.subprojects
@@ -45,8 +47,17 @@ val bukkit = project("bootstrap:bukkit")
 val fabric = project("bootstrap:fabric")
 val velocity = project("bootstrap:velocity")
 
+tasks.register("pluginJar") {
+    dependsOn(bukkit.tasks.build)
+}
+tasks.register("fabricJar") {
+    dependsOn(fabric.tasks.build)
+}
+tasks.register("velocityJar") {
+    dependsOn(velocity.tasks.build)
+}
+
 tasks.register("modrinthPublish") {
-    dependsOn(tasks.build)
     finalizedBy(
         tasks.modrinthSyncBody,
         bukkit.tasks.modrinth,
@@ -57,7 +68,7 @@ tasks.register("modrinthPublish") {
 
 tasks {
     runServer {
-        version(project.property("minecraft_version")!!.toString())
+        version(minecraft)
         pluginJars(bukkit.tasks.jar.flatMap {
             it.archiveFile
         })
@@ -81,7 +92,6 @@ tasks {
         )
     }
 }
-
 
 hangarPublish {
     publications.register("plugin") {

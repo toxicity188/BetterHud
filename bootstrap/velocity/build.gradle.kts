@@ -27,16 +27,12 @@ dependencies {
 tasks.jar {
     archiveBaseName = "${rootProject.name}-velocity"
     destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
-    setManifest()
-    doLast {
-        relocateAll()
-    }
 }
 
 
 modrinth {
     uploadFile.set(tasks.jar)
-    versionName = "BetterHud ${project.version} for velocity"
+    versionName = "BetterHud ${project.version} for Velocity"
     gameVersions = SUPPORTED_MINECRAFT_VERSION
-    loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")
+    loaders = listOf("velocity")
 }

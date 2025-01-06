@@ -36,6 +36,10 @@ tasks {
         ) {
             exclude("META-INF/MANIFEST.MF")
         }
+        setManifest()
+        doLast {
+            relocateAll()
+        }
     }
 }
 
@@ -51,4 +55,8 @@ modrinth {
     token = System.getenv("MODRINTH_API_TOKEN")
     projectId = "betterhud2"
     versionNumber = project.version as String
+    additionalFiles = listOf(
+        rootProject.layout.buildDirectory.file("libs/${rootProject.name}-${rootProject.version}-sources.jar"),
+        rootProject.layout.buildDirectory.file("libs/${rootProject.name}-${rootProject.version}-javadoc.jar")
+    )
 }
