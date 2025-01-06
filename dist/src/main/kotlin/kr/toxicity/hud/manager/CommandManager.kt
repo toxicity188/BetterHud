@@ -135,7 +135,7 @@ object CommandManager : BetterHudManager {
             @Command
             @Description(key = "betterhud.reload.description", defaultValue = "Reload BetterHud.")
             @Aliases(aliases = ["re", "rl"])
-            @Permission("hud.reload")
+            @Permission("betterhud.reload")
             fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
@@ -157,7 +157,7 @@ object CommandManager : BetterHudManager {
             @Command
             @Description(key = "betterhud.reload.parse", defaultValue = "Reload BetterHud.")
             @Aliases(aliases = ["p"])
-            @Permission("hud.parse")
+            @Permission("betterhud.parse")
             @Sender(type = [SenderType.PLAYER])
             fun parse(@Source me: HudPlayer, @Vararg argument: String) {
                 runCatching {
@@ -180,7 +180,7 @@ object CommandManager : BetterHudManager {
             @Command
             @Description(key = "betterhud.generate.description", defaultValue = "Generates default language file.")
             @Aliases(aliases = ["gen"])
-            @Permission("hud.generate")
+            @Permission("betterhud.generate")
             fun generate(@Source me: BetterCommandSource) {
                 generate_tryGenerate.send(me)
                 asyncTask {
@@ -201,7 +201,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.hud.add.description", defaultValue = "Adds the hud for a player.")
                     @Aliases(aliases = ["a"])
-                    @Permission("hud.hud.add")
+                    @Permission("betterhud.hud.add")
                     fun add(@Source me: BetterCommandSource, players: HudPlayerStack, huds: HudStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -226,7 +226,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.hud.remove.description", defaultValue = "Removes the hud from a player.")
                     @Aliases(aliases = ["r"])
-                    @Permission("hud.hud.remove")
+                    @Permission("betterhud.hud.remove")
                     fun remove(@Source me: BetterCommandSource, players: HudPlayerStack, huds: HudStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -256,7 +256,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.compass.add.description", defaultValue = "Adds the compass for a player.")
                     @Aliases(aliases = ["a"])
-                    @Permission("hud.compass.add")
+                    @Permission("betterhud.compass.add")
                     fun add(@Source me: BetterCommandSource, players: HudPlayerStack, compasses: CompassStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -281,7 +281,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.compass.remove.description", defaultValue = "Removes the compass from a player.")
                     @Aliases(aliases = ["r"])
-                    @Permission("hud.compass.remove")
+                    @Permission("betterhud.compass.remove")
                     fun remove(@Source me: BetterCommandSource, players: HudPlayerStack, compasses: CompassStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -311,7 +311,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.popup.add.description", defaultValue = "Adds the popup for a player.")
                     @Aliases(aliases = ["a"])
-                    @Permission("hud.popup.add")
+                    @Permission("betterhud.popup.add")
                     fun add(@Source me: BetterCommandSource, players: HudPlayerStack, popups: PopupStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -336,7 +336,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.popup.remove.description", defaultValue = "Removes the popup from a player.")
                     @Aliases(aliases = ["r"])
-                    @Permission("hud.popup.remove")
+                    @Permission("betterhud.popup.remove")
                     fun remove(@Source me: BetterCommandSource, players: HudPlayerStack, popups: PopupStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -363,7 +363,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.popup.show.description", defaultValue = "Shows a popup for a player.")
                     @Aliases(aliases = ["s"])
-                    @Permission("hud.popup.show")
+                    @Permission("betterhud.popup.show")
                     fun show(@Source me: BetterCommandSource, players: HudPlayerStack, popups: PopupStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -402,7 +402,7 @@ object CommandManager : BetterHudManager {
                     @Command
                     @Description(key = "betterhud.popup.hide.description", defaultValue = "Hides a popup for a player.")
                     @Aliases(aliases = ["h"])
-                    @Permission("hud.popup.hide")
+                    @Permission("betterhud.popup.hide")
                     fun hide(@Source me: BetterCommandSource, players: HudPlayerStack, popups: PopupStack) {
                         var stack = 0
                         players.forEach { player ->
@@ -443,7 +443,7 @@ object CommandManager : BetterHudManager {
                     private val on_success = library.registerKey(CommandMessage("betterhud.turn.on.message.success", Component.text("Successfully turned the HUD on.")))
                     @Command
                     @Description(key = "betterhud.turn.on.description", defaultValue = "Turns on your HUD.")
-                    @Permission("hud.turn.on")
+                    @Permission("betterhud.turn.on")
                     fun on(@Source me: BetterCommandSource, @Option target: HudPlayerStack?) {
                         when {
                             target != null && me.hasPermission("betterhud.turn.on.admin") -> target.forEach { p ->
@@ -461,7 +461,7 @@ object CommandManager : BetterHudManager {
                     private val off_success = library.registerKey(CommandMessage("betterhud.turn.off.message.success", Component.text("Successfully turned the HUD off.")))
                     @Command
                     @Description(key = "betterhud.turn.off.description", defaultValue = "Turns off your HUD.")
-                    @Permission("hud.turn.off")
+                    @Permission("betterhud.turn.off")
                     fun off(@Source me: BetterCommandSource, @Option target: HudPlayerStack?) {
                         when {
                             target != null && me.hasPermission("betterhud.turn.off.admin") -> target.forEach { p ->
@@ -483,7 +483,7 @@ object CommandManager : BetterHudManager {
                     private val set_success = library.registerKey(CommandMessage("betterhud.pointer.set.message.success", Component.text("Successfully located.")))
                     @Command
                     @Description(key = "betterhud.pointer.set.description", defaultValue = "Sets the compass pointer location of some player.")
-                    @Permission("hud.pointer.set")
+                    @Permission("betterhud.pointer.set")
                     fun set(@Source me: BetterCommandSource, players: HudPlayerStack, name: String, world: WorldWrapper, vector: Vec3, @Option icon: CompassIcon?) {
                         val loc = PointedLocation(
                             PointedLocationSource.INTERNAL,
@@ -509,7 +509,7 @@ object CommandManager : BetterHudManager {
                     private val clear_success = library.registerKey(CommandMessage("betterhud.pointer.clear.message.success", Component.text("Cleared successfully.")))
                     @Command
                     @Description(key = "betterhud.pointer.clear.description", defaultValue = "Clears the compass pointer location of some player.")
-                    @Permission("hud.pointer.clear")
+                    @Permission("betterhud.pointer.clear")
                     fun clear(@Source me: BetterCommandSource, players: HudPlayerStack) {
                         players.forEach { player ->
                             player.pointers().clear()
@@ -523,7 +523,7 @@ object CommandManager : BetterHudManager {
                     private val remove_failure = library.registerKey(CommandMessage("betterhud.pointer.remove.message.failure", Component.text("This pointer doesn't exist: [pointer] in [player]")))
                     @Command
                     @Description(key = "betterhud.pointer.remove.description", defaultValue = "Removes the compass pointer location of some player.")
-                    @Permission("hud.pointer.remove")
+                    @Permission("betterhud.pointer.remove")
                     fun remove(@Source me: BetterCommandSource, players: HudPlayerStack, name: String) {
                         var stack = 0
                         players.forEach { player ->
