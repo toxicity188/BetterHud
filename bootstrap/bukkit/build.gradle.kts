@@ -165,7 +165,7 @@ tasks.jar {
 
 beforeEvaluate {
     modrinth {
-        uploadFile = tasks.jar.get()
+        uploadFile.set(tasks.jar)
         versionName = "BetterHud ${project.version} for bukkit"
         gameVersions = SUPPORTED_MINECRAFT_VERSION
         loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")

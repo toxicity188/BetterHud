@@ -95,7 +95,7 @@ tasks {
 
 beforeEvaluate {
     modrinth {
-        uploadFile = tasks.remapJar.get()
+        uploadFile.set(tasks.remapJar)
         versionName = "BetterHud ${project.version} for fabric"
         gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
             SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),
