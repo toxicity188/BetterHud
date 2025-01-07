@@ -20,6 +20,10 @@ val excludeDependencies = listOf(
     "annotations-13.0.jar"
 )
 
+val versionString = version.toString()
+val versionGradle = gradle.gradleVersion
+val groupString = group.toString()
+
 tasks {
     jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -36,9 +40,9 @@ tasks {
         ) {
             exclude("META-INF/MANIFEST.MF")
         }
-        setManifest()
+        setManifest(versionString, versionGradle)
         doLast {
-            relocateAll()
+            relocateAll(groupString)
         }
     }
 }

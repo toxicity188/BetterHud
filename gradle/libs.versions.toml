@@ -11,8 +11,10 @@ bstats = "3.1.0"
 betterCommand = "1.4.2"
 resourceFactory = "1.2.0"
 loom = "1.9-SNAPSHOT"
-paperweight = "2.0.0-beta.11"
+paperweight = "2.0.0-beta.12"
 minotaur = "2.8.7"
+
+asm = "9.7.1"
 
 [libraries]
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -35,6 +37,9 @@ betterCommand = { group = "io.github.toxicity188", name = "BetterCommand", versi
 kotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.gradle.plugin", version.ref = "minotaur"}
+
+asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
+asmCommons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
 
 [plugins]
 standardConvention = { id = "standard-conventions" }
@@ -61,4 +66,8 @@ library = [
     "gson",
     "exp4j",
     "expiringmap"
+]
+asm = [
+    "asm",
+    "asmCommons"
 ]

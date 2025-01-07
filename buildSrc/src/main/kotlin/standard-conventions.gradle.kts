@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "kr.toxicity.hud"
-version = "1.11.3" + (buildNumber?.let { ".$it" } ?: "")
+version = "1.11.3" + (BUILD_NUMBER?.let { ".$it" } ?: "")
 
 val targetJavaVersion = 21
 

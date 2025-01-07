@@ -104,6 +104,9 @@ private class SplitBuilder(
         isClean = true
         return build
     }
+    fun style(style: Style) {
+        builder.style(style)
+    }
     fun append(like: ComponentLike) {
         builder.append(like)
         isClean = false
@@ -158,14 +161,15 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
             }
             val sb = StringBuilder()
 
+            subBuilder.style(style)
             fun end() {
                 subBuilder.accept {
-                    style(style).content(sb.toString())
+                    content(sb.toString())
                 }
                 sb.setLength(0)
             }
             fun add(component: ComponentLike) {
-                subBuilder.append(Component.text().style(style).content(sb.toString()))
+                subBuilder.append(Component.text().content(sb.toString()))
                 subBuilder.append(component)
                 sb.setLength(0)
             }
@@ -186,7 +190,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
                 if (i >= option.endWidth && (i >= (1.25 * option.endWidth).roundToInt() || ' '.code == codepoint) || option.forceSplit) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
-                style(style).content(sb.toString())
+                content(sb.toString())
             })
             for (child in children()) {
                 child.parse(subBuilder, subBold, subItalic)

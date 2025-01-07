@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.attributes
 import java.io.File
 import java.time.LocalDateTime
 
-val buildNumber: String? = System.getenv("BUILD_NUMBER")
+val BUILD_NUMBER: String? = System.getenv("BUILD_NUMBER")
 
 val SUPPORTED_MINECRAFT_VERSION = listOf(
     //1.19
@@ -35,14 +35,14 @@ val SUPPORTED_MINECRAFT_VERSION = listOf(
 val Project.libs
     get() = rootProject.extensions.getByName("libs") as LibrariesForLibs
 
-fun Jar.setManifest() {
+fun Jar.setManifest(version: String, gradle: String) {
     manifest {
         attributes(
-            "Dev-Build" to (buildNumber != null),
-            "Version" to project.version,
+            "Dev-Build" to (BUILD_NUMBER != null),
+            "Version" to version,
             "Author" to "toxicity188",
             "Url" to "https://github.com/toxicity188/BetterHud",
-            "Created-By" to "Gradle ${project.gradle.gradleVersion}",
+            "Created-By" to "Gradle $gradle",
             "Build-Jdk" to "${System.getProperty("java.vendor")} ${System.getProperty("java.version")}",
             "Build-OS" to "${System.getProperty("os.arch")} ${System.getProperty("os.name")}",
             "Build-Date" to LocalDateTime.now().toString()
@@ -50,7 +50,7 @@ fun Jar.setManifest() {
     }
 }
 
-fun Jar.relocateAll() {
+fun Jar.relocateAll(group: String) {
     val file = archiveFile.get().asFile
     val tempFile = file.copyTo(File.createTempFile("jar-relocator", System.currentTimeMillis().toString()).apply {
         if (exists()) delete()
@@ -66,7 +66,7 @@ fun Jar.relocateAll() {
             "me.lucko.jarrelocator",
             "kr.toxicity.command.impl"
         ).map {
-            Relocation(it, "${project.group}.shaded.$it")
+            Relocation(it, "${group}.shaded.$it")
         }
     ).run()
     tempFile.delete()

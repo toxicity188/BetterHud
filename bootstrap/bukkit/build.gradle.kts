@@ -48,7 +48,7 @@ dependencies {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.12") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
     }

@@ -75,6 +75,7 @@ enum class ImageType {
                     SplitType.valueOf(splitType.uppercase())
                 }.getOrNull()
             } ?: SplitType.LEFT
+            val split = yamlObject.getAsInt("split", 25).coerceAtLeast(1)
             val getFile = File(
                 assets,
                 yamlObject["file"]?.asString().ifNull("file value not set.")
@@ -87,7 +88,7 @@ enum class ImageType {
                         .toImage()
                         .removeEmptySide()
                         .ifNull("Invalid image.")
-                        .toNamed(getFile.name), yamlObject.getAsInt("split", 25).coerceAtLeast(1)
+                        .toNamed("${getFile.nameWithoutExtension}_${splitType.name.lowercase()}_$split.png"), split
                 ),
                 this,
                 yamlObject["setting"]?.asObject()
