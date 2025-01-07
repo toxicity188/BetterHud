@@ -108,9 +108,12 @@ class TextRenderer(
 
                     var build = EMPTY_WIDTH_COMPONENT.finalizeFont()
                     if (it.x != 0) build += it.x.toSpaceComponent()
-                    finalComp = build + WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total) + minus.toSpaceComponent() + finalComp
+                    build += WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total)
+                    if (max < build.width) max = build.width
+                    finalComp = build + minus.toSpaceComponent() + finalComp
+                } ?: run {
+                    if (max < finalComp.width) max = finalComp.width
                 }
-                if (finalComp.width > max) max = finalComp.width
                 widthComp = widthComp plusWithAlign finalComp
             }
             widthComp.applyColor(colorApply(targetHudPlayer)).toPixelComponent(when (align) {

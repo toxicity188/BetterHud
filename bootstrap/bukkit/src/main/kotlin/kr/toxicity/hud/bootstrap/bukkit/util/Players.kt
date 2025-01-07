@@ -42,25 +42,6 @@ val Player.emptySpace
         }
         return r
     }
-fun Player.storage(target : ItemStack?): Int {
-    if (target == null || target.type == Material.AIR) return emptySpace
-    val inv = inventory
-    val max = target.maxStackSize
-    return Array(36) { i ->
-        inv.getItem(i)?.run {
-            if (type == Material.AIR) max
-            else if (isSimilar(target)) (max - amount).coerceAtLeast(0)
-            else 0
-        } ?: max
-    }.sum()
-}
-fun Player.totalAmount(item: ItemStack): Int {
-    var i = 0
-    for (content in inventory.contents) {
-        if (content != null && item.isSimilar(content)) i += content.amount
-    }
-    return i
-}
 fun Player.storage(material: Material): Int {
     if (material == Material.AIR) return emptySpace
     val inv = inventory

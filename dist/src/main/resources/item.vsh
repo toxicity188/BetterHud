@@ -30,12 +30,12 @@ out vec4 normal;
 
 #CreateConstant
 
-float getDistance(mat4 modelViewMat, vec3 pos, int shape) {
+float getDistance(vec3 pos, int shape) {
     if (shape == 0) {
-        return length((modelViewMat * vec4(pos, 1.0)).xyz);
+        return length(pos);
     } else {
-        float distXZ = length((modelViewMat * vec4(pos.x, 0.0, pos.z, 1.0)).xyz);
-        float distY = length((modelViewMat * vec4(0.0, pos.y, 0.0, 1.0)).xyz);
+        float distXZ = length(pos.xz);
+        float distY = abs(pos.y);
         return max(distXZ, distY);
     }
 }
@@ -109,7 +109,7 @@ void main() {
 
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
-    vertexDistance = getDistance(ModelViewMat, pos, FogShape);
+    vertexDistance = getDistance(pos, FogShape);
     vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color) * texelFetch(Sampler2, UV2 / 16, 0);
     texCoord0 = UV0;
     texCoord1 = UV1;

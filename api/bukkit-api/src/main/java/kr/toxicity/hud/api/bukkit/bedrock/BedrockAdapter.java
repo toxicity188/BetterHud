@@ -7,6 +7,7 @@ import java.util.UUID;
 /**
  * Checks some player is bedrock player.
  */
+@FunctionalInterface
 public interface BedrockAdapter {
     /**
      * Returns whether given uuid's player is from bedrock.

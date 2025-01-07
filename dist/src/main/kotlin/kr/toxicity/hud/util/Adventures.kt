@@ -93,16 +93,19 @@ private class SplitBuilder(
     var isClean = true
         private set
     fun accept(block: TextComponent.Builder.() -> Unit = {}) {
-        val build = builder.apply(block)
+        val build = if (isClean) builder.apply(block) else builder.append(Component.text().apply(block))
         builder = Component.text()
         isClean = true
         chain(build)
     }
     fun build(block: TextComponent.Builder.() -> Unit = {}): TextComponent.Builder {
-        val build = builder.apply(block)
+        val build = if (isClean) builder.apply(block) else builder.append(Component.text().apply(block))
         builder = Component.text()
         isClean = true
         return build
+    }
+    fun style(style: Style) {
+        builder.style(style)
     }
     fun append(like: ComponentLike) {
         builder.append(like)
@@ -126,6 +129,13 @@ data class SplitOption(
     val forceSplit: Boolean
 )
 
+private val COMBINE = sequenceOf(
+    Character.NON_SPACING_MARK,
+    Character.COMBINING_SPACING_MARK,
+).map {
+    it.toInt()
+}.toSet()
+
 fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?): List<WidthComponent> {
     var i = 0
     val list = ArrayList<WidthComponent>()
@@ -133,6 +143,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
         list += WidthComponent(it, i)
         i = 0
     }
+    val shouldApplySpace = option.space > 0
     fun Component.parse(target: SplitBuilder, bold: Boolean, italic: Boolean) {
         if (this is TextComponent) {
             var style = style()
@@ -150,10 +161,16 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
             }
             val sb = StringBuilder()
 
+            subBuilder.style(style)
             fun end() {
                 subBuilder.accept {
-                    style(style).content(sb.toString())
+                    content(sb.toString())
                 }
+                sb.setLength(0)
+            }
+            fun add(component: ComponentLike) {
+                subBuilder.append(Component.text().content(sb.toString()))
+                subBuilder.append(component)
                 sb.setLength(0)
             }
             for (codepoint in content().codePoints()) {
@@ -161,17 +178,19 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
                     end()
                     continue
                 }
+                val length = (if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue) + add + (if (shouldApplySpace) option.space + add else 0)
+                val shouldCombine = COMBINE.contains(Character.getType(codepoint))
+                if (shouldCombine) {
+                    add((-length).toSpaceComponent().finalizeFont().component)
+                } else i += length
                 sb.appendCodePoint(codepoint)
-                i += if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue
-                i += add
-                if (option.space > 0) {
+                if (shouldApplySpace) {
                     sb.appendCodePoint(TEXT_SPACE_KEY_CODEPOINT)
-                    i += option.space + add
                 }
                 if (i >= option.endWidth && (i >= (1.25 * option.endWidth).roundToInt() || ' '.code == codepoint) || option.forceSplit) end()
             }
             if (!subBuilder.isClean || sb.isNotEmpty()) target.append(subBuilder.build {
-                style(style).content(sb.toString())
+                content(sb.toString())
             })
             for (child in children()) {
                 child.parse(subBuilder, subBold, subItalic)

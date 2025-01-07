@@ -10,7 +10,6 @@ import kr.toxicity.hud.element.TextElement
 import kr.toxicity.hud.image.LocatedImage
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.manager.TextManagerImpl.TextSupplier
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.BackgroundKey
@@ -26,7 +25,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
@@ -92,8 +90,24 @@ object TextManagerImpl : BetterHudManager, TextManager {
             addAll(0x0985..0x09B9)
         },
         "thailand" to HashSet<Int>().apply {
-            addAll(0x0E01..0x0E3A)
-            addAll(0x0E40..0x0E4E)
+            addAll(0x20..0x25)
+            addAll(0x27..0x3A)
+            addAll(0x3C..0x3E)
+            add(0x40)
+            addAll(0x5B..0x5F)
+            add(0x7C)
+            add(0xA0)
+            add(0xA9)
+            addAll(0xE01..0xE3A)
+            addAll(0xE40..0xE4E)
+            addAll(0x2010..0x2011)
+            addAll(0x2013..0x2014)
+            addAll(0x2018..0x2019)
+            addAll(0x201C..0x201D)
+            add(0x2026)
+            add(0x2030)
+            addAll(0x2032..0x2033)
+            add(0x20AC)
         },
         "greece" to HashSet<Int>().apply {
             addAll(0x0390..0x03CE)
@@ -110,6 +124,34 @@ object TextManagerImpl : BetterHudManager, TextManager {
         },
         "hebrew" to HashSet<Int>().apply {
             addAll(0x05D0..0x05EA)
+        },
+        "turkish" to HashSet<Int>().apply {
+            addAll(0x20..0x5F)
+            addAll(0x61..0x70)
+            addAll(0x72..0x76)
+            addAll(0x79..0x7A)
+            add(0x7C)
+            add(0xA0)
+            add(0xA7)
+            add(0xA9)
+            add(0xC7)
+            add(0xD6)
+            add(0xDC)
+            add(0xE7)
+            add(0xF6)
+            add(0xFC)
+            addAll(0x11E..0x11F)
+            addAll(0x130..0x131)
+            addAll(0x15E..0x15F)
+            addAll(0x2010..0x2011)
+            addAll(0x2013..0x2014)
+            addAll(0x2018..0x2019)
+            addAll(0x201C..0x201D)
+            addAll(0x2020..0x2021)
+            add(0x2026)
+            add(0x2030)
+            addAll(0x2032..0x2033)
+            add(0x20AC)
         }
     )
 

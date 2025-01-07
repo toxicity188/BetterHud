@@ -311,7 +311,7 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
                 .name(packet.name?.component ?: Component.empty())
                 .color(BossBar.Color.entries[packet.color])
                 .progress(packet.percent)
-                .overlay(BossBar.Overlay.entries[packet.overlay])
+                .overlay(Overlay.entries[packet.overlay])
                 .flags(set)
         }
         fun createUpdateNamePacket(): BossBarPacket {

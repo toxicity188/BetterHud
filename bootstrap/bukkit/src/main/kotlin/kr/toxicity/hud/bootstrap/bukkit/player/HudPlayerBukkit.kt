@@ -25,10 +25,9 @@ class HudPlayerBukkit(
         player.world.uid
     )
 
-    @Suppress("DEPRECATION")
     override fun locale(): Locale = player.locale.let {
         val split = it.split('_')
-        if (split.size == 1) Locale(split[0].lowercase()) else Locale(split[0].lowercase(), split[1].uppercase())
+        if (split.size == 1) Locale.of(split[0].lowercase()) else Locale.of(split[0].lowercase(), split[1].uppercase())
     }
 
     override fun location(): LocationWrapper {

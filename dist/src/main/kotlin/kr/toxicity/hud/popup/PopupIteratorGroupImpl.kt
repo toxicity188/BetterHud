@@ -72,11 +72,6 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
         if (iterator.markedAsRemoval()) {
             return false
         }
-        if (iterator.index > iterator.maxIndex) {
-            if (!iterator.canSave() || (iterator.alwaysCheckCondition() && !iterator.available())) {
-                return false
-            }
-        }
         if (iterator.index < 0 || !iterator.available()) return false
         return true
     }
@@ -88,15 +83,18 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
             var i = 0
             sourceSet.removeIf { next ->
                 i++
-                if (checkCondition(next)) {
+                (if (next.index > next.maxIndex) {
+                    !next.canSave() || (next.alwaysCheckCondition() && !next.available())
+                } else if (checkCondition(next)) {
                     result += next.next()
                     false
-                } else {
-                    next.remove()
-                    copy.subList(i, copy.size).forEach {
-                        if (it.priority < 0) it.index--
+                } else true).apply {
+                    if (this) {
+                        next.remove()
+                        copy.subList(i, copy.size).forEach {
+                            if (it.priority < 0) it.index--
+                        }
                     }
-                    true
                 }
             }
             return result

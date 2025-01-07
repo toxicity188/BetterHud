@@ -1,7 +1,9 @@
 import xyz.jpenilla.resourcefactory.fabric.Environment
 
 plugins {
-    id("xyz.jpenilla.resource-factory-fabric-convention") version "1.2.0"
+    alias(libs.plugins.bootstrapConvention)
+    alias(libs.plugins.resourceFactoryFabric)
+    alias(libs.plugins.loom)
 }
 
 repositories {
@@ -14,8 +16,11 @@ repositories {
 //    }
 }
 
+val minecraft = property("minecraft_version")
+val supportedVersion = property("supported_version")
+
 dependencies {
-    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
+    minecraft("com.mojang:minecraft:$minecraft")
     mappings(loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:${properties["parchment"]}")
@@ -30,6 +35,7 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
     modImplementation("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")
+    compileOnly(project(":api:standard-api"))
     implementation(include(project(":api:fabric-api"))!!)
 }
 
@@ -43,7 +49,7 @@ fabricModJson {
     id = "betterhud"
     name = rootProject.name
     version = project.version.toString()
-    description = "Make a hud in minecraft!"
+    description = "A multi-platform server-side implementation of HUD in Minecraft."
     authors.set(listOf(person("toxicity") {
         contact.sources = "https://github.com/toxicity188/BetterHud"
     }))
@@ -54,7 +60,7 @@ fabricModJson {
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),
-        "minecraft" to listOf("~${project.properties["minecraft_version"]}"),
+        "minecraft" to listOf("~$supportedVersion"),
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
         "betterhud-fabric-api" to listOf("*")
@@ -68,10 +74,28 @@ fabricModJson {
 }
 
 tasks {
+    jar {
+        archiveClassifier = "dev"
+    }
     remapJar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        archiveBaseName = "${rootProject.name}-fabric+$minecraft"
+        destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
         archiveClassifier = ""
     }
     runServer {
         enabled = false
     }
+}
+
+modrinth {
+    uploadFile.set(tasks.remapJar)
+    versionName = "BetterHud ${project.version} for Fabric"
+    gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
+        SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),
+        SUPPORTED_MINECRAFT_VERSION.size
+    )
+    loaders = listOf("fabric", "quilt")
+    required.project("fabric-api")
+    optional.project("polymer", "placeholder-api", "luckperms")
 }

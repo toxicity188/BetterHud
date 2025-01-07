@@ -1,5 +1,7 @@
 plugins {
-    id("xyz.jpenilla.resource-factory-fabric-convention") version "1.2.0"
+    alias(libs.plugins.apiConvention)
+    alias(libs.plugins.resourceFactoryFabric)
+    alias(libs.plugins.loom)
 }
 
 dependencies {

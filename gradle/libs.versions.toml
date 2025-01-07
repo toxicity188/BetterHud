@@ -1,0 +1,73 @@
+[versions]
+kotlin = "2.1.0"
+
+adventure = "4.18.0"
+adventurePlatform = "4.3.4"
+snakeyaml = "2.3"
+gson = "2.11.0"
+exp4j = "0.4.8"
+expiringmap = "0.5.11"
+bstats = "3.1.0"
+betterCommand = "1.4.2"
+resourceFactory = "1.2.0"
+loom = "1.9-SNAPSHOT"
+paperweight = "2.0.0-beta.12"
+minotaur = "2.8.7"
+
+asm = "9.7.1"
+
+[libraries]
+adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventureMinimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+adventureLegacySerializer = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventureGsonSerializer = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+
+adventurePlatformBukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventurePlatform" }
+
+snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+exp4j = { group = "net.objecthunter", name = "exp4j", version.ref = "exp4j" }
+expiringmap = { group = "net.jodah", name = "expiringmap", version.ref = "expiringmap" }
+
+bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+bstatsVelocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
+
+betterCommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "betterCommand" }
+
+kotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
+kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.gradle.plugin", version.ref = "minotaur"}
+
+asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
+asmCommons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
+
+[plugins]
+standardConvention = { id = "standard-conventions" }
+apiConvention = { id = "api-conventions" }
+bootstrapConvention = { id = "bootstrap-conventions" }
+paperweightConvention = { id = "paperweight-conventions" }
+
+resourceFactoryFabric = { id = "xyz.jpenilla.resource-factory-fabric-convention", version.ref = "resourceFactory" }
+resourceFactoryVelocity = { id = "xyz.jpenilla.resource-factory-velocity-convention", version.ref = "resourceFactory" }
+resourceFactoryBukkit = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
+
+loom = { id = "fabric-loom", version.ref = "loom" }
+paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+
+[bundles]
+adventure = [
+    "adventureApi",
+    "adventureMinimessage",
+    "adventureLegacySerializer",
+    "adventureGsonSerializer",
+]
+library = [
+    "snakeyaml",
+    "gson",
+    "exp4j",
+    "expiringmap"
+]
+asm = [
+    "asm",
+    "asmCommons"
+]

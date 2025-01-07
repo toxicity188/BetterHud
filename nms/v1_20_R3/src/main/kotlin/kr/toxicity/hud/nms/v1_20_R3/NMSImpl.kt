@@ -170,7 +170,7 @@ class NMSImpl : NMS {
                 return player.hasPlayedBefore()
             }
             override fun getWorldBorder(): WorldBorder? {
-                return player.getWorldBorder()
+                return player.worldBorder
             }
             override fun showBossBar(bar: BossBar) {
                 player.showBossBar(bar)

@@ -84,7 +84,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         it.getInputStream(ZipEntry("META-INF/MANIFEST.MF"))?.buffered()?.use { stream ->
             Manifest(stream).mainAttributes.getValue(Attributes.Name("Dev-Build"))?.toBoolean()
         }
-    } ?: false
+    } == true
 
     override fun addReloadStartTask(runnable: Runnable) {
         reloadStartTask += {

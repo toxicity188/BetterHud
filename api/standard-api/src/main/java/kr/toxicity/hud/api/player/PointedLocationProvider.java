@@ -8,6 +8,7 @@ import java.util.Collection;
 /**
  * A provider of pointer location.
  */
+@FunctionalInterface
 public interface PointedLocationProvider {
     /**
      * Provides location.
