@@ -201,6 +201,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
             for (child in children()) {
                 child.parse(subBuilder, subBold, subItalic)
             }
+            if (!subBuilder.isClean) target.append(subBuilder.build {})
         }
     }
     val style = style()

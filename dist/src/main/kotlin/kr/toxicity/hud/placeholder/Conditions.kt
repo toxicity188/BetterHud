@@ -37,7 +37,8 @@ object Conditions {
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")
 
-        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer.")).map[section["operation"]?.asString().ifNull(operationValue)].ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
+        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer."))[section["operation"]?.asString().ifNull(operationValue)]
+            .ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
         return ConditionBuilder { updateEvent ->
             val o1 = first build updateEvent
             val o2 = second build updateEvent

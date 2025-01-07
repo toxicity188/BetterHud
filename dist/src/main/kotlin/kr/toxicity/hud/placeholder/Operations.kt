@@ -41,7 +41,7 @@ object Operations {
 
     class Operation<T>(
         val map: Map<String, (T, T) -> Boolean>
-    )
+    ) : Map<String, (T, T) -> Boolean> by map
 
     private val types: Map<Class<*>, Operation<*>> = mapOf(
         java.lang.Boolean::class.java to boolean,
