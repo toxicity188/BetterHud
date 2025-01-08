@@ -36,5 +36,5 @@ default_compass:
     y: 0
   pixel:
     x: 0
-    y: 80
+    y: 20
   apply-opacity: true

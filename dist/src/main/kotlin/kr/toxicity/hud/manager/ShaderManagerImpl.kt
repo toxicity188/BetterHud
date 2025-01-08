@@ -39,7 +39,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         fun applyScale(offset: Int, scale: Double, pos: String) {
                             if (scale != 1.0 || static) {
                                 val scaleFloat = scale.toFloat()
-                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset} * uiScreen.$pos);")
+                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset});")
                             }
                         }
                         applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")

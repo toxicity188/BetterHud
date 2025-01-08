@@ -1,9 +1,7 @@
 package kr.toxicity.hud.api.manager;
 
 import kr.toxicity.hud.api.BetterHudAPI;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -71,9 +69,14 @@ public interface ShaderManager {
     /**
      * Shader tag.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     class ShaderTag {
         private final Map<String, List<String>> lines = new HashMap<>();
+
+        /**
+         * Private initializer.
+         */
+        private ShaderTag() {
+        }
 
         /**
          * Adds to tag

@@ -17,7 +17,7 @@ entity_health_popup:
         y: 0
       pixel:
         x: 128
-        y: 96
+        y: 32
     2:
       name: entity_health_text
       gui:
@@ -25,5 +25,5 @@ entity_health_popup:
         y: 0
       pixel:
         x: 128
-        y: 96
+        y: 32
   duration: 20

@@ -110,7 +110,7 @@ class TextRenderer(
                     if (it.x != 0) build += it.x.toSpaceComponent()
                     build += WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total)
                     if (max < build.width) max = build.width
-                    finalComp = build + minus.toSpaceComponent() + finalComp
+                    finalComp = build + minus.toSpaceComponent() + finalComp + (-minus - finalComp.width).toSpaceComponent()
                 } ?: run {
                     if (max < finalComp.width) max = finalComp.width
                 }

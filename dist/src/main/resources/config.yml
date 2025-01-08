@@ -35,4 +35,4 @@ use-legacy-format: false #Please don't enable it unless it is necessary.
 legacy-serializer: ampersand #section, ampersand, both
 minecraft-jar-version: bukkit #1.21, 1.20.4, etc.
 remove-default-hotbar: false
-disable-legacy-offset: false
+disable-legacy-offset: true
