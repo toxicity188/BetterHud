@@ -42,7 +42,7 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
     }
 
     override fun removeBossBar(player: HudPlayer) {
-        bossBarMap.remove(player.uuid())?.remove()
+        bossBarMap.remove(player.uuid())
     }
 
     override fun getTextureValue(player: HudPlayer): String {
@@ -86,18 +86,6 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
             val bossBar = HudBossBar(uuid, color, listener.protocolVersion)
             last = bossBar
             listener.write(bossBar.createUpdateNamePacket(component))
-        }
-
-
-        fun remove() {
-            val channel = listener.channel
-            channel.eventLoop().submit {
-                channel.pipeline().remove(INJECT_NAME)
-            }
-            listener.write(uuidHud.createRemovePacket())
-            dummy.dummyBars.forEach {
-                listener.write(it.createRemovePacket())
-            }
         }
 
         private fun writeBossBar(ctx: ChannelHandlerContext?, buf: BossBarPacket, promise: ChannelPromise?) {

@@ -139,7 +139,7 @@ object CommandManager : BetterHudManager {
             fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
-                    when (val reload = PLUGIN.reload(me, *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
+                    when (val reload = PLUGIN.reload(me, *args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray())) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
                         is Failure -> {

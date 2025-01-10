@@ -48,7 +48,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
 
-    private val unicodeRange = (0..0x10FFFF).toList()
+    private val unicodeRange = 0..0x10FFFF
 
     private val defaultLatin = HashSet<Int>().apply {
         addAll(0x0021..0x0026)
@@ -425,8 +425,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
 
     private class JavaBitmapProvider(private val targetFont: Font): FontBitmapProvider {
-        override val height: Int
-            get() = (targetFont.size.toDouble() * 1.4).roundToInt()
+        override val height: Int = (targetFont.size.toDouble() * 1.4).roundToInt()
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             val h = height
             unicodeRange.filter { char ->
@@ -447,9 +446,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
             }
         }
     }
-    private class UnifontBitmapProvider(private val scale: Int): FontBitmapProvider {
-        override val height: Int
-            get() = scale
+    private class UnifontBitmapProvider(scale: Int): FontBitmapProvider {
+        override val height: Int = scale
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             unifont.filter {
                 filter(it.first)
