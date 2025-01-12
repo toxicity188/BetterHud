@@ -1,5 +1,6 @@
 package kr.toxicity.hud.bootstrap.fabric
 
+import com.mojang.brigadier.CommandDispatcher
 import kr.toxicity.hud.BetterHudImpl
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
@@ -88,6 +89,18 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     var skipInitialReload = false
 
+    private fun CommandDispatcher<CommandSourceStack>.registerCommand() {
+        CommandManager.module.build { s: CommandSourceStack ->
+            when (val e = s.entity) {
+                is ServerPlayer -> BetterHudAPI.inst().playerManager.getHudPlayer(e.uuid)
+                null -> BetterHudAPI.inst().bootstrap().consoleSource()
+                else -> null
+            }
+        }.forEach { node ->
+            register(node)
+        }
+    }
+
     override fun onInitializeServer() {
         ServerLifecycleEvents.SERVER_STARTING.register {
             server = it
@@ -109,20 +122,13 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                 }
             }
             volatileCode = FabricVolatileCode()
-
-            val dispatcher = it.commands.dispatcher
-            CommandManager.module.build { s: CommandSourceStack ->
-                when (val e = s.entity) {
-                    is ServerPlayer -> BetterHudAPI.inst().playerManager.getHudPlayer(e.uuid)
-                    null -> BetterHudAPI.inst().bootstrap().consoleSource()
-                    else -> null
-                }
-            }.forEach { node ->
-                dispatcher.register(node)
-            }
+            it.commands.dispatcher.registerCommand()
             core.start()
             ModuleManager.start()
             CompatibilityManager.start()
+        }
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, _ ->
+            server.commands.dispatcher.registerCommand()
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {

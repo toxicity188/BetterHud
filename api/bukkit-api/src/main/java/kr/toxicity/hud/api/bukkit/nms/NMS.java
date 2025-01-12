@@ -31,4 +31,10 @@ public interface NMS extends VolatileCodeHandler {
      * @param module module
      */
     void registerCommand(@NotNull CommandModule<BetterCommandSource> module);
+
+    /**
+     * Registers this command on reload too.
+     * @param module modules
+     */
+    void handleReloadCommand(@NotNull CommandModule<BetterCommandSource> module);
 }

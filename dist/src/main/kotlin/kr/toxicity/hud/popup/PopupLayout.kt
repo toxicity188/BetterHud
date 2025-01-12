@@ -191,7 +191,7 @@ class PopupLayout(
                 text(textLayout.identifier(textShader, pixel.y + lineIndex * textLayout.lineWidth)) {
                     val array = textLayout.startJson()
                     textLayout.source.array.forEach {
-                        createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth) { y ->
+                        createAscent(textShader, pixel.y + lineIndex * textLayout.lineWidth - it.ascent(textLayout.scale)) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
                                 "file" to "$NAME_SPACE_ENCODED:${it.file}",

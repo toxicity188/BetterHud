@@ -52,7 +52,7 @@ class HudTextParser(
             text(text.identifier(shader, yAxis)) {
                 val array = text.startJson()
                 text.source.array.forEach {
-                    createAscent(shader, yAxis) { y ->
+                    createAscent(shader, yAxis - it.ascent(text.scale)) { y ->
                         array += jsonObjectOf(
                             "type" to "bitmap",
                             "file" to "$NAME_SPACE_ENCODED:${it.file}",
