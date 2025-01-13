@@ -9,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface DatabaseManager {
     /**
+     * Gets current database.
      * @see kr.toxicity.hud.api.database.HudDatabaseConnector
-     * @return current used database.
+     * @return current used database
      */
     @NotNull HudDatabase getCurrentDatabase();
 

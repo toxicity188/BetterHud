@@ -39,7 +39,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         fun applyScale(offset: Int, scale: Double, pos: String) {
                             if (scale != 1.0 || static) {
                                 val scaleFloat = scale.toFloat()
-                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset} * uiScreen.$pos);")
+                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset});")
                             }
                         }
                         applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")
@@ -151,11 +151,11 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 }
             }
 
-            if (yaml.getAsBoolean("disable-level-text", false)) replaceList.add("HideExp")
+            if (yaml.getAsBoolean("disable-level-text", false)) replaceList += "HideExp"
 
             yaml["hotbar"]?.asObject()?.let {
                 if (it.getAsBoolean("disable", false)) {
-                    replaceList.add("RemapHotBar")
+                    replaceList += "RemapHotBar"
                     val locations =
                         it.get("locations")?.asObject().ifNull("locations configuration not set.")
                     (1..10).map { index ->
@@ -179,12 +179,16 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 }
             }
 
-            shaders.forEach { shader ->
-                val tagSupplier = (tagSupplierMap[shader.first] ?: EMPTY_SUPPLIER).get()
+            shaders.forEach { (key, args) ->
+                val tagSupplier = (tagSupplierMap[key] ?: EMPTY_SUPPLIER).get()
                 val byte = buildString {
-                    shader.second.forEach write@{ string ->
+                    args.forEach write@{ string ->
                         var s = string
-                        if (s.isEmpty() || s.startsWith("//")) return@write
+                        if (s.startsWith("//")) {
+                            val get = s.substringBefore(' ')
+                            if (replaceList.contains(get.substring(2))) s = s.substring(get.length)
+                        }
+                        if (s.isEmpty()) return@write
                         val tagMatcher = tagPattern.matcher(s)
                         if (tagMatcher.find()) {
                             val group = tagMatcher.group("name")
@@ -206,11 +210,11 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         append(s.substringBeforeLast("//").replace("  ", ""))
                     }
                 }.toByteArray()
-                PackGenerator.addTask(resource.core + shader.first.fileName) {
+                PackGenerator.addTask(resource.core + key.fileName) {
                     byte
                 }
                 //+1.21.2
-                PackGenerator.addTask(resource.shaders + shader.first.fileName) {
+                PackGenerator.addTask(resource.shaders + key.fileName) {
                     byte
                 }
             }

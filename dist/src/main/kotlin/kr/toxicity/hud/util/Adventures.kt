@@ -90,22 +90,30 @@ private class SplitBuilder(
     private val chain: (TextComponent.Builder) -> Unit
 ) {
     private var builder = Component.text()
+    private var style: Style = Style.empty()
     var isClean = true
         private set
     fun accept(block: TextComponent.Builder.() -> Unit = {}) {
         val build = if (isClean) builder.apply(block) else builder.append(Component.text().apply(block))
-        builder = Component.text()
+        builder = Component.text().apply {
+            style(style)
+        }
         isClean = true
         chain(build)
     }
     fun build(block: TextComponent.Builder.() -> Unit = {}): TextComponent.Builder {
         val build = if (isClean) builder.apply(block) else builder.append(Component.text().apply(block))
-        builder = Component.text()
+        builder = Component.text().apply {
+            style(style)
+        }
         isClean = true
         return build
     }
-    fun style(style: Style) {
-        builder.style(style)
+    fun style(style: Style): SplitBuilder {
+        this.style = style.apply {
+            builder.style(this)
+        }
+        return this
     }
     fun append(like: ComponentLike) {
         builder.append(like)
@@ -158,10 +166,8 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
             if (subItalic) add++
             val subBuilder = target.then { b, c ->
                 b.append(c)
-            }
+            }.style(style)
             val sb = StringBuilder()
-
-            subBuilder.style(style)
             fun end() {
                 subBuilder.accept {
                     content(sb.toString())
@@ -178,7 +184,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
                     end()
                     continue
                 }
-                val length = (if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue) + add + (if (shouldApplySpace) option.space + add else 0)
+                val length = (if (codepoint == ' '.code) 4 else charWidth(style to codepoint) ?: continue) + add + if (shouldApplySpace) option.space + add else 0
                 val shouldCombine = COMBINE.contains(Character.getType(codepoint))
                 if (shouldCombine) {
                     add((-length).toSpaceComponent().finalizeFont().component)
@@ -195,9 +201,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
             for (child in children()) {
                 child.parse(subBuilder, subBold, subItalic)
             }
-            if (!subBuilder.isClean) target.append(subBuilder.build {
-                style(style)
-            })
+            if (!subBuilder.isClean) target.append(subBuilder.build {})
         }
     }
     val style = style()

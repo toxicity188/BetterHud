@@ -189,6 +189,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     }
 
     override fun onEnable() {
+        nms.handleReloadCommand(CommandManager.module)
         val pluginManager = Bukkit.getPluginManager()
         bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
             GeyserAdapter()

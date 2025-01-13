@@ -3,6 +3,7 @@ package kr.toxicity.hud.equation
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
 import net.objecthunter.exp4j.function.Function
+import java.lang.Math.clamp
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.max
@@ -22,6 +23,9 @@ class TEquation(expression: String) {
             },
             object : Function("max", 2) {
                 override fun apply(vararg p0: Double): Double = max(p0[0], p0[1])
+            },
+            object : Function("clamp", 3) {
+                override fun apply(vararg p0: Double): Double = clamp(p0[0], p0[1], p0[2])
             }
         )
         .variables(setOf(

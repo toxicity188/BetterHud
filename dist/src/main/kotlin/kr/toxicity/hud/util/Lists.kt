@@ -29,10 +29,8 @@ fun <T> Collection<T>.forEachAsync(block: (T) -> Unit) {
 fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
     synchronized(this) {
         val iterator = iterator()
-        synchronized(iterator) {
-            while (iterator.hasNext()) {
-                if (block(iterator.next())) iterator.remove()
-            }
+        while (iterator.hasNext()) {
+            if (block(iterator.next())) iterator.remove()
         }
     }
 }
@@ -55,7 +53,7 @@ fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
         } else {
             val queue = ArrayList<() -> Unit>()
             var i = 0
-            val add = (size.toDouble() / available).toInt()
+            val add = size / available
             while (i <= size) {
                 val get = subList(i, (i + add).coerceAtMost(size))
                 queue += {

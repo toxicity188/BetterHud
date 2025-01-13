@@ -338,7 +338,7 @@ class MMOCoreCompatibility : Compatibility {
                 .function { args, _ ->
                     val index = args[0].toInt()
                     Function get@ { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@get "<none>")
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@get "<none>"
                         mmo.party?.onlineMembers?.let {
                             return@get if (index < it.size) it[index].player.name else "<none>"
                         }
@@ -351,7 +351,7 @@ class MMOCoreCompatibility : Compatibility {
                 .function { args, _ ->
                     val index = args[0].toInt()
                     Function get@ { p ->
-                        val mmo = (p.bukkitPlayer.toMMOCore() ?: return@get "<none>")
+                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@get "<none>"
                         val uuid = p.bukkitPlayer.uniqueId
                         mmo.party?.onlineMembers?.filter {
                             it.player.uniqueId != uuid

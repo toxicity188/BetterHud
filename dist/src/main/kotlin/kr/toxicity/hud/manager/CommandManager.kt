@@ -139,7 +139,7 @@ object CommandManager : BetterHudManager {
             fun reload(@Source me: BetterCommandSource, @Option @CanBeNull args: String?) {
                 reload_tryReload.send(me)
                 asyncTask {
-                    when (val reload = PLUGIN.reload(me, *(args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray()))) {
+                    when (val reload = PLUGIN.reload(me, *args?.split(' ')?.let { ReloadFlagType.from(it).toTypedArray() } ?: emptyArray())) {
                         is OnReload -> reload_onReload.send(me)
                         is Success -> reload_success.send(me, mapOf("time" to reload.time.withDecimal()))
                         is Failure -> {
@@ -155,7 +155,7 @@ object CommandManager : BetterHudManager {
             private val parse_failure1 = library.registerKey(CommandMessage("betterhud.parse.message.failure.1", Component.text("Parse failed.")))
             private val parse_failure2 = library.registerKey(CommandMessage("betterhud.parse.message.failure.2", Component.text("Cause: [cause]")))
             @Command
-            @Description(key = "betterhud.reload.parse", defaultValue = "Reload BetterHud.")
+            @Description(key = "betterhud.reload.parse", defaultValue = "Tests BetterHud's text placeholder.")
             @Aliases(aliases = ["p"])
             @Permission("betterhud.parse")
             @Sender(type = [SenderType.PLAYER])

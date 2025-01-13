@@ -131,7 +131,7 @@ abstract class HudPlayerImpl : HudPlayer {
         }
         if (compList.isNotEmpty() || additionalComp != null) {
             additionalComp?.let {
-                compList += ((-it.width / 2).toSpaceComponent() + it)
+                compList += (-it.width / 2).toSpaceComponent() + it
             }
             var comp = NEGATIVE_ONE_SPACE_COMPONENT
             compList.forEach {

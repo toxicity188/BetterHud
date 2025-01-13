@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.impl.CommandModule
 import kr.toxicity.hud.api.BetterHud
@@ -34,6 +35,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.WorldBorder
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.craftbukkit.CraftServer
@@ -42,9 +44,12 @@ import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.util.CraftChatMessage
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.*
 import org.bukkit.permissions.Permission
+import org.bukkit.plugin.Plugin
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -103,7 +108,7 @@ class NMSImpl : NMS {
     }
 
     override fun removeBossBar(player: HudPlayer) {
-        bossBarMap.remove(player.uuid())?.remove()
+        bossBarMap.remove(player.uuid())
     }
 
     override fun getVersion(): NMSVersion {
@@ -114,18 +119,28 @@ class NMSImpl : NMS {
         return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
     }
 
-
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
         val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
+        val bootstrap = BetterHudAPI.inst().bootstrap()
         module.build { s: CommandSourceStack ->
             when (val sender = s.bukkitSender) {
-                is ConsoleCommandSender -> BetterHudAPI.inst().bootstrap().consoleSource()
+                is ConsoleCommandSender -> bootstrap.consoleSource()
                 is Player -> BetterHudAPI.inst().playerManager.getHudPlayer(sender.uniqueId)
                 else -> null
             }
         }.forEach {
             dispatcher.register(it)
         }
+    }
+
+    override fun handleReloadCommand(module: CommandModule<BetterCommandSource>) {
+        val bootstrap = BetterHudAPI.inst().bootstrap()
+        if (bootstrap.isPaper) Bukkit.getPluginManager().registerEvents(object : Listener {
+            @EventHandler
+            fun ServerResourcesReloadedEvent.reload() {
+                registerCommand(module)
+            }
+        }, bootstrap as Plugin)
     }
 
     override fun getFoliaAdaptedPlayer(player: Player): Player {
@@ -158,6 +173,7 @@ class NMSImpl : NMS {
             override fun getHealthScale(): Double {
                 return player.healthScale
             }
+            override fun getUniqueId(): UUID = player.uniqueId
             override fun getFirstPlayed(): Long {
                 return player.firstPlayed
             }
@@ -167,6 +183,8 @@ class NMSImpl : NMS {
             override fun getEnderChest(): Inventory {
                 return player.enderChest
             }
+            override fun getPotentialBedLocation(): Location? = player.potentialBedLocation
+
             override fun isOp(): Boolean {
                 return player.isOp
             }
@@ -185,15 +203,17 @@ class NMSImpl : NMS {
             override fun isPermissionSet(name: String): Boolean {
                 return player.isPermissionSet(name)
             }
-            override fun isPermissionSet(perm: Permission): Boolean {
-                return player.isPermissionSet(perm)
-            }
-            override fun hasPlayedBefore(): Boolean {
-                return player.hasPlayedBefore()
-            }
-            override fun getWorldBorder(): WorldBorder? {
-                return player.worldBorder
-            }
+            override fun isPermissionSet(perm: Permission): Boolean = player.isPermissionSet(perm)
+            override fun hasPlayedBefore(): Boolean = player.hasPlayedBefore()
+            override fun getLastDeathLocation(): Location? = player.lastDeathLocation
+            override fun getLocation(): Location = player.location
+            override fun getName(): String = player.name
+            override fun isOnGround(): Boolean = player.isOnGround
+            override fun getLastDamageCause(): EntityDamageEvent? = player.lastDamageCause
+            override fun getWorldBorder(): WorldBorder? = player.worldBorder
+            override fun pointers(): Pointers = player.pointers()
+            override fun spigot(): Player.Spigot = player.spigot()
+
             override fun showBossBar(bar: BossBar) {
                 player.showBossBar(bar)
             }
@@ -202,15 +222,6 @@ class NMSImpl : NMS {
             }
             override fun sendMessage(message: String) {
                 player.sendMessage(message)
-            }
-            override fun getLastDamageCause(): EntityDamageEvent? {
-                return player.lastDamageCause
-            }
-            override fun pointers(): Pointers {
-                return player.pointers()
-            }
-            override fun spigot(): Player.Spigot {
-                return player.spigot()
             }
         }
     }
@@ -250,17 +261,6 @@ class NMSImpl : NMS {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
-        }
-
-        fun remove() {
-            val channel = getConnection(listener).channel
-            channel.eventLoop().submit {
-                channel.pipeline().remove(INJECT_NAME)
-            }
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummy.dummyBarsUUID.forEach {
-                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
-            }
         }
 
         private fun writeBossBar(buf: HudByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {

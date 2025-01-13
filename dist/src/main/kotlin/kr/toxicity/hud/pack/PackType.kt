@@ -44,12 +44,10 @@ enum class PackType {
                 synchronized(this) {
                     if (ConfigManagerImpl.clearBuildFolder) {
                         val iterator = locationMap.values.iterator()
-                        synchronized(iterator) {
-                            while (iterator.hasNext()) {
-                                val next = iterator.next()
-                                if (next.listFiles()?.isNotEmpty() == true) continue
-                                next.delete()
-                            }
+                        while (iterator.hasNext()) {
+                            val next = iterator.next()
+                            if (next.listFiles()?.isNotEmpty() == true) continue
+                            next.delete()
                         }
                     }
                     info("File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(byte)}" else mbFormat(byte)}")

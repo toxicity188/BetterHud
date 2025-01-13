@@ -10,6 +10,7 @@ import io.lumine.mythic.core.players.PlayerData
 import io.lumine.mythic.core.skills.AbstractSkill
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
+import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
@@ -35,6 +36,9 @@ class MythicMobsCompatibility : Compatibility {
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
         get() = mapOf()
+
+    private fun <T> HudPlayer.profile(fallback: T, mapper: PlayerData.() -> T) = MythicBukkit.inst().playerManager.getProfile(bukkitPlayer)?.let(mapper) ?: fallback
+
     override val numbers: Map<String, HudPlaceholder<Number>>
         get() = mapOf(
             "current_cooldown" to HudPlaceholder.builder<Number>()
@@ -56,7 +60,9 @@ class MythicMobsCompatibility : Compatibility {
                 .requiredArgsLength(1)
                 .function { args, _ ->
                     Function { p ->
-                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).getAuraStacks(args[0])
+                        p.profile(0) {
+                            getAuraStacks(args[0])
+                        }
                     }
                 }
                 .build(),
@@ -64,9 +70,11 @@ class MythicMobsCompatibility : Compatibility {
                 .requiredArgsLength(1)
                 .function { args, _ ->
                     Function { p ->
-                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
-                            it.startDuration
-                        } ?: 0
+                        p.profile(0) {
+                            auraRegistry.auras[args[0]]?.maxOfOrNull {
+                                it.startDuration
+                            } ?: 0
+                        }
                     }
                 }
                 .build(),
@@ -74,9 +82,11 @@ class MythicMobsCompatibility : Compatibility {
                 .requiredArgsLength(1)
                 .function { args, _ ->
                     Function { p ->
-                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxOfOrNull {
-                            it.ticksRemaining
-                        } ?: 0
+                        p.profile(0) {
+                            auraRegistry.auras[args[0]]?.maxOfOrNull {
+                                it.ticksRemaining
+                            } ?: 0
+                        }
                     }
                 }
                 .build(),
@@ -84,11 +94,13 @@ class MythicMobsCompatibility : Compatibility {
                 .requiredArgsLength(1)
                 .function { args, _ ->
                     Function { p ->
-                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.auras[args[0]]?.maxByOrNull {
-                            it.startDuration
-                        }?.let {
-                            it.startDuration - it.ticksRemaining
-                        } ?: 0
+                        p.profile(0) {
+                            auraRegistry.auras[args[0]]?.maxByOrNull {
+                                it.startDuration
+                            }?.let {
+                                it.startDuration - it.ticksRemaining
+                            } ?: 0
+                        }
                     }
                 }
                 .build(),
@@ -203,7 +215,9 @@ class MythicMobsCompatibility : Compatibility {
                 .requiredArgsLength(1)
                 .function { args, _ ->
                     Function { p ->
-                        MythicBukkit.inst().playerManager.getProfile(p.bukkitPlayer).auraRegistry.hasAura(args[0])
+                        p.profile(false) {
+                            auraRegistry.hasAura(args[0])
+                        }
                     }
                 }
                 .build(),

@@ -40,7 +40,6 @@ object PackGenerator {
             runWithExceptionHandling(sender, "Unable to finalized resource pack build.") {
                 saveTask.close()
             }
-            tasks.clear()
             saveTask.resourcePack
         }.getOrElse {
             emptyMap()

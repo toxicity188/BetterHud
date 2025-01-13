@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.impl.CommandModule
 import kr.toxicity.hud.api.BetterHud
@@ -36,11 +37,14 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permission
+import org.bukkit.plugin.Plugin
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -96,7 +100,7 @@ class NMSImpl : NMS {
     }
 
     override fun removeBossBar(player: HudPlayer) {
-        bossBarMap.remove(player.uuid())?.remove()
+        bossBarMap.remove(player.uuid())
     }
 
     override fun getVersion(): NMSVersion {
@@ -109,15 +113,26 @@ class NMSImpl : NMS {
 
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
         val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
+        val bootstrap = BetterHudAPI.inst().bootstrap()
         module.build { s: CommandSourceStack ->
             when (val sender = s.bukkitSender) {
-                is ConsoleCommandSender -> BetterHudAPI.inst().bootstrap().consoleSource()
+                is ConsoleCommandSender -> bootstrap.consoleSource()
                 is Player -> BetterHudAPI.inst().playerManager.getHudPlayer(sender.uniqueId)
                 else -> null
             }
         }.forEach {
             dispatcher.register(it)
         }
+    }
+
+    override fun handleReloadCommand(module: CommandModule<BetterCommandSource>) {
+        val bootstrap = BetterHudAPI.inst().bootstrap()
+        if (bootstrap.isPaper) Bukkit.getPluginManager().registerEvents(object : Listener {
+            @EventHandler
+            fun ServerResourcesReloadedEvent.reload() {
+                registerCommand(module)
+            }
+        }, bootstrap as Plugin)
     }
 
     override fun getFoliaAdaptedPlayer(player: Player): Player {
@@ -229,17 +244,6 @@ class NMSImpl : NMS {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
-        }
-
-        fun remove() {
-            val channel = getConnection(listener).channel
-            channel.eventLoop().submit {
-                channel.pipeline().remove(INJECT_NAME)
-            }
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummy.dummyBarsUUID.forEach {
-                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
-            }
         }
 
         private fun writeBossBar(buf: FriendlyByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {

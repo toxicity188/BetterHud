@@ -100,7 +100,7 @@ class FabricVolatileCode : VolatileCodeHandler {
     }
 
     override fun removeBossBar(player: HudPlayer) {
-        bossBarMap.remove(player.uuid())?.remove()
+        bossBarMap.remove(player.uuid())
     }
 
     override fun getTextureValue(player: HudPlayer): String {
@@ -141,17 +141,6 @@ class FabricVolatileCode : VolatileCodeHandler {
             val bossBar = HudBossBar(uuid, component, color)
             last = bossBar
             listener.send(ClientboundBossEventPacket.createUpdateNamePacket(bossBar))
-        }
-
-        fun remove() {
-            val channel = getChannel(getConnection(listener))
-            channel.eventLoop().submit {
-                channel.pipeline().remove(INJECT_NAME)
-            }
-            listener.send(ClientboundBossEventPacket.createRemovePacket(uuid))
-            dummy.dummyBarsUUID.forEach {
-                listener.send(ClientboundBossEventPacket.createRemovePacket(it))
-            }
         }
 
         private fun writeBossBar(buf: HudByteBuf, ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {

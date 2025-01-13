@@ -78,8 +78,8 @@ public interface HudObject {
     record Identifier(@NotNull HudObject source) {
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Identifier that)) return false;
-            return source.getClass() == that.source.getClass() && Objects.equals(source.getName(), that.source.getName());
+            if (!(o instanceof Identifier(HudObject source1))) return false;
+            return source.getClass() == source1.getClass() && Objects.equals(source.getName(), source1.getName());
         }
 
         @Override

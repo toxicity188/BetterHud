@@ -56,8 +56,8 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.9.5")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.5.1")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.7.0")
-    compileOnly("io.th0rgal:oraxen:1.186.1")
+    compileOnly("com.nexomc:nexo:0.9.0")
+    compileOnly("io.th0rgal:oraxen:1.187.0")
 }
 
 bukkitPluginYaml {
