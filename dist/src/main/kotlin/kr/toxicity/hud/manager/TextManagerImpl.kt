@@ -622,7 +622,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                 }
                 fontProvider.provide(filter) {
-                    addImage(it)
+                    addImage(it, scale.toDouble() / fontProvider.height)
                 }
                 debug(ConfigManager.DebugLevel.ASSETS, "Generate font text $saveName...")
                 val textList = ArrayList<HudTextArray>()
