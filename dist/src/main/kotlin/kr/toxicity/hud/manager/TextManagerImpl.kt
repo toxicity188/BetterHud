@@ -681,7 +681,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                         }
                     }
                 }
-                debug(ConfigManager.DebugLevel.ASSETS, "Finalizing font text $saveName...")
+                debug(ConfigManager.DebugLevel.ASSETS, "Finalizing font text $saveName... (${charWidthMap.size.withDecimal()} of codepoints)")
                 val result = TextElement(internalName, scale, textList, charWidthMap, imageTextScaleMap, yamlObject)
                 synchronized(textCacheMap) {
                     textCacheMap[TextCache(internalName, images.keys, supportedLanguage)] = result

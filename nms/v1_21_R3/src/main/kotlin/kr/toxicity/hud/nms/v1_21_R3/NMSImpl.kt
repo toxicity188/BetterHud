@@ -183,8 +183,6 @@ class NMSImpl : NMS {
             override fun getEnderChest(): Inventory {
                 return player.enderChest
             }
-            override fun getPotentialBedLocation(): Location? = player.potentialBedLocation
-
             override fun isOp(): Boolean {
                 return player.isOp
             }

@@ -6,6 +6,11 @@ import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import net.kyori.adventure.text.Component
+import java.text.DecimalFormat
+
+private val COMMA_FORMAT = DecimalFormat("#,###")
+fun Number.withDecimal() = Component.text(COMMA_FORMAT.format(this))
 
 val PLUGIN
     get() = BetterHudAPI.inst()
