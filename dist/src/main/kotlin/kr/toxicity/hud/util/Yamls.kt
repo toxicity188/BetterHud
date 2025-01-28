@@ -27,21 +27,27 @@ fun Any.toYaml(path: String): YamlElement = when (this) {
     else -> YamlElementImpl(path, this)
 }
 
-fun File.toYaml(): YamlObject = inputStream().buffered().use {
+fun File.toYaml(): YamlObject = synchronized(YAML) {
+    inputStream().buffered().use {
+        YamlObjectImpl(
+            "",
+            YAML.load(it) ?: mutableMapOf<String, Any>()
+        )
+    }
+}
+
+fun InputStream.toYaml() = synchronized(YAML) {
     YamlObjectImpl(
         "",
-        YAML.load(it) ?: mutableMapOf<String, Any>()
+        YAML.load(this) ?: mutableMapOf<String, Any>()
     )
 }
 
-fun InputStream.toYaml() = YamlObjectImpl(
-    "",
-    YAML.load(this) ?: mutableMapOf<String, Any>()
-)
-
 fun Map<String, Any>.saveToYaml(file: File) {
-    file.bufferedWriter().use {
-        it.write(YAML.dumpAsMap(this))
+    synchronized(YAML) {
+        file.bufferedWriter().use {
+            it.write(YAML.dumpAsMap(this))
+        }
     }
 }
 
