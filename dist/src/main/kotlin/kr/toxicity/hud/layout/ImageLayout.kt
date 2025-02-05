@@ -19,6 +19,7 @@ interface ImageLayout : HudLayout<ImageElement> {
     val space: Int
     val stack: PlaceholderBuilder<*>?
     val maxStack: PlaceholderBuilder<*>?
+    val reversed: Boolean
 
     fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
         return ImageIdentifier(
@@ -81,5 +82,6 @@ interface ImageLayout : HudLayout<ImageElement> {
                 if (clazz !=  java.lang.Number::class.java) throw RuntimeException("this placeholder is not integer: $it")
             }
         }
+        override val reversed: Boolean = yamlObject.getAsBoolean("reversed", false)
     }
 }

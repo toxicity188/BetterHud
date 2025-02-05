@@ -28,7 +28,7 @@ class TextRenderer(
     layout: TextLayout,
     private val data: HudTextData,
     private val x: Int,
-) : TextLayout by layout, Renderer {
+) : TextLayout by layout, HudRenderer {
 
     companion object {
         private val decimalPattern = Pattern.compile("([0-9]+((\\.([0-9]+))?))")

@@ -47,7 +47,6 @@ fun <T : Event> createBukkitTrigger(
 ): HudBukkitEventTrigger<T> {
     return object : HudBukkitEventTrigger<T> {
         override fun getEventClass(): Class<T> = clazz
-        override fun getValue(t: T): UUID? = valueMapper(t)
         override fun getKey(t: T): Any = keyMapper(t)
         override fun registerEvent(eventConsumer: BiConsumer<UUID, UpdateEvent>) {
 

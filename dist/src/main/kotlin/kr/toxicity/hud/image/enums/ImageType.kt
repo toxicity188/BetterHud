@@ -12,6 +12,7 @@ import kr.toxicity.hud.yaml.YamlObjectImpl
 import java.io.File
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
+import kotlin.text.replace
 
 enum class ImageType {
     SINGLE {
@@ -33,19 +34,21 @@ enum class ImageType {
             s: String,
             yamlObject: YamlObject
         ): ImageElement {
+            val fileName = yamlObject["file"]?.asString().ifNull("file value not set.")
+                .replace('/', File.separatorChar)
             val targetFile = File(
                 assets,
-                yamlObject["file"]?.asString().ifNull("file value not set.")
-                    .replace('/', File.separatorChar)
+                fileName
             )
             return ImageElement(
                 s,
                 listOf(
                     targetFile
                         .toImage()
+                        .flip(yamlObject.toFlip())
                         .removeEmptySide()
                         .ifNull("Invalid image.")
-                        .toNamed(targetFile.name),
+                        .toNamed(fileName.replace(File.separatorChar, '_')),
                 ),
                 this,
                 yamlObject["setting"]?.asObject() ?: emptySetting
@@ -76,19 +79,21 @@ enum class ImageType {
                 }.getOrNull()
             } ?: SplitType.LEFT
             val split = yamlObject.getAsInt("split", 25).coerceAtLeast(1)
+            val fileName = yamlObject["file"]?.asString().ifNull("file value not set.")
+                .replace('/', File.separatorChar)
             val getFile = File(
                 assets,
-                yamlObject["file"]?.asString().ifNull("file value not set.")
-                    .replace('/', File.separatorChar)
+                fileName
             )
             return ImageElement(
                 s,
                 splitType.split(
                     getFile
                         .toImage()
+                        .flip(yamlObject.toFlip())
                         .removeEmptySide()
                         .ifNull("Invalid image.")
-                        .toNamed("${getFile.nameWithoutExtension}_${splitType.name.lowercase()}_$split.png"), split
+                        .toNamed("${fileName.replace(File.separatorChar, '_').substringBeforeLast('.')}_${splitType.name.lowercase()}_$split.png"), split
                 ),
                 this,
                 yamlObject["setting"]?.asObject()
@@ -128,12 +133,14 @@ enum class ImageType {
                         fileName = matcher.group("name")
                         frame = matcher.group("frame").toInt()
                     }
-                    val targetFile = File(assets, fileName.replace('/', File.separatorChar))
+                    fileName = fileName.replace('/', File.separatorChar)
+                    val targetFile = File(assets, fileName)
                     val targetImage = targetFile
                         .toImage()
+                        .flip(yamlObject.toFlip())
                         .removeEmptyWidth()
                         .ifNull("Invalid image: $string")
-                        .toNamed(targetFile.name)
+                        .toNamed(fileName.replace(File.separatorChar, '_'))
                     (0..<(frame * globalFrame).coerceAtLeast(1)).map {
                         targetImage
                     }
@@ -147,6 +154,10 @@ enum class ImageType {
     companion object {
         val emptySetting = YamlObjectImpl("", mutableMapOf<String, Any>())
         private val multiFrameRegex = Pattern.compile("(?<name>(([a-zA-Z]|/|.|(_))+)):(?<frame>([0-9]+))")
+
+        private fun YamlObject.toFlip() = get("flip")?.asArray()?.map {
+            FlipType.valueOf(it.asString().uppercase())
+        }?.toSet() ?: emptySet()
     }
 
     abstract fun getComponent(listener: HudListener, frame: Long, component: ImageComponent, player: HudPlayer): PixelComponent

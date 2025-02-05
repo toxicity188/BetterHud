@@ -14,7 +14,7 @@ import kotlin.math.roundToInt
 class ImageRenderer(
     layout: ImageLayout,
     component: ImageComponent
-) : ImageLayout by layout, Renderer {
+) : ImageLayout by layout, HudRenderer {
     private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it, this).apply {
             if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
@@ -51,11 +51,13 @@ class ImageRenderer(
                 if (maxStackFrame > 1) {
                     if (stackFrame <= 0.0) return@build EMPTY_PIXEL_COMPONENT
                     var empty = EMPTY_PIXEL_COMPONENT
-                    for (i in 0..<maxStackFrame) {
-                        empty = empty.append(space, selected.images[((stackFrame - i - 0.1) * selected.images.size)
+                    val range = 0..<maxStackFrame
+                    for (i in if (reversed) range.reversed() else range) {
+                        val frame = ((stackFrame - i - 0.1) * selected.images.size)
                             .roundToInt()
                             .coerceAtLeast(0)
-                            .coerceAtMost(selected.images.lastIndex)])
+                            .coerceAtMost(selected.images.lastIndex)
+                        empty = empty.append(space, selected.images[frame])
                     }
                     empty.applyColor(colorApply(target))
                 } else component.type.getComponent(listen, frame, selected, target).applyColor(colorApply(target))
