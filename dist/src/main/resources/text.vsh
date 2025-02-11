@@ -70,6 +70,7 @@ void main() {
     vec3 color = Color.xyz;
     applyColor = 0;
     bool isElement = checkElement(pos.z);
+    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     if (pos.y >= ui.y && ProjMat[3].x == -1 && (isElement || checkElement(pos.z - 0.03))) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
@@ -129,7 +130,6 @@ void main() {
 
         }
     } else {
-        vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
 //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
 //HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && checkExp(pos.z) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
 //HideExp            vertexColor = vec4(0);
