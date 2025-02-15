@@ -61,7 +61,10 @@ class ImageRenderer(
                     }
                     empty.applyColor(colorApply(target))
                 } else component.type.getComponent(listen, frame, selected, target).applyColor(colorApply(target))
-            } else EMPTY_PIXEL_COMPONENT
+            } else {
+                if (clearListener) listen.clear(player)
+                EMPTY_PIXEL_COMPONENT
+            }
         }
     }
 

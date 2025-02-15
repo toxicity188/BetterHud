@@ -28,7 +28,7 @@ interface HudLayout<T : HudElement> : ConditionSource, PlaceholderSource {
         group: LayoutGroup,
         originalLoc: PixelLocation,
         yaml: YamlObject
-    ) : HudLayout<T>, ConditionSource by source + ConditionSource.Impl(yaml) + group, PlaceholderSource by PlaceholderSource.Impl(yaml) {
+    ) : HudLayout<T>, ConditionSource by source + ConditionSource.Impl(yaml).memoize() + group, PlaceholderSource by PlaceholderSource.Impl(yaml) {
         override val outline: Boolean = yaml.getAsBoolean("outline", false)
         override val layer: Int = yaml.getAsInt("layer", 0)
         override val property: Int = ShaderProperty.properties(yaml["properties"]?.asArray())

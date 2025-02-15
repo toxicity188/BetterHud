@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.TextColor
 
 fun interface ColorOverride : (HudPlayer) -> TextColor? {
 
-    fun interface Builder : (UpdateEvent) -> ColorOverride {
+    fun interface Builder : (UpdateEvent) -> (HudPlayer) -> TextColor? {
         operator fun plus(other: Builder): Builder {
             return Builder new@ {
                 val b1 = this@Builder(it)
