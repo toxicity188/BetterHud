@@ -105,9 +105,12 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     }
 
     private class LazyListenerSetting(section: YamlObject) {
-        val second = section.getAsLong("expiring-second", 5).coerceAtLeast(1)
         val delay = section.getAsInt("delay", 0).coerceAtLeast(0)
-        val multiplier = section.getAsDouble("multiplier", 0.5).coerceAtLeast(0.0).coerceAtMost(1.0)
+        val multiplier = section.getAsDouble("multiplier", 0.5).coerceAtLeast(0.0).coerceAtMost(1.0) 
+        val cache: ExpiringMap<LazyValueKey, LazyValueAccess> = ExpiringMap.builder()
+            .expirationPolicy(ExpirationPolicy.ACCESSED)
+            .expiration(section.getAsLong("expiring-second", 5).coerceAtLeast(1), TimeUnit.SECONDS)
+            .build<LazyValueKey, LazyValueAccess>()
     }
 
     private class LazyListener(
@@ -116,16 +119,11 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
         val setting: LazyListenerSetting,
         val initialBuild: (HudPlayer) -> Double,
     ) : HudListener {
-        private val lazyMap = ExpiringMap.builder()
-            .expirationPolicy(ExpirationPolicy.ACCESSED)
-            .expiration(setting.second, TimeUnit.SECONDS)
-            .build<LazyValueKey, LazyValueAccess>()
-
         private fun HudPlayer.key() = LazyValueKey(uuid(), key)
 
         override fun getValue(player: HudPlayer): Double {
             val get = delegate.getValue(player)
-            return lazyMap.computeIfAbsent(player.key()) {
+            return setting.cache.computeIfAbsent(player.key()) {
                 LazyValueAccess(
                     setting.delay,
                     setting.multiplier,
@@ -135,7 +133,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
         }
 
         override fun clear(player: HudPlayer) {
-            lazyMap.remove(player.key())
+            setting.cache.remove(player.key())
             delegate.clear(player)
         }
     }
