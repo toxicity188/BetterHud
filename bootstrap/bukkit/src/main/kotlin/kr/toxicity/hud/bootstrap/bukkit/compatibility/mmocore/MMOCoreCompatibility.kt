@@ -365,6 +365,11 @@ class MMOCoreCompatibility : Compatibility {
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(
+            "is_loaded" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.toMMOCore() != null
+                }
+            },
             "is_casting_mode" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
