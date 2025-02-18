@@ -97,7 +97,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
             val name = it.get("name")?.asString().ifNull("unable to find the name value.")
             val password = it.get("password")?.asString().ifNull("unable to find the password value.")
 
-            val mysql = DriverManager.getConnection("jdbc:mysql://$host/$database?autoReconnect=true&useSSL=false&cmaxReconnets=5&initialTimeout=1", name, password).apply {
+            val mysql = DriverManager.getConnection("jdbc:mysql://$host/$database?autoReconnect=true&useSSL=false&maxReconnects=5&initialTimeout=1", name, password).apply {
                 createStatement().use { s ->
                     s.execute("CREATE TABLE IF NOT EXISTS enabled_hud(uuid CHAR(36) NOT NULL, type VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL);")
                     s.execute("CREATE TABLE IF NOT EXISTS enabled_pointed_location(uuid CHAR(36), name VARCHAR(255), value TEXT NOT NULL, PRIMARY KEY(uuid, name));")
@@ -115,28 +115,30 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     asyncTask {
                         val uuid = player.uuid().toString()
                         mysql.prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").use { s ->
-                            val result = s.executeQuery()
-                            while (result.next()) {
-                                when (result.getString("type")) {
-                                    "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
-                                        if (!h.isDefault) h.add(player)
-                                    }
-                                    "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
-                                        if (!p.isDefault) p.add(player)
-                                    }
-                                    "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { c ->
-                                        if (!c.isDefault) c.add(player)
+                            s.executeQuery().use { result ->
+                                while (result.next()) {
+                                    when (result.getString("type")) {
+                                        "hud" -> HudManagerImpl.getHud(result.getString("name"))?.let { h ->
+                                            if (!h.isDefault) h.add(player)
+                                        }
+                                        "popup" -> PopupManagerImpl.getPopup(result.getString("popup"))?.let { p ->
+                                            if (!p.isDefault) p.add(player)
+                                        }
+                                        "compass" -> CompassManagerImpl.getCompass(result.getString("compass"))?.let { c ->
+                                            if (!c.isDefault) c.add(player)
+                                        }
                                     }
                                 }
                             }
                         }
                         mysql.prepareStatement("SELECT value FROM enabled_pointed_location WHERE uuid = '$uuid';").use { s ->
-                            val result = s.executeQuery()
-                            while (result.next()) {
-                                runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
-                                    player.pointers().add(PointedLocation.deserialize(result.getString("value")
-                                        .toBase64Json()
-                                        .asJsonObject))
+                            s.executeQuery().use { result ->
+                                while (result.next()) {
+                                    runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
+                                        player.pointers().add(PointedLocation.deserialize(result.getString("value")
+                                            .toBase64Json()
+                                            .asJsonObject))
+                                    }
                                 }
                             }
                         }
