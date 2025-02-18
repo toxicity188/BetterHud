@@ -44,11 +44,11 @@ dependencies {
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.9") {
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.10") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.12") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
     }
@@ -56,7 +56,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.10.1")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.5.2")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:0.10.0")
+    compileOnly("com.nexomc:nexo:1.0.0")
     compileOnly("io.th0rgal:oraxen:1.189.0")
 }
 

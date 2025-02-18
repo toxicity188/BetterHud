@@ -208,8 +208,7 @@ class MythicMobsCompatibility : Compatibility {
                     }
                 }
                 .build(),
-            "entity_mythicmobs_id" to HudPlaceholder.builder<String>()
-                .requiredArgsLength(1)
+            "entity_id" to HudPlaceholder.builder<String>()
                 .function { args, reason ->
                     reason.unwrap { event: EntityEvent ->
                         Function get@ {

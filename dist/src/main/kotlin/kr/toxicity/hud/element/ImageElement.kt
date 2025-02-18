@@ -26,25 +26,32 @@ class ImageElement(
         if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $id")
     }
 
-    private val childrenList = when (val child = setting["children"]) {
-        is YamlArray -> child.map {
-            it.asString()
+    private val childrenMap = when (val child = setting["children"]) {
+        is YamlArray -> child.associate {
+            it.asString().let { s -> s to s }
         }
-        is YamlElement -> listOf(child.asString())
-        null -> emptyList()
+        is YamlObject -> child.associate {
+            it.key to it.value.asString()
+        }
+        is YamlElement -> child.asString().let {
+            mapOf(it to it)
+        }
+        null -> emptyMap()
     }
 
     val children by lazy {
-        fun String.toImagePair() = this to ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
+        fun String.toImage() = ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
         when {
-            childrenList.isEmpty() -> emptyMap()
-            childrenList.size == 1 -> if (childrenList[0] == "*") ImageManager.allImage.filter {
-                it.id != id && !it.childrenList.contains(id)
+            childrenMap.isEmpty() -> emptyMap()
+            childrenMap.size == 1 -> if (childrenMap.values.first() == "*") ImageManager.allImage.filter {
+                it.id != id && !it.childrenMap.containsKey(id)
             }.associateBy {
                 it.id
-            } else mapOf(childrenList[0].toImagePair())
-            else -> childrenList.associate {
-                it.toImagePair()
+            } else childrenMap.entries.first().run {
+                mapOf(key to value.toImage())
+            }
+            else -> childrenMap.entries.associate {
+                it.key to it.value.toImage()
             }
         }
     }
