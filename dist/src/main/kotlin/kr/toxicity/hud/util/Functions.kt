@@ -41,10 +41,7 @@ fun <T, R> T.runWithExceptionHandling(sender: BetterCommandSource, message: Stri
     }
 }
 
-fun <T, R> ((T) -> R).memoize(initialValue: R): (T) -> R = this as? MemoizedFunction ?: MemoizedFunction(this, initialValue)
-fun <P, T, R> ((P) -> (T) -> R).memoizeBuilder(initialValue: R): (P) -> (T) -> R = { p ->
-    this@memoizeBuilder(p).memoize(initialValue)
-}
+infix fun <T, R> ((T) -> R).memoize(initialValue: R): (T) -> R = this as? MemoizedFunction ?: MemoizedFunction(this, initialValue)
 
 private class MemoizedFunction<T, R>(
     private val delegate: (T) -> R,

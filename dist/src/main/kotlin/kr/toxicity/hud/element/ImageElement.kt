@@ -18,7 +18,7 @@ class ImageElement(
     val image: List<NamedLoadedImage>,
     val type: ImageType,
     setting: YamlObject
-) : HudElement, ConditionSource by ConditionSource.Impl(setting).memoize(), PlaceholderSource by PlaceholderSource.Impl(setting) {
+) : HudElement, ConditionSource by ConditionSource.Impl(setting), PlaceholderSource by PlaceholderSource.Impl(setting) {
     val listener = setting["listener"]?.asObject()?.let {
         ListenerManagerImpl.getListener(it)
     }

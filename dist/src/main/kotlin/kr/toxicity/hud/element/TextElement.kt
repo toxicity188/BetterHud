@@ -13,4 +13,4 @@ class TextElement(
     val charWidth: Map<Int, TextScale>,
     val imageTextScale: Map<Int, ImageTextScale>,
     yamlObject: YamlObject
-) : HudElement, ConditionSource by ConditionSource.Impl(yamlObject).memoize()
+) : HudElement, ConditionSource by ConditionSource.Impl(yamlObject)

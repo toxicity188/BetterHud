@@ -14,7 +14,7 @@ class LayoutGroup(
     override val id: String,
     sender: BetterCommandSource,
     section: YamlObject
-) : HudConfiguration, ConditionSource by ConditionSource.Impl(section).memoize() {
+) : HudConfiguration, ConditionSource by ConditionSource.Impl(section) {
 
     private val loc = PixelLocation(section)
 
