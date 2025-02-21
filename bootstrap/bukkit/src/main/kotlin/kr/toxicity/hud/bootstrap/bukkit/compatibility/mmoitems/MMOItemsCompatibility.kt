@@ -1,8 +1,6 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.mmoitems
 
-import io.lumine.mythic.lib.MythicLib
-import io.lumine.mythic.lib.api.item.ItemTag
-import io.lumine.mythic.lib.api.item.SupportedNBTTagValues
+import io.lumine.mythic.lib.api.item.NBTItem
 import io.lumine.mythic.lib.skill.handler.SkillHandler
 import io.lumine.mythic.lib.skill.result.SkillResult
 import io.lumine.mythic.lib.skill.trigger.TriggerType
@@ -17,7 +15,8 @@ import kr.toxicity.hud.util.ifNull
 import net.Indyuce.mmoitems.ItemStats
 import net.Indyuce.mmoitems.MMOItems
 import net.Indyuce.mmoitems.api.Type
-import net.Indyuce.mmoitems.stat.data.AbilityData
+import net.Indyuce.mmoitems.api.item.mmoitem.LiveMMOItem
+import net.Indyuce.mmoitems.stat.data.AbilityListData
 import org.bukkit.inventory.ItemStack
 import java.util.function.Function
 
@@ -62,23 +61,10 @@ class MMOItemsCompatibility : Compatibility {
     private fun mmoItem(type: Type, name: String) = MMOItems.plugin.getMMOItem(type, name).ifNull("Unable to find this MMOItem: $name in ${type.id}")
 
     private fun getAbility(itemStack: ItemStack): Map<TriggerType, SkillHandler<SkillResult>> {
-        val item = MythicLib.inst().version.wrapper.getNBTItem(itemStack)
-        val tags = ArrayList<ItemTag>()
-        if (item.hasTag(ItemStats.ABILITIES.nbtPath)) {
-            tags.add(ItemTag.getTagAtPath(ItemStats.ABILITIES.nbtPath, item, SupportedNBTTagValues.STRING) ?: return emptyMap())
-        }
-        val compact = ItemTag.getTagAtPath(ItemStats.ABILITIES.nbtPath, tags)?.value as? String ?: return emptyMap()
-        return runCatching {
-            val map = HashMap<TriggerType, SkillHandler<SkillResult>>()
-            io.lumine.mythic.lib.gson.JsonParser.parseString(compact).asJsonArray.forEach {
-                if (it.isJsonObject) {
-                    val data = AbilityData(it.asJsonObject)
-                    map[data.trigger] = data.handler
-                }
-            }
-            map
-        }.getOrElse {
-            emptyMap()
-        }
+        val nbt = NBTItem.get(itemStack)
+        if (MMOItems.getID(nbt) == null || MMOItems.getType(nbt) == null) return emptyMap()
+        return (LiveMMOItem(nbt).getData(ItemStats.ABILITIES) as? AbilityListData)?.abilities?.associate {
+            it.trigger to it.handler
+        } ?: emptyMap()
     }
 }

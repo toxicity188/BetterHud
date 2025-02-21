@@ -33,7 +33,7 @@ public interface HudPlayer extends BetterCommandSource {
     UUID uuid();
 
     /**
-     * Gets player scorebard name
+     * Gets player scoreboard name
      * @return name
      */
     @NotNull
