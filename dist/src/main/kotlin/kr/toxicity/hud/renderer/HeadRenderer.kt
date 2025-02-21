@@ -29,7 +29,7 @@ class HeadRenderer(
     private val font: Key,
     private val pixel: Int,
     private val x: Int,
-) : HeadLayout by layout, Renderer {
+) : HeadLayout by layout, HudRenderer {
     private interface HeadPixelGetter {
         fun render(head: HudPlayerHead, color: TextColor?): TextComponent.Builder
     }

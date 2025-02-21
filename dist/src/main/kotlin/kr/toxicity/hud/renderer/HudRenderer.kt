@@ -5,6 +5,6 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.util.TickProvider
 
-fun interface Renderer {
+fun interface HudRenderer {
     fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent>
 }

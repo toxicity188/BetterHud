@@ -126,8 +126,6 @@ abstract class HudPlayerImpl : HudPlayer {
                     popupGroupIterator.remove()
                 } else compList += comp
             }
-        } else {
-            popupGroup.clear()
         }
         if (compList.isNotEmpty() || additionalComp != null) {
             additionalComp?.let {

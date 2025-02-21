@@ -5,7 +5,7 @@ import kr.toxicity.hud.manager.EncodeManager
 
 fun String.encodeFile(namespace: EncodeManager.EncodeNamespace): String {
     val split = split('.')
-    if (split.size != 2) throw RuntimeException("Invaild file name: $this")
+    if (split.size != 2) throw RuntimeException("Invalid file name: $this")
     return "${split[0].encodeKey(namespace)}.${split[1]}"
 }
 

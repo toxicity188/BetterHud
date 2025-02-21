@@ -52,7 +52,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency GSON = new BetterHudDependency(
             "com{}google{}code{}gson",
             "gson",
-            "2.11.0",
+            "2.12.1",
             false,
             List.of(BetterHudPlatform.VELOCITY)
     );
@@ -72,7 +72,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency MYSQL_CONNECTOR_J = new BetterHudDependency(
             "com{}mysql",
             "mysql-connector-j",
-            "9.1.0",
+            "9.2.0",
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
     );
@@ -106,7 +106,16 @@ public class BetterHudDependency {
             true,
             BetterHudPlatform.ALL
     );
-
+    /**
+     * HikariCP
+     */
+    public static final BetterHudDependency HIKARICP = new BetterHudDependency(
+            "com{}zaxxer",
+            "HikariCP",
+            "6.2.1",
+            false,
+            BetterHudPlatform.ALL
+    );
     /**
      * Adventure
      */

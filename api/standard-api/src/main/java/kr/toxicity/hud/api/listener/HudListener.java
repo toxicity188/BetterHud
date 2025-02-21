@@ -24,4 +24,13 @@ public interface HudListener {
      * Ignored if below 0
      */
     HudListener EMPTY = p -> -1;
+
+    /**
+     * Clears listener value of player.
+     * It is basically empty method.
+     * @param player player
+     */
+    default void clear(@NotNull HudPlayer player) {
+
+    }
 }

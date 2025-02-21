@@ -2,6 +2,7 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.image.LoadedImage
 import kr.toxicity.hud.image.NamedLoadedImage
+import kr.toxicity.hud.image.enums.FlipType
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.ByteArrayOutputStream
@@ -123,3 +124,5 @@ fun LoadedImage.circleCut(degree: Double, reversed: Boolean = false) = BufferedI
         }
     }
 }.removeEmptyWidth(xOffset, yOffset)
+
+fun BufferedImage.flip(fileTypes: Set<FlipType>) = FlipType.flip(this, fileTypes)

@@ -208,6 +208,15 @@ class MythicMobsCompatibility : Compatibility {
                     }
                 }
                 .build(),
+            "entity_id" to HudPlaceholder.builder<String>()
+                .function { args, reason ->
+                    reason.unwrap { event: EntityEvent ->
+                        Function get@ {
+                            (MythicBukkit.inst().mobManager.getMythicMobInstance(event.entity) ?: return@get "<none>").mobType
+                        }
+                    }
+                }
+                .build(),
         )
     override val booleans: Map<String, HudPlaceholder<Boolean>>
         get() = mapOf(

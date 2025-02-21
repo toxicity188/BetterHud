@@ -40,3 +40,23 @@ fun <T, R> T.runWithExceptionHandling(sender: BetterCommandSource, message: Stri
         )
     }
 }
+
+infix fun <T, R> ((T) -> R).memoize(initialValue: R): (T) -> R = this as? MemoizedFunction ?: MemoizedFunction(this, initialValue)
+
+private class MemoizedFunction<T, R>(
+    private val delegate: (T) -> R,
+    private var value: R
+) : (T) -> R {
+
+    private var time = 0L
+
+    @Synchronized
+    override fun invoke(p1: T): R {
+        val current = System.currentTimeMillis()
+        if (current - time >= ConfigManagerImpl.tickSpeed * 50) {
+            time = current
+            value = delegate(p1)
+        }
+        return value
+    }
+}

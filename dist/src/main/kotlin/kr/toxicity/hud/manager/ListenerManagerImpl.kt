@@ -47,6 +47,41 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
 
     override fun getAllListenerKeys(): Set<String> = Collections.unmodifiableSet(listenerMap.keys)
 
+    private fun Double.checkMinThreshold(other: Double) = other <= this + MIN_THRESHOLD && other >= this - MIN_THRESHOLD
+
+    fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
+        val clazz = section["class"]?.asString().ifNull("class value not set.")
+        val listener = listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
+        if (section.getAsBoolean("lazy", false)) {
+            val setting = LazyListenerSetting(section)
+            val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {
+                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).apply {
+                    if (this.clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${this.clazz.simpleName}.")
+                }.let {
+                    { reason ->
+                        (it build reason).let { placeholder ->
+                            { player ->
+                                (placeholder(player) as Number).toDouble()
+                            }
+                        }
+                    }
+                }
+            } ?: {
+                {
+                    1.0
+                }
+            }
+            return { event: UpdateEvent ->
+                LazyListener(
+                    event.key,
+                    listener(event),
+                    setting,
+                    initialValue(event)
+                )
+            }
+        } else return listener
+    }
+
     private data class LazyValueKey(
         val uuid: UUID,
         val key: Any
@@ -69,52 +104,38 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
         }
     }
 
-    private fun Double.checkMinThreshold(other: Double) = other <= this + MIN_THRESHOLD && other >= this - MIN_THRESHOLD
+    private class LazyListenerSetting(section: YamlObject) {
+        val delay = section.getAsInt("delay", 0).coerceAtLeast(0)
+        val multiplier = section.getAsDouble("multiplier", 0.5).coerceAtLeast(0.0).coerceAtMost(1.0) 
+        val cache: ExpiringMap<LazyValueKey, LazyValueAccess> = ExpiringMap.builder()
+            .expirationPolicy(ExpirationPolicy.ACCESSED)
+            .expiration(section.getAsLong("expiring-second", 5).coerceAtLeast(1), TimeUnit.SECONDS)
+            .build<LazyValueKey, LazyValueAccess>()
+    }
 
-    fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
-        val clazz = section["class"]?.asString().ifNull("class value not set.")
-        val listener = listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
-        if (section.getAsBoolean("lazy", false)) {
-            val second = section.getAsLong("expiring-second", 5).coerceAtLeast(1)
-            val lazyMap = ExpiringMap.builder()
-                .expirationPolicy(ExpirationPolicy.ACCESSED)
-                .expiration(second, TimeUnit.SECONDS)
-                .build<LazyValueKey, LazyValueAccess>()
-            val delay = section.getAsInt("delay", 0).coerceAtLeast(0)
-            val multiplier = section.getAsDouble("multiplier", 0.5).coerceAtLeast(0.0).coerceAtMost(1.0)
-            val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {
-                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).apply {
-                    if (this.clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${this.clazz.simpleName}.")
-                }.let {
-                    { reason ->
-                        (it build reason).let { placeholder ->
-                            { player ->
-                                (placeholder(player) as Number).toDouble()
-                            }
-                        }
-                    }
-                }
-            } ?: {
-                {
-                    1.0
-                }
-            }
-            return { event: UpdateEvent ->
-                val gen = listener(event)
-                val initialBuild = initialValue(event)
-                HudListener { p ->
-                    val get = gen.getValue(p)
-                    val other = lazyMap.computeIfAbsent(LazyValueKey(p.uuid(), event.key)) {
-                        LazyValueAccess(
-                            delay,
-                            multiplier,
-                            initialBuild(p).coerceAtLeast(0.0).coerceAtMost(1.0)
-                        )
-                    }(get)
-                    other
-                }
-            }
-        } else return listener
+    private class LazyListener(
+        val key: Any,
+        val delegate: HudListener,
+        val setting: LazyListenerSetting,
+        val initialBuild: (HudPlayer) -> Double,
+    ) : HudListener {
+        private fun HudPlayer.key() = LazyValueKey(uuid(), key)
+
+        override fun getValue(player: HudPlayer): Double {
+            val get = delegate.getValue(player)
+            return setting.cache.computeIfAbsent(player.key()) {
+                LazyValueAccess(
+                    setting.delay,
+                    setting.multiplier,
+                    initialBuild(player).coerceAtLeast(0.0).coerceAtMost(1.0)
+                )
+            }(get)
+        }
+
+        override fun clear(player: HudPlayer) {
+            setting.cache.remove(player.key())
+            delegate.clear(player)
+        }
     }
 
     override fun addListener(name: String, listenerFunction: Function<YamlObject, Function<UpdateEvent, HudListener>>) {

@@ -22,7 +22,7 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(including Folia) 1.19-1.21.4
+- Bukkit(with Folia) 1.19-1.21.4
 - Velocity 3.3-3.4
 - Fabric server 1.21.2-1.21.4
 
@@ -35,6 +35,8 @@ This project implements a server-side HUD.
 - [gson](https://github.com/google/gson): Implements json parser/writer.
 - [better command](https://github.com/toxicity188/BetterCommand): Implements multi-platform supporting command.
 - [expiring map](https://github.com/jhalterman/expiringmap): Implements cache map.
+- [HikariCP](https://github.com/brettwooldridge/HikariCP): Implements comfortable DB handling.
+- [mysql-connector-j](https://github.com/mysql/mysql-connector-j): Implements MySQL connector.
 
 
 ### Dependency

@@ -22,7 +22,7 @@ import kr.toxicity.hud.player.head.HeadRenderType.FANCY
 import kr.toxicity.hud.player.head.HeadRenderType.STANDARD
 import kr.toxicity.hud.renderer.HeadRenderer
 import kr.toxicity.hud.renderer.ImageRenderer
-import kr.toxicity.hud.renderer.Renderer
+import kr.toxicity.hud.renderer.HudRenderer
 import kr.toxicity.hud.renderer.TextRenderer
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.text.BackgroundKey
@@ -330,7 +330,7 @@ class PopupLayout(
             )
         }
 
-        private val renderers: List<Renderer> = listOf(
+        private val renderers: List<HudRenderer> = listOf(
             image,
             texts,
             heads

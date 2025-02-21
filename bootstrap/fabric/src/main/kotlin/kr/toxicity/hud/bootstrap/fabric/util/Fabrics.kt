@@ -45,7 +45,6 @@ fun <T : FabricEvent<*>> createFabricTrigger(
 ): HudFabricEventTrigger<T> {
     return object : HudFabricEventTrigger<T> {
         override fun registry(): EventRegistry<T> = registry
-        override fun getValue(t: T): UUID? = valueMapper(t)
         override fun getKey(t: T): Any = keyMapper(t)
         override fun registerEvent(eventConsumer: BiConsumer<UUID, UpdateEvent>) {
             registry.registerTemp {

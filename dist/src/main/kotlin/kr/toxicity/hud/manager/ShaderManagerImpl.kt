@@ -203,11 +203,14 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                                 return@write
                             }
                         }
-                        if (isNotEmpty() && s.first() == '#') {
-                            if (last() != '\n') s = '\n' + s
-                            s += '\n'
+                        var tr = s.trim()
+                        if (tr.isNotEmpty()) {
+                            if (isNotEmpty() && tr.first() == '#') {
+                                if (last() != '\n') tr = '\n' + tr
+                                tr += '\n'
+                            }
+                            append(tr.substringBeforeLast("//"))
                         }
-                        append(s.substringBeforeLast("//").replace("  ", ""))
                     }
                 }.toByteArray()
                 PackGenerator.addTask(resource.core + key.fileName) {

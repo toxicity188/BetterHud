@@ -23,13 +23,8 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.File
-import java.text.DecimalFormat
 
 object CommandManager : BetterHudManager {
-
-    private val numberDecimal = DecimalFormat("#,###")
-    private fun Number.withDecimal() = Component.text(numberDecimal.format(this))
-
     val library = BetterCommand(DATA_FOLDER.subFolder("lang").apply {
         PLUGIN.loadAssets("lang") { name, stream ->
             val file = File(this, name)
