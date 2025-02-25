@@ -37,7 +37,7 @@ fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
 
 
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
-    forEachAsync({ i -> i }, block)
+    forEachAsync({ it }, block)
 }
 fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
     if (isNotEmpty()) {

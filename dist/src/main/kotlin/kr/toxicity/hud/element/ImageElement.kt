@@ -57,9 +57,8 @@ class ImageElement(
     }
 
     val follow = setting["follow"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $id: $it")
-        }
+        PlaceholderManagerImpl.find(it, this)
+            .assertString("This placeholder is not a string in image $id: $it")
     }
     val childrenMapper = setting["children-mapper"]?.asObject()?.map {
         it.key to Conditions.parse(it.value.asObject(), this)

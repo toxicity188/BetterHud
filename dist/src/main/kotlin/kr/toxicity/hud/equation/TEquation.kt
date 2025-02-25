@@ -8,6 +8,7 @@ import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class TEquation(expression: String) {
     companion object {
@@ -35,11 +36,13 @@ class TEquation(expression: String) {
         ))
         .build()
 
-    fun evaluate(t: Double) = Expression(expression)
+    infix fun evaluate(t: Double) = Expression(expression)
         .setVariables(mapOf(
             "t" to t,
             "pi" to PI,
             "e" to E
         ))
         .evaluate()
+
+    infix fun evaluateToInt(t: Double) = evaluate(t).roundToInt()
 }

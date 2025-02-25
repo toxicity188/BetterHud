@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.JavaNumber
 import kr.toxicity.hud.util.ifNull
 import net.jodah.expiringmap.ExpirationPolicy
 import net.jodah.expiringmap.ExpiringMap
@@ -30,7 +31,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
-                if (value.clazz == max.clazz && value.clazz == java.lang.Number::class.java) {
+                if (value.clazz == max.clazz && value.clazz == JavaNumber::class.java) {
                     HudListener {
                         runCatching {
                             (value(it) as Number).toDouble() / (max(it) as Number).toDouble()
@@ -55,8 +56,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
         if (section.getAsBoolean("lazy", false)) {
             val setting = LazyListenerSetting(section)
             val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {
-                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).apply {
-                    if (this.clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${this.clazz.simpleName}.")
+                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).assertNumber {
+                    "this index is not a number. it is ${this.clazz.simpleName}."
                 }.let {
                     { reason ->
                         (it build reason).let { placeholder ->

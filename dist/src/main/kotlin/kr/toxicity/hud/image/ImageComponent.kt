@@ -34,19 +34,19 @@ class ImageComponent(
         images.map {
             it applyColor color
         },
-        entries.associate {
-            it.key to (it.value applyColor color)
+        entries.associate { (name, component) ->
+            name to (component applyColor color)
         }
     )
 
     private fun interface ImageMapper : (HudPlayer) -> ImageComponent
 
-    private val childrenMapper: (ImageComponent, UpdateEvent) -> ImageMapper = original.childrenMapper?.map {
-        children[it.first].ifNull("This children doesn't exist in ${original.id}: ${it.first}") to it.second
+    private val childrenMapper: (ImageComponent, UpdateEvent) -> ImageMapper = original.childrenMapper?.map { (name, condition) ->
+        children[name].ifNull("This children doesn't exist in ${original.id}: $name") to condition
     }?.let {
         { root, event ->
-            it.map { builder ->
-                builder.first mapper event to (builder.second build event)
+            it.map { (component, condition) ->
+                component mapper event to (condition build event)
             }.let { buildList ->
                 ImageMapper { player ->
                     buildList.firstOrNull { pair ->

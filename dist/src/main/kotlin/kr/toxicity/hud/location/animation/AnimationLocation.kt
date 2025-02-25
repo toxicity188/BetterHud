@@ -3,7 +3,6 @@ package kr.toxicity.hud.location.animation
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.EquationTriple
 import kr.toxicity.hud.location.PixelLocation
-import kotlin.math.roundToInt
 
 data class AnimationLocation(
     val type: AnimationType,
@@ -21,9 +20,9 @@ data class AnimationLocation(
         (0..<duration).map {
             val d = it.toDouble()
             PixelLocation(
-                imageEquation.x.evaluate(d).roundToInt(),
-                imageEquation.y.evaluate(d).roundToInt(),
-                imageEquation.opacity.evaluate(d)
+                imageEquation.x evaluateToInt d,
+                imageEquation.y evaluateToInt d,
+                imageEquation.opacity evaluate d
             )
         }
     )

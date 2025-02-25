@@ -15,8 +15,8 @@ class EquationPairLocation(
     }
     val locations = (1..duration).map {
         val d = it.toDouble()
-        val eval1 = gui.evaluate(d)
-        val eval2 = pixel.evaluate(d)
+        val eval1 = gui evaluate d
+        val eval2 = pixel evaluate d
         LocationGroup(
             GuiLocation(eval1.first, eval1.second),
             PixelLocation(eval2.first.toInt(), eval2.second.toInt(), eval2.third)

@@ -38,8 +38,8 @@ class PopupImpl(
     private val default = ConfigManagerImpl.defaultPopup.contains(id) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
+        PlaceholderManagerImpl.find(it, this).assertNumber {
+            "this index is not a number. it is ${clazz.simpleName}."
         }.let {
             { reason ->
                 (it build reason).let { placeholder ->

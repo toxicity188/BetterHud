@@ -16,9 +16,7 @@ class ImageRenderer(
     component: ImageComponent
 ) : ImageLayout by layout, HudRenderer {
     private val followHudPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
-        }
+        PlaceholderManagerImpl.find(it, this).assertString("This placeholder is not a string: $it")
     }
     private val component = component applyColor color
 

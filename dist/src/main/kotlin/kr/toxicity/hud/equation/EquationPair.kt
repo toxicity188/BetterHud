@@ -9,7 +9,7 @@ class EquationPair(val x: TEquation, val y: TEquation) {
         val zero = EquationPair(TEquation.zero, TEquation.zero)
     }
 
-    fun evaluate(d: Double) = x.evaluate(d) to y.evaluate(d)
+    infix fun evaluate(d: Double) = x evaluate d to (y evaluate d)
 
     constructor(section: YamlObject): this(
         section["x-equation"]?.asString().ifNull("x-equation value not set.").toEquation(),

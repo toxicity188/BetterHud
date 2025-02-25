@@ -60,8 +60,8 @@ data class PackUUID(
             val digest = messageDigest.digest()
             for (element in digest) {
                 val byte = element.toInt()
-                hash.append(Character.forDigit((byte shr 4) and 15, 16))
-                    .append(Character.forDigit(byte and 15, 16))
+                hash.append(((byte shr 4) and 15).digitToChar(16))
+                    .append((byte and 15).digitToChar(16))
             }
             val string = hash.toString()
             var t = 0
