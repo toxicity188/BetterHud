@@ -39,12 +39,16 @@ class ImageElement(
         null -> emptyMap()
     }
 
+    fun contains(key: String): Boolean = children.containsKey(key) || children.values.any {
+        it.contains(key)
+    }
+
     val children by lazy {
         fun String.toImage() = ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
         when {
             childrenMap.isEmpty() -> emptyMap()
             childrenMap.size == 1 -> if (childrenMap.values.first() == "*") ImageManager.allImage.filter {
-                it.id != id && !it.childrenMap.containsKey(id)
+                it.id != id && !it.contains(id)
             }.associateBy {
                 it.id
             } else childrenMap.entries.first().run {

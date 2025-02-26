@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class HudPlayerImpl : HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
-    private val componentMap = HashMap<HudObject.Identifier, HudComponentSupplier<*>>()
+    private val componentMap = ConcurrentHashMap<HudObject.Identifier, HudComponentSupplier<*>>()
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
