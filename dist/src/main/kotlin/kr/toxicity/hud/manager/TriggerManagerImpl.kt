@@ -24,8 +24,8 @@ object TriggerManagerImpl : BetterHudManager, TriggerManager {
     }
 
     fun getTrigger(yamlObject: YamlObject): HudTrigger<*> {
-        val clazz = yamlObject["class"]?.asString()?.ifNull("class value not found.")
-        val builder = map[clazz].ifNull("this class doesn't exist: $clazz")
+        val clazz = yamlObject["class"]?.asString()?.ifNull { "class value not found." }
+        val builder = map[clazz].ifNull { "this class doesn't exist: $clazz" }
         return builder(yamlObject)
     }
 

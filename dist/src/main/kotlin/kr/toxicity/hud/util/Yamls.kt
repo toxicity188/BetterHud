@@ -55,11 +55,13 @@ fun Map<String, Any>.saveToYaml(file: File) {
 fun File.forEachAllYaml(sender: BetterCommandSource, block: (File, String, YamlObject) -> Unit) {
     forEachAllFolder {
         if (it.extension == "yml") {
-            runWithExceptionHandling(sender, "Unable to load this yml file: ${it.name}") {
+            runCatching {
                 it.toYaml().forEach { e ->
                     val v = e.value
                     if (v is YamlObject) block(it, e.key, v)
                 }
+            }.onFailure { e ->
+                e.handle(sender, "Unable to load this yml file: ${it.name}")
             }
         } else {
             sender.warn("This is not a yml file: ${it.path}")

@@ -110,7 +110,7 @@ enum class PackType {
             })
             fun addEntry(entry: ZipEntry, byte: ByteArray) {
                 synchronized(zip) {
-                    runWithExceptionHandling(info.sender, "Unable to write this file: ${entry.name}") {
+                    runCatching {
                         zip.byteArrayMap[entry.name] = byte
                         zip.zip.putNextEntry(entry)
                         zip.zip.write(byte)
@@ -119,6 +119,8 @@ enum class PackType {
                             entry.crc = byte.size.toLong()
                             entry.size = BigInteger(byte).mod(BigInteger.valueOf(Long.MAX_VALUE)).toLong()
                         }
+                    }.onFailure {
+                        it.handle(info.sender, "Unable to write this file: ${entry.name}")
                     }
                 }
             }

@@ -110,7 +110,7 @@ object PlayerHeadManager : BetterHudManager {
             }
         }
         DATA_FOLDER.subFolder("heads").forEachAllYaml(info.sender) { file, s, yamlObject ->
-            runWithExceptionHandling(info.sender, "Unable to load this head: $s in ${file.name}") {
+            runCatching {
                 headMap.putSync("head") {
                     val head = HeadElement(s, yamlObject)
                     val pixel = head.pixel
@@ -125,6 +125,8 @@ object PlayerHeadManager : BetterHudManager {
                     }
                     head
                 }
+            }.onFailure {
+                it.handle(info.sender, "Unable to load this head: $s in ${file.name}")
             }
         }
     }

@@ -34,7 +34,7 @@ enum class ImageType {
             s: String,
             yamlObject: YamlObject
         ): ImageElement {
-            val fileName = yamlObject["file"]?.asString().ifNull("file value not set.")
+            val fileName = yamlObject["file"]?.asString().ifNull { "file value not set." }
                 .replace('/', File.separatorChar)
             val targetFile = File(
                 assets,
@@ -47,7 +47,7 @@ enum class ImageType {
                         .toImage()
                         .flip(yamlObject.toFlip())
                         .removeEmptySide()
-                        .ifNull("Invalid image.")
+                        .ifNull { "Invalid image." }
                         .toNamed(fileName.replace(File.separatorChar, '_')),
                 ),
                 this,
@@ -74,12 +74,14 @@ enum class ImageType {
             yamlObject: YamlObject
         ): ImageElement {
             val splitType = yamlObject["split-type"]?.asString()?.let { splitType ->
-                runWithExceptionHandling(sender, "Unable to find that split-type: $splitType") {
+                runCatching {
                     SplitType.valueOf(splitType.uppercase())
+                }.onFailure {
+                    it.handle("Unable to find that split-type: $splitType")
                 }.getOrNull()
             } ?: SplitType.LEFT
             val split = yamlObject.getAsInt("split", 25).coerceAtLeast(1)
-            val fileName = yamlObject["file"]?.asString().ifNull("file value not set.")
+            val fileName = yamlObject["file"]?.asString().ifNull { "file value not set." }
                 .replace('/', File.separatorChar)
             val getFile = File(
                 assets,
@@ -92,12 +94,12 @@ enum class ImageType {
                         .toImage()
                         .flip(yamlObject.toFlip())
                         .removeEmptySide()
-                        .ifNull("Invalid image.")
+                        .ifNull { "Invalid image." }
                         .toNamed("${fileName.replace(File.separatorChar, '_').substringBeforeLast('.')}_${splitType.name.lowercase()}_$split.png"), split
                 ),
                 this,
                 yamlObject["setting"]?.asObject()
-                    .ifNull("setting configuration not found.")
+                    .ifNull { "setting configuration not found." }
             )
         }
     },
@@ -139,7 +141,7 @@ enum class ImageType {
                         .toImage()
                         .flip(yamlObject.toFlip())
                         .removeEmptyWidth()
-                        .ifNull("Invalid image: $string")
+                        .ifNull { "Invalid image: $string" }
                         .toNamed(fileName.replace(File.separatorChar, '_'))
                     (0..<(frame * globalFrame).coerceAtLeast(1)).map {
                         targetImage

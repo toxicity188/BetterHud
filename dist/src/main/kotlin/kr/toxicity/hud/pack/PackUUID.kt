@@ -1,8 +1,7 @@
 package kr.toxicity.hud.pack
 
-import kr.toxicity.hud.util.CONSOLE
 import kr.toxicity.hud.util.DATA_FOLDER
-import kr.toxicity.hud.util.runWithExceptionHandling
+import kr.toxicity.hud.util.handle
 import kr.toxicity.hud.util.subFolder
 import java.io.File
 import java.security.MessageDigest
@@ -26,7 +25,7 @@ data class PackUUID(
             private set(value) {
                 _previous = value?.apply {
                     cacheFile.run {
-                        runWithExceptionHandling(CONSOLE, "Unable to save pack digest.") {
+                        runCatching {
                             bufferedWriter().use {
                                 it.write(Base64.getEncoder().encodeToString(digest) + '\n')
                                 it.write(hash + '\n')
@@ -34,6 +33,7 @@ data class PackUUID(
                             }
                             true
                         }.getOrElse {
+                            it.handle("Unable to save pack digest.")
                             false
                         }
                     }
@@ -42,7 +42,7 @@ data class PackUUID(
 
         private val load
             get() = cacheFile.run {
-                if (exists()) runWithExceptionHandling(CONSOLE, "Unable to load pack digest.") {
+                if (exists()) runCatching {
                     bufferedReader().use {
                         PackUUID(
                             Base64.getDecoder().decode(it.readLine()),
@@ -51,6 +51,7 @@ data class PackUUID(
                         )
                     }
                 }.getOrElse {
+                    it.handle("Unable to load pack digest.")
                     null
                 } else null
             }

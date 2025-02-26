@@ -44,7 +44,7 @@ class ImageElement(
     }
 
     val children by lazy {
-        fun String.toImage() = ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
+        fun String.toImage() = ImageManager.getImage(this).ifNull { "This children image doesn't exist in $id: $this" }
         when {
             childrenMap.isEmpty() -> emptyMap()
             childrenMap.size == 1 -> if (childrenMap.values.first() == "*") ImageManager.allImage.filter {

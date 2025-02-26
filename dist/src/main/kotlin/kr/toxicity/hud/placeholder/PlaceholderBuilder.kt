@@ -18,21 +18,15 @@ interface PlaceholderBuilder<T : Any> {
     fun assertString(message: String) = assertString { message }
 
     fun assertNumber(message: PlaceholderBuilder<T>.() -> String): PlaceholderBuilder<T> {
-        assert(isNumber) {
-            message()
-        }
+        if (!isNumber) throw RuntimeException(message())
         return this
     }
     fun assertBoolean(message: PlaceholderBuilder<T>.() -> String): PlaceholderBuilder<T> {
-        assert(isBoolean) {
-            message()
-        }
+        if (!isBoolean) throw RuntimeException(message())
         return this
     }
     fun assertString(message: PlaceholderBuilder<T>.() -> String): PlaceholderBuilder<T> {
-        assert(isString) {
-            message()
-        }
+        if (!isString) throw RuntimeException(message())
         return this
     }
 

@@ -11,9 +11,8 @@ import kr.toxicity.hud.bootstrap.bukkit.compatibility.parties.PartiesCompatibili
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.worldguard.WorldGuardCompatibility
-import kr.toxicity.hud.util.CONSOLE
 import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.runWithExceptionHandling
+import kr.toxicity.hud.util.handle
 import org.bukkit.Bukkit
 import java.util.function.Function
 
@@ -56,7 +55,7 @@ object CompatibilityManager {
         compatibilities.forEach {
             if (Bukkit.getPluginManager().isPluginEnabled(it.key)) {
                 val obj = it.value()
-                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support. checks this: ${obj.website}") {
+                runCatching {
                     obj.start()
                     val namespace = it.key.lowercase()
                     obj.listeners.forEach { entry ->
@@ -79,6 +78,8 @@ object CompatibilityManager {
                     obj.triggers.forEach { entry ->
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
+                }.onFailure { e ->
+                    e.handle("Unable to load ${it.key} support. checks this: ${obj.website}")
                 }
             }
         }

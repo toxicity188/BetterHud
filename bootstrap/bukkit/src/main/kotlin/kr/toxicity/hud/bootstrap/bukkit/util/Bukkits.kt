@@ -22,7 +22,7 @@ val HudPlayer.bukkitPlayer
     get() = handle() as Player
 
 val Player.hudPlayer
-    get() = PlayerManagerImpl.getHudPlayer(uniqueId).ifNull("Unable to find this player: $name")
+    get() = PlayerManagerImpl.getHudPlayer(uniqueId).ifNull { "Unable to find this player: $name" }
 
 fun Event.call(): Boolean {
     Bukkit.getPluginManager().callEvent(this)

@@ -122,15 +122,15 @@ interface TextLayout : HudLayout<TextElement> {
             loc: PixelLocation
         ): this(
             s,
-            yamlObject["name"]?.asString().ifNull("name value not set: $s").let { n ->
-                TextManagerImpl.getText(n).ifNull("this text doesn't exist: $n")
+            yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let { n ->
+                TextManagerImpl.getText(n).ifNull { "this text doesn't exist: $n" }
             },
             group,
             yamlObject,
             loc
         )
 
-        override val pattern: String = yamlObject["pattern"]?.asString().ifNull("pattern value not set: $s")
+        override val pattern: String = yamlObject["pattern"]?.asString().ifNull { "pattern value not set: $s" }
         override val scale: Double = yamlObject.getAsDouble("scale", 1.0)
         override val space: Int = yamlObject.getAsInt("space", 0)
         override val align: LayoutAlign = yamlObject["align"]?.asString().toLayoutAlign()

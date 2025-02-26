@@ -21,7 +21,7 @@ class BukkitStandardModule : BukkitModule {
     override val triggers: Map<String, (YamlObject) -> HudBukkitEventTrigger<*>>
         get() = mapOf(
             "custom" to {
-                val n = it.get("name")?.asString().ifNull("name value not set.")
+                val n = it.get("name")?.asString().ifNull { "name value not set." }
                 createBukkitTrigger(CustomPopupEvent::class.java, { e ->
                     if (e.name == n) e.player.uniqueId else null
                 })

@@ -26,8 +26,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->
             val source = PlaceholderSource.Impl(c)
-            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull("value value not set."), source)
-            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull("max value not set."), source)
+            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull { "value value not set." }, source)
+            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull { "max value not set." }, source)
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
@@ -51,8 +51,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     private fun Double.checkMinThreshold(other: Double) = other <= this + MIN_THRESHOLD && other >= this - MIN_THRESHOLD
 
     fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
-        val clazz = section["class"]?.asString().ifNull("class value not set.")
-        val listener = listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
+        val clazz = section["class"]?.asString().ifNull { "class value not set." }
+        val listener = listenerMap[clazz].ifNull { "this class doesn't exist: $clazz" }(section)
         if (section.getAsBoolean("lazy", false)) {
             val setting = LazyListenerSetting(section)
             val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {

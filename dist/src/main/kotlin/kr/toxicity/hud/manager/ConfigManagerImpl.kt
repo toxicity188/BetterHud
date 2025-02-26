@@ -139,14 +139,18 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
                 defaultFontName = it
             }
             yaml["pack-type"]?.asString()?.let {
-                runWithExceptionHandling(CONSOLE, "Unable to find this pack type: $it") {
+                runCatching {
                     packType = PackType.valueOf(it.uppercase())
+                }.onFailure { e ->
+                    e.handle("Unable to find this pack type: $it")
                 }
             }
             tickSpeed = yaml.getAsLong("tick-speed", 1)
             numberFormat = yaml["number-format"]?.asString()?.let {
-                runWithExceptionHandling(CONSOLE, "Unable to read this number-format: $it") {
+                runCatching {
                     DecimalFormat(it)
+                }.onFailure { e ->
+                    e.handle("Unable to read this number-format: $it")
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#")
             disableToBedrockPlayer = yaml.getAsBoolean("disable-to-bedrock-player", true)
@@ -189,8 +193,10 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             } ?: emptyList()
             useLegacyFormat = yaml.getAsBoolean("use-legacy-format",  false)
             yaml["legacy-serializer"]?.asString()?.let {
-                runWithExceptionHandling(CONSOLE, "Unable to find legacy serializer.") {
+                runCatching {
                     legacySerializer = it.toLegacySerializer()
+                }.onFailure { e ->
+                    e.handle("Unable to find this legacy serializer: $it")
                 }
             }
             key = KeyResource(yaml["namespace"]?.asString() ?: NAME_SPACE)

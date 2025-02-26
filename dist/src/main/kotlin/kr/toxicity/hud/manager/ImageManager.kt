@@ -39,13 +39,15 @@ object ImageManager : BetterHudManager {
         }
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("images").forEachAllYaml(info.sender) { file, s, yamlObject ->
-            runWithExceptionHandling(info.sender, "Unable to load this image: $s in ${file.name}") {
+            runCatching {
                 val image = ImageType.valueOf(
-                    yamlObject["type"]?.asString().ifNull("type value not set.").uppercase()
+                    yamlObject["type"]?.asString().ifNull { "type value not set." }.uppercase()
                 ).createElement(assets, info.sender, file, s, yamlObject)
                 imageMap.putSync("image") {
                     image
                 }
+            }.onFailure {
+                it.handle(info.sender, "Unable to load this image: $s in ${file.name}")
             }
         }
         imageMap.values.forEach { value ->

@@ -63,8 +63,8 @@ interface ImageLayout : HudLayout<ImageElement> {
             yamlObject: YamlObject,
             loc: PixelLocation,
         ): this(
-            yamlObject["name"]?.asString().ifNull("name value not set: $s").let { n ->
-                ImageManager.getImage(n).ifNull("this image doesn't exist: $n")
+            yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let { n ->
+                ImageManager.getImage(n).ifNull { "this image doesn't exist: $n" }
             },
             group,
             yamlObject,

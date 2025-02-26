@@ -42,9 +42,9 @@ class HudImpl(
         newChar
     }
 
-    private val elements = section["layouts"]?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
-        val layout = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
-            LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
+    private val elements = section["layouts"]?.asObject().ifNull { "layout configuration not set." }.mapSubConfiguration { s, yamlObject ->
+        val layout = yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let {
+            LayoutManager.getLayout(it).ifNull { "this layout doesn't exist: $it" }
         }
         var gui = GuiLocation(yamlObject)
         yamlObject["gui"]?.asObject()?.let {

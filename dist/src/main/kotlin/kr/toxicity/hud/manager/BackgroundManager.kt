@@ -23,15 +23,15 @@ object BackgroundManager : BetterHudManager {
         backgroundMap.clear()
         folder.forEach {
             if (it.extension == "yml") {
-                runWithExceptionHandling(info.sender, "Unable to load this yml: ${it.name}") {
+                runCatching {
                     val yaml = it.toYaml()
                     val name = it.nameWithoutExtension
                     val backgroundFolder = folder.subFolder(name)
                     fun getImage(imageName: String) = File(backgroundFolder, "$imageName.png")
-                        .ifNotExist("this image doesn't exist: $imageName.png in $name")
+                        .ifNotExist { "this image doesn't exist: $imageName.png in $name" }
                         .toImage()
                         .removeEmptyWidth()
-                        .ifNull("this image is empty: $imageName.png in $name").apply {
+                        .ifNull { "this image is empty: $imageName.png in $name" }.apply {
                             PackGenerator.addTask(resource.textures + "${"background_${name}_$imageName".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)}.png") {
                                 image.toByteArray()
                             }
@@ -45,6 +45,8 @@ object BackgroundManager : BetterHudManager {
                             PixelLocation(yaml)
                         )
                     }
+                }.onFailure { e ->
+                    e.handle(info.sender, "Unable to load this yml: ${it.name}")
                 }
             }
         }

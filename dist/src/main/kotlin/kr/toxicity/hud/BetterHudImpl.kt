@@ -108,7 +108,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
             reloadStartTask.forEach {
                 it()
             }
-            val result = runWithExceptionHandling(info.sender, "Unable to reload.") {
+            val result = runCatching {
                 managers.forEach {
                     it.preReload()
                 }
@@ -122,6 +122,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
             }.getOrElse {
+                it.handle(info.sender, "Unable to reload.")
                 Failure(it)
             }
             reloadEndTask.forEach {
@@ -185,7 +186,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     fun isOldVersion(then: (String) -> Unit) {
         if (isDevVersion) warn("This build is dev version - be careful to use it!")
-        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
+        else runCatching {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
@@ -210,6 +211,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 if (result ?: (get.size > now.size)) then(body)
             }
+        }.onFailure { e ->
+            e.handle("Unable to get latest version.")
         }
     }
 

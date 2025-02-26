@@ -99,7 +99,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
     override fun reload(info: ReloadInfo, resource: GlobalResource) {
         constants.clear()
-        runWithExceptionHandling(info.sender, "Unable to load shader.yml") {
+        runCatching {
             val shaders = ShaderType.entries.map {
                 it to it.lines()
             }
@@ -157,7 +157,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 if (it.getAsBoolean("disable", false)) {
                     replaceList += "RemapHotBar"
                     val locations =
-                        it.get("locations")?.asObject().ifNull("locations configuration not set.")
+                        it.get("locations")?.asObject().ifNull { "locations configuration not set." }
                     (1..10).map { index ->
                         locations.get(index.toString())?.asObject()?.let { shaderConfig ->
                             HotBarShader(
@@ -221,6 +221,8 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     byte
                 }
             }
+        }.onFailure {
+            it.handle(info.sender, "Unable to load shader.yml")
         }
     }
 

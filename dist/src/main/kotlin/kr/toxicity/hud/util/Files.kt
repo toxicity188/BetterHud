@@ -11,11 +11,7 @@ fun File.subFile(name: String) = File(this, name).apply {
     if (!exists()) createNewFile()
 }
 
-fun File.ifNotExist(message: String) = takeIf { exists() }.ifNull(message)
-
-fun File.ifNotExist(messageCreator: File.() -> String) = apply {
-    if (!exists()) throw RuntimeException(messageCreator())
-}
+fun File.ifNotExist(lazyMessage: () -> String) = takeIf { exists() }.ifNull(lazyMessage)
 
 fun File.forEach(block: (File) -> Unit) {
     listFiles()?.sortedBy {

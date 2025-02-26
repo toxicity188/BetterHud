@@ -72,7 +72,7 @@ class SkriptCompatibility : Compatibility {
             "variable" to HudPlaceholder.builder<String>()
                 .requiredArgsLength(1)
                 .function { args, reason ->
-                    val value = VariableString.newInstance(args.joinToString(",")).ifNull("Invalid variable.")
+                    val value = VariableString.newInstance(args.joinToString(",")).ifNull { "Invalid variable." }
                     if (reason.type == UpdateReason.EMPTY) {
                         Function {
                             value.getSingle(kr.toxicity.hud.api.bukkit.event.HudUpdateEvent(it)) ?: "<none>"

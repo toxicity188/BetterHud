@@ -21,7 +21,7 @@ enum class PluginConfiguration(
         val exists = file.exists()
         if (!exists) file.createNewFile()
         val yaml = file.toYaml()
-        val newYaml = BOOTSTRAP.resource(dir)?.toYaml().ifNull("Resource '$dir' not found.")
+        val newYaml = BOOTSTRAP.resource(dir)?.toYaml().ifNull { "Resource '$dir' not found." }
         yaml.merge(newYaml)
         return yaml.apply {
             save(file)

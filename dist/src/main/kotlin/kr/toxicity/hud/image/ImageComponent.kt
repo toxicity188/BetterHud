@@ -42,7 +42,7 @@ class ImageComponent(
     private fun interface ImageMapper : (HudPlayer) -> ImageComponent
 
     private val childrenMapper: (ImageComponent, UpdateEvent) -> ImageMapper = original.childrenMapper?.map { (name, condition) ->
-        children[name].ifNull("This children doesn't exist in ${original.id}: $name") to condition
+        children[name].ifNull { "This children doesn't exist in ${original.id}: $name" } to condition
     }?.let {
         { root, event ->
             it.map { (component, condition) ->

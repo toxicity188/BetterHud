@@ -16,8 +16,8 @@ class EquationTriple(val x: TEquation, val y: TEquation, val opacity: TEquation)
     )
 
     constructor(section: YamlObject): this(
-        section["x-equation"]?.asString().ifNull("x-equation value not set.").toEquation(),
-        section["y-equation"]?.asString().ifNull("y-equation value not set.").toEquation(),
+        section["x-equation"]?.asString().ifNull { "x-equation value not set." }.toEquation(),
+        section["y-equation"]?.asString().ifNull { "y-equation value not set." }.toEquation(),
         section["opacity-equation"]?.asString()?.toEquation() ?: TEquation.one
     )
 }

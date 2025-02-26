@@ -57,7 +57,7 @@ object MinecraftManager : BetterHudManager {
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling(info.sender, "Unable to load minecraft default textures.") {
+            runCatching {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -126,7 +126,8 @@ object MinecraftManager : BetterHudManager {
                         }
                     }
                 }
-
+            }.onFailure {
+                it.handle(info.sender, "Unable to load minecraft default textures.")
             }
         } else assetsMap.clear()
     }

@@ -31,8 +31,8 @@ interface HeadLayout : HudLayout<HeadElement> {
             yamlObject: YamlObject,
             loc: PixelLocation
         ): this(
-            yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
-                PlayerHeadManager.getHead(it).ifNull("this head doesn't exist: $it in $s")
+            yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let {
+                PlayerHeadManager.getHead(it).ifNull { "this head doesn't exist: $it in $s" }
             },
             group,
             yamlObject,

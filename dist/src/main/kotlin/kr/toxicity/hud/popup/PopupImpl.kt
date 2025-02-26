@@ -74,10 +74,10 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section["layouts"]?.asObject()?.let {
-        val json = array.ifNull("error is occurred.")
+        val json = array.ifNull { "error is occurred." }
         var i = 0
         it.mapSubConfiguration { _, yamlObject ->
-            val layout = yamlObject["name"]?.asString().ifNull("name value not set.")
+            val layout = yamlObject["name"]?.asString().ifNull { "name value not set." }
             var loc = GuiLocation(yamlObject)
             yamlObject["gui"]?.asObject()?.let { gui ->
                 loc += GuiLocation(gui)
@@ -85,7 +85,7 @@ class PopupImpl(
             PopupLayout(
                 ++i,
                 json,
-                LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
+                LayoutManager.getLayout(layout).ifNull { "this layout doesn't exist: $layout" },
                 this@PopupImpl,
                 loc,
                 yamlObject["pixel"]?.asObject()?.let { pixel ->
@@ -94,7 +94,7 @@ class PopupImpl(
                 resource.font,
             )
         }
-    }.ifNull("layouts configuration not set.").ifEmpty {
+    }.ifNull { "layouts configuration not set." }.ifEmpty {
         throw RuntimeException("layouts is empty.")
     }
 

@@ -21,12 +21,14 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
         compassMap.clear()
         val assets = DATA_FOLDER.subFolder("assets")
         DATA_FOLDER.subFolder("compasses").forEachAllYaml(info.sender) { f, s, c ->
-            runWithExceptionHandling(info.sender, "Unable to load this compass: $s in ${f.name}") {
+            runCatching {
                 compassMap.putSync("compass") {
-                    c["type"]?.asString().ifNull("type value not set.").run {
+                    c["type"]?.asString().ifNull { "type value not set." }.run {
                         CompassType.valueOf(uppercase()).build(resource, assets, s, c)
                     }
                 }
+            }.onFailure {
+                it.handle(info.sender, "Unable to load this compass: $s in ${f.name}")
             }
         }
     }

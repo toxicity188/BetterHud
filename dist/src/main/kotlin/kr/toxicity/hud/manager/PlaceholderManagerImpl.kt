@@ -113,8 +113,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
             },
             "replace" to { s, e ->
                 val obj = e.asObject()
-                val from = obj["from"].ifNull("Cannot find 'from' section.").asString()
-                val to = obj["to"].ifNull("Cannot find 'to' section.").asString()
+                val from = obj["from"].ifNull { "Cannot find 'from' section." }.asString()
+                val to = obj["to"].ifNull { "Cannot find 'to' section." }.asString()
                 s.replace(from, to)
             }
         ),

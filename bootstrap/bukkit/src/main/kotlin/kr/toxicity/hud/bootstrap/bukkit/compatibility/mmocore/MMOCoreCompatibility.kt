@@ -80,8 +80,8 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "cooldown_skill" to search@ { c ->
-                val name = c["skill"]?.asString().ifNull("skill value not set.")
-                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull("the skill named \"$name\" doesn't exist.")
+                val name = c["skill"]?.asString().ifNull { "skill value not set." }
+                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull { "the skill named \"$name\" doesn't exist." }
                 return@search { _: UpdateEvent ->
                     HudListener { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0

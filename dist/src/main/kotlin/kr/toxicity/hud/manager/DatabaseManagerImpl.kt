@@ -58,8 +58,10 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                         CompassManagerImpl.getCompass(it)
                     }
                     yaml["locations"]?.asArray()?.forEach {
-                        runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
+                        runCatching {
                             player.pointers().add(PointedLocation.deserialize(it.asObject()))
+                        }.onFailure { e ->
+                            e.handle("unable to load ${player.name()}'s location.")
                         }
                     }
                 }
@@ -96,12 +98,12 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
         "yml" to defaultConnector,
         "mysql" to HudDatabaseConnector {
             Class.forName("com.mysql.cj.jdbc.Driver")
-            val host = it.get("host")?.asString().ifNull("unable to find the host value.")
-            val database = it.get("database")?.asString().ifNull("unable to find the database value.")
+            val host = it.get("host")?.asString().ifNull { "unable to find the host value." }
+            val database = it.get("database")?.asString().ifNull { "unable to find the database value." }
             val mysql = HikariDataSource(HikariConfig().apply {
                 jdbcUrl = "jdbc:mysql://$host/$database"
-                username = it.get("name")?.asString().ifNull("unable to find the name value.")
-                password = it.get("password")?.asString().ifNull("unable to find the password value.")
+                username = it.get("name")?.asString().ifNull { "unable to find the name value." }
+                password = it.get("password")?.asString().ifNull { "unable to find the password value." }
                 maximumPoolSize = 10
                 minimumIdle = 2
                 idleTimeout = 30000
@@ -123,11 +125,13 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                 }
 
                 fun open(block: Connection.() -> Unit): Boolean {
-                    return runWithExceptionHandling(CONSOLE, "Unable to connect mysql") {
+                    return runCatching{
                         mysql.connection.use {
                             block(it)
                         }
                         true
+                    }.onFailure { e ->
+                        e.handle("Unable to connect mysql")
                     }.getOrDefault(false)
                 }
 
@@ -177,10 +181,12 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                                 }
                             }
                             prepareStatement("SELECT value FROM enabled_pointed_location WHERE uuid = '$uuid';").forEach {
-                                runWithExceptionHandling(CONSOLE, "unable to load ${player.name()}'s location.") {
+                                runCatching {
                                     player.pointers().add(PointedLocation.deserialize(getString("value")
                                         .toBase64Json()
                                         .asJsonObject))
+                                }.onFailure { e ->
+                                    e.handle("unable to load ${player.name()}'s location.")
                                 }
                             }
                         }
@@ -239,9 +245,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
         runCatching {
             current.close()
             val db = PluginConfiguration.DATABASE.create()
-            val type = db.get("type")?.asString().ifNull("type value not set.")
-            val dbInfo = db.get("info")?.asObject().ifNull("info configuration not set.")
-            current = connectionMap[type].ifNull("this database doesn't exist: $type").connect(dbInfo)
+            val type = db.get("type")?.asString().ifNull { "type value not set." }
+            val dbInfo = db.get("info")?.asObject().ifNull { "info configuration not set." }
+            current = connectionMap[type].ifNull { "this database doesn't exist: $type" }.connect(dbInfo)
         }.onFailure { e ->
             current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
             warn(
