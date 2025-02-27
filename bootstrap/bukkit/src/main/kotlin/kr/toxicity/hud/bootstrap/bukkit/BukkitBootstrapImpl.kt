@@ -33,6 +33,7 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
+import kr.toxicity.hud.player.head.MineToolsProvider
 import kr.toxicity.hud.scheduler.PaperScheduler
 import kr.toxicity.hud.scheduler.BukkitScheduler
 import kr.toxicity.hud.util.*
@@ -114,10 +115,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                         val update = yamlObject.getAsInt("update", 1).coerceAtLeast(1)
                         val async = yamlObject.getAsBoolean("async", false)
                         updateTask.add(object : PlaceholderTask {
-                            override val tick: Int
-                                get() = update
-                            override val async: Boolean
-                                get() = async
+                            override val tick: Int = update
+                            override val async: Boolean = async
 
                             override fun invoke(p1: HudPlayer) {
                                 runCatching {
@@ -221,6 +220,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlayerHeadManager.addSkinProvider(SkinsRestorerSkinProvider())
         }
         if (!Bukkit.getServer().onlineMode) {
+            PlayerHeadManager.addSkinProvider(MineToolsProvider())
             PlayerHeadManager.addSkinProvider(HttpSkinProvider())
         }
         if (pluginManager.isPluginEnabled("PlaceholderAPI")) {

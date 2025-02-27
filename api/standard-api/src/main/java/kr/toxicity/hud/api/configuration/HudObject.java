@@ -84,7 +84,7 @@ public interface HudObject {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(source.getName().hashCode());
+            return source.getName().hashCode();
         }
     }
 }

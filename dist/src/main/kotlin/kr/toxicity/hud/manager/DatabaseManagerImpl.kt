@@ -250,11 +250,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
             current = connectionMap[type].ifNull { "this database doesn't exist: $type" }.connect(dbInfo)
         }.onFailure { e ->
             current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
-            warn(
-                "Unable to connect the database.",
-                "Reason: ${e.message}"
-            )
-            if (ConfigManagerImpl.debug()) e.printStackTrace()
+            e.handle("Unable to connect the database.")
         }
     }
 

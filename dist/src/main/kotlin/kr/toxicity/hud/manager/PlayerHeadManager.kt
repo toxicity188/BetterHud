@@ -7,7 +7,6 @@ import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.GameProfileSkinProvider
 import kr.toxicity.hud.player.head.HudPlayerHeadImpl
-import kr.toxicity.hud.player.head.MineToolsProvider
 import kr.toxicity.hud.player.head.PlayerSkinProvider
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
@@ -52,7 +51,6 @@ object PlayerHeadManager : BetterHudManager {
     }
 
     override fun start() {
-        skinProviders += MineToolsProvider()
         PLUGIN.loadAssets("skin") { s, stream ->
             val image = stream.toImage()
             loadingHeadMap[s.substringBeforeLast('.')] = HudPlayerHeadImpl((0..63).map { i ->

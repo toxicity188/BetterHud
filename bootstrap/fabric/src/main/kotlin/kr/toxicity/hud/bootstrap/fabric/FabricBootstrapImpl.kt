@@ -17,9 +17,12 @@ import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.manager.CommandManager
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.DatabaseManagerImpl
+import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
+import kr.toxicity.hud.player.head.HttpSkinProvider
+import kr.toxicity.hud.player.head.MineToolsProvider
 import kr.toxicity.hud.util.asyncTask
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
@@ -126,6 +129,10 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             core.start()
             ModuleManager.start()
             CompatibilityManager.start()
+            if (!it.usesAuthentication()) {
+                PlayerHeadManager.addSkinProvider(MineToolsProvider())
+                PlayerHeadManager.addSkinProvider(HttpSkinProvider())
+            }
         }
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, _ ->
             server.commands.dispatcher.registerCommand()
