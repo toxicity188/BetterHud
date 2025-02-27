@@ -133,7 +133,10 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
                 if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
-                logger.info("Mod enabled.")
+                logger.info(
+                    "Platform: Fabric",
+                    "Mod enabled."
+                )
                 core.isOldVersion {
                     warn(
                         "New version found: $it",

@@ -21,7 +21,7 @@ fun Throwable.handle(log: String) {
 
 fun Throwable.handle(sender: BetterCommandSource, log: String) {
     handle(log) {
-        synchronized(sender) {
+        synchronized(sender.audience()) {
             it.forEach(sender::info)
         }
     }

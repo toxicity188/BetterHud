@@ -33,7 +33,7 @@ include(
     "nms:v1_21_R3",
 
     "scheduler:standard",
-    "scheduler:folia",
+    "scheduler:paper",
 
     "bedrock:geyser",
     "bedrock:floodgate",

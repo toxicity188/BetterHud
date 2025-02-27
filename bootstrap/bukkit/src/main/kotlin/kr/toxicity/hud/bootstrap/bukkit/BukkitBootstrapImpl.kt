@@ -33,8 +33,8 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
-import kr.toxicity.hud.scheduler.FoliaScheduler
-import kr.toxicity.hud.scheduler.StandardScheduler
+import kr.toxicity.hud.scheduler.PaperScheduler
+import kr.toxicity.hud.scheduler.BukkitScheduler
 import kr.toxicity.hud.util.*
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.audience.Audience
@@ -63,15 +63,15 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     private val listener = object : Listener {}
 
     private val isFolia = runCatching {
-        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
+        Class.forName("io.papermc.paper.threadedregions.RegionizedServer")
         true
     }.getOrDefault(false)
     private val isPaper = isFolia || runCatching {
-        Class.forName("com.destroystokyo.paper.profile.PlayerProfile")
+        Class.forName("io.papermc.paper.configuration.PaperConfigurations")
         true
     }.getOrDefault(false)
 
-    private val scheduler = if (isFolia) FoliaScheduler(this) else StandardScheduler(this)
+    private val scheduler = if (isPaper) PaperScheduler(this) else BukkitScheduler(this)
     private val updateTask = ArrayList<PlaceholderTask>()
 
     private val log = object : BetterHudLogger {
@@ -260,6 +260,11 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 }
                 log.info(
                     "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Platform: ${when {
+                        isFolia -> "Folia"
+                        isPaper -> "Paper"
+                        else -> "Bukkit"
+                    }}",
                     "Plugin enabled."
                 )
             }

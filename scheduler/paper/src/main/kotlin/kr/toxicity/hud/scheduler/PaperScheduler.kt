@@ -9,9 +9,9 @@ import org.bukkit.Location
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
 
-class FoliaScheduler(
+class PaperScheduler(
     private val plugin: Plugin
-): HudScheduler {
+) : HudScheduler {
 
     private fun ScheduledTask.wrap() = object : HudTask {
         override fun isCancelled(): Boolean {

@@ -7,9 +7,9 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
 
-class StandardScheduler(
+class BukkitScheduler(
     private val plugin: Plugin
-): HudScheduler {
+) : HudScheduler {
 
     private fun BukkitTask.wrap() = object : HudTask {
         override fun isCancelled(): Boolean {

@@ -151,7 +151,10 @@ class VelocityBootstrapImpl @Inject constructor(
         core.start()
         scheduler.task {
             core.reload()
-            log.info("Plugin enabled.")
+            log.info(
+                "Platform: Velocity",
+                "Plugin enabled."
+            )
         }
     }
 

@@ -161,10 +161,10 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     (1..10).map { index ->
                         locations.get(index.toString())?.asObject()?.let { shaderConfig ->
                             HotBarShader(
-                                shaderConfig.get("gui")?.asObject()?.let { gui ->
+                                shaderConfig["gui"]?.asObject()?.let { gui ->
                                     gui.getAsDouble("x", 0.0) to gui.getAsDouble("y", 0.0)
                                 } ?: (0.0 to 0.0),
-                                shaderConfig.get("pixel")?.asObject()?.let { pixel ->
+                                shaderConfig["pixel"]?.asObject()?.let { pixel ->
                                     pixel.getAsInt("x", 0) to pixel.getAsInt("y", 0)
                                 } ?: (0 to 0),
                             )
