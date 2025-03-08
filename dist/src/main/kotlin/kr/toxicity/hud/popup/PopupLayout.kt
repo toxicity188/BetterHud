@@ -180,10 +180,10 @@ class PopupLayout(
                 pixel.opacity,
                 textLayout.property
             )
-            val scaledMap = textLayout.source.charWidth.entries.associate { (k, v) ->
+            val scaledMap = textLayout.source.charWidth.intEntries.associate { (k, v) ->
                 k to v * textLayout.scale
             }
-            val scaledImageMap = textLayout.imageCharMap.entries.associate { (k, v) ->
+            val scaledImageMap = textLayout.imageCharMap.intEntries.associate { (k, v) ->
                 k to v * textLayout.scale * textLayout.emoji.scale
             }
             val index = ++textIndex
@@ -253,11 +253,11 @@ class PopupLayout(
                 textLayout,
                 HudTextData(
                     keys,
-                    scaledMap.entries.associate { (k, v) ->
+                    (scaledMap.entries.associate { (k, v) ->
                         k to v.normalizedWidth
                     } + scaledImageMap.entries.associate { (k, v) ->
                         k to v.normalizedWidth
-                    },
+                    }).toIntMap(),
                     scaledImageMap.map {
                         it.value.name to it.key
                     }.toMap(),

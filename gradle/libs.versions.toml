@@ -16,6 +16,7 @@ minotaur = "2.8.7"
 
 asm = "9.7.1"
 hikariCP = "6.2.1"
+fastUtil = "8.5.15"
 
 [libraries]
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -42,6 +43,7 @@ minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.grad
 asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
 asmCommons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
 hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariCP" }
+fastUtil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastUtil" }
 
 [plugins]
 standardConvention = { id = "standard-conventions" }
@@ -68,7 +70,8 @@ library = [
     "gson",
     "exp4j",
     "expiringmap",
-    "hikariCP"
+    "hikariCP",
+    "fastUtil"
 ]
 asm = [
     "asm",

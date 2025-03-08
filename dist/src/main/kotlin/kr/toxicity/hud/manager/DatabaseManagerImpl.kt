@@ -20,7 +20,6 @@ import java.sql.ResultSet
 
 object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
-
     private val defaultConnector = HudDatabaseConnector {
         object : HudDatabase {
 
@@ -93,6 +92,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
             }
         }
     }
+    private var currentConnector = defaultConnector
 
     private val connectionMap = mutableMapOf(
         "yml" to defaultConnector,
@@ -232,6 +232,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
     )
 
     private var current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
+
     override fun start() {
 
     }
@@ -243,11 +244,14 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
     override fun reload(info: ReloadInfo, resource: GlobalResource) {
         runCatching {
-            current.close()
             val db = PluginConfiguration.DATABASE.create()
             val type = db.get("type")?.asString().ifNull { "type value not set." }
             val dbInfo = db.get("info")?.asObject().ifNull { "info configuration not set." }
-            current = connectionMap[type].ifNull { "this database doesn't exist: $type" }.connect(dbInfo)
+            val connector = connectionMap[type].ifNull { "this database doesn't exist: $type" }
+            if (currentConnector === connector) return
+            current.close()
+            current = connector.connect(dbInfo)
+            currentConnector = connector
         }.onFailure { e ->
             current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
             e.handle("Unable to connect the database.")

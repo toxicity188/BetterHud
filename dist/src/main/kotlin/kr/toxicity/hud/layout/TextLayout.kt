@@ -21,12 +21,12 @@ import java.text.DecimalFormat
 interface TextLayout : HudLayout<TextElement> {
 
     companion object {
-        private fun interface EmojiProvider : (TextLayout, () -> Int) -> Map<Int, ImageTextScale>
+        private fun interface EmojiProvider : (TextLayout, () -> Int) -> IntKeyMap<ImageTextScale>
         private val emojiProviderMap: List<EmojiProvider> = listOf(
             EmojiProvider { layout, getter ->
                 if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
                     MinecraftManager.applyAll(layout, getter)
-                } else emptyMap()
+                } else emptyMap<Int, ImageTextScale>().toIntKeyMap()
             }
         )
     }
@@ -106,7 +106,7 @@ interface TextLayout : HudLayout<TextElement> {
         )
     )
 
-    val imageCharMap: Map<Int, ImageTextScale>
+    val imageCharMap: IntKeyMap<ImageTextScale>
 
     class Impl(
         s: String,
@@ -168,8 +168,8 @@ interface TextLayout : HudLayout<TextElement> {
         }
         override val lineWidth = yamlObject.getAsInt("line-width", 10)
         override val forceSplit: Boolean = yamlObject.getAsBoolean("force-split", false)
-        override val imageCharMap: Map<Int, ImageTextScale> = run {
-            val map = source.imageTextScale.toMutableMap()
+        override val imageCharMap: IntKeyMap<ImageTextScale> = run {
+            val map = source.imageTextScale.toIntKeyMap()
             var baseValue = TEXT_IMAGE_START_CODEPOINT + map.size
             val getter = {
                 ++baseValue

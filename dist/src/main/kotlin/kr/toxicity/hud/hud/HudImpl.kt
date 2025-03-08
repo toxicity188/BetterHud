@@ -33,12 +33,12 @@ class HudImpl(
     private val imageEncoded = "hud_${id}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
-    private val spaces = HashMap<Int, String>()
+    private val spaces = intKeyMapOf<String>()
     private val default = ConfigManagerImpl.defaultHud.contains(id) || section.getAsBoolean("default", false)
     var textIndex = 0
     private val tick = section.getAsLong("tick", 1)
 
-    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 

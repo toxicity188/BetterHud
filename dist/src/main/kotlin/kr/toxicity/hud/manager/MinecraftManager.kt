@@ -23,8 +23,8 @@ object MinecraftManager : BetterHudManager {
 
     private val assetsMap = Collections.synchronizedSet(HashSet<MinecraftAsset>())
 
-    fun applyAll(layout: TextLayout, intGetter: () -> Int): Map<Int, ImageTextScale> {
-        val map = HashMap<Int, ImageTextScale>()
+    fun applyAll(layout: TextLayout, intGetter: () -> Int): IntKeyMap<ImageTextScale> {
+        val map = intKeyMapOf<ImageTextScale>()
         assetsMap.forEach {
             map[intGetter()] = it.toCharWidth(layout)
         }

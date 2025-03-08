@@ -59,10 +59,10 @@ class PopupImpl(
     var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
-    private val spaces = HashMap<Int, String>()
+    private val spaces = intKeyMapOf<String>()
     private var imageChar = 0xCE000
 
-    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 

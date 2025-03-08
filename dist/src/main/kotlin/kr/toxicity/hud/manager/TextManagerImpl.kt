@@ -42,10 +42,10 @@ object TextManagerImpl : BetterHudManager, TextManager {
     private val textMap = HashMap<String, TextElement>()
     private val textCacheMap = HashMap<TextCache, TextElement>()
 
-    private val textWidthMap = HashMap<Int, Int>()
+    private val textWidthMap = intMapOf()
     private val textKeyMap = ConcurrentHashMap<HudLayout.Identifier, BackgroundKey>()
 
-    private val defaultBitmapImageMap = HashMap<Int, BufferedImage>()
+    private val defaultBitmapImageMap = intKeyMapOf<BufferedImage>()
     private val translatableString = HashMap<String, Map<String, String>>()
 
     private val unicodeRange = 0..0x10FFFF
@@ -476,7 +476,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         } ?: run {
             val saveFontName = "font${++fontIndex}"
             TextSupplier {
-                val charWidthMap = HashMap<Int, TextScale>()
+                val charWidthMap = intKeyMapOf<TextScale>()
                 val textArray = ArrayList<HudTextArray>()
                 val assetsFolder = DATA_FOLDER.subFolder("assets")
                 debug(ConfigManager.DebugLevel.ASSETS, "Generating bitmap text $saveName...")
@@ -532,7 +532,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     null,
                     textArray,
                     charWidthMap,
-                    mapOf(),
+                    intKeyMapOf(),
                     yamlObject
                 )
             }
@@ -583,7 +583,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             TextSupplier {
                 debug(ConfigManager.DebugLevel.ASSETS, "Starting font text $saveName...")
                 val pairMap = TreeMap<FontDisplay, MutableSet<CharImage>>()
-                val charWidthMap = HashMap<Int, TextScale>()
+                val charWidthMap = intKeyMapOf<TextScale>()
                 fun addImage(image: CharImage, multiplier: Double = 1.0) {
                     val w = image.image.width
                     val h = image.image.height
@@ -630,7 +630,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 val textList = ArrayList<HudTextArray>()
                 var i = 0
                 var imageStart = TEXT_IMAGE_START_CODEPOINT
-                val imageTextScaleMap = HashMap<Int, ImageTextScale>()
+                val imageTextScaleMap = intKeyMapOf<ImageTextScale>()
                 images.forEach { (k, v) ->
                     val nh = v.image.image.height.toDouble() * v.scale
                     imageTextScaleMap[++imageStart] = ImageTextScale(

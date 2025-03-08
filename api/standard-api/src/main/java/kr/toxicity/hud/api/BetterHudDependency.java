@@ -117,6 +117,16 @@ public class BetterHudDependency {
             BetterHudPlatform.ALL
     );
     /**
+     * FastUtil
+     */
+    public static final BetterHudDependency FAST_UTIL = new BetterHudDependency(
+            "it{}unimi{}dsi",
+            "fastutil",
+            "8.5.15",
+            false,
+            List.of(BetterHudPlatform.VELOCITY)
+    );
+    /**
      * Adventure
      */
     public static final BetterHudDependency ADVENTURE_API = new BetterHudDependency(

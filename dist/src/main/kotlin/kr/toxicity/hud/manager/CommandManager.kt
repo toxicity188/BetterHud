@@ -187,7 +187,7 @@ object CommandManager : BetterHudManager {
             }
             //Generate
         }).children("hud") {
-            it.permission("hud.hud")
+            it.permission("betterhud.hud")
                 .description(CommandMessage("betterhud.hud.description", Component.text("Manages player's hud.")))
                 .executes(object : CommandListener {
                     //Hud add
@@ -243,7 +243,7 @@ object CommandManager : BetterHudManager {
         }.children("compass") {
             it.aliases(arrayOf("com"))
                 .description(CommandMessage("betterhud.compass.description", Component.text("Manages player's compass.")))
-                .permission("hud.compass")
+                .permission("betterhud.compass")
                 .executes(object : CommandListener {
                     //Compass add
                     private val add_success = library.registerKey(CommandMessage("betterhud.compass.add.message.success", Component.text("Successfully added.")))
@@ -298,7 +298,7 @@ object CommandManager : BetterHudManager {
         }.children("popup") {
             it.aliases(arrayOf("pop"))
                 .description(CommandMessage("betterhud.popup.description", Component.text("Manages player's popup.")))
-                .permission("hud.popup")
+                .permission("betterhud.popup")
                 .executes(object : CommandListener {
                     //Popup add
                     private val add_success = library.registerKey(CommandMessage("betterhud.popup.add.message.success", Component.text("Successfully added.")))
@@ -431,7 +431,7 @@ object CommandManager : BetterHudManager {
         }.children("turn") {
             it.aliases(arrayOf("t"))
                 .description(CommandMessage("betterhud.turn.description", Component.text("Turns on or off HUD.")))
-                .permission("hud.turn")
+                .permission("betterhud.turn")
                 .executes(object : CommandListener {
                     //Turn on
                     private val on_no_target = library.registerKey(CommandMessage("betterhud.turn.on.message.no_target", Component.text("No target player provided.")))
@@ -472,7 +472,7 @@ object CommandManager : BetterHudManager {
         }.children("pointer") {
             it.aliases(arrayOf("point"))
                 .description(CommandMessage("betterhud.pointer.description", Component.text("Manages your compass pointer.")))
-                .permission("hud.pointer")
+                .permission("betterhud.pointer")
                 .executes(object : CommandListener {
                     //Pointer set
                     private val set_success = library.registerKey(CommandMessage("betterhud.pointer.set.message.success", Component.text("Successfully located.")))
