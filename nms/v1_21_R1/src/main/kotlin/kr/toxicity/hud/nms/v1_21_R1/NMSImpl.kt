@@ -14,6 +14,8 @@ import kr.toxicity.hud.api.bukkit.nms.NMS
 import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.nms.v1_21_R1.entity.CraftEntityView
+import kr.toxicity.hud.nms.v1_21_R1.entity.CraftLivingEntityView
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
@@ -38,9 +40,12 @@ import org.bukkit.GameMode
 import org.bukkit.WorldBorder
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.util.CraftChatMessage
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -141,6 +146,15 @@ class NMSImpl : NMS {
             }
         }, bootstrap as Plugin)
     }
+
+    override fun getFoliaAdaptedEntity(entity: Entity): Entity {
+        return when (entity) {
+            is Player -> getFoliaAdaptedPlayer(entity)
+            is CraftLivingEntity -> CraftLivingEntityView(entity)
+            else -> CraftEntityView(entity as CraftEntity)
+        }
+    }
+
     override fun getFoliaAdaptedPlayer(player: Player): Player {
         val handle = (player as CraftPlayer).handle
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {
