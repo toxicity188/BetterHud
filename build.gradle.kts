@@ -77,7 +77,7 @@ tasks {
             hangar("ViaVersion", "5.2.1")
             hangar("ViaBackwards", "5.2.1")
             hangar("PlaceholderAPI", "2.11.6")
-            hangar("Skript", "2.10.1")
+            hangar("Skript", "2.10.2")
         }
     }
     build {

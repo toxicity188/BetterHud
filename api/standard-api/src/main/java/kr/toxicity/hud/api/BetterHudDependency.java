@@ -62,7 +62,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency SNAKEYAML = new BetterHudDependency(
             "org{}yaml",
             "snakeyaml",
-            "2.3",
+            "2.4",
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
     );

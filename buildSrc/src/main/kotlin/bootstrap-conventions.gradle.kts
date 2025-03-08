@@ -1,3 +1,5 @@
+import gradle.kotlin.dsl.accessors._71500ebfd02aecedbeba1ea751aee542.compileOnly
+
 plugins {
     id("standard-conventions")
     id("com.modrinth.minotaur")
@@ -7,6 +9,7 @@ val shade = configurations.create("shade")
 val dist = rootProject.project("dist")
 
 dependencies {
+    compileOnly(libs.bundles.library)
     compileOnly(shade("me.lucko:jar-relocator:1.7") {
         exclude("org.ow2.asm")
     })

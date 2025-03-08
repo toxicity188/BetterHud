@@ -1,5 +1,6 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.yaml.YamlObject
 import java.io.File
 
@@ -20,15 +21,10 @@ fun File.forEach(block: (File) -> Unit) {
 }
 
 fun File.forEachAllFolder(block: (File) -> Unit) {
+    if (name.startsWith('-')) return debug(ConfigManager.DebugLevel.FILE, "File skipped: $path")
     if (isDirectory) forEach {
         it.forEachAllFolder(block)
-    } else {
-        block(this)
-    }
-}
-
-fun File.mapAllFolder() = mutableListOf<File>().apply {
-    forEachAllFolder(this::add)
+    } else block(this)
 }
 
 fun YamlObject.forEachSubConfiguration(block: (String, YamlObject) -> Unit) {
