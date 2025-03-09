@@ -210,7 +210,7 @@ class PopupImpl(
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {
-                iterator.priority = index
+                iterator.priority = index.coerceAtMost(iterator.maxIndex)
             }
         }
     }

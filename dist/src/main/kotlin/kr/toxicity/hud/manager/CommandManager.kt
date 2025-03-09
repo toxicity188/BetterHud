@@ -311,7 +311,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = popup.remove(player)
+                                val success = popup.add(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),
@@ -336,7 +336,7 @@ object CommandManager : BetterHudManager {
                         var stack = 0
                         players.forEach { player ->
                             popups.forEach { popup ->
-                                val success = popup.add(player)
+                                val success = popup.remove(player)
                                 if (++stack < 6) {
                                     val map = mapOf(
                                         "player" to Component.text(player.name()),

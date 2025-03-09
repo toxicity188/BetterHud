@@ -51,7 +51,7 @@ class TextRenderer(
                     SPACE_KEY -> codepoint - CENTER_SPACE_CODEPOINT
                     null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> data.codepoint[codepoint]?.let { c -> c + 1 }
+                        else -> data.codepoint[codepoint] + 1
                     }
                     else -> null
                 }

@@ -12,7 +12,6 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
     override fun addIterator(iterator: PopupIterator) {
         synchronized(sourceSet) {
             if (iterator.isUnique && contains(iterator.name())) return
-            val p = iterator.priority
             val map = HashSet<Int>()
             val loop = sourceSet.iterator()
             while (loop.hasNext()) {
@@ -21,8 +20,8 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
                 else map += next.index
             }
             val i = if (iterator.index < 0) when (iterator.sortType) {
-                PopupSortType.FIRST -> if (p >= 0) p else 0
-                PopupSortType.LAST -> if (p >= 0) p else run {
+                PopupSortType.FIRST -> 0
+                PopupSortType.LAST -> run {
                     var i = 0
                     while (map.contains(i)) i++
                     i
@@ -92,7 +91,7 @@ class PopupIteratorGroupImpl : PopupIteratorGroup {
                     if (this) {
                         next.remove()
                         copy.subList(i, copy.size).forEach {
-                            if (it.priority < 0) it.index--
+                            it.index--
                         }
                     }
                 }

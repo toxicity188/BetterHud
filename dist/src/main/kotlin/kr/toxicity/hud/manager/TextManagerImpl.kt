@@ -424,18 +424,13 @@ object TextManagerImpl : BetterHudManager, TextManager {
         fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit)
     }
 
-
-
     private class JavaBitmapProvider(private val targetFont: Font): FontBitmapProvider {
         override val height: Int = (targetFont.size.toDouble() * 1.4).roundToInt()
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
-            val h = height
-            unicodeRange.filter { char ->
-                filter(char)
-            }.forEachAsync { char ->
+            unicodeRange.filter(filter).forEachAsync { char ->
                 if (targetFont.canDisplay(char)) BufferedImage(
                     targetFont.size,
-                    h,
+                    height,
                     BufferedImage.TYPE_INT_ARGB
                 ).apply {
                     createGraphics().run {
@@ -448,6 +443,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             }
         }
     }
+
     private class UnifontBitmapProvider(scale: Int): FontBitmapProvider {
         override val height: Int = scale
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {

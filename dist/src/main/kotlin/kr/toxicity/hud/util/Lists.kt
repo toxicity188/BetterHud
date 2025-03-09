@@ -70,6 +70,7 @@ fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
             val integer = AtomicInteger()
             Executors.newFixedThreadPool(tasks.size) {
                 Thread(it).apply {
+                    isDaemon = true
                     name = "BetterHud-Worker-${integer.andIncrement}"
                     uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, exception ->
                         exception.handle("A error has been occurred in ${thread.name}")
