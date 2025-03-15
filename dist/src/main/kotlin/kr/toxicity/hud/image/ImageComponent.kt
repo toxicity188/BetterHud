@@ -28,6 +28,8 @@ class ImageComponent(
             it.max
         } ?: 0)
 
+    infix fun choose(index: Long) = original.animationType.choose(images, index)
+
     infix fun applyColor(color: TextColor): ImageComponent = ImageComponent(
         original,
         parent,

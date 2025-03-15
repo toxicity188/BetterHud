@@ -14,7 +14,6 @@ import kr.toxicity.hud.layout.LayoutGroup
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.location.LocationGroup
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.location.animation.AnimationType
 import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.player.head.HeadKey
@@ -75,11 +74,7 @@ class PopupLayout(
                     it.getComponent(reason, frame)(p)
                 }
                 Runner {
-                    val f = frame()
-                    m[when (layout.animation.type) {
-                        AnimationType.LOOP -> f % m.size
-                        AnimationType.PLAY_ONCE -> f.coerceAtMost(m.lastIndex.toLong())
-                    }.toInt()]()
+                    layout.animation.type.choose(m, frame())()
                 }
             }
         }

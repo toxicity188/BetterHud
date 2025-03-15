@@ -1,6 +1,7 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.hud.animation.AnimationType
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
@@ -51,6 +52,15 @@ fun Map<String, Any>.saveToYaml(file: File) {
     }
 }
 
+fun YamlObject.getAsAnimationType(key: String, sender: BetterCommandSource = BOOTSTRAP.consoleSource()) = get(key)?.asString()?.let {
+    runCatching {
+        AnimationType.valueOf(it.uppercase())
+    }.getOrElse {
+        it.handle(sender, "This animation doesn't exist.")
+        AnimationType.LOOP
+    }
+} ?: AnimationType.LOOP
+
 
 fun File.forEachAllYaml(sender: BetterCommandSource, block: (File, String, YamlObject) -> Unit) {
     forEachAllFolder {
@@ -68,23 +78,6 @@ fun File.forEachAllYaml(sender: BetterCommandSource, block: (File, String, YamlO
         }
     }
 }
-
-interface LoadedYaml {
-    val name: String
-    val yaml: YamlObject
-}
-
-class LoadedOtherYaml(
-    override val name: String,
-    override val yaml: YamlObject
-) : LoadedYaml
-
-class LoadedFileYaml(
-    val file: File,
-    override val name: String,
-    override val yaml: YamlObject
-) : LoadedYaml
-
 
 fun YamlObject.toConditions(source: PlaceholderSource) = get("conditions")?.asObject()?.let {
     Conditions.parse(it, source)

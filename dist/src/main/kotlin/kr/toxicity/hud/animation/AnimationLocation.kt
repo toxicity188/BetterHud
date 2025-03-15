@@ -1,8 +1,9 @@
-package kr.toxicity.hud.location.animation
+package kr.toxicity.hud.animation
 
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.EquationTriple
 import kr.toxicity.hud.location.PixelLocation
+import kr.toxicity.hud.util.getAsAnimationType
 
 data class AnimationLocation(
     val type: AnimationType,
@@ -28,9 +29,7 @@ data class AnimationLocation(
     )
 
     constructor(section: YamlObject): this(
-        section["type"]?.asString()?.let {
-            AnimationType.valueOf(it.uppercase())
-        } ?: AnimationType.LOOP,
+        section.getAsAnimationType("type"),
         section.getAsInt("duration", 20).coerceAtLeast(1),
         EquationTriple(section)
     )

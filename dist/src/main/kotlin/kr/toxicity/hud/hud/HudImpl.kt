@@ -9,7 +9,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.location.animation.AnimationType
+import kr.toxicity.hud.animation.AnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.pack.PackGenerator
@@ -100,10 +100,7 @@ class HudImpl(
         }
         return HudComponentSupplier.of(this) {
             if (conditions(player)) map.map { (type, element) ->
-                element[when (type) {
-                    AnimationType.LOOP -> (player.tick % element.size).toInt()
-                    AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(element.lastIndex)
-                }]()
+                type.choose(element, player.tick)()
             } else emptyList()
         }
     }

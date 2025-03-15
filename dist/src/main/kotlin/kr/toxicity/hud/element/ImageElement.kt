@@ -11,6 +11,7 @@ import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.placeholder.PlaceholderSource
+import kr.toxicity.hud.util.getAsAnimationType
 import kr.toxicity.hud.util.ifNull
 
 class ImageElement(
@@ -25,6 +26,7 @@ class ImageElement(
     val scale = setting.getAsDouble("scale", 1.0).apply {
         if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $id")
     }
+    val animationType = setting.getAsAnimationType("animation-type")
 
     private val childrenMap = when (val child = setting["children"]) {
         is YamlArray -> child.associate {

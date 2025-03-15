@@ -63,7 +63,7 @@ enum class ImageType {
             }
             return if (get >= 0) component.images[get
                 .coerceAtLeast(0)
-                .coerceAtMost(component.images.lastIndex)] else component.images[(frame % component.images.size).toInt()]
+                .coerceAtMost(component.images.lastIndex)] else component choose frame
         }
 
         override fun createElement(
@@ -110,7 +110,7 @@ enum class ImageType {
             }
             return if (get >= 0) component.images[get
                 .coerceAtLeast(0)
-                .coerceAtMost(component.images.lastIndex)] else component.images[(frame % component.images.size).toInt()]
+                .coerceAtMost(component.images.lastIndex)] else component choose frame
         }
 
         override fun createElement(
@@ -126,7 +126,7 @@ enum class ImageType {
                 (yamlObject["files"]?.asArray()?.map {
                     it.asString()
                 } ?: emptyList()).ifEmpty {
-                    throw RuntimeException("files is empty.")
+                    throw RuntimeException("files are empty.")
                 }.map { string ->
                     val matcher = multiFrameRegex.matcher(string)
                     var fileName = string

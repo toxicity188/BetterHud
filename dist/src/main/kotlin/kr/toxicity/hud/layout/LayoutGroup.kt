@@ -5,7 +5,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.layout.enums.LayoutOffset
-import kr.toxicity.hud.location.animation.AnimationLocation
+import kr.toxicity.hud.animation.AnimationLocation
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.util.*
