@@ -151,6 +151,22 @@ class BukkitEntityModule : BukkitModule {
                         entity.isDead
                     }
                 }
+            },
+            "frozen" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
+                    Function {
+                        entity.isFrozen
+                    }
+                }
+            },
+            "burning" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
+                    Function {
+                        entity.fireTicks > 0
+                    }
+                }
             }
         )
 

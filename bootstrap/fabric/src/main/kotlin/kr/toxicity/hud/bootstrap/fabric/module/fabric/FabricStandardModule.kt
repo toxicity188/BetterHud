@@ -216,7 +216,12 @@ class FabricStandardModule : FabricModule {
             },
             "frozen" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.fabricPlayer.isFreezing
+                    p.fabricPlayer.isFullyFrozen
+                }
+            },
+            "burning" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.fabricPlayer.remainingFireTicks > 0
                 }
             },
             "has_permission" to HudPlaceholder.builder<Boolean>()

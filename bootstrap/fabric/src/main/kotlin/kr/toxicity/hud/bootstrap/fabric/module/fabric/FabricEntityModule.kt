@@ -151,6 +151,20 @@ class FabricEntityModule : FabricModule {
                         e.entity().isDeadOrDying
                     }
                 }
+            },
+            "frozen" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        e.entity().isFullyFrozen
+                    }
+                }
+            },
+            "burning" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        e.entity().remainingFireTicks > 0
+                    }
+                }
             }
         )
 

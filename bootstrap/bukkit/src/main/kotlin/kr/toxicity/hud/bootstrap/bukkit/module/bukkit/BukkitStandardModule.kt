@@ -276,6 +276,11 @@ class BukkitStandardModule : BukkitModule {
                     p.bukkitPlayer.isFrozen
                 }
             },
+            "burning" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.bukkitPlayer.fireTicks > 0
+                }
+            },
             "has_off_hand" to HudPlaceholder.of { _, _ ->
                 Function {
                     it.bukkitPlayer.inventory.itemInOffHand.type != Material.AIR
