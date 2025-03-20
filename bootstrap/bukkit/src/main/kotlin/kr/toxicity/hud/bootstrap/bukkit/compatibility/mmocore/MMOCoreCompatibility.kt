@@ -169,7 +169,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "stat" to HudPlaceholder.builder<Number>()
-                .requiredArgsLength(2)
+                .requiredArgsLength(1)
                 .function { args, _ ->
                     val getter: (PlayerStats) -> Number = if (args.size > 1) {
                         { stats: PlayerStats ->
@@ -188,7 +188,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
                 .build(),
             "temp_stat" to HudPlaceholder.builder<Number>()
-                .requiredArgsLength(2)
+                .requiredArgsLength(1)
                 .function { args, _ ->
                     val predicate: (StatModifier) -> Boolean = if (args.size > 1) {
                         { stat: StatModifier ->
