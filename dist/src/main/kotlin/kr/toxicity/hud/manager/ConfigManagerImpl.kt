@@ -13,6 +13,10 @@ import java.io.File
 import java.text.DecimalFormat
 
 object ConfigManagerImpl : BetterHudManager, ConfigManager {
+
+    override val managerName: String = "Config"
+    override val supportExternalPacks: Boolean = false
+
     var key = KeyResource(NAME_SPACE)
         private set
     private var line = 1
@@ -95,7 +99,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
         preReload()
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         if (removeDefaultHotbar) {
             PLUGIN.loadAssets("empty") { n, i ->
                 val read = i.readAllBytes()

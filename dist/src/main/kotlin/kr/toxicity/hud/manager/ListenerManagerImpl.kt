@@ -12,6 +12,7 @@ import kr.toxicity.hud.util.JavaNumber
 import kr.toxicity.hud.util.ifNull
 import net.jodah.expiringmap.ExpirationPolicy
 import net.jodah.expiringmap.ExpiringMap
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
@@ -22,6 +23,9 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     private const val MIN_THRESHOLD = 0.01
     private const val DELTA_MIN_THRESHOLD = 0.1
     private const val DELTA_THRESHOLD = 0.75
+
+    override val managerName: String = "Listener"
+    override val supportExternalPacks: Boolean = false
 
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->
@@ -148,7 +152,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             }
         }
     }
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

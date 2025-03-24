@@ -20,6 +20,9 @@ import java.sql.ResultSet
 
 object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
+    override val managerName: String = "Database"
+    override val supportExternalPacks: Boolean = false
+
     private val defaultConnector = HudDatabaseConnector {
         object : HudDatabase {
 
@@ -242,7 +245,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
         return connectionMap.putIfAbsent(name, connector) == null
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         runCatching {
             val db = PluginConfiguration.DATABASE.create()
             val type = db.get("type")?.asString().ifNull { "type value not set." }

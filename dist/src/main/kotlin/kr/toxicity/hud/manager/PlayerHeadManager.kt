@@ -15,12 +15,16 @@ import net.jodah.expiringmap.ExpiringMap
 import net.kyori.adventure.text.format.TextColor
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.File
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 object PlayerHeadManager : BetterHudManager {
+
+    override val managerName: String = "Player head"
+    override val supportExternalPacks: Boolean = true
 
     private val skinProviders = ArrayList<PlayerSkinProvider>()
     private val defaultProviders = GameProfileSkinProvider()
@@ -88,13 +92,14 @@ object PlayerHeadManager : BetterHudManager {
         headMap[name]
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        synchronized(this) {
-            headMap.clear()
-            headNameComponent.clear()
-        }
+    override fun preReload() {
+        headMap.clear()
+        headNameComponent.clear()
         headLock.clear()
         headCache.clear()
+    }
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         loadingHead = when (val name = ConfigManagerImpl.loadingHead) {
             "random" -> {
                 {
@@ -107,7 +112,7 @@ object PlayerHeadManager : BetterHudManager {
                 }
             }
         }
-        DATA_FOLDER.subFolder("heads").forEachAllYaml(info.sender) { file, s, yamlObject ->
+        workingDirectory.subFolder("heads").forEachAllYaml(info.sender) { file, s, yamlObject ->
             runCatching {
                 headMap.putSync("head") {
                     val head = HeadElement(s, yamlObject)

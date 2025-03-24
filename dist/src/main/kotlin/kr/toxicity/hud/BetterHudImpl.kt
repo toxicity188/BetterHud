@@ -113,9 +113,18 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                     it.preReload()
                 }
                 val resource = GlobalResource(info)
+                DATA_FOLDER.subFolder("packs").forEach { pack ->
+                    if (!pack.isDirectory || pack.name.startsWith('-')) return@forEach
+                    managers.filter {
+                        it.supportExternalPacks
+                    }.forEach {
+                        debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName} in ${pack.name}...")
+                        it.reload(pack, info, resource)
+                    }
+                }
                 managers.forEach {
-                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.javaClass.simpleName}...")
-                    it.reload(info, resource)
+                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName}...")
+                    it.reload(DATA_FOLDER, info, resource)
                 }
                 managers.forEach {
                     it.postReload()
@@ -145,7 +154,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         DatabaseManagerImpl.currentDatabase.close()
     }
 
-    override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint) ?: 3
+    override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint)
 
     override fun loadAssets(prefix: String, dir: File) {
         loadAssets(prefix) { s, i ->

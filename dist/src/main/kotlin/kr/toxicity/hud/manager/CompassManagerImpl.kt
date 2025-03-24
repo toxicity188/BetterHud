@@ -7,9 +7,13 @@ import kr.toxicity.hud.compass.CompassImpl
 import kr.toxicity.hud.compass.CompassType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import java.io.File
 import java.util.*
 
 object CompassManagerImpl : BetterHudManager, CompassManager {
+
+    override val managerName: String = "Background"
+    override val supportExternalPacks: Boolean = true
 
     private val compassMap = HashMap<String, CompassImpl>()
 
@@ -17,10 +21,14 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
     }
 
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun preReload() {
         compassMap.clear()
-        val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("compasses").forEachAllYaml(info.sender) { f, s, c ->
+    }
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        compassMap.clear()
+        val assets = workingDirectory.subFolder("assets")
+        workingDirectory.subFolder("compasses").forEachAllYaml(info.sender) { f, s, c ->
             runCatching {
                 compassMap.putSync("compass") {
                     c["type"]?.asString().ifNull { "type value not set." }.run {

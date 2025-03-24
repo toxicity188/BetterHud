@@ -18,12 +18,16 @@ import kr.toxicity.hud.util.JavaBoolean
 import kr.toxicity.hud.util.JavaNumber
 import kr.toxicity.hud.util.JavaString
 import kr.toxicity.hud.util.ifNull
+import java.io.File
 import java.text.DecimalFormat
 import java.util.*
 import java.util.function.Function
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
+
+    override val managerName: String = "Placeholder"
+    override val supportExternalPacks: Boolean = false
 
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
@@ -362,7 +366,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

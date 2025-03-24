@@ -25,6 +25,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.File
 
 object CommandManager : BetterHudManager {
+
+    override val managerName: String = "Command"
+    override val supportExternalPacks: Boolean = false
+
     val library = BetterCommand(DATA_FOLDER.subFolder("lang").apply {
         PLUGIN.loadAssets("lang") { name, stream ->
             val file = File(this, name)
@@ -543,7 +547,7 @@ object CommandManager : BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         library.reload()
     }
 

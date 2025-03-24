@@ -11,11 +11,16 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
+import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object ShaderManagerImpl : BetterHudManager, ShaderManager {
+
+    override val managerName: String = "Shader"
+    override val supportExternalPacks: Boolean = false
+
     var barColor = BossBar.Color.YELLOW
         private set
 
@@ -97,7 +102,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         }
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         constants.clear()
         runCatching {
             val shaders = ShaderType.entries.map {

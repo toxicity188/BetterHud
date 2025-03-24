@@ -10,6 +10,10 @@ import java.io.File
 
 //TODO replace it to proper background in the future.
 object BackgroundManager : BetterHudManager {
+
+    override val managerName: String = "Background"
+    override val supportExternalPacks: Boolean = true
+
     private val backgroundMap = HashMap<String, HudBackground>()
 
     override fun start() {
@@ -18,9 +22,12 @@ object BackgroundManager : BetterHudManager {
 
     fun getBackground(name: String) = backgroundMap[name]
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        val folder = DATA_FOLDER.subFolder("backgrounds")
+    override fun preReload() {
         backgroundMap.clear()
+    }
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        val folder = workingDirectory.subFolder("backgrounds")
         folder.forEach {
             if (it.extension == "yml") {
                 runCatching {

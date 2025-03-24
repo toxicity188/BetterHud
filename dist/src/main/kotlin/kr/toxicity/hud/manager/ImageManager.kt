@@ -8,9 +8,13 @@ import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 object ImageManager : BetterHudManager {
+
+    override val managerName: String = "Image"
+    override val supportExternalPacks: Boolean = true
 
     private val imageMap = HashMap<String, ImageElement>()
     private val imageNameComponent = ConcurrentHashMap<HudLayout.Identifier, WidthComponent>()
@@ -31,26 +35,26 @@ object ImageManager : BetterHudManager {
         imageMap[name]
     }
 
+    override fun preReload() {
+        imageMap.clear()
+    }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        synchronized(imageMap) {
-            imageMap.clear()
-            imageNameComponent.clear()
-        }
-        val assets = DATA_FOLDER.subFolder("assets")
-        DATA_FOLDER.subFolder("images").forEachAllYaml(info.sender) { file, s, yamlObject ->
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        val assets = workingDirectory.subFolder("assets")
+        val map = HashMap<String, ImageElement>()
+        workingDirectory.subFolder("images").forEachAllYaml(info.sender) { file, s, yamlObject ->
             runCatching {
                 val image = ImageType.valueOf(
                     yamlObject["type"]?.asString().ifNull { "type value not set." }.uppercase()
                 ).createElement(assets, info.sender, file, s, yamlObject)
-                imageMap.putSync("image") {
+                map.putSync("image") {
                     image
                 }
             }.onFailure {
                 it.handle(info.sender, "Unable to load this image: $s in ${file.name}")
             }
         }
-        imageMap.values.forEach { value ->
+        map.values.forEach { value ->
             val list = value.image
             if (list.isNotEmpty()) {
                 list.distinctBy {
@@ -62,6 +66,7 @@ object ImageManager : BetterHudManager {
                 }
             }
         }
+        imageMap += map
     }
 
     override fun postReload() {

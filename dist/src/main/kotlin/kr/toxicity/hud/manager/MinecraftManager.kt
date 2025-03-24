@@ -21,6 +21,9 @@ object MinecraftManager : BetterHudManager {
 
     private const val ASSETS_LOCATION = "assets/minecraft/textures/"
 
+    override val managerName: String = "Minecraft"
+    override val supportExternalPacks: Boolean = false
+
     private val assetsMap = Collections.synchronizedSet(HashSet<MinecraftAsset>())
 
     fun applyAll(layout: TextLayout, intGetter: () -> Int): IntKeyMap<ImageTextScale> {
@@ -49,7 +52,7 @@ object MinecraftManager : BetterHudManager {
 
     private var previous = ""
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
             if (assetsMap.isEmpty() || previous != current) {

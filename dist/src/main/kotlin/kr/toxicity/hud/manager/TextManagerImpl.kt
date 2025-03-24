@@ -29,6 +29,9 @@ import kotlin.math.roundToInt
 
 object TextManagerImpl : BetterHudManager, TextManager {
 
+    override val managerName: String = "Text"
+    override val supportExternalPacks: Boolean = true
+
     private data class TextCache(
         val name: String,
         val imagesName: Set<String>,
@@ -225,16 +228,17 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
-        synchronized(this) {
-            fontIndex = 0
-            textMap.clear()
-            textWidthMap.clear()
-            textKeyMap.clear()
-            textCacheMap.clear()
-        }
-        val assetsFolder = DATA_FOLDER.subFolder("assets")
-        val fontFolder = DATA_FOLDER.subFolder("fonts")
+    override fun preReload() {
+        fontIndex = 0
+        textMap.clear()
+        textWidthMap.clear()
+        textKeyMap.clear()
+        textCacheMap.clear()
+    }
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        val assetsFolder = workingDirectory.subFolder("assets")
+        val fontFolder = workingDirectory.subFolder("fonts")
 
         val defaultArray = jsonArrayOf(
             jsonObjectOf(
@@ -273,7 +277,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
         }
 
         val suppliers = mutableListOf<TextSupplier>()
-        DATA_FOLDER.subFolder("texts").forEachAllYaml(info.sender) { file, s, section ->
+        workingDirectory.subFolder("texts").forEachAllYaml(info.sender) { file, s, section ->
             runCatching {
                 val fontDir = section["file"]?.asString()?.let {
                     File(fontFolder, it).ifNotExist { "this file doesn't exist: $it" }
@@ -321,6 +325,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                     "bitmap" -> {
                         parseBitmapFont(
+                            workingDirectory,
                             s,
                             resource.textures,
                             section["chars"].ifNull { "Unable to find 'chars' array." }.asObject().mapSubConfiguration { _, obj ->
@@ -458,6 +463,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
     private fun parseBitmapFont(
+        workingDirectory: File,
         saveName: String,
         imageSaveFolder: List<String>,
         data: List<BitmapData>,
@@ -474,7 +480,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
             TextSupplier {
                 val charWidthMap = intKeyMapOf<TextScale>()
                 val textArray = ArrayList<HudTextArray>()
-                val assetsFolder = DATA_FOLDER.subFolder("assets")
+                val assetsFolder = workingDirectory.subFolder("assets")
                 debug(ConfigManager.DebugLevel.ASSETS, "Generating bitmap text $saveName...")
                 data.forEachIndexed { i, d ->
                     val file = File(assetsFolder, d.file.replace('/', File.separatorChar))
