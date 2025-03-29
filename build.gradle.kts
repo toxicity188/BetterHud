@@ -61,7 +61,7 @@ tasks.register("modrinthPublish") {
     finalizedBy(
         tasks.modrinthSyncBody,
         bukkit.tasks.modrinth,
-        fabric.tasks.modrinth,
+        //fabric.tasks.modrinth, TODO Add it when adventure-platform-fabric is released.
         velocity.tasks.modrinth
     )
 }
@@ -74,8 +74,8 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.2.1")
-            hangar("ViaBackwards", "5.2.1")
+            hangar("ViaVersion", "5.3.0")
+            hangar("ViaBackwards", "5.3.0")
             hangar("PlaceholderAPI", "2.11.6")
             hangar("Skript", "2.10.2")
         }

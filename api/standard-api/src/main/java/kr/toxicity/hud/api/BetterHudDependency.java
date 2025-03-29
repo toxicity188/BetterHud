@@ -242,7 +242,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency OPTION = new BetterHudDependency(
             "net{}kyori",
             "option",
-            "1.0.0",
+            "1.1.0",
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );

@@ -52,7 +52,7 @@ public enum NMSVersion {
     /**
      * 1.21.5
      */
-    V1_21_R4(21,3, 55)
+    V1_21_R4(21,4, 55)
     ;
     /**
      * Main version.

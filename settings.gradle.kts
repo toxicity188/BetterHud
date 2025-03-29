@@ -31,6 +31,7 @@ include(
     "nms:v1_21_R1",
     "nms:v1_21_R2",
     "nms:v1_21_R3",
+    "nms:v1_21_R4",
 
     "scheduler:standard",
     "scheduler:paper",

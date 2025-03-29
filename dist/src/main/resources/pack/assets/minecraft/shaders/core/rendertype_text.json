@@ -4,8 +4,8 @@
         "srcrgb": "srcalpha",
         "dstrgb": "1-srcalpha"
     },
-    "vertex": "text",
-    "fragment": "text",
+    "vertex": "rendertype_text",
+    "fragment": "rendertype_text",
     "attributes": [
         "Position",
         "Color",

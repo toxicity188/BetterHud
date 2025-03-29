@@ -218,11 +218,11 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         }
                     }
                 }.toByteArray()
-                PackGenerator.addTask(resource.core + key.fileName) {
+                PackGenerator.addTask(resource.core + key.shadersCoreName) {
                     byte
                 }
                 //+1.21.2
-                PackGenerator.addTask(resource.shaders + key.fileName) {
+                PackGenerator.addTask(resource.shaders + key.shadersCoreName) {
                     byte
                 }
             }

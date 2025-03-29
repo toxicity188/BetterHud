@@ -253,9 +253,9 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     }
 
 
-    override fun minecraftVersion(): String = "1.21.4"
+    override fun minecraftVersion(): String = "1.21.5"
 
-    override fun mcmetaVersion(): Int = 46
+    override fun mcmetaVersion(): Int = 55
 
     private val uuidMap = ConcurrentHashMap<String, UUID>()
 

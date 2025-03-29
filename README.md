@@ -22,9 +22,9 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(with Folia) 1.19-1.21.4
+- Bukkit(with Folia) 1.19-1.21.5
 - Velocity 3.3-3.4
-- Fabric server 1.21.2-1.21.4
+- Fabric server 1.21.5
 
 ### Library
 - [kotlin stdlib](https://github.com/JetBrains/kotlin): Implements better functional programming.

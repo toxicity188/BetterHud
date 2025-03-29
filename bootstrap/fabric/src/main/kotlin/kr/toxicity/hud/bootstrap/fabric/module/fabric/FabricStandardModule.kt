@@ -154,7 +154,7 @@ class FabricStandardModule : FabricModule {
             },
             "hotbar_slot" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.fabricPlayer.inventory.selected
+                    p.fabricPlayer.inventory.selectedSlot
                 }
             },
             "potion_effect_duration" to HudPlaceholder.builder<Number>()

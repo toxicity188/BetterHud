@@ -127,7 +127,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     mysql.close()
                 }
 
-                fun open(block: Connection.() -> Unit): Boolean {
+                fun transaction(block: Connection.() -> Unit): Boolean {
                     return runCatching{
                         mysql.connection.use {
                             block(it)
@@ -138,16 +138,17 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     }.getOrDefault(false)
                 }
 
-                fun PreparedStatement.forEach(block: ResultSet.() -> Unit) = use {
-                    it.executeQuery().forEach(block)
+                fun Connection.query(sql: String, query: PreparedStatement.() -> Unit = {}, block: ResultSet.() -> Unit) = prepareStatement(sql).use {
+                    it.query()
+                    it.executeQuery().query(block)
                 }
 
-                fun PreparedStatement.update(block: PreparedStatement.() -> Unit = {}) = use {
-                    block(it)
+                fun Connection.update(sql: String, block: PreparedStatement.() -> Unit = {}) = prepareStatement(sql).use {
+                    it.block()
                     it.executeUpdate()
                 }
 
-                fun ResultSet.forEach(block: ResultSet.() -> Unit) = use {
+                fun ResultSet.query(block: ResultSet.() -> Unit) = use {
                     while (it.next()) block(this)
                 }
 
@@ -156,8 +157,10 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                 override fun load(player: HudPlayer) {
                     asyncTask {
                         val uuid = player.uuid().toString()
-                        open {
-                            prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").forEach {
+                        transaction {
+                            query("SELECT type, name FROM enabled_hud WHERE uuid = ?;", {
+                                setString(1, uuid)
+                            }) {
                                 when (getString("type")) {
                                     "hud" -> HudManagerImpl.getHud(getString("name"))?.let { h ->
                                         if (!h.isDefault) h.add(player)
@@ -170,7 +173,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                                     }
                                 }
                             }
-                            prepareStatement("SELECT type, name FROM enabled_hud WHERE uuid = '$uuid';").forEach {
+                            query("SELECT type, name FROM enabled_hud WHERE uuid = ?;", {
+                                setString(1, uuid)
+                            }) {
                                 when (getString("type")) {
                                     "hud" -> HudManagerImpl.getHud(getString("name"))?.let { h ->
                                         if (!h.isDefault) h.add(player)
@@ -183,7 +188,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                                     }
                                 }
                             }
-                            prepareStatement("SELECT value FROM enabled_pointed_location WHERE uuid = '$uuid';").forEach {
+                            query("SELECT value FROM enabled_pointed_location WHERE uuid = ?;", {
+                                setString(1, uuid)
+                            }) {
                                 runCatching {
                                     player.pointers().add(PointedLocation.deserialize(getString("value")
                                         .toBase64Json()
@@ -198,18 +205,19 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
 
                 override fun save(player: HudPlayer): Boolean {
                     val uuid = player.uuid().toString()
-                    return open {
-                        prepareStatement("DELETE FROM enabled_hud WHERE uuid = '$uuid';").update()
-                        prepareStatement("DELETE FROM enabled_pointed_location WHERE uuid = '$uuid';").update()
+                    return transaction {
+                        update("DELETE FROM enabled_hud WHERE uuid = ?;") {
+                            setString(1, uuid)
+                        }
+                        update("DELETE FROM enabled_pointed_location WHERE uuid = ?;") {
+                            setString(1, uuid)
+                        }
                         fun save(name: String, supplier: () -> Set<HudObject>) {
-                            supplier().filter { h ->
-                                !h.isDefault
-                            }.forEach { h ->
-                                prepareStatement("INSERT INTO enabled_hud(uuid, type, name) VALUES(?, ?, ?);").update {
-                                    setString(1, uuid)
-                                    setString(2, name)
-                                    setString(3, h.name)
-                                }
+                            val values = supplier().filter { !it.isDefault }.joinToString(", ") { h ->
+                                "('$uuid', '$name', '${h.name}')"
+                            }
+                            if (values.isNotEmpty()) {
+                                update("INSERT INTO enabled_hud(uuid, type, name) VALUES $values;")
                             }
                         }
                         save("hud") {
@@ -221,12 +229,11 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                         save("compass") {
                             player.compasses
                         }
-                        player.pointers().forEach {
-                            prepareStatement("INSERT INTO enabled_pointed_location(uuid, name, value) VALUES(?, ?, ?);").update {
-                                setString(1, uuid)
-                                setString(2, it.name)
-                                setString(3, it.serialize().toJsonElement().toBase64String())
-                            }
+                        val pointerValues = player.pointers().joinToString(", ") { p ->
+                            "('$uuid', '${p.name}', '${p.serialize().toJsonElement().toBase64String()}')"
+                        }
+                        if (pointerValues.isNotEmpty()) {
+                            update("INSERT INTO enabled_pointed_location(uuid, name, value) VALUES $pointerValues;")
                         }
                     }
                 }
