@@ -159,7 +159,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             if (yaml.getAsBoolean("disable-level-text", false)) replaceList += "HideExp"
 
             yaml["hotbar"]?.asObject()?.let {
-                if (it.getAsBoolean("disable", false)) {
+                if (!it.getAsBoolean("disable", false)) {
                     replaceList += "RemapHotBar"
                     val locations =
                         it.get("locations")?.asObject().ifNull { "locations configuration not set." }
