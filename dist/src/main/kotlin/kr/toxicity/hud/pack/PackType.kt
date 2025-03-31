@@ -58,7 +58,7 @@ enum class PackType {
             }
         }
 
-        override fun createGenerator(info: ReloadInfo): Generator {
+        override fun createGenerator(meta: PackMeta, info: ReloadInfo): Generator {
             val build = DATA_FOLDER.parentFile.subFolder(ConfigManagerImpl.buildFolderLocation)
             val pathLength = build.path.length + 1
             val builder = FileTreeBuilder(build)
@@ -95,7 +95,7 @@ enum class PackType {
             val zip: ZipOutputStream
         ) : Builder()
 
-        override fun createGenerator(info: ReloadInfo): Generator {
+        override fun createGenerator(meta: PackMeta, info: ReloadInfo): Generator {
             val protection = ConfigManagerImpl.enableProtection
             val host = ConfigManagerImpl.enableSelfHost
             val message = runCatching {
@@ -128,13 +128,7 @@ enum class PackType {
                 BOOTSTRAP.resource("icon.png")?.buffered()?.use {
                     addEntry(ZipEntry("pack.png"), it.readAllBytes())
                 }
-                addEntry(
-                    ZipEntry("pack.mcmeta"), jsonObjectOf(
-                    "pack" to jsonObjectOf(
-                        "pack_format" to BOOTSTRAP.mcmetaVersion(),
-                        "description" to "BetterHud's self-host pack."
-                    )
-                ).toByteArray())
+                addEntry(PackMeta.zipEntry, meta.toByteArray())
             }
             return object : Generator {
                 override val resourcePack: Map<String, ByteArray>
@@ -176,7 +170,7 @@ enum class PackType {
         }
     },
     NONE {
-        override fun createGenerator(info: ReloadInfo): Generator {
+        override fun createGenerator(meta: PackMeta, info: ReloadInfo): Generator {
             val builder = Builder()
             return object : Generator {
                 override val resourcePack: Map<String, ByteArray>
@@ -211,7 +205,7 @@ enum class PackType {
         val byteArrayMap = HashMap<String, ByteArray>()
     }
     
-    abstract fun createGenerator(info: ReloadInfo): Generator
+    abstract fun createGenerator(meta: PackMeta, info: ReloadInfo): Generator
     
     interface Generator : (PackFile) -> Unit, AutoCloseable {
         val resourcePack: Map<String, ByteArray>

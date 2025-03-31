@@ -12,6 +12,7 @@ object PackGenerator {
     fun generate(info: ReloadInfo): Map<String, ByteArray> {
         val sender = info.sender
         val resourcePack = runCatching {
+            var meta = PackMeta.default
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
@@ -27,11 +28,17 @@ object PackGenerator {
                     }
                 }
                 mergeTarget.forEach { target ->
-                    addFile(target)
+                    if (target.name == "pack.mcmeta") {
+                        runCatching {
+                            meta += PackMeta.fromFile(target)
+                        }.getOrElse {
+                            it.handle("Invalid pack.mcmeta: ${target.path}")
+                        }
+                    } else addFile(target)
                 }
             }
             runCatching {
-                ConfigManagerImpl.packType.createGenerator(info).use { saveTask ->
+                ConfigManagerImpl.packType.createGenerator(meta, info).use { saveTask ->
                     tasks.values.forEachAsync { t ->
                         runCatching {
                             saveTask(t)
