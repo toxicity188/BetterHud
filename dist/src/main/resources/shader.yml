@@ -3,7 +3,7 @@ bar-color: yellow
 disable-level-text: false
 
 hotbar:
-  disable: false
+  enable-hotbar-relocation: false
   locations:
     1:
       gui:

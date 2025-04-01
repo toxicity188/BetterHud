@@ -74,8 +74,8 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.3.0")
-            hangar("ViaBackwards", "5.3.0")
+            hangar("ViaVersion", "5.3.1")
+            hangar("ViaBackwards", "5.3.1")
             hangar("PlaceholderAPI", "2.11.6")
             hangar("Skript", "2.10.2")
         }
