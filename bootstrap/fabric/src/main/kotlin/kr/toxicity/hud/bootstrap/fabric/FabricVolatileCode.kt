@@ -1,34 +1,31 @@
 package kr.toxicity.hud.bootstrap.fabric
 
-import com.google.gson.JsonObject
-import com.mojang.serialization.JsonOps
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
-import io.netty.channel.Channel
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.fabric.player.FabricCommonPacketListener
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
+import kr.toxicity.hud.bootstrap.fabric.util.toAdventure
+import kr.toxicity.hud.bootstrap.fabric.util.toMinecraft
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.core.RegistryAccess
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtOps
 import net.minecraft.network.Connection
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent
 import java.util.*
@@ -46,28 +43,10 @@ class FabricVolatileCode : VolatileCodeHandler {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
-        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = ServerCommonPacketListenerImpl::class.java.declaredFields.first { f ->
-            f.type == Connection::class.java
-        }.apply {
-            isAccessible = true
-        }.let { get ->
-            {
-                get[it] as Connection
-            }
-        }
-        private val getChannel: (Connection) -> Channel = Connection::class.java.declaredFields.first {
-            it.type == Channel::class.java
-        }.apply {
-            isAccessible = true
-        }.let { get ->
-            {
-                get[it] as Channel
-            }
-        }
 
         fun createBossBar(byteBuf: RegistryFriendlyByteBuf): ClientboundBossEventPacket = ClientboundBossEventPacket.STREAM_CODEC.decode(byteBuf)
 
-        private fun getColor(color: BossBar.Color) =  when (color) {
+        private fun getColor(color: BossBar.Color) = when (color) {
             BossBar.Color.PINK -> BossEvent.BossBarColor.PINK
             BossBar.Color.BLUE -> BossEvent.BossBarColor.BLUE
             BossBar.Color.RED -> BossEvent.BossBarColor.RED
@@ -76,18 +55,7 @@ class FabricVolatileCode : VolatileCodeHandler {
             BossBar.Color.PURPLE -> BossEvent.BossBarColor.PURPLE
             BossBar.Color.WHITE -> BossEvent.BossBarColor.WHITE
         }
-
-        private val codec = ComponentSerialization.CODEC
-
-        private fun toAdventure(component: net.minecraft.network.chat.Component) = if (component.style.isEmpty && component.contents is PlainTextContents) {
-            Component.text((component.contents as PlainTextContents).text())
-        } else {
-            GsonComponentSerializer.gson().deserializeFromTree(codec.encode(component, JsonOps.INSTANCE, JsonObject()).orThrow)
-        }
-        private fun fromAdventure(component: Component) = codec.decode(JsonOps.INSTANCE, GsonComponentSerializer.gson().serializeToTree(component)).orThrow.first
     }
-
-
 
     override fun inject(player: HudPlayer, color: BossBar.Color) {
         val h = player.handle() as ServerPlayer
@@ -104,7 +72,10 @@ class FabricVolatileCode : VolatileCodeHandler {
     }
 
     override fun getTextureValue(player: HudPlayer): String {
-        return (player.handle() as ServerPlayer).gameProfile.properties.get("textures").first().value
+        val value = (player.handle() as ServerPlayer)
+            .gameProfile
+            .properties["textures"]
+        return if (value.isNotEmpty()) value.first().value else ""
     }
 
     private class CachedHudBossbar(val hud: HudBossBar, val cacheUUID: UUID, val buf: HudByteBuf)
@@ -131,7 +102,7 @@ class FabricVolatileCode : VolatileCodeHandler {
         private var onUse = uuid to HudByteBuf(Unpooled.buffer())
 
         init {
-            val pipeLine = getChannel(getConnection(listener)).pipeline()
+            val pipeLine = (listener as FabricCommonPacketListener).`betterHud$channel`().pipeline()
             pipeLine.toMap().forEach {
                 if (it.value is Connection) pipeLine.addBefore(it.key, INJECT_NAME, this)
             }
@@ -175,7 +146,7 @@ class FabricVolatileCode : VolatileCodeHandler {
             fun changeName(targetBuf: HudByteBuf = buf) {
                 runCatching {
                     val hud = BetterHudAPI.inst().playerManager.getHudPlayer(player.uuid) ?: return
-                    val comp = toAdventure(targetBuf.readComponentTrusted())
+                    val comp = targetBuf.readComponentTrusted().toAdventure()
                     val key = BetterHudAPI.inst().defaultKey
                     fun applyFont(component: Component): Component {
                         return component.font(key).children(component.children().map {
@@ -382,10 +353,10 @@ class FabricVolatileCode : VolatileCodeHandler {
         }
     }
 
-    private class HudBossBar(val uuid: UUID, component: net.minecraft.network.chat.Component, color: BossBarColor): BossEvent(uuid, component, color, BossBarOverlay.PROGRESS) {
+    private class HudBossBar(val uuid: UUID, component: net.minecraft.network.chat.Component, color: BossBarColor) : BossEvent(uuid, component, color, BossBarOverlay.PROGRESS) {
         constructor(uuid: UUID, component: Component, color: BossBar.Color): this(
             uuid,
-            fromAdventure(component),
+            component.toMinecraft(),
             getColor(color)
         )
         override fun getProgress(): Float {

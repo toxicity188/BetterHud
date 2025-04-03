@@ -95,6 +95,9 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var disableLegacyOffset = false
         private set
 
+    val namespace
+        get() = key.namespace
+
     override fun start() {
         preReload()
     }

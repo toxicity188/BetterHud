@@ -20,6 +20,8 @@ fun File.forEach(block: (File) -> Unit) {
     }?.forEach(block)
 }
 
+fun File.isNotEmptyDirectory() = listFiles()?.isNotEmpty() == true
+
 fun File.forEachAllFolder(block: (File) -> Unit) {
     if (name.startsWith('-')) return debug(ConfigManager.DebugLevel.FILE, "File skipped: $path")
     if (isDirectory) forEach {

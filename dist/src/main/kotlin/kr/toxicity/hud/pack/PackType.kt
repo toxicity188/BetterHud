@@ -21,17 +21,36 @@ enum class PackType {
         @Volatile
         private var beforeByte = 0L
         private inner class FileTreeBuilder(
-            private val build: File
+            private val info: ReloadInfo
         ) : Builder() {
-            val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
+            private val build = DATA_FOLDER.parentFile.subFolder(ConfigManagerImpl.buildFolderLocation)
+            private val locationMap = TreeMap<String, File>(Comparator.reverseOrder())
+            private val skipIo = info.has(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK) && build.isNotEmptyDirectory()
+
+            init {
+                if (!skipIo) {
+                    fun getAllLocation(file: File, length: Int) {
+                        locationMap.put(file.path.substring(length), file)?.let {
+                            info.sender.warn("Duplicated file skipped: ${file.path} and ${it.path}")
+                        }
+                        file.forEach {
+                            getAllLocation(it, length)
+                        }
+                    }
+                    build.forEach {
+                        getAllLocation(it, build.path.length + 1)
+                    }
+                }
+            }
 
             fun save(packFile: PackFile) {
-                val replace = packFile.path.replace('/', File.separatorChar)
                 val arr = packFile()
                 synchronized(this) {
                     byte += arr.size
                     byteArrayMap[packFile.path] = arr
                 }
+                if (skipIo) return
+                val replace = packFile.path.replace('/', File.separatorChar)
                 (synchronized(locationMap) {
                     locationMap.remove(replace)
                 } ?: File(build, replace).apply {
@@ -40,13 +59,15 @@ enum class PackType {
                     stream.write(arr)
                 }
             }
+
             fun close() {
+                if (skipIo) return
                 synchronized(this) {
                     if (ConfigManagerImpl.clearBuildFolder) {
-                        val iterator = locationMap.values.iterator()
+                        val iterator = locationMap.iterator()
                         while (iterator.hasNext()) {
-                            val next = iterator.next()
-                            if (next.listFiles()?.isNotEmpty() == true) continue
+                            val (path, next) = iterator.next()
+                            if (!path.startsWith("assets/${ConfigManagerImpl.namespace}") || next.listFiles()?.isNotEmpty() == true) continue
                             next.delete()
                         }
                     }
@@ -59,20 +80,7 @@ enum class PackType {
         }
 
         override fun createGenerator(meta: PackMeta, info: ReloadInfo): Generator {
-            val build = DATA_FOLDER.parentFile.subFolder(ConfigManagerImpl.buildFolderLocation)
-            val pathLength = build.path.length + 1
-            val builder = FileTreeBuilder(build)
-            fun getAllLocation(file: File, length: Int) {
-                builder.locationMap.put(file.path.substring(length), file)?.let {
-                    info.sender.warn("Duplicated file skipped: ${file.path} and ${it.path}")
-                }
-                file.forEach {
-                    getAllLocation(it, length)
-                }
-            }
-            build.forEach {
-                getAllLocation(it, pathLength)
-            }
+            val builder = FileTreeBuilder(info)
             return object : Generator {
                 override val resourcePack: Map<String, ByteArray>
                     get() = Collections.unmodifiableMap(builder.byteArrayMap)
@@ -135,13 +143,13 @@ enum class PackType {
                     get() = Collections.unmodifiableMap(zip.byteArrayMap)
 
                 override fun close() {
+                    if (message == null) return warn("Unable to find SHA-1 algorithm, skipped.")
                     synchronized(zip) {
                         zip.zip.close()
                         val finalByte = stream.toByteArray()
                         info(
                                 "File packed: ${if (beforeByte > 0) "${mbFormat(beforeByte)} -> ${mbFormat(finalByte.size.toLong())}" else mbFormat(finalByte.size.toLong())}",
                         )
-                        if (message == null) return warn("Unable to find SHA-1 algorithm, skipped.")
                         var previousUUID = PackUUID.previous
                         if (previousUUID == null || ConfigManagerImpl.forceUpdate || beforeByte != finalByte.size.toLong() || info.has(ReloadFlagType.FORCE_GENERATE_RESOURCE_PACK)) {
                             beforeByte = finalByte.size.toLong()

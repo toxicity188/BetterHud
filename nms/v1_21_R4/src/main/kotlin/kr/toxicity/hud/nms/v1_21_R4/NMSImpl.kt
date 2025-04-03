@@ -1,5 +1,6 @@
 package kr.toxicity.hud.nms.v1_21_R4
 
+import com.mojang.authlib.GameProfile
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
@@ -16,6 +17,8 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.nms.v1_21_R4.entity.CraftEntityView
 import kr.toxicity.hud.nms.v1_21_R4.entity.CraftLivingEntityView
+import kr.toxicity.hud.nms.v1_21_R4.entity.createAdaptedFieldGetter
+import kr.toxicity.hud.nms.v1_21_R4.entity.unsafeHandle
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
@@ -71,21 +74,9 @@ class NMSImpl : NMS {
         } as Class<out Enum<*>>
 
         private val operationEnum = operation.enumConstants
-        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = if (BetterHudAPI.inst().bootstrap().isPaper) {
-            {
-                it.connection
-            }
-        } else {
-            ServerCommonPacketListenerImpl::class.java.declaredFields.first { f ->
-                f.type == Connection::class.java
-            }.apply {
-                isAccessible = true
-            }.let { get ->
-                {
-                    get[it] as Connection
-                }
-            }
-        }
+
+        private val getGameProfile: (net.minecraft.world.entity.player.Player) -> GameProfile = createAdaptedFieldGetter { it.gameProfile }
+        private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = createAdaptedFieldGetter { it.connection }
 
         fun createBossBar(byteBuf: RegistryFriendlyByteBuf): ClientboundBossEventPacket = ClientboundBossEventPacket.STREAM_CODEC.decode(byteBuf)
 
@@ -121,7 +112,9 @@ class NMSImpl : NMS {
     }
 
     override fun getTextureValue(player: HudPlayer): String {
-        return (player.handle() as CraftPlayer).handle.gameProfile.properties.get("textures").first().value
+        val value = getGameProfile((player.handle() as CraftPlayer).handle)
+            .properties["textures"]
+        return if (value.isNotEmpty()) value.first().value else ""
     }
 
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
@@ -157,13 +150,13 @@ class NMSImpl : NMS {
     }
 
     override fun getFoliaAdaptedPlayer(player: Player): Player {
-        val handle = (player as CraftPlayer).handle
-        return object : CraftPlayer(Bukkit.getServer() as CraftServer, handle) {
+        val craftPlayer = player as CraftPlayer
+        return object : CraftPlayer(Bukkit.getServer() as CraftServer, craftPlayer.unsafeHandle as ServerPlayer) {
             override fun getPersistentDataContainer(): CraftPersistentDataContainer {
                 return player.persistentDataContainer
             }
             override fun getHandle(): ServerPlayer {
-                return handle
+                return craftPlayer.unsafeHandle as ServerPlayer
             }
             override fun dropItem(dropAll: Boolean): Boolean {
                 return player.dropItem(dropAll)
@@ -514,7 +507,7 @@ class NMSImpl : NMS {
         }
     }
 
-    private class HudBossBar(val uuid: UUID, component: net.minecraft.network.chat.Component, color: BossBarColor): BossEvent(uuid, component, color, BossBarOverlay.PROGRESS) {
+    private class HudBossBar(val uuid: UUID, component: net.minecraft.network.chat.Component, color: BossBarColor) : BossEvent(uuid, component, color, BossBarOverlay.PROGRESS) {
         constructor(uuid: UUID, component: Component, color: BossBar.Color): this(
             uuid,
             fromAdventure(component),

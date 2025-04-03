@@ -8,6 +8,8 @@
   },
   "mixins": [
     "entity.EntityMixin",
-    "entity.LivingEntityMixin"
+    "entity.LivingEntityMixin",
+    "player.ConnectionMixin",
+    "player.ServerCommonPacketListenerImplMixin"
   ]
 }

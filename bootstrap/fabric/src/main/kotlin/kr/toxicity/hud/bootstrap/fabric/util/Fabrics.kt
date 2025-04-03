@@ -36,7 +36,10 @@ inline fun <reified T : FabricEvent<*>, R : Any> UpdateEvent.unwrap(block: (T) -
     } else throw RuntimeException("Unsupported update found: ${javaClass.simpleName}")
 }
 
-fun Component.toMiniMessageString() = MiniMessage.miniMessage().serialize(NonWrappingComponentSerializer.INSTANCE.deserialize(this))
+fun Component.toAdventure() = NonWrappingComponentSerializer.INSTANCE.deserialize(this)
+fun net.kyori.adventure.text.Component.toMinecraft() = NonWrappingComponentSerializer.INSTANCE.serialize(this)
+
+fun Component.toMiniMessageString() = MiniMessage.miniMessage().serialize(toAdventure())
 
 fun <T : FabricEvent<*>> createFabricTrigger(
     registry: EventRegistry<T>,

@@ -9,11 +9,11 @@ public interface FabricLivingEntity {
      * Gets last damage.
      * @return last damage
      */
-    double betterhud$getLastDamage();
+    double betterHud$getLastDamage();
 
     /**
      * Gets health + last damage.
      * @return last health
      */
-    double betterhud$getLastHealth();
+    double betterHud$getLastHealth();
 }

@@ -12,16 +12,11 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionAttachmentInfo
 
 class CraftLivingEntityView(
-    val source: CraftLivingEntity,
-    val nmsSource: LivingEntity
-) : CraftLivingEntity(Bukkit.getServer() as CraftServer, nmsSource) {
-    constructor(source: CraftLivingEntity): this(
-        source,
-        source.unsafeHandle as LivingEntity
-    )
+    val source: CraftLivingEntity
+) : CraftLivingEntity(Bukkit.getServer() as CraftServer, source.unsafeHandle as LivingEntity) {
 
     override fun getHandle(): LivingEntity? {
-        return nmsSource
+        return source.unsafeHandle as LivingEntity
     }
 
     override fun getPersistentDataContainer(): CraftPersistentDataContainer {

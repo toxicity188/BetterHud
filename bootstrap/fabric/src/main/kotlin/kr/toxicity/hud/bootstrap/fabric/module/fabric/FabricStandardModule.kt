@@ -83,18 +83,18 @@ class FabricStandardModule : FabricModule {
             },
             "last_damage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastDamage`()
+                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastDamage`()
                 }
             },
             "last_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastHealth`()
+                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastHealth`()
                 }
             },
             "last_health_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.fabricPlayer as FabricLivingEntity).let {
-                        it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                        it.`betterHud$getLastHealth`() / (it as LivingEntity).maxHealth
                     }
                 }
             },

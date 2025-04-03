@@ -20,7 +20,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -101,44 +100,40 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     private val onReload = AtomicBoolean()
 
     override fun reload(info: ReloadInfo): ReloadState {
-        if (onReload.get()) return ReloadState.ON_RELOAD
-        onReload.set(true)
+        if (!onReload.compareAndSet(false, true)) return ReloadState.ON_RELOAD
         val time = System.currentTimeMillis()
-        val result = CompletableFuture.supplyAsync {
-            reloadStartTask.forEach {
-                it()
+        reloadStartTask.forEach {
+            it()
+        }
+        val result = runCatching {
+            managers.forEach {
+                it.preReload()
             }
-            val result = runCatching {
-                managers.forEach {
-                    it.preReload()
+            val resource = GlobalResource(info)
+            DATA_FOLDER.subFolder("packs").forEach { pack ->
+                if (!pack.isDirectory || pack.name.startsWith('-')) return@forEach
+                managers.filter {
+                    it.supportExternalPacks
+                }.forEach {
+                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName} in ${pack.name}...")
+                    it.reload(pack, info, resource)
                 }
-                val resource = GlobalResource(info)
-                DATA_FOLDER.subFolder("packs").forEach { pack ->
-                    if (!pack.isDirectory || pack.name.startsWith('-')) return@forEach
-                    managers.filter {
-                        it.supportExternalPacks
-                    }.forEach {
-                        debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName} in ${pack.name}...")
-                        it.reload(pack, info, resource)
-                    }
-                }
-                managers.forEach {
-                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName}...")
-                    it.reload(DATA_FOLDER, info, resource)
-                }
-                managers.forEach {
-                    it.postReload()
-                }
-                Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
-            }.getOrElse {
-                it.handle(info.sender, "Unable to reload.")
-                Failure(it)
             }
-            reloadEndTask.forEach {
-                it(result)
+            managers.forEach {
+                debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName}...")
+                it.reload(DATA_FOLDER, info, resource)
             }
-            result
-        }.join()
+            managers.forEach {
+                it.postReload()
+            }
+            Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
+        }.getOrElse {
+            it.handle(info.sender, "Unable to reload.")
+            Failure(it)
+        }
+        reloadEndTask.forEach {
+            it(result)
+        }
         onReload.set(false)
         return result
     }

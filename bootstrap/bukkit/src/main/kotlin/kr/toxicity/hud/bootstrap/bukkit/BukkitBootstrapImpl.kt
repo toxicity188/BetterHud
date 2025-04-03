@@ -16,6 +16,7 @@ import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
@@ -256,7 +257,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 debug(ConfigManager.DebugLevel.MANAGER,"Initialized: $type")
                 if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) {
                     scheduler.asyncTask {
-                        core.reload()
+                        core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
                     }
                 }
                 log.info(
@@ -280,6 +281,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     }
 
     fun register(player: Player) {
+        if (!player.isOnline) return
         if (ConfigManagerImpl.disableToBedrockPlayer && bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
         val audience = PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {

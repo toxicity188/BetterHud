@@ -9,6 +9,7 @@ import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.fabric.FabricBootstrap
 import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
@@ -139,7 +140,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
                 logger.info(
                     "Platform: Fabric",
                     "Mod enabled."
