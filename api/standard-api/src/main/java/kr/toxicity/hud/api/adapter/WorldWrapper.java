@@ -6,16 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A wrapper class of world
  * @param name world name
- * @param uuid world uuid
  */
 public record WorldWrapper(
-        @NotNull String name,
-        @NotNull UUID uuid
+        @NotNull String name
 ) {
     /**
      * Finds world from yaml.
@@ -24,8 +21,7 @@ public record WorldWrapper(
      */
     public static @NotNull WorldWrapper deserialize(@NotNull YamlObject data) {
         return new WorldWrapper(
-                Objects.requireNonNull(data.get("name"), "name").asString(),
-                UUID.fromString(Objects.requireNonNull(data.get("uuid"), "uuid").asString())
+                Objects.requireNonNull(data.get("name"), "name").asString()
         );
     }
     /**
@@ -35,8 +31,7 @@ public record WorldWrapper(
      */
     public static @NotNull WorldWrapper deserialize(@NotNull JsonObject data) {
         return new WorldWrapper(
-                Objects.requireNonNull(data.getAsJsonPrimitive("name"), "name").getAsString(),
-                UUID.fromString(Objects.requireNonNull(data.getAsJsonPrimitive("uuid"), "uuid").getAsString())
+                Objects.requireNonNull(data.getAsJsonPrimitive("name"), "name").getAsString()
         );
     }
     /**
@@ -45,8 +40,7 @@ public record WorldWrapper(
      */
     public @NotNull Map<String, Object> serialize() {
         return Map.ofEntries(
-                Map.entry("name", name),
-                Map.entry("uuid", uuid.toString())
+                Map.entry("name", name)
         );
     }
 }

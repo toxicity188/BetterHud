@@ -61,7 +61,7 @@ tasks.register("modrinthPublish") {
     finalizedBy(
         tasks.modrinthSyncBody,
         bukkit.tasks.modrinth,
-        //fabric.tasks.modrinth, TODO Add it when adventure-platform-fabric is released.
+        fabric.tasks.modrinth,
         velocity.tasks.modrinth
     )
 }

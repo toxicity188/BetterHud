@@ -15,11 +15,7 @@ import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
-import kr.toxicity.hud.manager.CommandManager
-import kr.toxicity.hud.manager.ConfigManagerImpl
-import kr.toxicity.hud.manager.DatabaseManagerImpl
-import kr.toxicity.hud.manager.PlayerHeadManager
-import kr.toxicity.hud.manager.PlayerManagerImpl
+import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.player.head.HttpSkinProvider
@@ -51,8 +47,6 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 import java.net.URLClassLoader
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
@@ -258,23 +252,10 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     override fun mcmetaVersion(): Int = 55
 
-    private val uuidMap = ConcurrentHashMap<String, UUID>()
-
-    private fun createUUID(string: String): UUID {
-        return uuidMap.computeIfAbsent(string) {
-            var uuid = UUID.randomUUID()
-            while (uuidMap.values.contains(uuid)) {
-                uuid = UUID.randomUUID()
-            }
-            uuid
-        }
-    }
-
     fun wrap(world: ServerLevel): WorldWrapper {
         val levelName = world.dimension().location().path
         return WorldWrapper(
-            levelName,
-            createUUID(levelName)
+            levelName
         )
     }
 

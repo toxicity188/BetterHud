@@ -21,8 +21,7 @@ class HudPlayerBukkit(
     override fun handle(): Any = player
     override fun audience(): Audience = audience
     override fun world(): WorldWrapper = WorldWrapper(
-        player.world.name,
-        player.world.uid
+        player.world.name
     )
 
     override fun locale(): Locale = player.locale.let {

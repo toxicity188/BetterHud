@@ -312,7 +312,7 @@ class CircleCompass(
                 val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
 
                 val targetLoc = it.location
-                if (targetLoc.world.uuid != world.uuid) return@forEach
+                if (targetLoc.world.name != world.name) return@forEach
                 var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
                 if (get < 0) get += 2
                 var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180

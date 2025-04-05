@@ -354,12 +354,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     override fun world(name: String): WorldWrapper? {
         return Bukkit.getWorld(name)?.let {
-            WorldWrapper(it.name, it.uid)
+            WorldWrapper(it.name)
         }
     }
 
     override fun worlds(): List<WorldWrapper> = Bukkit.getWorlds().map {
-        WorldWrapper(it.name, it.uid)
+        WorldWrapper(it.name)
     }
 
     override fun loader(): URLClassLoader {

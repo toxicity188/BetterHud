@@ -26,7 +26,7 @@ class PaperScheduler(
         runnable.run()
     }.wrap()
     override fun task(location: LocationWrapper, runnable: Runnable): HudTask = Bukkit.getRegionScheduler().run(plugin, Location(
-        Bukkit.getWorld(location.world.uuid),
+        Bukkit.getWorld(location.world.name),
         location.x,
         location.y,
         location.z,

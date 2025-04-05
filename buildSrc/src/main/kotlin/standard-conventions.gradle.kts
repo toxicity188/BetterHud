@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "kr.toxicity.hud"
-version = property("version").toString() + (BUILD_NUMBER?.let { ".$it" } ?: "")
+version = property("version").toString() + (BUILD_NUMBER?.let { "-SNAPSHOT-$it" } ?: "")
 
 val targetJavaVersion = 21
 

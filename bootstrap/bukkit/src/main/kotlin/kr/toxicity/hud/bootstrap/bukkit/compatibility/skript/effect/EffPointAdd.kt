@@ -40,7 +40,7 @@ class EffPointAdd : Effect() {
                 icon?.getSingle(p0),
                 LocationWrapper(
                     it.world?.let { w ->
-                        WorldWrapper(w.name, w.uid)
+                        WorldWrapper(w.name)
                     } ?: return,
                     it.x,
                     it.y,

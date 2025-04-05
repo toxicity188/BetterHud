@@ -72,6 +72,7 @@ class BukkitItemModule : BukkitModule {
             "custom_model_data" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: UpdateItemEvent ->
                     Function {
+                        @Suppress("DEPRECATION")
                         e.itemMeta.customModelData
                     }
                 }
