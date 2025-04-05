@@ -34,7 +34,7 @@ fun interface ColorOverride : (HudPlayer) -> TextColor? {
             conditional(
                 yaml.toConditions(source),
                 yaml["color"]
-                    .ifNull("'color' section not found.")
+                    .ifNull { "'color' section not found." }
                     .asString()
                     .toTextColor()
             )

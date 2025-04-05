@@ -80,8 +80,8 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "cooldown_skill" to search@ { c ->
-                val name = c["skill"]?.asString().ifNull("skill value not set.")
-                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull("the skill named \"$name\" doesn't exist.")
+                val name = c["skill"]?.asString().ifNull { "skill value not set." }
+                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull { "the skill named \"$name\" doesn't exist." }
                 return@search { _: UpdateEvent ->
                     HudListener { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
@@ -169,7 +169,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "stat" to HudPlaceholder.builder<Number>()
-                .requiredArgsLength(2)
+                .requiredArgsLength(1)
                 .function { args, _ ->
                     val getter: (PlayerStats) -> Number = if (args.size > 1) {
                         { stats: PlayerStats ->
@@ -188,7 +188,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
                 .build(),
             "temp_stat" to HudPlaceholder.builder<Number>()
-                .requiredArgsLength(2)
+                .requiredArgsLength(1)
                 .function { args, _ ->
                     val predicate: (StatModifier) -> Boolean = if (args.size > 1) {
                         { stat: StatModifier ->

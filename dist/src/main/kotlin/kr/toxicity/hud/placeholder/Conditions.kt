@@ -31,14 +31,14 @@ object Conditions {
 
     @Suppress("UNCHECKED_CAST")
     private fun parse0(section: YamlObject, source: PlaceholderSource): ConditionBuilder {
-        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull("first value not set."), source)
-        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull("second value not set."), source)
-        val operationValue = section["operation"]?.asString().ifNull("operation value not set")
+        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull { "first value not set." }, source)
+        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull { "second value not set." }, source)
+        val operationValue = section["operation"]?.asString().ifNull { "operation value not set" }
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")
 
-        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer."))[section["operation"]?.asString().ifNull(operationValue)]
-            .ifNull("unsupported operation: $operationValue") as (Any, Any) -> Boolean
+        val operation = (Operations.find(first.clazz) ?: throw RuntimeException("unable to load valid operation. you need to call developer."))[section["operation"]?.asString().ifNull { operationValue }]
+            .ifNull { "unsupported operation: $operationValue" } as (Any, Any) -> Boolean
         return ConditionBuilder { updateEvent ->
             val o1 = first build updateEvent
             val o2 = second build updateEvent

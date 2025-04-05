@@ -14,13 +14,20 @@ import kr.toxicity.hud.placeholder.Placeholder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.JavaBoolean
+import kr.toxicity.hud.util.JavaNumber
+import kr.toxicity.hud.util.JavaString
 import kr.toxicity.hud.util.ifNull
+import java.io.File
 import java.text.DecimalFormat
 import java.util.*
 import java.util.function.Function
 import java.util.regex.Pattern
 
 object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
+
+    override val managerName: String = "Placeholder"
+    override val supportExternalPacks: Boolean = false
 
     private val castPattern = Pattern.compile("(\\((?<type>[a-zA-Z]+)\\))")
     private val stringPattern = Pattern.compile("'(?<content>[\\w|\\W]+)'")
@@ -30,7 +37,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
 
     private val number = PlaceholderContainerImpl(
         "number",
-        java.lang.Number::class.java,
+        JavaNumber::class.java,
         0.0,
         mapOf<String, HudPlaceholder<Number>>(
             "popup_count" to HudPlaceholder.of { _, _ ->
@@ -66,7 +73,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         },
         mapOf(
             "evaluate" to { n, e ->
-                TEquation(e.asString()).evaluate(n.toDouble())
+                TEquation(e.asString()) evaluate n.toDouble()
             }
         ),
         { a, b ->
@@ -75,7 +82,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     )
     private val string = PlaceholderContainerImpl(
         "string",
-        java.lang.String::class.java,
+        JavaString::class.java,
         "<none>",
         mapOf(
             "string" to HudPlaceholder.builder<String>()
@@ -110,8 +117,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
             },
             "replace" to { s, e ->
                 val obj = e.asObject()
-                val from = obj["from"].ifNull("Cannot find 'from' section.").asString()
-                val to = obj["to"].ifNull("Cannot find 'to' section.").asString()
+                val from = obj["from"].ifNull { "Cannot find 'from' section." }.asString()
+                val to = obj["to"].ifNull { "Cannot find 'to' section." }.asString()
                 s.replace(from, to)
             }
         ),
@@ -121,7 +128,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     )
     private val boolean = PlaceholderContainerImpl(
         "boolean",
-        java.lang.Boolean::class.java,
+        JavaBoolean::class.java,
         false,
         mapOf(
             "boolean" to HudPlaceholder.builder<Boolean>()
@@ -227,7 +234,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         val numberMapper: (Double) -> Double = if (equation.find()) {
             TEquation(equation.group("equation")).let { mapper ->
                 { t ->
-                    mapper.evaluate(t)
+                    mapper evaluate t
                 }
             }
         } else {
@@ -264,30 +271,25 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
 
         val stringMapper = type?.stringValue(stringOption) ?: get.first.stringValue(stringOption)
 
-        return object : PlaceholderBuilder<Any> {
-            override val clazz: Class<out Any>
-                get() = type?.clazz ?: get.first.clazz
+        return PlaceholderBuilder.Delegate<Any>(type?.clazz ?: get.first.clazz) { reason ->
+            val second = get.second(args, reason)
+            object : Placeholder<Any> {
+                override val clazz: Class<out Any>
+                    get() = type?.clazz ?: get.first.clazz
 
-            override fun build(reason: UpdateEvent): Placeholder<Any> {
-                val second = get.second(args, reason)
-                return object : Placeholder<Any> {
-                    override val clazz: Class<out Any>
-                        get() = type?.clazz ?: get.first.clazz
-
-                    override fun invoke(p1: HudPlayer): Any {
-                        var value: Any = second.apply(p1)
-                        type?.let {
-                            value = it.parser(value.toString()) ?: it.defaultValue
-                        }
-                        (value as? Number)?.let {
-                            value = numberMapper(it.toDouble())
-                        }
-                        return value
+                override fun invoke(p1: HudPlayer): Any {
+                    var value: Any = second.apply(p1)
+                    type?.let {
+                        value = it.parser(value.toString()) ?: it.defaultValue
                     }
-
-                    override fun stringValue(player: HudPlayer): String {
-                        return stringMapper(invoke(player))
+                    (value as? Number)?.let {
+                        value = numberMapper(it.toDouble())
                     }
+                    return value
+                }
+
+                override fun stringValue(player: HudPlayer): String {
+                    return stringMapper(invoke(player))
                 }
             }
         }
@@ -364,7 +366,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     override fun start() {
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

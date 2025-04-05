@@ -38,8 +38,8 @@ class PopupImpl(
     private val default = ConfigManagerImpl.defaultPopup.contains(id) || section.getAsBoolean("default", false)
     private val keyMapping = section.getAsBoolean("key-mapping", false)
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${clazz.simpleName}.")
+        PlaceholderManagerImpl.find(it, this).assertNumber {
+            "this index is not a number. it is ${clazz.simpleName}."
         }.let {
             { reason ->
                 (it build reason).let { placeholder ->
@@ -59,10 +59,10 @@ class PopupImpl(
     var array: JsonArray? = JsonArray()
     val imageKey = createAdventureKey(imageEncoded)
 
-    private val spaces = HashMap<Int, String>()
+    private val spaces = intKeyMapOf<String>()
     private var imageChar = 0xCE000
 
-    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 
@@ -74,10 +74,10 @@ class PopupImpl(
     } ?: PopupSortType.LAST
 
     private val layouts = section["layouts"]?.asObject()?.let {
-        val json = array.ifNull("error is occurred.")
+        val json = array.ifNull { "error is occurred." }
         var i = 0
         it.mapSubConfiguration { _, yamlObject ->
-            val layout = yamlObject["name"]?.asString().ifNull("name value not set.")
+            val layout = yamlObject["name"]?.asString().ifNull { "name value not set." }
             var loc = GuiLocation(yamlObject)
             yamlObject["gui"]?.asObject()?.let { gui ->
                 loc += GuiLocation(gui)
@@ -85,7 +85,7 @@ class PopupImpl(
             PopupLayout(
                 ++i,
                 json,
-                LayoutManager.getLayout(layout).ifNull("this layout doesn't exist: $layout"),
+                LayoutManager.getLayout(layout).ifNull { "this layout doesn't exist: $layout" },
                 this@PopupImpl,
                 loc,
                 yamlObject["pixel"]?.asObject()?.let { pixel ->
@@ -94,7 +94,7 @@ class PopupImpl(
                 resource.font,
             )
         }
-    }.ifNull("layouts configuration not set.").ifEmpty {
+    }.ifNull { "layouts configuration not set." }.ifEmpty {
         throw RuntimeException("layouts is empty.")
     }
 
@@ -210,7 +210,7 @@ class PopupImpl(
             }
             override fun getIndex(): Int = iterator.index
             override fun setIndex(index: Int) {
-                iterator.priority = index
+                iterator.priority = index.coerceAtMost(iterator.maxIndex)
             }
         }
     }

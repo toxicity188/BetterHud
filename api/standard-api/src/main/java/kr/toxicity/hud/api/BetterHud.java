@@ -29,7 +29,7 @@ public interface BetterHud {
     /**
      * Adventure api version.
      */
-    String ADVENTURE_VERSION = "4.18.0";
+    String ADVENTURE_VERSION = "4.19.0";
     /**
      * Adventure platform version.
      */
@@ -62,9 +62,10 @@ public interface BetterHud {
      * @param args reload args
      * @return result of reload.
      */
-    default @NotNull ReloadState reload(@NotNull String... args) {
-        return reload(bootstrap().consoleSource());
+    default @NotNull ReloadState reload(@NotNull ReloadFlagType... args) {
+        return reload(bootstrap().consoleSource(), args);
     }
+
     /**
      * Executes reload.
      * @param sender log handler.

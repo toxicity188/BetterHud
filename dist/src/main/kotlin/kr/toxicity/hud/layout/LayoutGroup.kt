@@ -5,7 +5,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.layout.enums.LayoutOffset
-import kr.toxicity.hud.location.animation.AnimationLocation
+import kr.toxicity.hud.animation.AnimationLocation
 import kr.toxicity.hud.location.PixelLocation
 import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.util.*
@@ -19,13 +19,17 @@ class LayoutGroup(
     private val loc = PixelLocation(section)
 
     val align = section["align"]?.asString()?.let {
-        runWithExceptionHandling(sender, "Unable to find that align: $it") {
+        runCatching {
             LayoutAlign.valueOf(it.uppercase())
+        }.onFailure {
+            it.handle(sender, "Unable to find that align: $it")
         }.getOrNull()
     } ?: LayoutAlign.LEFT
     val offset = section["offset"]?.asString()?.let {
-        runWithExceptionHandling(sender, "Unable to find that offset: $it") {
+        runCatching {
             LayoutOffset.valueOf(it.uppercase())
+        }.onFailure {
+            it.handle(sender, "Unable to find that offset: $it")
         }.getOrNull()
     } ?: LayoutOffset.CENTER
 

@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.manager.PlayerHeadManager
 import kr.toxicity.hud.util.parseJson
 import kr.toxicity.hud.util.toImage
+import kr.toxicity.hud.util.toIntKeyMap
 import kr.toxicity.hud.util.warn
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -30,7 +31,7 @@ class HudPlayerHeadImpl(
             if (rgb ushr 24 > 0) {
                 TextColor.color(rgb)
             } else null
-        }
+        }.toIntKeyMap()
     )
     private constructor(playerName: String) : this(
         HttpClient.newHttpClient().send(

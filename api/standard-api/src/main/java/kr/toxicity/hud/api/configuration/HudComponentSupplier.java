@@ -47,6 +47,7 @@ public interface HudComponentSupplier<T extends HudObject> extends Supplier<List
      * @return list supplier
      * @param <R> type
      */
+    @ApiStatus.Internal
     static <R extends HudObject> @NotNull HudComponentSupplier<R> of(@NotNull R parent, @NotNull Supplier<List<WidthComponent>> supplier) {
         return new HudComponentSupplier<>() {
             @Override

@@ -21,10 +21,13 @@ object MinecraftManager : BetterHudManager {
 
     private const val ASSETS_LOCATION = "assets/minecraft/textures/"
 
+    override val managerName: String = "Minecraft"
+    override val supportExternalPacks: Boolean = false
+
     private val assetsMap = Collections.synchronizedSet(HashSet<MinecraftAsset>())
 
-    fun applyAll(layout: TextLayout, intGetter: () -> Int): Map<Int, ImageTextScale> {
-        val map = HashMap<Int, ImageTextScale>()
+    fun applyAll(layout: TextLayout, intGetter: () -> Int): IntKeyMap<ImageTextScale> {
+        val map = intKeyMapOf<ImageTextScale>()
         assetsMap.forEach {
             map[intGetter()] = it.toCharWidth(layout)
         }
@@ -49,7 +52,7 @@ object MinecraftManager : BetterHudManager {
 
     private var previous = ""
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
             val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
             if (assetsMap.isEmpty() || previous != current) {
@@ -57,7 +60,7 @@ object MinecraftManager : BetterHudManager {
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runWithExceptionHandling(info.sender, "Unable to load minecraft default textures.") {
+            runCatching {
                 val client = HttpClient.newHttpClient()
                 info("Getting minecraft default version...")
                 val json = InputStreamReader(client.send(HttpRequest.newBuilder()
@@ -126,7 +129,8 @@ object MinecraftManager : BetterHudManager {
                         }
                     }
                 }
-
+            }.onFailure {
+                it.handle(info.sender, "Unable to load minecraft default textures.")
             }
         } else assetsMap.clear()
     }

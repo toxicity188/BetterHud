@@ -36,12 +36,12 @@ public class LivingEntityMixin implements FabricLivingEntity {
     }
 
     @Override
-    public double betterhud$getLastDamage() {
+    public double betterHud$getLastDamage() {
         return lastHurt;
     }
 
     @Override
-    public double betterhud$getLastHealth() {
+    public double betterHud$getLastHealth() {
         return lastHealth;
     }
 }

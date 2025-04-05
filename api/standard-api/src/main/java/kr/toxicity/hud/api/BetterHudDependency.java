@@ -62,7 +62,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency SNAKEYAML = new BetterHudDependency(
             "org{}yaml",
             "snakeyaml",
-            "2.3",
+            "2.4",
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
     );
@@ -115,6 +115,16 @@ public class BetterHudDependency {
             "6.2.1",
             false,
             BetterHudPlatform.ALL
+    );
+    /**
+     * FastUtil
+     */
+    public static final BetterHudDependency FAST_UTIL = new BetterHudDependency(
+            "it{}unimi{}dsi",
+            "fastutil",
+            "8.5.15",
+            false,
+            List.of(BetterHudPlatform.VELOCITY)
     );
     /**
      * Adventure
@@ -232,7 +242,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency OPTION = new BetterHudDependency(
             "net{}kyori",
             "option",
-            "1.0.0",
+            "1.1.0",
             false,
             List.of(BetterHudPlatform.BUKKIT)
     );

@@ -2,6 +2,7 @@ package kr.toxicity.hud.util
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     val result = ArrayList<List<T>>()
@@ -37,7 +38,7 @@ fun <T> MutableCollection<T>.removeIfSync(block: (T) -> Boolean) {
 
 
 fun <T> List<T>.forEachAsync(block: (T) -> Unit) {
-    forEachAsync({ i -> i }, block)
+    forEachAsync({ it }, block)
 }
 fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
     if (isNotEmpty()) {
@@ -66,7 +67,16 @@ fun <T> List<T>.forEachAsync(multiplier: (Int) -> Int, block: (T) -> Unit) {
             queue
         }
         try {
-            Executors.newFixedThreadPool(tasks.size).use { pool ->
+            val integer = AtomicInteger()
+            Executors.newFixedThreadPool(tasks.size) {
+                Thread(it).apply {
+                    isDaemon = true
+                    name = "BetterHud-Worker-${integer.andIncrement}"
+                    uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, exception ->
+                        exception.handle("A error has been occurred in ${thread.name}")
+                    }
+                }
+            }.use { pool ->
                 CompletableFuture.allOf(
                     *tasks.map {
                         CompletableFuture.runAsync({

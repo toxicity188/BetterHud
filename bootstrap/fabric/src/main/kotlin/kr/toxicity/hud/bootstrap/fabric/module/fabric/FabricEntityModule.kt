@@ -83,14 +83,14 @@ class FabricEntityModule : FabricModule {
             "last_damage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? FabricLivingEntity)?.`betterhud$getLastDamage`()
+                        (e.entity() as? FabricLivingEntity)?.`betterHud$getLastDamage`()
                     }
                 }
             },
             "last_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? FabricLivingEntity)?.`betterhud$getLastHealth`()
+                        (e.entity() as? FabricLivingEntity)?.`betterHud$getLastHealth`()
                     }
                 }
             },
@@ -98,7 +98,7 @@ class FabricEntityModule : FabricModule {
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
                         (e.entity() as? FabricLivingEntity)?.let {
-                            it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                            it.`betterHud$getLastHealth`() / (it as LivingEntity).maxHealth
                         }
                     }
                 }
@@ -149,6 +149,20 @@ class FabricEntityModule : FabricModule {
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
                         e.entity().isDeadOrDying
+                    }
+                }
+            },
+            "frozen" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        e.entity().isFullyFrozen
+                    }
+                }
+            },
+            "burning" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent<*> ->
+                    Function {
+                        e.entity().remainingFireTicks > 0
                     }
                 }
             }

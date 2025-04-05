@@ -1,21 +1,22 @@
 [versions]
-kotlin = "2.1.10"
+kotlin = "2.1.20"
 
 adventure = "4.19.0"
 adventurePlatform = "4.3.4"
-snakeyaml = "2.3"
+snakeyaml = "2.4"
 gson = "2.12.1"
 exp4j = "0.4.8"
 expiringmap = "0.5.11"
 bstats = "3.1.0"
 betterCommand = "1.4.3"
 resourceFactory = "1.2.0"
-loom = "1.9-SNAPSHOT"
-paperweight = "2.0.0-beta.14"
+loom = "1.10-SNAPSHOT"
+paperweight = "2.0.0-beta.16"
 minotaur = "2.8.7"
 
 asm = "9.7.1"
 hikariCP = "6.2.1"
+fastUtil = "8.5.15"
 
 [libraries]
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -42,6 +43,7 @@ minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.grad
 asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
 asmCommons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
 hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariCP" }
+fastUtil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastUtil" }
 
 [plugins]
 standardConvention = { id = "standard-conventions" }
@@ -68,7 +70,8 @@ library = [
     "gson",
     "exp4j",
     "expiringmap",
-    "hikariCP"
+    "hikariCP",
+    "fastUtil"
 ]
 asm = [
     "asm",

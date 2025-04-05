@@ -33,7 +33,7 @@ class MMOItemsCompatibility : Compatibility {
             "total_amount" to HudPlaceholder.builder<Number>()
                 .requiredArgsLength(2)
                 .function { args, _ ->
-                    val item = mmoItem(Type.get(args[0]).ifNull("Unable to find this MMOItems type: ${args[0]}"), args[1]).id
+                    val item = mmoItem(Type.get(args[0]).ifNull { "Unable to find this MMOItems type: ${args[0]}" }, args[1]).id
                     Function { p ->
                         p.bukkitPlayer.inventory.sumOf {
                             if (MMOItems.getID(it) == item) it.amount else 0
@@ -58,7 +58,7 @@ class MMOItemsCompatibility : Compatibility {
         get() = mapOf()
 
 
-    private fun mmoItem(type: Type, name: String) = MMOItems.plugin.getMMOItem(type, name).ifNull("Unable to find this MMOItem: $name in ${type.id}")
+    private fun mmoItem(type: Type, name: String) = MMOItems.plugin.getMMOItem(type, name).ifNull { "Unable to find this MMOItem: $name in ${type.id}" }
 
     private fun getAbility(itemStack: ItemStack): Map<TriggerType, SkillHandler<SkillResult>> {
         val nbt = NBTItem.get(itemStack)

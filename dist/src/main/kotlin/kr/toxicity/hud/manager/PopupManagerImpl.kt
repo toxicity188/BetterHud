@@ -6,17 +6,25 @@ import kr.toxicity.hud.api.popup.Popup
 import kr.toxicity.hud.popup.PopupImpl
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
+import java.io.File
 import java.util.*
 
 object PopupManagerImpl : BetterHudManager, PopupManager {
+
+    override val managerName: String = "Popup"
+    override val supportExternalPacks: Boolean = true
+
     private val popupMap = HashMap<String, PopupImpl>()
     override fun start() {
 
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun preReload() {
         popupMap.clear()
-        DATA_FOLDER.subFolder("popups").forEachAllYaml(info.sender) { file, s, yamlObject ->
+    }
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        workingDirectory.subFolder("popups").forEachAllYaml(info.sender) { file, s, yamlObject ->
             runCatching {
                 popupMap.putSync("popup") {
                     PopupImpl(s, resource, yamlObject)

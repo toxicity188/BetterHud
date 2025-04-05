@@ -8,9 +8,11 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
+import kr.toxicity.hud.util.JavaNumber
 import kr.toxicity.hud.util.ifNull
 import net.jodah.expiringmap.ExpirationPolicy
 import net.jodah.expiringmap.ExpiringMap
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
@@ -22,15 +24,18 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     private const val DELTA_MIN_THRESHOLD = 0.1
     private const val DELTA_THRESHOLD = 0.75
 
+    override val managerName: String = "Listener"
+    override val supportExternalPacks: Boolean = false
+
     private val listenerMap = mutableMapOf<String, (YamlObject) -> (UpdateEvent) -> HudListener>(
         "placeholder" to placeholder@ { c ->
             val source = PlaceholderSource.Impl(c)
-            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull("value value not set."), source)
-            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull("max value not set."), source)
+            val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull { "value value not set." }, source)
+            val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull { "max value not set." }, source)
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
-                if (value.clazz == max.clazz && value.clazz == java.lang.Number::class.java) {
+                if (value.clazz == max.clazz && value.clazz == JavaNumber::class.java) {
                     HudListener {
                         runCatching {
                             (value(it) as Number).toDouble() / (max(it) as Number).toDouble()
@@ -50,13 +55,13 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
     private fun Double.checkMinThreshold(other: Double) = other <= this + MIN_THRESHOLD && other >= this - MIN_THRESHOLD
 
     fun getListener(section: YamlObject): (UpdateEvent) -> HudListener {
-        val clazz = section["class"]?.asString().ifNull("class value not set.")
-        val listener = listenerMap[clazz].ifNull("this class doesn't exist: $clazz")(section)
+        val clazz = section["class"]?.asString().ifNull { "class value not set." }
+        val listener = listenerMap[clazz].ifNull { "this class doesn't exist: $clazz" }(section)
         if (section.getAsBoolean("lazy", false)) {
             val setting = LazyListenerSetting(section)
             val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {
-                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).apply {
-                    if (this.clazz != java.lang.Number::class.java) throw RuntimeException("this index is not a number. it is ${this.clazz.simpleName}.")
+                PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).assertNumber {
+                    "this index is not a number. it is ${this.clazz.simpleName}."
                 }.let {
                     { reason ->
                         (it build reason).let { placeholder ->
@@ -147,7 +152,8 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             }
         }
     }
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun end() {

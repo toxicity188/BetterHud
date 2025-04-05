@@ -7,14 +7,13 @@ import kr.toxicity.hud.bootstrap.fabric.FabricScheduler.TaskType.LOOP
 import kr.toxicity.hud.bootstrap.fabric.FabricScheduler.TaskType.REMOVE
 import kr.toxicity.hud.util.removeIfSync
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import java.util.*
 import java.util.concurrent.*
 
 
 class FabricScheduler : HudScheduler {
 
     private val serverTasks = ConcurrentLinkedQueue<SyncFabricTask>()
-    private val worldTasks = ConcurrentHashMap<UUID, MutableCollection<SyncFabricTask>>()
+    private val worldTasks = ConcurrentHashMap<String, MutableCollection<SyncFabricTask>>()
 
     private val executors = Executors.newScheduledThreadPool(256)
 
@@ -112,7 +111,7 @@ class FabricScheduler : HudScheduler {
             runnable
         )
         val list = synchronized(worldTasks) {
-            worldTasks.computeIfAbsent(location.world.uuid) {
+            worldTasks.computeIfAbsent(location.world.name) {
                 ConcurrentLinkedQueue()
             }
         }
@@ -142,6 +141,7 @@ class FabricScheduler : HudScheduler {
     }
 
     override fun asyncTaskLater(delay: Long, runnable: Runnable): HudTask {
+        if (delay < 0) throw RuntimeException("delay < 0")
         return AsyncFabricTask(
             executors.schedule(runnable, delay * 50, TimeUnit.MILLISECONDS)
         )

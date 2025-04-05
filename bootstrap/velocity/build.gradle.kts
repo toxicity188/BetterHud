@@ -4,7 +4,7 @@ plugins {
 }
 
 velocityPluginJson {
-    main = "kr.toxicity.hud.bootstrap.velocity.VelocityBootstrapImpl"
+    main = "$group.bootstrap.velocity.VelocityBootstrapImpl"
     version = rootProject.version.toString()
     id = "betterhud"
     name = "BetterHud"

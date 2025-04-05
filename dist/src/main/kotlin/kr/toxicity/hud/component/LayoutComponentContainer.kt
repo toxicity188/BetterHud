@@ -12,11 +12,17 @@ class LayoutComponentContainer(
     private val align: LayoutAlign,
     private val max: Int
 ) {
-    private val list = ArrayList<PixelComponent>()
+    private var comp = EMPTY_WIDTH_COMPONENT
 
     private fun append(other: PixelComponent) {
-        list.add(other)
+        val move = when (align) {
+            LayoutAlign.LEFT -> 0
+            LayoutAlign.CENTER -> (max - other.component.width) / 2
+            LayoutAlign.RIGHT -> max - other.component.width
+        }
+        comp += (other.pixel + move).toSpaceComponent() + other.component + (-other.pixel - other.component.width - move).toSpaceComponent()
     }
+
     fun append(others: List<PixelComponent>): LayoutComponentContainer {
         others.forEach {
             append(it)
@@ -25,15 +31,6 @@ class LayoutComponentContainer(
     }
 
     fun build(): WidthComponent {
-        var comp = EMPTY_WIDTH_COMPONENT
-        list.forEach {
-            val move = when (align) {
-                LayoutAlign.LEFT -> 0
-                LayoutAlign.CENTER -> (max - it.component.width) / 2
-                LayoutAlign.RIGHT -> max - it.component.width
-            }
-            comp += (it.pixel + move).toSpaceComponent() + it.component + (-it.pixel - it.component.width - move).toSpaceComponent()
-        }
         return when (offset) {
             LayoutOffset.LEFT -> 0
             LayoutOffset.CENTER -> -max / 2

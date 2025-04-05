@@ -5,9 +5,8 @@ import kr.toxicity.hud.bootstrap.fabric.compatibility.Compatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerAutoHostCompatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerResourcePackCompatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.TextPlaceholderAPICompatibility
-import kr.toxicity.hud.util.CONSOLE
 import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.runWithExceptionHandling
+import kr.toxicity.hud.util.handle
 import net.fabricmc.loader.api.FabricLoader
 import java.util.function.Function
 
@@ -29,7 +28,7 @@ object CompatibilityManager {
         compatibilities.forEach {
             if (FabricLoader.getInstance().isModLoaded(it.key)) {
                 val obj = it.value()
-                runWithExceptionHandling(CONSOLE, "Unable to load ${it.key} support. check this: ${obj.website}") {
+                runCatching {
                     val namespace = it.key.lowercase().replace('-', '_')
                     obj.start()
                     obj.listeners.forEach { entry ->
@@ -52,6 +51,8 @@ object CompatibilityManager {
                     obj.triggers.forEach { entry ->
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
+                }.onFailure { e ->
+                    e.handle("Unable to load ${it.key} support. check this: ${obj.website}")
                 }
             }
         }

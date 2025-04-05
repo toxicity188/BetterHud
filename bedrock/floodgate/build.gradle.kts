@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     compileOnly(project(":api:bukkit-api"))
-    compileOnly("org.geysermc.floodgate:api:2.2.3-SNAPSHOT")
+    compileOnly("org.geysermc.floodgate:api:2.2.4-SNAPSHOT")
 }

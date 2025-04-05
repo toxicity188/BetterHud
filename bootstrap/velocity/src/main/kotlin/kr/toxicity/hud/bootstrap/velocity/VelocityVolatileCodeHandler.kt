@@ -46,11 +46,10 @@ class VelocityVolatileCodeHandler : VolatileCodeHandler {
     }
 
     override fun getTextureValue(player: HudPlayer): String {
-        return (player.handle() as ConnectedPlayer).gameProfile.properties.first {
+        return (player.handle() as ConnectedPlayer).gameProfile.properties.firstOrNull {
             it.name == "textures"
-        }.value
+        }?.value ?: ""
     }
-
 
     private class PlayerBossBar(val player: Player, val listener: MinecraftConnection, var originalColor: BossBar.Color): ChannelDuplexHandler() {
         private inner class PlayerDummyBossBar(color: BossBar.Color) {

@@ -98,9 +98,7 @@ class HeadRenderer(
 
 
     private val followPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
-        }
+        PlaceholderManagerImpl.find(it, this).assertString("This placeholder is not a string: $it")
     }
     override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
         val cond = conditions build event

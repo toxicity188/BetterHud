@@ -57,12 +57,10 @@ class BukkitEntityModule : BukkitModule {
             "health" to {
                 { event ->
                     event.unwrap ref@ { target: EntityEvent ->
-                        val entity = target.entity as? LivingEntity ?: return@ref HudListener.EMPTY
-                        entity.getAttribute(ATTRIBUTE_MAX_HEALTH)?.value?.let { maxHealth ->
-                            HudListener {
-                                entity.health / maxHealth
-                            }
-                        } ?: HudListener.ZERO
+                        val entity = target.entity.adapt as? LivingEntity ?: return@ref HudListener.EMPTY
+                        HudListener {
+                            entity.health / entity.maximumHealth
+                        }
                     }
                 }
             }
@@ -71,45 +69,48 @@ class BukkitEntityModule : BukkitModule {
         get() = mapOf(
             "health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function {
-                        (e.entity as? LivingEntity)?.health ?: 0.0
+                        entity.health
                     }
                 }
             },
             "last_damage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function {
-                        (e.entity as? LivingEntity)?.lastDamage ?: 0.0
+                        entity.lastDamage
                     }
                 }
             },
             "last_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function {
-                        (e.entity as? LivingEntity)?.let { le -> le.health + le.lastDamage } ?: 0.0
+                        entity.health + entity.lastDamage
                     }
                 }
             },
             "last_health_percentage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function {
-                        (e.entity as? LivingEntity)?.let { le ->
-                            (le.health + le.lastDamage) / le.maximumHealth
-                        } ?: 0.0
+                        (entity.health + entity.lastDamage) / entity.maximumHealth
                     }
                 }
             },
             "max_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function {
-                        (e.entity as? LivingEntity)?.maximumHealth ?: 0.0
+                        entity.maximumHealth
                     }
                 }
             },
             "health_percentage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt as? LivingEntity ?: return@unwrap Function { 0.0 }
                     Function get@ {
-                        val entity = e.entity as? LivingEntity ?: return@get 0.0
                         entity.health / entity.maximumHealth
                     }
                 }
@@ -127,14 +128,16 @@ class BukkitEntityModule : BukkitModule {
             "type" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
+                        @Suppress("DEPRECATION")
                         e.entity.type.key.key
                     }
                 }
             },
             "custom_name" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
                     Function {
-                        e.entity.customName ?: e.entity.name
+                        entity.customName ?: entity.name
                     }
                 }
             },
@@ -143,8 +146,25 @@ class BukkitEntityModule : BukkitModule {
         get() = mapOf(
             "dead" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
                     Function {
-                        e.entity.isDead
+                        entity.isDead
+                    }
+                }
+            },
+            "frozen" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
+                    Function {
+                        entity.isFrozen
+                    }
+                }
+            },
+            "burning" to HudPlaceholder.of { _, u ->
+                u.unwrap { e: EntityEvent ->
+                    val entity = e.entity.adapt
+                    Function {
+                        entity.fireTicks > 0
                     }
                 }
             }

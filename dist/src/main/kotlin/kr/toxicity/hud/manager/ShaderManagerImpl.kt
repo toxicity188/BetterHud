@@ -11,11 +11,16 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
+import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object ShaderManagerImpl : BetterHudManager, ShaderManager {
+
+    override val managerName: String = "Shader"
+    override val supportExternalPacks: Boolean = false
+
     var barColor = BossBar.Color.YELLOW
         private set
 
@@ -97,9 +102,9 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         }
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         constants.clear()
-        runWithExceptionHandling(info.sender, "Unable to load shader.yml") {
+        runCatching {
             val shaders = ShaderType.entries.map {
                 it to it.lines()
             }
@@ -154,17 +159,17 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             if (yaml.getAsBoolean("disable-level-text", false)) replaceList += "HideExp"
 
             yaml["hotbar"]?.asObject()?.let {
-                if (it.getAsBoolean("disable", false)) {
+                if (it.getAsBoolean("enable-hotbar-relocation", false)) {
                     replaceList += "RemapHotBar"
                     val locations =
-                        it.get("locations")?.asObject().ifNull("locations configuration not set.")
+                        it.get("locations")?.asObject().ifNull { "locations configuration not set." }
                     (1..10).map { index ->
                         locations.get(index.toString())?.asObject()?.let { shaderConfig ->
                             HotBarShader(
-                                shaderConfig.get("gui")?.asObject()?.let { gui ->
+                                shaderConfig["gui"]?.asObject()?.let { gui ->
                                     gui.getAsDouble("x", 0.0) to gui.getAsDouble("y", 0.0)
                                 } ?: (0.0 to 0.0),
-                                shaderConfig.get("pixel")?.asObject()?.let { pixel ->
+                                shaderConfig["pixel"]?.asObject()?.let { pixel ->
                                     pixel.getAsInt("x", 0) to pixel.getAsInt("y", 0)
                                 } ?: (0 to 0),
                             )
@@ -213,14 +218,16 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                         }
                     }
                 }.toByteArray()
-                PackGenerator.addTask(resource.core + key.fileName) {
+                PackGenerator.addTask(resource.core + key.shadersCoreName) {
                     byte
                 }
                 //+1.21.2
-                PackGenerator.addTask(resource.shaders + key.fileName) {
+                PackGenerator.addTask(resource.shaders + key.shadersCoreName) {
                     byte
                 }
             }
+        }.onFailure {
+            it.handle(info.sender, "Unable to load shader.yml")
         }
     }
 

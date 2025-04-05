@@ -60,9 +60,9 @@ class CircleCompass(
     } ?: defaultColorEquation
     private val space = section.getAsInt("space", 2).coerceAtLeast(0)
 
-    private val pixel = PixelLocation(section["pixel"]?.asObject().ifNull("pixel value not set.")) + PixelLocation.hotBarHeight
+    private val pixel = PixelLocation(section["pixel"]?.asObject().ifNull { "pixel value not set." }) + PixelLocation.hotBarHeight
     private val shader = HudShader(
-        GuiLocation(section["gui"]?.asObject().ifNull("gui value not set.")),
+        GuiLocation(section["gui"]?.asObject().ifNull { "gui value not set." }),
         RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
         section.getAsBoolean("outline", false),
@@ -70,7 +70,7 @@ class CircleCompass(
         ShaderProperty.properties(section["properties"]?.asArray())
     )
     private var array: JsonArray? = JsonArray()
-    private val images = CompassImage(assets, section["file"]?.asObject().ifNull("file value not set."))
+    private val images = CompassImage(assets, section["file"]?.asObject().ifNull { "file value not set." })
     private val conditions = section.toConditions(this) build UpdateEvent.EMPTY
     private val isDefault = ConfigManagerImpl.defaultCompass.contains(id) || section.getAsBoolean("default", false)
     private val tick = section.getAsLong("tick", 1)
@@ -182,9 +182,9 @@ class CircleCompass(
         val b: TEquation
     ) {
         constructor(section: YamlObject): this(
-            section.getTEquation("r").ifNull("r value not set."),
-            section.getTEquation("g").ifNull("g value not set."),
-            section.getTEquation("b").ifNull("b value not set.")
+            section.getTEquation("r").ifNull { "r value not set." },
+            section.getTEquation("g").ifNull { "g value not set." },
+            section.getTEquation("b").ifNull { "b value not set." }
         )
 
         fun evaluate(t: Double): TextColor {
@@ -202,7 +202,7 @@ class CircleCompass(
         section: YamlObject
     ) {
         val map = run {
-            val fileName = section["name"]?.asString().ifNull("name value not set.").replace('/', File.separatorChar)
+            val fileName = section["name"]?.asString().ifNull { "name value not set." }.replace('/', File.separatorChar)
             val scale = section.getAsDouble("scale", 1.0).apply {
                 if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0")
             }
@@ -211,10 +211,10 @@ class CircleCompass(
                 if (this <= 0.0) throw RuntimeException("opacity cannot be <= 0.0")
             }
             val image = File(assets, fileName)
-                .ifNotExist("this image doesn't exist: $fileName")
+                .ifNotExist { "this image doesn't exist: $fileName" }
                 .toImage()
                 .removeEmptySide()
-                .ifNull("invalid image: $fileName")
+                .ifNull { "invalid image: $fileName" }
                 .image
             val div = ceil(length.toDouble() / 2).toInt()
             if (applyOpacity) {
@@ -312,7 +312,7 @@ class CircleCompass(
                 val selectedPointer = it.icon?.let { s -> images.customIcon[s] } ?: images.point ?: return@forEach
 
                 val targetLoc = it.location
-                if (targetLoc.world.uuid != world.uuid) return@forEach
+                if (targetLoc.world.name != world.name) return@forEach
                 var get = atan2(targetLoc.z - loc.z, targetLoc.x - loc.x) / PI
                 if (get < 0) get += 2
                 var yawCal = (if (yaw > 90) -270 + yaw else 90 + yaw) / 180

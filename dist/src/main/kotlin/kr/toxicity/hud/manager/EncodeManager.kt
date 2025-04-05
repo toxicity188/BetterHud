@@ -2,16 +2,20 @@ package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.resource.GlobalResource
+import java.io.File
 import java.util.*
 
 object EncodeManager : BetterHudManager {
+
+    override val managerName: String = "Encode"
+    override val supportExternalPacks: Boolean = false
 
     private val encodeMap = EnumMap<EncodeNamespace, MutableMap<String, String>>(EncodeNamespace::class.java)
 
     override fun start() {
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun postReload() {

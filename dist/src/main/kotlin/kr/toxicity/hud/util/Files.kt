@@ -1,5 +1,6 @@
 package kr.toxicity.hud.util
 
+import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.yaml.YamlObject
 import java.io.File
 
@@ -11,11 +12,7 @@ fun File.subFile(name: String) = File(this, name).apply {
     if (!exists()) createNewFile()
 }
 
-fun File.ifNotExist(message: String) = takeIf { exists() }.ifNull(message)
-
-fun File.ifNotExist(messageCreator: File.() -> String) = apply {
-    if (!exists()) throw RuntimeException(messageCreator())
-}
+fun File.ifNotExist(lazyMessage: () -> String) = takeIf { exists() }.ifNull(lazyMessage)
 
 fun File.forEach(block: (File) -> Unit) {
     listFiles()?.sortedBy {
@@ -23,16 +20,13 @@ fun File.forEach(block: (File) -> Unit) {
     }?.forEach(block)
 }
 
+fun File.isNotEmptyDirectory() = listFiles()?.isNotEmpty() == true
+
 fun File.forEachAllFolder(block: (File) -> Unit) {
+    if (name.startsWith('-')) return debug(ConfigManager.DebugLevel.FILE, "File skipped: $path")
     if (isDirectory) forEach {
         it.forEachAllFolder(block)
-    } else {
-        block(this)
-    }
-}
-
-fun File.mapAllFolder() = mutableListOf<File>().apply {
-    forEachAllFolder(this::add)
+    } else block(this)
 }
 
 fun YamlObject.forEachSubConfiguration(block: (String, YamlObject) -> Unit) {

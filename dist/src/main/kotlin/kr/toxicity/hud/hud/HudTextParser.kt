@@ -40,10 +40,10 @@ class HudTextParser(
             loc.opacity,
             text.property
         )
-        val scaledMap = text.source.charWidth.entries.associate { (k, v) ->
+        val scaledMap = text.source.charWidth.intEntries.associate { (k, v) ->
             k to v * text.scale
         }
-        val scaledImageMap = text.imageCharMap.entries.associate { (k, v) ->
+        val scaledImageMap = text.imageCharMap.intEntries.associate { (k, v) ->
             k to v * text.scale * text.emoji.scale
         }
         val index2 = ++parent.textIndex
@@ -114,11 +114,11 @@ class HudTextParser(
             text,
             HudTextData(
                 keys,
-                scaledMap.entries.associate { (k, v) ->
+                (scaledMap.entries.associate { (k, v) ->
                     k to v.normalizedWidth
                 } + scaledImageMap.entries.associate { (k, v) ->
                     k to v.normalizedWidth
-                },
+                }).toIntMap(),
                 scaledImageMap.map {
                     it.value.name to it.key
                 }.toMap(),

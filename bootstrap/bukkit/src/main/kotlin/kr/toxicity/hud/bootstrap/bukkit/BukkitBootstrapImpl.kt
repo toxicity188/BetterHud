@@ -16,6 +16,7 @@ import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
@@ -33,8 +34,9 @@ import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
-import kr.toxicity.hud.scheduler.FoliaScheduler
-import kr.toxicity.hud.scheduler.StandardScheduler
+import kr.toxicity.hud.player.head.MineToolsProvider
+import kr.toxicity.hud.scheduler.PaperScheduler
+import kr.toxicity.hud.scheduler.BukkitScheduler
 import kr.toxicity.hud.util.*
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.audience.Audience
@@ -63,15 +65,15 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     private val listener = object : Listener {}
 
     private val isFolia = runCatching {
-        Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler")
+        Class.forName("io.papermc.paper.threadedregions.RegionizedServer")
         true
     }.getOrDefault(false)
     private val isPaper = isFolia || runCatching {
-        Class.forName("com.destroystokyo.paper.profile.PlayerProfile")
+        Class.forName("io.papermc.paper.configuration.PaperConfigurations")
         true
     }.getOrDefault(false)
 
-    private val scheduler = if (isFolia) FoliaScheduler(this) else StandardScheduler(this)
+    private val scheduler = if (isPaper) PaperScheduler(this) else BukkitScheduler(this)
     private val updateTask = ArrayList<PlaceholderTask>()
 
     private val log = object : BetterHudLogger {
@@ -108,16 +110,14 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             updateTask.clear()
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 DATA_FOLDER.subFolder("placeholders").forEachAllYaml(CONSOLE) { file, s, yamlObject ->
-                    runWithExceptionHandling(CONSOLE, "Unable to read this placeholder task: $s in ${file.name}") {
-                        val variable = yamlObject["variable"]?.asString().ifNull("variable not set.")
-                        val placeholder = yamlObject["placeholder"]?.asString().ifNull("placeholder not set.")
+                    runCatching {
+                        val variable = yamlObject["variable"]?.asString().ifNull { "variable not set." }
+                        val placeholder = yamlObject["placeholder"]?.asString().ifNull { "placeholder not set." }
                         val update = yamlObject.getAsInt("update", 1).coerceAtLeast(1)
                         val async = yamlObject.getAsBoolean("async", false)
                         updateTask.add(object : PlaceholderTask {
-                            override val tick: Int
-                                get() = update
-                            override val async: Boolean
-                                get() = async
+                            override val tick: Int = update
+                            override val async: Boolean = async
 
                             override fun invoke(p1: HudPlayer) {
                                 runCatching {
@@ -125,6 +125,8 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                                 }
                             }
                         })
+                    }.getOrElse {
+                        it.handle("Unable to read this placeholder task: $s in ${file.name}")
                     }
                 }
             }
@@ -169,6 +171,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (MinecraftVersion.current) {
+            MinecraftVersion.version1_21_5 -> kr.toxicity.hud.nms.v1_21_R4.NMSImpl()
             MinecraftVersion.version1_21_4 -> kr.toxicity.hud.nms.v1_21_R3.NMSImpl()
             MinecraftVersion.version1_21_2, MinecraftVersion.version1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
             MinecraftVersion.version1_21, MinecraftVersion.version1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
@@ -219,6 +222,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             PlayerHeadManager.addSkinProvider(SkinsRestorerSkinProvider())
         }
         if (!Bukkit.getServer().onlineMode) {
+            PlayerHeadManager.addSkinProvider(MineToolsProvider())
             PlayerHeadManager.addSkinProvider(HttpSkinProvider())
         }
         if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
@@ -253,11 +257,16 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                 debug(ConfigManager.DebugLevel.MANAGER,"Initialized: $type")
                 if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) {
                     scheduler.asyncTask {
-                        core.reload()
+                        core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
                     }
                 }
                 log.info(
                     "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Platform: ${when {
+                        isFolia -> "Folia"
+                        isPaper -> "Paper"
+                        else -> "Bukkit"
+                    }}",
                     "Plugin enabled."
                 )
             }
@@ -272,6 +281,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     }
 
     fun register(player: Player) {
+        if (!player.isOnline) return
         if (ConfigManagerImpl.disableToBedrockPlayer && bedrockAdapter.isBedrockPlayer(player.uniqueId)) return
         val adaptedPlayer = if (isFolia) nms.getFoliaAdaptedPlayer(player) else player
         val audience = PlayerManagerImpl.addHudPlayer(adaptedPlayer.uniqueId) {
@@ -344,12 +354,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     override fun world(name: String): WorldWrapper? {
         return Bukkit.getWorld(name)?.let {
-            WorldWrapper(it.name, it.uid)
+            WorldWrapper(it.name)
         }
     }
 
     override fun worlds(): List<WorldWrapper> = Bukkit.getWorlds().map {
-        WorldWrapper(it.name, it.uid)
+        WorldWrapper(it.name)
     }
 
     override fun loader(): URLClassLoader {

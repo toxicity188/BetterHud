@@ -70,12 +70,7 @@ class PopupIteratorImpl(
     override fun next(): List<WidthComponent> {
         if (_i != i) {
             _i = i
-            _mapper = valueMap.map {
-                runByTick(parent.tick(), when (parent.frameType()) {
-                    GLOBAL -> { { player.tick } }
-                    LOCAL -> { { tick } }
-                }, it(player, _i))
-            }
+            refreshMapper()
         }
         val r = _mapper.map {
             it()
@@ -93,6 +88,7 @@ class PopupIteratorImpl(
     override fun getPriority(): Int = value
     override fun setPriority(priority: Int) {
         value = priority
+        if (value >= 0) refreshMapper()
     }
     override fun name(): String = name
     override fun equals(other: Any?): Boolean {
@@ -112,4 +108,12 @@ class PopupIteratorImpl(
         return i.compareTo(other.index)
     }
 
+    private fun refreshMapper() {
+        _mapper = valueMap.map {
+            runByTick(parent.tick(), when (parent.frameType()) {
+                GLOBAL -> { { player.tick } }
+                LOCAL -> { { tick } }
+            }, it(player, if (value >= 0) value else _i))
+        }
+    }
 }

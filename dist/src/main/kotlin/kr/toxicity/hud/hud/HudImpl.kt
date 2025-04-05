@@ -9,7 +9,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.location.animation.AnimationType
+import kr.toxicity.hud.animation.AnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.pack.PackGenerator
@@ -33,18 +33,18 @@ class HudImpl(
     private val imageEncoded = "hud_${id}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
     val imageKey = createAdventureKey(imageEncoded)
     var jsonArray: JsonArray? = JsonArray()
-    private val spaces = HashMap<Int, String>()
+    private val spaces = intKeyMapOf<String>()
     private val default = ConfigManagerImpl.defaultHud.contains(id) || section.getAsBoolean("default", false)
     var textIndex = 0
     private val tick = section.getAsLong("tick", 1)
 
-    fun getOrCreateSpace(int: Int) = spaces.computeIfAbsent(int) {
+    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 
-    private val elements = section["layouts"]?.asObject().ifNull("layout configuration not set.").mapSubConfiguration { s, yamlObject ->
-        val layout = yamlObject["name"]?.asString().ifNull("name value not set: $s").let {
-            LayoutManager.getLayout(it).ifNull("this layout doesn't exist: $it")
+    private val elements = section["layouts"]?.asObject().ifNull { "layout configuration not set." }.mapSubConfiguration { s, yamlObject ->
+        val layout = yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let {
+            LayoutManager.getLayout(it).ifNull { "this layout doesn't exist: $it" }
         }
         var gui = GuiLocation(yamlObject)
         yamlObject["gui"]?.asObject()?.let {
@@ -100,10 +100,7 @@ class HudImpl(
         }
         return HudComponentSupplier.of(this) {
             if (conditions(player)) map.map { (type, element) ->
-                element[when (type) {
-                    AnimationType.LOOP -> (player.tick % element.size).toInt()
-                    AnimationType.PLAY_ONCE -> player.tick.toInt().coerceAtMost(element.lastIndex)
-                }]()
+                type.choose(element, player.tick)()
             } else emptyList()
         }
     }

@@ -7,10 +7,14 @@ import kr.toxicity.hud.api.player.PointedLocationProvider
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.player.HudPlayerImpl
 import kr.toxicity.hud.resource.GlobalResource
+import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 object PlayerManagerImpl : BetterHudManager, PlayerManager {
+
+    override val managerName: String = "Player"
+    override val supportExternalPacks: Boolean = false
 
     private val playerMap = ConcurrentHashMap<UUID, HudPlayer>()
     private val stringPlayer = ConcurrentHashMap<String, HudPlayer>()
@@ -68,7 +72,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
         }
     }
 
-    override fun reload(info: ReloadInfo, resource: GlobalResource) {
+    override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
     }
 
     override fun postReload() {

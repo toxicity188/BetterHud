@@ -11,7 +11,8 @@ object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
     fun generate(info: ReloadInfo): Map<String, ByteArray> {
         val sender = info.sender
-        val resourcePack = runWithExceptionHandling(sender, "Unable to make a resource pack.") {
+        val resourcePack = runCatching {
+            var meta = PackMeta.default
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
                 val mergeLength = mergeTarget.path.length + 1
@@ -27,21 +28,33 @@ object PackGenerator {
                     }
                 }
                 mergeTarget.forEach { target ->
-                    addFile(target)
+                    if (target.name == "pack.mcmeta") {
+                        runCatching {
+                            meta += PackMeta.fromFile(target)
+                        }.getOrElse {
+                            it.handle("Invalid pack.mcmeta: ${target.path}")
+                        }
+                    } else addFile(target)
                 }
             }
-            val saveTask = ConfigManagerImpl.packType.createGenerator(info)
-            tasks.values.forEachAsync { t ->
-                runWithExceptionHandling(sender, "Unable to save this file: ${t.path}") {
-                    saveTask(t)
-                    debug(ConfigManager.DebugLevel.FILE,"Pack file ${t.path} is generated.")
+            runCatching {
+                ConfigManagerImpl.packType.createGenerator(meta, info).use { saveTask ->
+                    tasks.values.forEachAsync { t ->
+                        runCatching {
+                            saveTask(t)
+                            debug(ConfigManager.DebugLevel.FILE,"Pack file ${t.path} is generated.")
+                        }.onFailure {
+                            it.handle(sender, "Unable to save this file: ${t.path}")
+                        }
+                    }
+                    saveTask.resourcePack
                 }
+            }.getOrElse {
+                it.handle(sender, "Unable to finalized resource pack build.")
+                emptyMap()
             }
-            runWithExceptionHandling(sender, "Unable to finalized resource pack build.") {
-                saveTask.close()
-            }
-            saveTask.resourcePack
         }.getOrElse {
+            it.handle(sender, "Unable to make a resource pack.")
             emptyMap()
         }
         tasks.clear()

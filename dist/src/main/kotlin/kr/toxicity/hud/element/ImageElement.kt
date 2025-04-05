@@ -11,6 +11,7 @@ import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.placeholder.Conditions
 import kr.toxicity.hud.placeholder.ConditionSource
 import kr.toxicity.hud.placeholder.PlaceholderSource
+import kr.toxicity.hud.util.getAsAnimationType
 import kr.toxicity.hud.util.ifNull
 
 class ImageElement(
@@ -25,6 +26,7 @@ class ImageElement(
     val scale = setting.getAsDouble("scale", 1.0).apply {
         if (this <= 0.0) throw RuntimeException("scale cannot be <= 0.0: $id")
     }
+    val animationType = setting.getAsAnimationType("animation-type")
 
     private val childrenMap = when (val child = setting["children"]) {
         is YamlArray -> child.associate {
@@ -39,12 +41,16 @@ class ImageElement(
         null -> emptyMap()
     }
 
+    fun contains(key: String): Boolean = children.containsKey(key) || children.values.any {
+        it.contains(key)
+    }
+
     val children by lazy {
-        fun String.toImage() = ImageManager.getImage(this).ifNull("This children image doesn't exist in $id: $this")
+        fun String.toImage() = ImageManager.getImage(this).ifNull { "This children image doesn't exist in $id: $this" }
         when {
             childrenMap.isEmpty() -> emptyMap()
             childrenMap.size == 1 -> if (childrenMap.values.first() == "*") ImageManager.allImage.filter {
-                it.id != id && !it.childrenMap.containsKey(id)
+                it.id != id && !it.contains(id)
             }.associateBy {
                 it.id
             } else childrenMap.entries.first().run {
@@ -57,9 +63,8 @@ class ImageElement(
     }
 
     val follow = setting["follow"]?.asString()?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string in image $id: $it")
-        }
+        PlaceholderManagerImpl.find(it, this)
+            .assertString("This placeholder is not a string in image $id: $it")
     }
     val childrenMapper = setting["children-mapper"]?.asObject()?.map {
         it.key to Conditions.parse(it.value.asObject(), this)

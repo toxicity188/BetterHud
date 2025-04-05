@@ -17,14 +17,14 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class HudPlayerImpl : HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
-    private val componentMap = HashMap<HudObject.Identifier, HudComponentSupplier<*>>()
+    private val componentMap = ConcurrentHashMap<HudObject.Identifier, HudComponentSupplier<*>>()
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
     private var additionalComp: WidthComponent? = null
-    private val variable = HashMap<String, String>()
+    private val variable = ConcurrentHashMap<String, String>()
     private val popupGroup = ConcurrentHashMap<String, PopupIteratorGroup>()
-    private val popupKey = HashMap<Any, PopupUpdater>()
+    private val popupKey = ConcurrentHashMap<Any, PopupUpdater>()
     private var task: HudTask? = null
     private var color: BossBar.Color? = null
     private var enabled = true
@@ -110,8 +110,7 @@ abstract class HudPlayerImpl : HudPlayer {
                     compList.addAll(v.get())
                     false
                 }.onFailure { e ->
-                    e.printStackTrace()
-                    warn("Unable to update ${k}. reason: ${e.message}")
+                    e.handle("Unable to update ${k}.")
                 }.getOrDefault(true)
             }
             val popupGroupIterator = popupGroup.values.iterator()

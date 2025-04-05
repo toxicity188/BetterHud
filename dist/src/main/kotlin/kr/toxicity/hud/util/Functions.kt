@@ -7,38 +7,37 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 
 fun interface Runner<T> : () -> T
 
-fun <T> T?.ifNull(message: String): T & Any {
-    return this ?: throw RuntimeException(message)
-}
+fun <T> T?.ifNull(lazyMessage: () -> String): T & Any = this ?: throw RuntimeException(lazyMessage())
 
 fun String.toEquation() = TEquation(this)
 
 fun String?.toLayoutAlign(): LayoutAlign = if (this != null) LayoutAlign.valueOf(uppercase()) else LayoutAlign.LEFT
 
-fun <R> runWithExceptionHandling(sender: BetterCommandSource, message: String, block: () -> R) = runCatching(block).onFailure {
-    synchronized(sender) {
-        sender.warn(message)
-        sender.warn("Reason: ${it.message ?: it.javaClass.name}")
-    }
-    if (ConfigManagerImpl.debug()) {
-        warn(
-            "Stack trace:",
-            it.stackTraceToString()
-        )
+fun Throwable.handle(log: String) {
+    handle(log) {
+        warn(*it.toTypedArray())
     }
 }
 
-fun <T, R> T.runWithExceptionHandling(sender: BetterCommandSource, message: String, block: T.() -> R) = runCatching(block).onFailure {
-    synchronized(sender) {
-        sender.warn(message)
-        sender.warn("Reason: ${it.message ?: it.javaClass.name}")
+fun Throwable.handle(sender: BetterCommandSource, log: String) {
+    handle(log) {
+        synchronized(sender.audience()) {
+            it.forEach(sender::info)
+        }
     }
+}
+
+fun Throwable.handle(log: String, handler: (List<String>) -> Unit) {
     if (ConfigManagerImpl.debug()) {
         warn(
             "Stack trace:",
-            it.stackTraceToString()
+            stackTraceToString()
         )
     }
+    handler(listOf(
+        log,
+        "Reason: ${message ?: javaClass.name}"
+    ))
 }
 
 infix fun <T, R> ((T) -> R).memoize(initialValue: R): (T) -> R = this as? MemoizedFunction ?: MemoizedFunction(this, initialValue)

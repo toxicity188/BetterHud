@@ -39,9 +39,7 @@ class TextRenderer(
     }
 
     private val followHudPlayer = follow?.let {
-        PlaceholderManagerImpl.find(it, this).apply {
-            if (!java.lang.String::class.java.isAssignableFrom(clazz)) throw RuntimeException("This placeholder is not a string: $it")
-        }
+        PlaceholderManagerImpl.find(it, this).assertString("This placeholder is not a string: $it")
     }
 
     private val parsedPatter = PlaceholderManagerImpl.parse(pattern, this)
@@ -53,7 +51,7 @@ class TextRenderer(
                     SPACE_KEY -> codepoint - CENTER_SPACE_CODEPOINT
                     null -> when (codepoint) {
                         TEXT_SPACE_KEY_CODEPOINT -> space
-                        else -> data.codepoint[codepoint]?.let { c -> c + 1 }
+                        else -> data.codepoint[codepoint] + 1
                     }
                     else -> null
                 }
@@ -188,7 +186,7 @@ class TextRenderer(
                 .replacement { r, _ ->
                     val g = r.group()
                     Component.text(runCatching {
-                        numberFormat.format(numberEquation.evaluate(g.toDouble()))
+                        numberFormat.format(numberEquation evaluate g.toDouble())
                     }.getOrDefault(g))
                 }
                 .build())

@@ -35,7 +35,7 @@ object PackUploader {
         fun openServer(body: String) {
             val host = ConfigManagerImpl.selfHostPort
             val url = "http://$body:$host/${packUUID.hash}.zip"
-            runWithExceptionHandling(CONSOLE, "Unable to open server.") {
+            runCatching {
                 server?.stop()
                 packUUID.save()
                 val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
@@ -67,6 +67,8 @@ object PackUploader {
                 }
                 BOOTSTRAP.sendResourcePack()
                 info("Resource pack server opened at $url")
+            }.onFailure {
+                it.handle("Unable to open server.")
             }
         }
         when (val host = ConfigManagerImpl.selfHostIp) {

@@ -21,6 +21,7 @@ import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.api.velocity.VelocityBootstrap
@@ -150,8 +151,11 @@ class VelocityBootstrapImpl @Inject constructor(
         registerCommand()
         core.start()
         scheduler.task {
-            core.reload()
-            log.info("Plugin enabled.")
+            core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
+            log.info(
+                "Platform: Velocity",
+                "Plugin enabled."
+            )
         }
     }
 
@@ -229,8 +233,8 @@ class VelocityBootstrapImpl @Inject constructor(
         }
     }
 
-    override fun minecraftVersion(): String = "1.21.4"
-    override fun mcmetaVersion(): Int = 46
+    override fun minecraftVersion(): String = "1.21.5"
+    override fun mcmetaVersion(): Int = 55
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()

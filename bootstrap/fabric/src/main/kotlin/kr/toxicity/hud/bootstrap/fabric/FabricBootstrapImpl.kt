@@ -9,17 +9,17 @@ import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.fabric.FabricBootstrap
 import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
-import kr.toxicity.hud.manager.CommandManager
-import kr.toxicity.hud.manager.ConfigManagerImpl
-import kr.toxicity.hud.manager.DatabaseManagerImpl
-import kr.toxicity.hud.manager.PlayerManagerImpl
+import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
+import kr.toxicity.hud.player.head.HttpSkinProvider
+import kr.toxicity.hud.player.head.MineToolsProvider
 import kr.toxicity.hud.util.asyncTask
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
@@ -47,8 +47,6 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 import java.net.URLClassLoader
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
@@ -126,14 +124,21 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             core.start()
             ModuleManager.start()
             CompatibilityManager.start()
+            if (!it.usesAuthentication()) {
+                PlayerHeadManager.addSkinProvider(MineToolsProvider())
+                PlayerHeadManager.addSkinProvider(HttpSkinProvider())
+            }
         }
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, _ ->
             server.commands.dispatcher.registerCommand()
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload()
-                logger.info("Mod enabled.")
+                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
+                logger.info(
+                    "Platform: Fabric",
+                    "Mod enabled."
+                )
                 core.isOldVersion {
                     warn(
                         "New version found: $it",
@@ -243,27 +248,14 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     }
 
 
-    override fun minecraftVersion(): String = "1.21.4"
+    override fun minecraftVersion(): String = "1.21.5"
 
-    override fun mcmetaVersion(): Int = 46
-
-    private val uuidMap = ConcurrentHashMap<String, UUID>()
-
-    private fun createUUID(string: String): UUID {
-        return uuidMap.computeIfAbsent(string) {
-            var uuid = UUID.randomUUID()
-            while (uuidMap.values.contains(uuid)) {
-                uuid = UUID.randomUUID()
-            }
-            uuid
-        }
-    }
+    override fun mcmetaVersion(): Int = 55
 
     fun wrap(world: ServerLevel): WorldWrapper {
         val levelName = world.dimension().location().path
         return WorldWrapper(
-            levelName,
-            createUUID(levelName)
+            levelName
         )
     }
 

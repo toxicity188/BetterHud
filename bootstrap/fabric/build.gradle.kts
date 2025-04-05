@@ -23,7 +23,7 @@ dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:${properties["parchment"]}")
+        parchment("org.parchmentmc.data:${property("parchment")}")
     })
     //Other mod dependency
     modCompileOnly("eu.pb4:polymer-resource-pack:0.9.18+1.21.1")
@@ -32,9 +32,9 @@ dependencies {
     modCompileOnly("net.luckperms:api:5.4")
 
     //Kyori
-    modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
-    modImplementation("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")
+    modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
+    modImplementation("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")
     compileOnly(project(":api:standard-api"))
     implementation(include(project(":api:fabric-api"))!!)
 }
@@ -49,14 +49,14 @@ fabricModJson {
     id = "betterhud"
     name = rootProject.name
     version = project.version.toString()
-    description = "A multi-platform server-side implementation of HUD in Minecraft."
+    description = "A multiplatform server-side implementation of HUD in Minecraft."
     authors.set(listOf(person("toxicity") {
         contact.sources = "https://github.com/toxicity188/BetterHud"
     }))
     license = listOf("MIT")
     environment = Environment.SERVER
     entrypoints = listOf(
-        serverEntrypoint("kr.toxicity.hud.bootstrap.fabric.FabricBootstrapImpl")
+        serverEntrypoint("$group.bootstrap.fabric.FabricBootstrapImpl")
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),

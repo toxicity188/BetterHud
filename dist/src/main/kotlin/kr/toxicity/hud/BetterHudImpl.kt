@@ -20,7 +20,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -101,34 +100,40 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
     private val onReload = AtomicBoolean()
 
     override fun reload(info: ReloadInfo): ReloadState {
-        if (onReload.get()) return ReloadState.ON_RELOAD
-        onReload.set(true)
+        if (!onReload.compareAndSet(false, true)) return ReloadState.ON_RELOAD
         val time = System.currentTimeMillis()
-        val result = CompletableFuture.supplyAsync {
-            reloadStartTask.forEach {
-                it()
+        reloadStartTask.forEach {
+            it()
+        }
+        val result = runCatching {
+            managers.forEach {
+                it.preReload()
             }
-            val result = runWithExceptionHandling(info.sender, "Unable to reload.") {
-                managers.forEach {
-                    it.preReload()
+            val resource = GlobalResource(info)
+            DATA_FOLDER.subFolder("packs").forEach { pack ->
+                if (!pack.isDirectory || pack.name.startsWith('-')) return@forEach
+                managers.filter {
+                    it.supportExternalPacks
+                }.forEach {
+                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName} in ${pack.name}...")
+                    it.reload(pack, info, resource)
                 }
-                val resource = GlobalResource(info)
-                managers.forEach {
-                    debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.javaClass.simpleName}...")
-                    it.reload(info, resource)
-                }
-                managers.forEach {
-                    it.postReload()
-                }
-                Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
-            }.getOrElse {
-                Failure(it)
             }
-            reloadEndTask.forEach {
-                it(result)
+            managers.forEach {
+                debug(ConfigManager.DebugLevel.MANAGER, "Reloading ${it.managerName}...")
+                it.reload(DATA_FOLDER, info, resource)
             }
-            result
-        }.join()
+            managers.forEach {
+                it.postReload()
+            }
+            Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
+        }.getOrElse {
+            it.handle(info.sender, "Unable to reload.")
+            Failure(it)
+        }
+        reloadEndTask.forEach {
+            it(result)
+        }
         onReload.set(false)
         return result
     }
@@ -144,7 +149,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         DatabaseManagerImpl.currentDatabase.close()
     }
 
-    override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint) ?: 3
+    override fun getWidth(codepoint: Int): Int = TextManagerImpl.getWidth(codepoint)
 
     override fun loadAssets(prefix: String, dir: File) {
         loadAssets(prefix) { s, i ->
@@ -185,7 +190,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     fun isOldVersion(then: (String) -> Unit) {
         if (isDevVersion) warn("This build is dev version - be careful to use it!")
-        else runWithExceptionHandling(CONSOLE, "Unable to get latest version.") {
+        else runCatching {
             HttpClient.newHttpClient().sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
@@ -210,6 +215,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
                 }
                 if (result ?: (get.size > now.size)) then(body)
             }
+        }.onFailure { e ->
+            e.handle("Unable to get latest version.")
         }
     }
 

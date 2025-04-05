@@ -83,18 +83,18 @@ class FabricStandardModule : FabricModule {
             },
             "last_damage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastDamage`()
+                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastDamage`()
                 }
             },
             "last_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterhud$getLastHealth`()
+                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastHealth`()
                 }
             },
             "last_health_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
                     (p.fabricPlayer as FabricLivingEntity).let {
-                        it.`betterhud$getLastHealth`() / (it as LivingEntity).maxHealth
+                        it.`betterHud$getLastHealth`() / (it as LivingEntity).maxHealth
                     }
                 }
             },
@@ -154,7 +154,7 @@ class FabricStandardModule : FabricModule {
             },
             "hotbar_slot" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.fabricPlayer.inventory.selected
+                    p.fabricPlayer.inventory.selectedSlot
                 }
             },
             "potion_effect_duration" to HudPlaceholder.builder<Number>()
@@ -216,7 +216,12 @@ class FabricStandardModule : FabricModule {
             },
             "frozen" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    p.fabricPlayer.isFreezing
+                    p.fabricPlayer.isFullyFrozen
+                }
+            },
+            "burning" to HudPlaceholder.of { _, _ ->
+                Function { p ->
+                    p.fabricPlayer.remainingFireTicks > 0
                 }
             },
             "has_permission" to HudPlaceholder.builder<Boolean>()
