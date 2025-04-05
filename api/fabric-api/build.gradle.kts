@@ -5,15 +5,15 @@ plugins {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
+    minecraft("com.mojang:minecraft:${property("minecraft_version")}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:${properties["parchment"]}")
+        parchment("org.parchmentmc.data:${property("parchment")}")
     })
     //Kyori
-    modCompileOnly("net.fabricmc:fabric-loader:${properties["loader_version"]}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["kyori_mod_implementation"]}")!!)
+    modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
+    modImplementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
     implementation(include(project(":api:standard-api"))!!)
 }
 
@@ -37,7 +37,7 @@ fabricModJson {
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),
-        "minecraft" to listOf("~${properties["supported_version"]}"),
+        "minecraft" to listOf("~${property("supported_version")}"),
         "java" to listOf(">=21"),
         "fabric-api" to listOf("*"),
         "adventure-platform-fabric" to listOf("*")
