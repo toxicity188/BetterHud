@@ -7,7 +7,6 @@ import kr.toxicity.hud.util.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
@@ -72,14 +71,17 @@ object PackUploader {
             }
         }
         when (val host = ConfigManagerImpl.selfHostIp) {
-            "*" -> HttpClient.newHttpClient()
-                .sendAsync(HttpRequest.newBuilder()
+            "*" -> httpClient {
+                sendAsync(HttpRequest.newBuilder()
                     .uri(URI.create("http://checkip.amazonaws.com/"))
                     .GET()
                     .build(), HttpResponse.BodyHandlers.ofString()).thenAccept {
-                        val body = it.body()
-                        openServer(body.substring(0, body.length - 1))
+                    val body = it.body()
+                    openServer(body.substring(0, body.length - 1))
                 }
+            }.onFailure {
+                it.handle("Unable to open server.")
+            }
             else -> openServer(host)
         }
 

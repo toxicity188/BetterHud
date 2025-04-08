@@ -2,15 +2,11 @@ package kr.toxicity.hud.player.head
 
 import kr.toxicity.hud.api.player.HudPlayerHead
 import kr.toxicity.hud.manager.PlayerHeadManager
-import kr.toxicity.hud.util.parseJson
-import kr.toxicity.hud.util.toImage
-import kr.toxicity.hud.util.toIntKeyMap
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import java.awt.image.BufferedImage
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.util.*
@@ -34,22 +30,24 @@ class HudPlayerHeadImpl(
         }.toIntKeyMap()
     )
     private constructor(playerName: String) : this(
-        HttpClient.newHttpClient().send(
-            HttpRequest.newBuilder()
-                .uri(URI.create(
-                    parseJson(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
-                    .asJsonObject
-                    .getAsJsonObject("textures")
-                    .getAsJsonObject("SKIN")
-                    .getAsJsonPrimitive("url")
-                    .asString
-                ))
-                .GET()
-                .build(),
-            BodyHandlers.ofInputStream()
-        ).body().buffered().use {
-            it.toImage()
-        }
+        httpClient {
+            send(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(
+                        parseJson(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
+                            .asJsonObject
+                            .getAsJsonObject("textures")
+                            .getAsJsonObject("SKIN")
+                            .getAsJsonPrimitive("url")
+                            .asString
+                    ))
+                    .GET()
+                    .build(),
+                BodyHandlers.ofInputStream()
+            ).body().buffered().use {
+                it.toImage()
+            }
+        }.getOrThrow()
     )
 
     private val flatHead = (0..63).map {

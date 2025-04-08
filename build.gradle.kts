@@ -68,7 +68,7 @@ tasks.register("modrinthPublish") {
 
 tasks {
     runServer {
-        version(minecraft)
+        version("1.21.4") //TODO set this to 'minecraft' when 1.21.5 paper is released.
         pluginJars(bukkit.tasks.jar.flatMap {
             it.archiveFile
         })

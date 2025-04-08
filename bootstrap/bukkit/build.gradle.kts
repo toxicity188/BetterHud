@@ -38,7 +38,6 @@ dependencies {
     compileOnly(libs.adventurePlatformBukkit)
     compileOnly(shade(rootProject.fileTree("shaded"))!!)
 
-
     compileOnly("io.lumine:Mythic-Dist:5.8.2")
     compileOnly("io.lumine:MythicLib-dist:1.7.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
@@ -56,7 +55,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.10.2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.6.1")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:1.2.0")
+    compileOnly("com.nexomc:nexo:1.3.0")
     compileOnly("io.th0rgal:oraxen:1.189.0")
 }
 

@@ -4,10 +4,17 @@ import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import java.net.http.HttpClient
 
 fun interface Runner<T> : () -> T
 
 fun <T> T?.ifNull(lazyMessage: () -> String): T & Any = this ?: throw RuntimeException(lazyMessage())
+
+fun <T> httpClient(block: HttpClient.() -> T) = HttpClient.newHttpClient().use {
+    runCatching {
+        it.block()
+    }
+}
 
 fun String.toEquation() = TEquation(this)
 

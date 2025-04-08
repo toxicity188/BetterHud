@@ -60,7 +60,7 @@ tasks {
     remapJar {
         archiveBaseName = "betterhud-${project.name}"
         archiveClassifier = ""
-        nestedJars.from(files("libs/adventure-platform-fabric-6.2.1-SNAPSHOT.jar"))
+        nestedJars.from(files("libs/adventure-platform-fabric-6.4.0-SNAPSHOT.jar"))
     }
     runServer {
         enabled = false

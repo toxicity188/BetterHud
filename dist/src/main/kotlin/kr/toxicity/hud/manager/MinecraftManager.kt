@@ -8,7 +8,6 @@ import kr.toxicity.hud.util.*
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
@@ -60,10 +59,9 @@ object MinecraftManager : BetterHudManager {
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runCatching {
-                val client = HttpClient.newHttpClient()
+            httpClient {
                 info("Getting minecraft default version...")
-                val json = InputStreamReader(client.send(HttpRequest.newBuilder()
+                val json = InputStreamReader(send(HttpRequest.newBuilder()
                     .uri(URI.create("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
                     .GET()
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
@@ -74,8 +72,8 @@ object MinecraftManager : BetterHudManager {
                 if (!file.exists() || file.length() == 0L) {
                     info("$current.jar doesn't exist. so download it...")
                     ZipOutputStream(file.outputStream().buffered()).use { outputStream ->
-                        ZipInputStream(client.send(HttpRequest.newBuilder()
-                            .uri(URI.create(InputStreamReader(client.send(HttpRequest.newBuilder()
+                        ZipInputStream(send(HttpRequest.newBuilder()
+                            .uri(URI.create(InputStreamReader(send(HttpRequest.newBuilder()
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
                                 }.first {

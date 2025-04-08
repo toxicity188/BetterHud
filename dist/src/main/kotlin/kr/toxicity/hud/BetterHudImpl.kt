@@ -17,7 +17,6 @@ import net.kyori.adventure.key.Key
 import java.io.File
 import java.io.InputStream
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.concurrent.atomic.AtomicBoolean
@@ -190,8 +189,8 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     fun isOldVersion(then: (String) -> Unit) {
         if (isDevVersion) warn("This build is dev version - be careful to use it!")
-        else runCatching {
-            HttpClient.newHttpClient().sendAsync(
+        else httpClient {
+            sendAsync(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
                     .GET()
