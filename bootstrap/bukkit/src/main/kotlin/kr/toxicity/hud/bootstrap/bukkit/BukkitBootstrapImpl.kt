@@ -98,10 +98,14 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     private val core = BetterHudImpl(this).apply {
         BetterHudAPI.inst(this)
         addReloadStartTask {
-            PluginReloadStartEvent().call()
+            scheduler.asyncTask {
+                PluginReloadStartEvent().call()
+            }
         }
         addReloadEndTask {
-            PluginReloadedEvent(it).call()
+            scheduler.asyncTask {
+                PluginReloadedEvent(it).call()
+            }
         }
         addReloadStartTask {
             HandlerList.unregisterAll(listener)
