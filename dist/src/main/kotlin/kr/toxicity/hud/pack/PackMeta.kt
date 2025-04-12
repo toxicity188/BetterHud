@@ -15,7 +15,7 @@ import kotlin.math.max
 
 data class PackMeta(
     val pack: Pack,
-    val overlays: Overlay = Overlay()
+    val overlays: Overlay? = Overlay()
 ) {
     companion object {
         private val gson = GsonBuilder()
@@ -53,9 +53,16 @@ data class PackMeta(
     }
 
     operator fun plus(other: PackMeta): PackMeta {
+        val o1 = overlays
+        val o2 = other.overlays
         return PackMeta(
             pack + other.pack,
-            overlays + other.overlays
+            when {
+                o1 != null && o2 != null -> o1 + o2
+                o1 != null -> o1
+                o2 != null -> o2
+                else -> null
+            }
         )
     }
 

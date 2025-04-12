@@ -30,6 +30,7 @@ import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.velocity.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.velocity.player.HudPlayerVelocity
 import kr.toxicity.hud.manager.CommandManager
+import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackUploader
@@ -174,7 +175,7 @@ class VelocityBootstrapImpl @Inject constructor(
             }
             impl
         }
-        if (player.hasPermission(VERSION_CHECK_PERMISSION)) latest.forEach(audience::info)
+        if (player.hasPermission(VERSION_CHECK_PERMISSION) && ConfigManagerImpl.versionCheck) latest.forEach(audience::info)
     }
 
     override fun logger(): BetterHudLogger = log

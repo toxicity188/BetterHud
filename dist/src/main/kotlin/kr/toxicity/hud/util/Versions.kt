@@ -5,12 +5,12 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
-import com.vdurmont.semver4j.Semver
 import kr.toxicity.hud.api.version.MinecraftVersion
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import org.semver4j.Semver
 import java.io.InputStreamReader
 import java.lang.reflect.Type
 import java.net.URI
@@ -110,7 +110,7 @@ data class ArtifactVersion(
     fun toURLComponent(): Component {
         val url = "https://modrinth.com/plugin/betterhud2/version/$id"
         return Component.text()
-            .content(versionNumber.originalValue)
+            .content(versionNumber.version)
             .color(NamedTextColor.AQUA)
             .hoverEvent(HoverEvent.showText(
                 Component.text()

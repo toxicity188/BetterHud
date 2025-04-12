@@ -168,7 +168,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             }
             impl
         }
-        if (listener.player.hasPermission(VERSION_CHECK_PERMISSION)) latest.forEach(audience::info)
+        if (listener.player.hasPermission(VERSION_CHECK_PERMISSION) && ConfigManagerImpl.versionCheck) latest.forEach(audience::info)
     }
     private fun disconnect(player: ServerPlayer) {
         PlayerManagerImpl.removeHudPlayer(player.uuid)?.let {

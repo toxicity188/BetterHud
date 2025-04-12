@@ -1,11 +1,11 @@
 package kr.toxicity.hud.util
 
-import com.vdurmont.semver4j.Semver
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
+import org.semver4j.Semver
 import java.net.http.HttpClient
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -24,7 +24,7 @@ fun <T> httpClient(block: HttpClient.() -> T) = runCatching {
     CLIENT.block()
 }
 
-fun String.toSemver() = Semver(this, Semver.SemverType.LOOSE)
+fun String.toSemver() = Semver(this)
 fun String.toMinecraftVersion() = MinecraftVersion(this)
 
 fun String.toEquation() = TEquation(this)
