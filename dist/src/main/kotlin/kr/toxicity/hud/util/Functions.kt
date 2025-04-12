@@ -1,20 +1,31 @@
 package kr.toxicity.hud.util
 
+import com.vdurmont.semver4j.Semver
 import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.enums.LayoutAlign
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import java.net.http.HttpClient
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.Executors
 
 fun interface Runner<T> : () -> T
 
 fun <T> T?.ifNull(lazyMessage: () -> String): T & Any = this ?: throw RuntimeException(lazyMessage())
 
-fun <T> httpClient(block: HttpClient.() -> T) = HttpClient.newHttpClient().use {
-    runCatching {
-        it.block()
-    }
+private val CLIENT = HttpClient.newBuilder()
+    .executor(Executors.newVirtualThreadPerTaskExecutor())
+    .connectTimeout(Duration.of(5, ChronoUnit.SECONDS))
+    .build()
+
+fun <T> httpClient(block: HttpClient.() -> T) = runCatching {
+    CLIENT.block()
 }
+
+fun String.toSemver() = Semver(this, Semver.SemverType.LOOSE)
+fun String.toMinecraftVersion() = MinecraftVersion(this)
 
 fun String.toEquation() = TEquation(this)
 
@@ -45,24 +56,4 @@ fun Throwable.handle(log: String, handler: (List<String>) -> Unit) {
         log,
         "Reason: ${message ?: javaClass.name}"
     ))
-}
-
-infix fun <T, R> ((T) -> R).memoize(initialValue: R): (T) -> R = this as? MemoizedFunction ?: MemoizedFunction(this, initialValue)
-
-private class MemoizedFunction<T, R>(
-    private val delegate: (T) -> R,
-    private var value: R
-) : (T) -> R {
-
-    private var time = 0L
-
-    @Synchronized
-    override fun invoke(p1: T): R {
-        val current = System.currentTimeMillis()
-        if (current - time >= ConfigManagerImpl.tickSpeed * 50) {
-            time = current
-            value = delegate(p1)
-        }
-        return value
-    }
 }
