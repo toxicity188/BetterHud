@@ -16,9 +16,6 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
 import java.io.File
 import java.io.InputStream
-import java.net.URI
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -27,7 +24,6 @@ import java.util.jar.JarFile
 import java.util.jar.Manifest
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
-import kotlin.math.min
 
 @Suppress("UNUSED")
 class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
@@ -36,7 +32,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         if (!bootstrap.dataFolder().exists() && !bootstrap.isVelocity) loadAssets("default", bootstrap.dataFolder().apply {
             mkdir()
         })
-        val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), bootstrap.loader())
+        val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), bootstrap.classloader())
         BetterHudDependency.dependencies().forEach {
             if (it.platforms.any { p ->
                 p.match(bootstrap)
@@ -185,38 +181,6 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         buildString {
             while (matcher.find()) append(matcher.group())
         }.toInt()
-    }
-
-    fun isOldVersion(then: (String) -> Unit) {
-        if (isDevVersion) warn("This build is dev version - be careful to use it!")
-        else httpClient {
-            sendAsync(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.spigotmc.org/legacy/update.php?resource=115559/"))
-                    .GET()
-                    .build(), HttpResponse.BodyHandlers.ofString()
-            ).thenAccept {
-                val body = it.body()
-                val get = body.extractNumber()
-                val now = bootstrap.version().extractNumber()
-                var result: Boolean? = null
-                for (i in 0..min(get.lastIndex, now.lastIndex)) {
-                    when {
-                        get[i] < now[i] -> {
-                            result = false
-                            break
-                        }
-                        get[i] > now[i] -> {
-                            result = true
-                            break
-                        }
-                    }
-                }
-                if (result ?: (get.size > now.size)) then(body)
-            }
-        }.onFailure { e ->
-            e.handle("Unable to get latest version.")
-        }
     }
 
     override fun getEncodedNamespace(): String = NAME_SPACE_ENCODED

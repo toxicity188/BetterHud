@@ -11,19 +11,22 @@ import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.manager.CompatibilityManager
 import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
+import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.player.head.HttpSkinProvider
 import kr.toxicity.hud.player.head.MineToolsProvider
+import kr.toxicity.hud.util.VERSION_CHECK_PERMISSION
 import kr.toxicity.hud.util.asyncTask
+import kr.toxicity.hud.util.handleLatestVersion
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.task
-import kr.toxicity.hud.util.warn
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -32,7 +35,6 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -83,7 +85,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
     private lateinit var version: String
     private lateinit var core: BetterHudImpl
 
-    private var latestVersion: String? = null
+    private var latest = emptyList<Component>()
 
     var skipInitialReload = false
 
@@ -139,13 +141,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                     "Platform: Fabric",
                     "Mod enabled."
                 )
-                core.isOldVersion {
-                    warn(
-                        "New version found: $it",
-                        "Download: https://modrinth.com/plugin/betterhud2"
-                    )
-                    latestVersion = it
-                }
+                latest = handleLatestVersion()
             }
         }
         ServerLifecycleEvents.SERVER_STOPPED.register {
@@ -172,18 +168,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             }
             impl
         }
-        latestVersion?.let { latest ->
-            if (version() != latest) {
-                audience.info("New BetterHud version found: $latest")
-                audience.info(
-                    Component.text("Download: https://modrinth.com/plugin/betterhud2")
-                        .clickEvent(
-                            ClickEvent.clickEvent(
-                                ClickEvent.Action.OPEN_URL,
-                                "https://modrinth.com/plugin/betterhud2"
-                            )))
-            }
-        }
+        if (listener.player.hasPermission(VERSION_CHECK_PERMISSION)) latest.forEach(audience::info)
     }
     private fun disconnect(player: ServerPlayer) {
         PlayerManagerImpl.removeHudPlayer(player.uuid)?.let {
@@ -247,8 +232,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }
     }
 
-
-    override fun minecraftVersion(): String = "1.21.5"
+    override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
 
     override fun mcmetaVersion(): Int = 55
 
@@ -269,7 +253,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         wrap(it)
     }
 
-    override fun loader(): URLClassLoader {
+    override fun classloader(): URLClassLoader {
         val loader = javaClass.classLoader
         return javaClass.classLoader.javaClass.declaredFields.first {
             URLClassLoader::class.java.isAssignableFrom(it.type)

@@ -127,6 +127,16 @@ public class BetterHudDependency {
             List.of(BetterHudPlatform.VELOCITY)
     );
     /**
+     * Semver4j
+     */
+    public static final BetterHudDependency SEMVER4J = new BetterHudDependency(
+            "com{}vdurmont",
+            "semver4j",
+            "3.1.0",
+            false,
+            BetterHudPlatform.ALL
+    );
+    /**
      * Adventure
      */
     public static final BetterHudDependency ADVENTURE_API = new BetterHudDependency(

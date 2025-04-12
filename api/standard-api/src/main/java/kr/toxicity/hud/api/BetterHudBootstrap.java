@@ -5,6 +5,7 @@ import kr.toxicity.command.SenderType;
 import kr.toxicity.hud.api.adapter.WorldWrapper;
 import kr.toxicity.hud.api.player.HudPlayer;
 import kr.toxicity.hud.api.scheduler.HudScheduler;
+import kr.toxicity.hud.api.version.MinecraftVersion;
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,7 @@ public interface BetterHudBootstrap {
      * @return class loader.
      */
     @NotNull
-    URLClassLoader loader();
+    URLClassLoader classloader();
 
     /**
      * Whether this platform is Paper or that's fork.
@@ -140,10 +141,10 @@ public interface BetterHudBootstrap {
 
     /**
      * Target platform's minecraft protocol version.
-     * @return version like "1.21.1"
+     * @return version like "1.21.5"
      */
     @NotNull
-    String minecraftVersion();
+    MinecraftVersion minecraftVersion();
 
     /**
      * A resource pack version matched at target platform's minecraft.
@@ -166,6 +167,18 @@ public interface BetterHudBootstrap {
     @Unmodifiable
     List<WorldWrapper> worlds();
 
+
+    /**
+     * Gets loader name.
+     * @return loader name
+     */
+    default @NotNull String loaderName() {
+        if (isFolia()) return "folia";
+        else if (isFabric()) return "fabric";
+        else if (isVelocity()) return "velocity";
+        else if (isPaper()) return "paper";
+        else return "bukkit";
+    }
 
     /**
      * Gets a command source based on console.

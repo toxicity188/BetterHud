@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.ImageTextScale
@@ -49,11 +50,11 @@ object MinecraftManager : BetterHudManager {
     override fun start() {
     }
 
-    private var previous = ""
+    private var previous: MinecraftVersion? = null
 
     override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-            val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
+            val current = ConfigManagerImpl.minecraftJarVersion ?: BOOTSTRAP.minecraftVersion()
             if (assetsMap.isEmpty() || previous != current) {
                 previous = current
             } else return
@@ -77,7 +78,7 @@ object MinecraftManager : BetterHudManager {
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
                                 }.first {
-                                    it.getAsJsonPrimitive("id").asString == current
+                                    it.getAsJsonPrimitive("id").asString.toMinecraftVersion() == current
                                 }.getAsJsonPrimitive("url").asString))
                                 .GET()
                                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {

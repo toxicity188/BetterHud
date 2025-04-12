@@ -25,6 +25,7 @@ import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.scheduler.HudTask
 import kr.toxicity.hud.api.velocity.VelocityBootstrap
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.velocity.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.velocity.player.HudPlayerVelocity
@@ -32,13 +33,9 @@ import kr.toxicity.hud.manager.CommandManager
 import kr.toxicity.hud.manager.DatabaseManagerImpl
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.pack.PackUploader
-import kr.toxicity.hud.util.asyncTask
-import kr.toxicity.hud.util.info
-import kr.toxicity.hud.util.task
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.velocity.Metrics
 import org.bstats.velocity.Metrics.Factory
 import org.slf4j.Logger
@@ -133,17 +130,11 @@ class VelocityBootstrapImpl @Inject constructor(
     override fun version(): String = description.version.orElse("unknown")
     override fun resource(path: String): InputStream? = javaClass.getResourceAsStream("/$path")?.buffered()
 
-    private var latestVersion: String? = null
+    private var latest = emptyList<Component>()
 
     @Subscribe
     fun enable(e: ProxyInitializeEvent) {
-        core.isOldVersion {
-            latestVersion = it
-            warn(
-                "New version found: $it",
-                "Download: https://hangar.papermc.io/toxicity188/BetterHud/channels"
-            )
-        }
+        latest = handleLatestVersion()
         proxyServer.allPlayers.forEach {
             register(it)
         }
@@ -183,18 +174,7 @@ class VelocityBootstrapImpl @Inject constructor(
             }
             impl
         }
-        latestVersion?.let { latest ->
-            if (version() != latest) {
-                audience.info("New BetterHud version found: $latest")
-                audience.info(
-                    Component.text("Download: https://www.spigotmc.org/resources/115559")
-                        .clickEvent(
-                            ClickEvent.clickEvent(
-                                ClickEvent.Action.OPEN_URL,
-                                "https://www.spigotmc.org/resources/115559"
-                            )))
-            }
-        }
+        if (player.hasPermission(VERSION_CHECK_PERMISSION)) latest.forEach(audience::info)
     }
 
     override fun logger(): BetterHudLogger = log
@@ -233,14 +213,14 @@ class VelocityBootstrapImpl @Inject constructor(
         }
     }
 
-    override fun minecraftVersion(): String = "1.21.5"
+    override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
     override fun mcmetaVersion(): Int = 55
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()
 
 
-    override fun loader(): URLClassLoader {
+    override fun classloader(): URLClassLoader {
         return javaClass.classLoader as URLClassLoader
     }
 

@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
 import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackType
@@ -77,8 +78,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var clearBuildFolder = true
         private set
 
-    var minecraftJarVersion = "bukkit"
-        private set
+    var minecraftJarVersion: MinecraftVersion? = null
 
     var loadMinecraftDefaultTextures = true
         private set
@@ -207,7 +207,11 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
                 }
             }
             key = KeyResource(yaml["namespace"]?.asString() ?: NAME_SPACE)
-            minecraftJarVersion = yaml["minecraft-jar-version"]?.asString() ?: "bukkit"
+            minecraftJarVersion = yaml["minecraft-jar-version"]?.asString()?.let {
+                runCatching {
+                    it.toMinecraftVersion()
+                }.getOrNull()
+            }
             removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
             disableLegacyOffset = yaml.getAsBoolean("disable-legacy-offset", false)
         }.onFailure { e ->
