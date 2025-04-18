@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.impl.CommandModule
@@ -227,6 +228,13 @@ class NMSImpl : NMS {
             override fun sendMessage(message: String) {
                 player.sendMessage(message)
             }
+
+            override fun <T : Any> getData(p0: DataComponentType.Valued<T>): T? = player.getData(p0)
+            override fun <T : Any> getDataOrDefault(
+                p0: DataComponentType.Valued<out T>,
+                p1: T?
+            ): T? = player.getDataOrDefault(p0, p1)
+            override fun hasData(p0: DataComponentType): Boolean = player.hasData(p0)
         }
     }
 

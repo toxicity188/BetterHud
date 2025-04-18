@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Player is dead.
+ * The Player is dead.
  * @param player player
  */
 public record PlayerDeathEvent(@NotNull ServerPlayer player) implements PlayerEvent<PlayerDeathEvent> {

@@ -59,7 +59,7 @@ fun Player.storage(material: Material): Int {
 fun Player.totalAmount(material: Material): Int {
     var i = 0
     for (content in inventory.contents) {
-        if (content.type == material) i += content.amount
+        if (content?.type == material) i += content.amount
     }
     return i
 }

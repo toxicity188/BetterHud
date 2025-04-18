@@ -135,7 +135,7 @@ public interface BetterHudBootstrap {
     void sendResourcePack(@NotNull HudPlayer player);
 
     /**
-     * Sends resource pack url packet to all player.
+     * Sends resource pack url packet to all players.
      */
     void sendResourcePack();
 
@@ -155,7 +155,7 @@ public interface BetterHudBootstrap {
     /**
      * Finds some world by given name.
      * @param name world name
-     * @return wrapper of world or null if not exists.
+     * @return wrapper of a world or null if not exists.
      */
     @Nullable WorldWrapper world(@NotNull String name);
 

@@ -52,7 +52,7 @@ public record HudObjectType<T extends HudObject>(@NotNull Class<T> clazz, @NotNu
     );
 
     /**
-     * Gets supplier from object
+     * Gets supplier from an object
      * @param object target object
      * @param player target player
      * @return supplier

@@ -10,7 +10,7 @@ import java.util.List;
 public interface YamlArray extends Iterable<YamlElement>, YamlElement {
 
     /**
-     * Gets an array as list.
+     * Gets an array as a list.
      * @return raw list
      */
     @NotNull
@@ -57,7 +57,7 @@ public interface YamlArray extends Iterable<YamlElement>, YamlElement {
         throw new UnsupportedOperationException("array");
     }
     /**
-     * Gets this element as a long
+     * Gets this element as along
      * @throws UnsupportedOperationException if type is different.
      * @return long
      */

@@ -47,7 +47,7 @@ public interface HudPlayer extends BetterCommandSource {
     LocationWrapper location();
 
     /**
-     * Gets player world
+     * Gets a player world
      * @return world
      */
     @NotNull
@@ -130,7 +130,7 @@ public interface HudPlayer extends BetterCommandSource {
     @NotNull Map<String, PopupIteratorGroup> getPopupGroupIteratorMap();
 
     /**
-     * Gets a mutable map of player's local variable.
+     * Gets a mutable map of the player's local variable.
      * @return player's variable map
      */
     @NotNull Map<String, String> getVariableMap();

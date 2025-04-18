@@ -25,7 +25,7 @@ public record LocationWrapper(
         float yaw
 ) {
     /**
-     * Finds location from yaml.
+     * Finds location from YAML.
      * @param data raw data
      * @return location
      */
@@ -40,7 +40,7 @@ public record LocationWrapper(
         );
     }
     /**
-     * Finds location from json.
+     * Finds location from JSON.
      * @param data raw data
      * @return location
      */

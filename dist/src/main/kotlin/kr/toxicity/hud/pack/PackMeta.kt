@@ -106,8 +106,8 @@ data class PackMeta(
     }
 
     data class VersionRange(
-        val min: Int,
-        val max: Int
+        @SerializedName("min_inclusive") val min: Int,
+        @SerializedName("max_inclusive") val max: Int
     ) : Comparable<VersionRange> {
 
         val range get() = max - min

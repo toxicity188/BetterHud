@@ -12,7 +12,7 @@ public interface FabricLivingEntity {
     double betterHud$getLastDamage();
 
     /**
-     * Gets health + last damage.
+     * Gets health and last damage.
      * @return last health
      */
     double betterHud$getLastHealth();

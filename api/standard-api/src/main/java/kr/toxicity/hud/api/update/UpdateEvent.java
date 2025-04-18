@@ -33,7 +33,7 @@ public interface UpdateEvent {
     @NotNull UpdateReason getType();
 
     /**
-     * Returns the key. normally random uuid.
+     * Returns the key. Normally random uuid.
      * @return unique key
      */
     @NotNull Object getKey();

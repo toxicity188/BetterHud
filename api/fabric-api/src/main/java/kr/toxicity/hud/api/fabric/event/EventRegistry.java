@@ -68,7 +68,7 @@ public final class EventRegistry<T> {
     }
 
     /**
-     * Clears all temp listener from all registries.
+     * Clears all temp listeners from all registries.
      */
     @ApiStatus.Internal
     public static void clearAll() {

@@ -21,7 +21,7 @@ public interface ListenerManager {
     void addListener(@NotNull String name, @NotNull Function<YamlObject, Function<UpdateEvent, HudListener>> listenerFunction);
 
     /**
-     * Gets all listener name
+     * Gets all listener names
      * @return listener name
      */
     @NotNull

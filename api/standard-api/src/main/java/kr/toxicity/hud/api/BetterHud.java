@@ -77,8 +77,8 @@ public interface BetterHud {
     }
 
     /**
-     * Checks whether this build is dev version.
-     * @return whether this build is dev version
+     * Checks whether this build is a dev version.
+     * @return whether this build is a dev version
      */
     boolean isDevVersion();
 
@@ -117,7 +117,7 @@ public interface BetterHud {
     void loadAssets(@NotNull String prefix, @NotNull BiConsumer<String, InputStream> consumer);
 
     /**
-     * Gets a width of default font's char
+     * Gets the width of default font's char
      * @param codepoint target codepoint
      * @return width
      */
@@ -199,7 +199,7 @@ public interface BetterHud {
 
 
     /**
-     * Get a translated result of key.
+     * Get a translated result of a key.
      * @param locale locale
      * @param key key
      * @return translated value

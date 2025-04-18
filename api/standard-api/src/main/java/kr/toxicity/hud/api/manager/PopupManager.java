@@ -19,7 +19,7 @@ public interface PopupManager {
     @Nullable Popup getPopup(@NotNull String name);
 
     /**
-     * Gets all name of popup.
+     * Gets all names of popup.
      * @return names
      */
     @NotNull @Unmodifiable Set<String> getAllNames();

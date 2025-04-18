@@ -20,7 +20,7 @@ public interface TriggerManager {
     void addTrigger(@NotNull String name, @NotNull Function<YamlObject, HudTrigger<?>> trigger);
 
     /**
-     * Gets all triggers name.
+     * Gets all triggers names.
      * @return name
      */
     @NotNull

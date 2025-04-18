@@ -12,26 +12,26 @@ import java.util.Map;
 public interface YamlObject extends Iterable<Map.Entry<String, YamlElement>>, YamlElement {
 
     /**
-     * Gets a data as a map.
+     * Gets data as a map.
      * @return map
      */
     @NotNull Map<String, Object> get();
 
     /**
-     * Gets yaml element by some key.
+     * Gets YAML element by some key.
      * @param path key
      * @return element or null if not exists.
      */
     @Nullable YamlElement get(@NotNull String path);
 
     /**
-     * Merges data with other object.
-     * @param object other object
+     * Merges data with another object.
+     * @param object another object
      */
     void merge(@NotNull YamlObject object);
 
     /**
-     * Saves yaml as flat file.
+     * Saves YAML as a flat file.
      * @param file target file
      */
     void save(@NotNull File file);
@@ -77,7 +77,7 @@ public interface YamlObject extends Iterable<Map.Entry<String, YamlElement>>, Ya
         throw new UnsupportedOperationException("object");
     }
     /**
-     * Gets this element as a long
+     * Gets this element as along
      * @throws UnsupportedOperationException if type is different.
      * @return long
      */
@@ -146,7 +146,7 @@ public interface YamlObject extends Iterable<Map.Entry<String, YamlElement>>, Ya
         return value != null ? value.asDouble() : defaultValue;
     }
     /**
-     * Gets some value by some key as a long
+     * Gets some value by some key as along
      * @throws UnsupportedOperationException if type is different.
      * @param path key
      * @param defaultValue default value
