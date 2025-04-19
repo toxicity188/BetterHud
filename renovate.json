@@ -16,7 +16,7 @@
         "eu.pb4:polymer-autohost",
         "eu.pb4:polymer-resource-pack"
       ],
-      "versioning": "regex:^(?<major>\\d)+\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+\\d+\\.\\d+(\\.\\d+)?$"
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+\\d+\\.\\d+(\\.\\d+)?$"
     }
   ]
 }
