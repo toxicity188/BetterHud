@@ -5,6 +5,7 @@
   ],
   "ignoreDeps": [
     "net.fabricmc.fabric-api:fabric-api",
-    "fabric-loom"
+    "fabric-loom",
+    "com.mojang:minecraft"
   ]
 }
