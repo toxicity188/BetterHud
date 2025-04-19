@@ -35,18 +35,16 @@ val Player.armor
 val Player.emptySpace
     get(): Int {
         val inv: Inventory = inventory
-        var r = 0
-        for (i in 0..35) {
+        return (0..35).count { i ->
             val item = inv.getItem(i)
-            if (item == null || item.type == Material.AIR) r++
+            item == null || item.type == Material.AIR
         }
-        return r
     }
 fun Player.storage(material: Material): Int {
     if (material == Material.AIR) return emptySpace
     val inv = inventory
     val max = material.maxStackSize
-    return Array(36) { i ->
+    return (0..35).sumOf { i ->
         inv.getItem(i)?.run {
             when (type) {
                 Material.AIR -> max
@@ -54,13 +52,11 @@ fun Player.storage(material: Material): Int {
                 else -> 0
             }
         } ?: max
-    }.sum()
+    }
 }
 fun Player.totalAmount(material: Material): Int {
-    var i = 0
-    for (content in inventory.contents) {
-        if (content?.type == material) i += content.amount
+    return inventory.contents.sumOf { content ->
+        if (content?.type == material) content.amount else 0
     }
-    return i
 }
 fun Player.toHud() = PlayerManagerImpl.getHudPlayer(uniqueId)
