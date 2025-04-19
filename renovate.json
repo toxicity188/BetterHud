@@ -7,5 +7,16 @@
     "net.fabricmc.fabric-api:fabric-api",
     "fabric-loom",
     "com.mojang:minecraft"
+  ],
+  "packageRules": [
+    {
+      "description": "Ignore snapshot version.",
+      "matchPackageNames": [
+        "eu.pb4:placeholder-api",
+        "eu.pb4:polymer-autohost",
+        "eu.pb4:polymer-resource-pack"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+(?<loose_major>\\d+)\\.(?<loose_minor>\\d+)(\\.(?<loose_patch>\\d+))?$"
+    }
   ]
 }
