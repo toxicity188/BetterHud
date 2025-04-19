@@ -5,7 +5,7 @@ plugins {
     id("com.modrinth.minotaur")
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
 }
 
 val minecraft = property("minecraft_version")!!.toString()
