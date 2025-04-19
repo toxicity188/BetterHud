@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "ignoreDeps": [
+    "net.fabricmc.fabric-api:fabric-api",
+    "fabric-loom",
+    "eu.pb4:placeholder-api",
+    "eu.pb4:polymer-autohost",
+    "eu.pb4:polymer-resource-pack",
+    "com.mojang:minecraft"
+  ],
+  "baseBranches": [
+    "dev"
+  ]
+}
