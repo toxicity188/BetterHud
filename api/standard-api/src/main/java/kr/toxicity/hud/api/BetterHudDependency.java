@@ -82,7 +82,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency ASM_COMMONS = new BetterHudDependency(
             "org{}ow2{}asm",
             "asm-commons",
-            "9.7.1",
+            "9.8",
             false,
             List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.BUKKIT)
     );
@@ -112,7 +112,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency HIKARICP = new BetterHudDependency(
             "com{}zaxxer",
             "HikariCP",
-            "6.2.1",
+            "6.3.0",
             false,
             BetterHudPlatform.ALL
     );
