@@ -62,8 +62,8 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                     yaml["locations"]?.asArray()?.forEach {
                         runCatching {
                             player.pointers().add(PointedLocation.deserialize(it.asObject()))
-                        }.onFailure { e ->
-                            e.handle("unable to load ${player.name()}'s location.")
+                        }.handleFailure {
+                            "unable to load ${player.name()}'s location."
                         }
                     }
                 }
@@ -114,8 +114,8 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                 validationTimeout = 5000
                 connectionTestQuery = "SELECT 1"
             }).apply {
-                connection.use {
-                    it.createStatement().use { s ->
+                connection.use { connection ->
+                    connection.createStatement().use { s ->
                         s.execute("CREATE TABLE IF NOT EXISTS enabled_hud(uuid CHAR(36) NOT NULL, type VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL);")
                         s.execute("CREATE TABLE IF NOT EXISTS enabled_pointed_location(uuid CHAR(36), name VARCHAR(255), value TEXT NOT NULL, PRIMARY KEY(uuid, name));")
                     }
@@ -128,28 +128,26 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                 }
 
                 fun transaction(block: Connection.() -> Unit): Boolean {
-                    return runCatching{
-                        mysql.connection.use {
-                            block(it)
-                        }
+                    return runCatching {
+                        mysql.connection.use(block)
                         true
-                    }.onFailure { e ->
-                        e.handle("Unable to connect mysql")
+                    }.handleFailure {
+                        "Unable to connect mysql"
                     }.getOrDefault(false)
                 }
 
-                fun Connection.query(sql: String, query: PreparedStatement.() -> Unit = {}, block: ResultSet.() -> Unit) = prepareStatement(sql).use {
-                    it.query()
-                    it.executeQuery().query(block)
+                fun Connection.query(sql: String, query: PreparedStatement.() -> Unit = {}, block: ResultSet.() -> Unit) = prepareStatement(sql).use { statement ->
+                    statement.query()
+                    statement.executeQuery().query(block)
                 }
 
-                fun Connection.update(sql: String, block: PreparedStatement.() -> Unit = {}) = prepareStatement(sql).use {
-                    it.block()
-                    it.executeUpdate()
+                fun Connection.update(sql: String, block: PreparedStatement.() -> Unit = {}) = prepareStatement(sql).use { statement ->
+                    statement.block()
+                    statement.executeUpdate()
                 }
 
-                fun ResultSet.query(block: ResultSet.() -> Unit) = use {
-                    while (it.next()) block(this)
+                fun ResultSet.query(block: ResultSet.() -> Unit) = use { result ->
+                    while (result.next()) block(this)
                 }
 
                 override fun isClosed(): Boolean = mysql.isClosed
@@ -195,8 +193,8 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                                     player.pointers().add(PointedLocation.deserialize(getString("value")
                                         .toBase64Json()
                                         .asJsonObject))
-                                }.onFailure { e ->
-                                    e.handle("unable to load ${player.name()}'s location.")
+                                }.handleFailure {
+                                    "unable to load ${player.name()}'s location."
                                 }
                             }
                         }
@@ -213,7 +211,7 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
                             setString(1, uuid)
                         }
                         fun save(name: String, supplier: () -> Set<HudObject>) {
-                            val values = supplier().filter { !it.isDefault }.joinToString(", ") { h ->
+                            val values = supplier().filter { obj -> !obj.isDefault }.joinToString(", ") { h ->
                                 "('$uuid', '$name', '${h.name}')"
                             }
                             if (values.isNotEmpty()) {
@@ -262,9 +260,9 @@ object DatabaseManagerImpl : BetterHudManager, DatabaseManager {
             current.close()
             current = connector.connect(dbInfo)
             currentConnector = connector
-        }.onFailure { e ->
+        }.handleFailure(info) {
             current = defaultConnector.connect(YamlObjectImpl("", mutableMapOf<String, Any>()))
-            e.handle("Unable to connect the database.")
+            "Unable to connect the database."
         }
     }
 

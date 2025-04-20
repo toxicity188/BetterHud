@@ -61,10 +61,7 @@ class HudPlayerHeadImpl(
         fun of(playerName: String) = runCatching {
             HudPlayerHeadImpl(playerName)
         }.getOrElse { e ->
-            warn(
-                "Unable to get ${playerName}'s head.",
-                "Reason: ${e.message}"
-            )
+            e.handle("Unable to get ${playerName}'s head.")
             allBlack
         }
     }

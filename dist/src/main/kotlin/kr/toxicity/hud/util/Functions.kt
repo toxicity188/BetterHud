@@ -1,6 +1,7 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.command.BetterCommandSource
+import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.equation.TEquation
 import kr.toxicity.hud.layout.enums.LayoutAlign
@@ -46,14 +47,23 @@ fun Throwable.handle(sender: BetterCommandSource, log: String) {
 }
 
 fun Throwable.handle(log: String, handler: (List<String>) -> Unit) {
+    val list = mutableListOf(
+        log,
+        "Reason: ${message ?: javaClass.name}"
+    )
     if (ConfigManagerImpl.debug()) {
-        warn(
+        list += listOf(
             "Stack trace:",
             stackTraceToString()
         )
     }
-    handler(listOf(
-        log,
-        "Reason: ${message ?: javaClass.name}"
-    ))
+    handler(list)
+}
+
+fun <T> Result<T>.handleFailure(lazyMessage: () -> String) = onFailure { throwable ->
+    throwable.handle(lazyMessage())
+}
+fun <T> Result<T>.handleFailure(info: ReloadInfo, lazyMessage: () -> String) = handleFailure(info.sender, lazyMessage)
+fun <T> Result<T>.handleFailure(source: BetterCommandSource, lazyMessage: () -> String) = onFailure { throwable ->
+    throwable.handle(source, lazyMessage())
 }

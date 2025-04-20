@@ -128,8 +128,8 @@ object MinecraftManager : BetterHudManager {
                         }
                     }
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load minecraft default textures.")
+            }.handleFailure(info) {
+                "Unable to load minecraft default textures."
             }
         } else assetsMap.clear()
     }

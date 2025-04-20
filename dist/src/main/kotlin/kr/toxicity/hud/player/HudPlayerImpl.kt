@@ -109,8 +109,8 @@ abstract class HudPlayerImpl : HudPlayer {
                 runCatching {
                     compList.addAll(v.get())
                     false
-                }.onFailure { e ->
-                    e.handle("Unable to update ${k}.")
+                }.handleFailure {
+                    "Unable to update ${k}."
                 }.getOrDefault(true)
             }
             val popupGroupIterator = popupGroup.values.iterator()

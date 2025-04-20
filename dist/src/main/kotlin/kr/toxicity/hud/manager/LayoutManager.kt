@@ -31,8 +31,8 @@ object LayoutManager : BetterHudManager {
                 layoutMap.putSync("layout") {
                     LayoutGroup(s, info.sender, yamlObject)
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this layout: $s in ${file.name}")
+            }.handleFailure(info) {
+                "Unable to load this layout: $s in ${file.name}"
             }
         }
     }

@@ -39,7 +39,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
         "number",
         JavaNumber::class.java,
         0.0,
-        mapOf<String, HudPlaceholder<Number>>(
+        mapOf(
             "popup_count" to HudPlaceholder.of { _, _ ->
                 Function {
                     it.popupGroupIteratorMap.size
@@ -197,8 +197,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     val func = get(args, reason)
                     return Function {
                         var value = func.apply(it)
-                        appliers.forEach {
-                            value = it(value)
+                        appliers.forEach { applier ->
+                            value = applier(value)
                         }
                         value
                     }
@@ -271,7 +271,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
 
         val stringMapper = type?.stringValue(stringOption) ?: get.first.stringValue(stringOption)
 
-        return PlaceholderBuilder.Delegate<Any>(type?.clazz ?: get.first.clazz) { reason ->
+        return PlaceholderBuilder.Delegate(type?.clazz ?: get.first.clazz) { reason ->
             val second = get.second(args, reason)
             object : Placeholder<Any> {
                 override val clazz: Class<out Any>

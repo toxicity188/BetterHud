@@ -12,7 +12,7 @@ import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.vault.VaultCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.worldguard.WorldGuardCompatibility
 import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.handle
+import kr.toxicity.hud.util.handleFailure
 import org.bukkit.Bukkit
 import java.util.function.Function
 
@@ -78,8 +78,8 @@ object CompatibilityManager {
                     obj.triggers.forEach { entry ->
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
-                }.onFailure { e ->
-                    e.handle("Unable to load ${it.key} support. checks this: ${obj.website}")
+                }.handleFailure {
+                    "Unable to load ${it.key} support. checks this: ${obj.website}"
                 }
             }
         }

@@ -29,11 +29,8 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
                 popupMap.putSync("popup") {
                     PopupImpl(s, resource, yamlObject)
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this popup: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
+            }.handleFailure(info) {
+                "Unable to load this popup: $s in ${file.name}"
             }
         }
     }

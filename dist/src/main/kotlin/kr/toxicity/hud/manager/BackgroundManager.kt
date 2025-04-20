@@ -52,8 +52,8 @@ object BackgroundManager : BetterHudManager {
                             PixelLocation(yaml)
                         )
                     }
-                }.onFailure { e ->
-                    e.handle(info.sender, "Unable to load this yml: ${it.name}")
+                }.handleFailure(info) {
+                    "Unable to load this yml: ${it.name}"
                 }
             }
         }

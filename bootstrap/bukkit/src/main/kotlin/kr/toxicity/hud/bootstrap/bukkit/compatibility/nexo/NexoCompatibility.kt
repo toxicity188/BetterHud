@@ -16,6 +16,7 @@ import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.util.BOOTSTRAP
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.handle
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
 import org.bukkit.event.EventHandler
@@ -48,10 +49,7 @@ class NexoCompatibility : Compatibility {
                         info("Successfully merged with Nexo: (${state.time} ms)")
                     }
                     is Failure -> {
-                        warn(
-                            "Fail to merge the resource pack with Nexo.",
-                            "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
-                        )
+                        state.throwable.handle("Fail to merge the resource pack with Nexo.")
                     }
                     is OnReload -> warn("This plugin is still on reload!")
                 }

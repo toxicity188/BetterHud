@@ -50,8 +50,8 @@ object ImageManager : BetterHudManager {
                 map.putSync("image") {
                     image
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this image: $s in ${file.name}")
+            }.handleFailure(info) {
+                "Unable to load this image: $s in ${file.name}"
             }
         }
         map.values.forEach { value ->

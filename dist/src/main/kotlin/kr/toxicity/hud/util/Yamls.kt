@@ -55,8 +55,8 @@ fun Map<String, Any>.saveToYaml(file: File) {
 fun YamlObject.getAsAnimationType(key: String, sender: BetterCommandSource = BOOTSTRAP.consoleSource()) = get(key)?.asString()?.let {
     runCatching {
         AnimationType.valueOf(it.uppercase())
-    }.getOrElse {
-        it.handle(sender, "This animation doesn't exist.")
+    }.getOrElse { e ->
+        e.handle(sender, "This animation doesn't exist.")
         AnimationType.LOOP
     }
 } ?: AnimationType.LOOP
@@ -70,8 +70,8 @@ fun File.forEachAllYaml(sender: BetterCommandSource, block: (File, String, YamlO
                     val v = e.value
                     if (v is YamlObject) block(it, e.key, v)
                 }
-            }.onFailure { e ->
-                e.handle(sender, "Unable to load this yml file: ${it.name}")
+            }.handleFailure(sender) {
+                "Unable to load this yml file: ${it.name}"
             }
         } else {
             sender.warn("This is not a yml file: ${it.path}")

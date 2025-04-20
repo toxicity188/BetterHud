@@ -226,8 +226,8 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     byte
                 }
             }
-        }.onFailure {
-            it.handle(info.sender, "Unable to load shader.yml")
+        }.handleFailure(info) {
+            "Unable to load shader.yml"
         }
     }
 

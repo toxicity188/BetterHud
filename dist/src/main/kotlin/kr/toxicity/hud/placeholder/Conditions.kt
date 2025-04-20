@@ -3,8 +3,8 @@ package kr.toxicity.hud.placeholder
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.util.forEachSubConfiguration
+import kr.toxicity.hud.util.handleFailure
 import kr.toxicity.hud.util.ifNull
-import kr.toxicity.hud.util.warn
 
 object Conditions {
     fun parse(section: YamlObject, source: PlaceholderSource): ConditionBuilder {
@@ -19,11 +19,8 @@ object Conditions {
                         throw RuntimeException("this gate doesn't exist: $gate")
                     }
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this condition: $s",
-                    "Reason: ${e.message}"
-                )
+            }.handleFailure {
+                "Unable to load this condition: $s"
             }
         }
         return value

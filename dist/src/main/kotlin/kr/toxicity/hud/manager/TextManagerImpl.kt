@@ -342,8 +342,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
                     }
                     else -> throw RuntimeException("Unsupported type: only ttf or bitmap supported.")
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this text: $s in ${file.name}")
+            }.handleFailure(info) {
+                "Unable to load this text: $s in ${file.name}"
             }
         }
         suppliers.forEachAsync { s ->
@@ -373,10 +373,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                             return
                         }
                     }.getOrElse { e ->
-                        warn(
-                            "Unable to load this image: $imageName",
-                            "Reason: ${e.message}"
-                        )
+                        e.handle("Unable to load this image: $imageName")
                         return
                     }
                     val array = obj.getAsJsonArray("chars")
@@ -392,11 +389,8 @@ object TextManagerImpl : BetterHudManager, TextManager {
                         }
                     }
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to parse minecraft_default.json",
-                    "Reason: ${e.message}"
-                )
+            }.handleFailure {
+                "Unable to parse minecraft_default.json"
             }
         }
     }

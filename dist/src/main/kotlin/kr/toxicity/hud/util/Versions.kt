@@ -65,13 +65,13 @@ fun artifactVersions(minecraftVersion: MinecraftVersion, loader: String) = httpC
             parseJson(reader)
         }.asJsonArray
             .asSequence()
-            .mapNotNull {
+            .mapNotNull { json ->
                 runCatching {
-                    VERSION_GSON.fromJson(it, ArtifactVersion::class.java)
+                    VERSION_GSON.fromJson(json, ArtifactVersion::class.java)
                 }.getOrNull()
             }
-            .filter {
-                it.gameVersions.contains(minecraftVersion) && it.loaders.contains(loader)
+            .filter { version ->
+                version.gameVersions.contains(minecraftVersion) && version.loaders.contains(loader)
             }
             .sortedDescending()
             .toList()
