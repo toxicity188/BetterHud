@@ -21,6 +21,7 @@ import kr.toxicity.hud.nms.v1_21_R4.entity.CraftLivingEntityView
 import kr.toxicity.hud.nms.v1_21_R4.entity.createAdaptedFieldGetter
 import kr.toxicity.hud.nms.v1_21_R4.entity.unsafeHandle
 import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -150,6 +151,7 @@ class NMSImpl : NMS {
         }
     }
 
+    @Suppress("UnstableApiUsage")
     override fun getFoliaAdaptedPlayer(player: Player): Player {
         val craftPlayer = player as CraftPlayer
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, craftPlayer.unsafeHandle as ServerPlayer) {
@@ -189,6 +191,12 @@ class NMSImpl : NMS {
             }
             override fun getEnderChest(): Inventory {
                 return player.enderChest
+            }
+            override fun getCooldown(key: Key): Int {
+                return player.getCooldown(key)
+            }
+            override fun setCooldown(key: Key, i: Int) {
+                player.setCooldown(key, i)
             }
             override fun isOp(): Boolean {
                 return player.isOp
