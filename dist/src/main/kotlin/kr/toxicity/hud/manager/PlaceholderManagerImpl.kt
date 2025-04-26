@@ -197,8 +197,8 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                     val func = get(args, reason)
                     return Function {
                         var value = func.apply(it)
-                        appliers.forEach { applier ->
-                            value = applier(value)
+                        appliers.forEach { applyFunction ->
+                            value = applyFunction(value)
                         }
                         value
                     }

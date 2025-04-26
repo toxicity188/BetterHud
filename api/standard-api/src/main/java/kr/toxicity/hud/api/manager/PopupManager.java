@@ -24,11 +24,6 @@ public interface PopupManager {
      */
     @NotNull @Unmodifiable Set<String> getAllNames();
 
-    /**
-     * Gets all default popup.
-     * @return default popups
-     */
-    @NotNull @Unmodifiable Set<Popup> getDefaultPopups();
 
     /**
      * Gets all popup.

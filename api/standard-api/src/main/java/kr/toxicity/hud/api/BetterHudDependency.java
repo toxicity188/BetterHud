@@ -52,7 +52,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency GSON = new BetterHudDependency(
             "com{}google{}code{}gson",
             "gson",
-            "2.13.0",
+            "2.13.1",
             false,
             List.of(BetterHudPlatform.VELOCITY)
     );

@@ -27,11 +27,6 @@ public interface CompassManager {
     Set<String> getAllNames();
 
     /**
-     * Gets all default compasses.
-     * @return default compass
-     */
-    @NotNull @Unmodifiable Set<Compass> getDefaultCompasses();
-    /**
      * Gets all compasses.
      * @return all compasses
      */

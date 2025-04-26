@@ -71,10 +71,7 @@ object PlayerManagerImpl : BetterHudManager, PlayerManager {
     }
 
     override fun postReload() {
-        playerMap.values.forEach {
-            it.startTick()
-            it.reload()
-        }
+        playerMap.values.forEach(HudPlayer::reload)
     }
 
     override fun end() {

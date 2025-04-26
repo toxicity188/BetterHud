@@ -20,15 +20,9 @@ public interface HudManager {
 
     /**
      * Gets all hud's name.
-     * @return all name of hud
+     * @return all names of hud
      */
     @NotNull @Unmodifiable Set<String> getAllNames();
-
-    /**
-     * Gets all default hud.
-     * @return default hud
-     */
-    @NotNull @Unmodifiable Set<Hud> getDefaultHuds();
 
     /**
      * Gets all hud.
