@@ -46,10 +46,6 @@ object HudManagerImpl : BetterHudManager, HudManager {
 
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)
 
-    override fun getDefaultHuds(): Set<Hud> = hudMap.values.filter {
-        it.isDefault
-    }.toSet()
-
     override fun getAllHuds(): Set<Hud> {
         return hudMap.values.toSet()
     }

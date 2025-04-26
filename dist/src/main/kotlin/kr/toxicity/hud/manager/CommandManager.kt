@@ -9,6 +9,7 @@ import kr.toxicity.command.impl.CommandMessage
 import kr.toxicity.command.impl.annotation.*
 import kr.toxicity.hud.api.adapter.LocationWrapper
 import kr.toxicity.hud.api.adapter.WorldWrapper
+import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.player.PointedLocation
 import kr.toxicity.hud.api.player.PointedLocationSource
@@ -57,8 +58,8 @@ object CommandManager : BetterHudManager {
         )
         .addSerializer(HudStack::class.java, ClassSerializer.builder { _, s ->
             when (s) {
-                "all" -> HudStack(HudManagerImpl.allHuds)
-                "default" -> HudStack(HudManagerImpl.defaultHuds)
+                "all" -> HudStack(HudObjectType.HUD.all())
+                "default" -> HudStack(HudObjectType.HUD.defaultObjects().toList())
                 else -> HudManagerImpl.getHud(s)?.let {
                     HudStack(listOf(it))
                 }
@@ -70,8 +71,8 @@ object CommandManager : BetterHudManager {
         )
         .addSerializer(CompassStack::class.java, ClassSerializer.builder { _, s ->
             when (s) {
-                "all" -> CompassStack(CompassManagerImpl.allCompasses)
-                "default" -> CompassStack(CompassManagerImpl.defaultCompasses)
+                "all" -> CompassStack(HudObjectType.COMPASS.all())
+                "default" -> CompassStack(HudObjectType.COMPASS.defaultObjects().toList())
                 else -> CompassManagerImpl.getCompass(s)?.let {
                     CompassStack(listOf(it))
                 }
@@ -83,8 +84,8 @@ object CommandManager : BetterHudManager {
         )
         .addSerializer(PopupStack::class.java, ClassSerializer.builder { _, s ->
             when (s) {
-                "all" -> PopupStack(PopupManagerImpl.allPopups)
-                "default" -> PopupStack(PopupManagerImpl.defaultPopups)
+                "all" -> PopupStack(HudObjectType.POPUP.all())
+                "default" -> PopupStack(HudObjectType.POPUP.defaultObjects().toList())
                 else -> PopupManagerImpl.getPopup(s)?.let {
                     PopupStack(listOf(it))
                 }
