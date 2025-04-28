@@ -8,17 +8,16 @@ import java.util.*
 
 class SkinsRestorerSkinProvider : PlayerSkinProvider {
     override fun provide(player: HudPlayer): String? {
-        return provide(player.uuid())
+        return player.uuid().provide()
     }
 
     override fun provide(playerName: String): String? {
-        return Bukkit.getPlayer(playerName)?.let {
-            provide(it.uniqueId)
-        }
+        @Suppress("DEPRECATION") //It is not deprecated in Paper.
+        return Bukkit.getServer().getOfflinePlayer(playerName).uniqueId.provide()
     }
 
-    private fun provide(uuid: UUID): String? {
-        return SkinsRestorerProvider.get().playerStorage.getSkinOfPlayer(uuid).map {
+    private fun UUID.provide(): String? {
+        return SkinsRestorerProvider.get().playerStorage.getSkinOfPlayer(this).map {
             it.value
         }.orElse(null)
     }

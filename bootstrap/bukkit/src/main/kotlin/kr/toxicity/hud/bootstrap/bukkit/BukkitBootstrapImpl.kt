@@ -72,7 +72,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         true
     }.getOrDefault(false)
 
-    private val scheduler = if (isPaper) PaperScheduler(this) else BukkitScheduler(this)
+    private val scheduler = if (isFolia) PaperScheduler(this) else BukkitScheduler(this)
     private val updateTask = ArrayList<PlaceholderTask>()
     private val minecraftVersion = Bukkit.getBukkitVersion()
         .substringBefore('-')
@@ -157,9 +157,20 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
     }
 
-    private lateinit var bedrockAdapter: BedrockAdapter
     private lateinit var nms: NMS
-    private lateinit var audiences: BukkitAudiences
+
+    private val bedrockAdapter by lazy {
+        Bukkit.getPluginManager().run {
+            if (isPluginEnabled("Geyser-Spigot")) {
+                GeyserAdapter()
+            } else if (isPluginEnabled("floodgate")) {
+                FloodgateAdapter()
+            } else BedrockAdapter { false }
+        }
+    }
+    private val audiences by lazy {
+        BukkitAudiences.create(this)
+    }
 
     override fun isFolia(): Boolean = isFolia
     override fun volatileCode(): NMS = nms
@@ -201,12 +212,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onEnable() {
         nms.handleReloadCommand(CommandManager.module)
         val pluginManager = Bukkit.getPluginManager()
-        bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
-            GeyserAdapter()
-        } else if (pluginManager.isPluginEnabled("floodgate")) {
-            FloodgateAdapter()
-        } else BedrockAdapter { false }
-        audiences = BukkitAudiences.create(this)
+        audiences
         if (pluginManager.isPluginEnabled("GPS")) PlayerManagerImpl.addLocationProvider(GPSLocationProvider())
         pluginManager.registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
