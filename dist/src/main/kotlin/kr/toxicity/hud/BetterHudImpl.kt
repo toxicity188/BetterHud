@@ -11,6 +11,7 @@ import kr.toxicity.hud.api.plugin.ReloadState.Success
 import kr.toxicity.hud.dependency.DependencyInjector
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
+import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.key.Key
@@ -137,6 +138,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
 
     fun end() {
+        PackUploader.stop()
         managers.forEach {
             it.end()
         }

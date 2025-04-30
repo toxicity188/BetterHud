@@ -20,12 +20,14 @@ object PackUploader {
         val digest: ByteArray
         val digestString: String
     }
-    @Volatile
     var server: PackServer? = null
-        private set
+        private set(value) {
+            field?.stop()
+            field = value
+        }
 
     fun stop(): Boolean {
-        val result = server?.stop() != null
+        val result = server != null
         server = null
         return result
     }
@@ -35,7 +37,6 @@ object PackUploader {
             val host = ConfigManagerImpl.selfHostPort
             val url = "http://$body:$host/${packUUID.hash}.zip"
             runCatching {
-                server?.stop()
                 packUUID.save()
                 val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
                     createContext("/") { exec ->
