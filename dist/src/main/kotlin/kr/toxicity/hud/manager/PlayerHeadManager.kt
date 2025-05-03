@@ -128,8 +128,8 @@ object PlayerHeadManager : BetterHudManager {
                     }
                     head
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this head: $s in ${file.name}")
+            }.handleFailure(info) {
+                "Unable to load this head: $s in ${file.name}"
             }
         }
     }

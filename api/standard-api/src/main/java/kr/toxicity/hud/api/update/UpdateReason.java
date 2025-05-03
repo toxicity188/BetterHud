@@ -1,7 +1,7 @@
 package kr.toxicity.hud.api.update;
 
 /**
- * Returns update reason.
+ * Return update reason.
  */
 public enum UpdateReason {
     /**

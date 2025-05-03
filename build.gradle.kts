@@ -4,8 +4,7 @@ plugins {
     alias(libs.plugins.standardConvention)
     id("com.modrinth.minotaur")
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
 val minecraft = property("minecraft_version")!!.toString()
@@ -74,10 +73,10 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.3.1")
-            hangar("ViaBackwards", "5.3.1")
+            hangar("ViaVersion", "5.3.2")
+            hangar("ViaBackwards", "5.3.2")
             hangar("PlaceholderAPI", "2.11.6")
-            hangar("Skript", "2.10.2")
+            hangar("Skript", "2.11.1")
         }
     }
     build {

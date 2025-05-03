@@ -3,6 +3,7 @@ package kr.toxicity.hud.manager
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.ConfigManager.DebugLevel
 import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackType
@@ -77,8 +78,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
     var clearBuildFolder = true
         private set
 
-    var minecraftJarVersion = "bukkit"
-        private set
+    var minecraftJarVersion: MinecraftVersion? = null
 
     var loadMinecraftDefaultTextures = true
         private set
@@ -148,16 +148,16 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             yaml["pack-type"]?.asString()?.let {
                 runCatching {
                     packType = PackType.valueOf(it.uppercase())
-                }.onFailure { e ->
-                    e.handle("Unable to find this pack type: $it")
+                }.handleFailure {
+                    "Unable to find this pack type: $it"
                 }
             }
             tickSpeed = yaml.getAsLong("tick-speed", 1)
             numberFormat = yaml["number-format"]?.asString()?.let {
                 runCatching {
                     DecimalFormat(it)
-                }.onFailure { e ->
-                    e.handle("Unable to read this number-format: $it")
+                }.handleFailure {
+                    "Unable to read this number-format: $it"
                 }.getOrNull()
             } ?: DecimalFormat("#,###.#")
             disableToBedrockPlayer = yaml.getAsBoolean("disable-to-bedrock-player", true)
@@ -202,19 +202,20 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             yaml["legacy-serializer"]?.asString()?.let {
                 runCatching {
                     legacySerializer = it.toLegacySerializer()
-                }.onFailure { e ->
-                    e.handle("Unable to find this legacy serializer: $it")
+                }.handleFailure {
+                    "Unable to find this legacy serializer: $it"
                 }
             }
             key = KeyResource(yaml["namespace"]?.asString() ?: NAME_SPACE)
-            minecraftJarVersion = yaml["minecraft-jar-version"]?.asString() ?: "bukkit"
+            minecraftJarVersion = yaml["minecraft-jar-version"]?.asString()?.let {
+                runCatching {
+                    it.toMinecraftVersion()
+                }.getOrNull()
+            }
             removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
             disableLegacyOffset = yaml.getAsBoolean("disable-legacy-offset", false)
-        }.onFailure { e ->
-            warn(
-                "Unable to load config.yml",
-                "Reason: ${e.message}"
-            )
+        }.handleFailure {
+            "Unable to load config.yml"
         }
     }
     override fun end() {

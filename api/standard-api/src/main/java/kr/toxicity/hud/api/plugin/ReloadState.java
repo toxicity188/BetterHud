@@ -12,7 +12,7 @@ public sealed interface ReloadState {
     /**
      * Reload success.
      * @param time reload time
-     * @param resourcePack resource pack path and byte
+     * @param resourcePack resource packs path and byte
      */
     record Success(long time, @NotNull @Unmodifiable Map<String, byte[]> resourcePack) implements ReloadState {
     }

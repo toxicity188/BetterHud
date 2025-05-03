@@ -2,7 +2,6 @@ package kr.toxicity.hud.placeholder
 
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.util.memoize
 
 fun interface ConditionBuilder {
     companion object {
@@ -27,9 +26,5 @@ fun interface ConditionBuilder {
         { p ->
             build1(p) || build2(p)
         }
-    }
-
-    fun memoize() = ConditionBuilder result@ { updateEvent ->
-        this@ConditionBuilder.build(updateEvent).memoize(false)
     }
 }

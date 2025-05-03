@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A wrapper class of world
+ * A wrapper class of a world
  * @param name world name
  */
 public record WorldWrapper(
         @NotNull String name
 ) {
     /**
-     * Finds world from yaml.
+     * Finds world from YAML.
      * @param data raw data
      * @return location
      */
@@ -25,7 +25,7 @@ public record WorldWrapper(
         );
     }
     /**
-     * Finds world from json.
+     * Finds world from JSON.
      * @param data raw data
      * @return location
      */

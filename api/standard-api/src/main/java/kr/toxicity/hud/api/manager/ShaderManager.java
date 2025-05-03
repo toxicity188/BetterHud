@@ -25,7 +25,7 @@ public interface ShaderManager {
 
     /**
      * Adds shader tag to some shader file.
-     * Default: #GenerateOtherMainMethod with empty list in all file.
+     * Default: #GenerateOtherMainMethod with an empty list in all files.
      * @param type type of shader
      * @param supplier tag function
      */
@@ -50,7 +50,7 @@ public interface ShaderManager {
     interface ShaderTagSupplier extends Supplier<ShaderTag> {
         /**
          * Pluses supplier with others.
-         * @param other other supplier
+         * @param other another supplier
          * @return new supplier
          */
         default ShaderTagSupplier plus(@NotNull ShaderManager.ShaderTagSupplier other) {
@@ -103,7 +103,7 @@ public interface ShaderManager {
 
         /**
          * Sums two different tags to new one.
-         * @param tag other tag
+         * @param tag another tag
          * @return new merged tag
          */
         public @NotNull ShaderTag plus(@NotNull ShaderTag tag) {

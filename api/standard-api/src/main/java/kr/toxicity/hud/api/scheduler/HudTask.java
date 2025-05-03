@@ -1,11 +1,11 @@
 package kr.toxicity.hud.api.scheduler;
 
 /**
- * Represents wrapped task between Paper and Folia.
+ * Represents a wrapped task between Paper and Folia.
  */
 public interface HudTask {
     /**
-     * Returns whether this task is cancelled.
+     * Returns whether this task is canceled.
      * @return whether to cancel.
      */
     boolean isCancelled();

@@ -21,19 +21,14 @@ public interface CompassManager {
 
     /**
      * Gets all compass's name.
-     * @return all name of compass
+     * @return all names of compass
      */
     @NotNull @Unmodifiable
     Set<String> getAllNames();
 
     /**
-     * Gets all default compass.
-     * @return default compass
-     */
-    @NotNull @Unmodifiable Set<Compass> getDefaultCompasses();
-    /**
-     * Gets all compass.
-     * @return all compass
+     * Gets all compasses.
+     * @return all compasses
      */
     @NotNull @Unmodifiable Set<Compass> getAllCompasses();
 }

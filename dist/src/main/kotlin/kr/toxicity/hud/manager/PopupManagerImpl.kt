@@ -29,11 +29,8 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
                 popupMap.putSync("popup") {
                     PopupImpl(s, resource, yamlObject)
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this popup: $s in ${file.name}",
-                    "Reason: ${e.message}"
-                )
+            }.handleFailure(info) {
+                "Unable to load this popup: $s in ${file.name}"
             }
         }
     }
@@ -46,9 +43,6 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
 
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(popupMap.keys)
     override fun getPopup(name: String): Popup? = popupMap[name]
-    override fun getDefaultPopups(): Set<Popup> = popupMap.values.filter {
-        it.isDefault
-    }.toSet()
     override fun getAllPopups(): Set<Popup> = popupMap.values.toSet()
     override fun end() {
     }

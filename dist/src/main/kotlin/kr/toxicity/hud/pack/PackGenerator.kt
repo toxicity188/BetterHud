@@ -31,8 +31,8 @@ object PackGenerator {
                     if (target.name == "pack.mcmeta") {
                         runCatching {
                             meta += PackMeta.fromFile(target)
-                        }.getOrElse {
-                            it.handle("Invalid pack.mcmeta: ${target.path}")
+                        }.getOrElse { e ->
+                            e.handle("Invalid pack.mcmeta: ${target.path}")
                         }
                     } else addFile(target)
                 }

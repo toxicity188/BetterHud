@@ -6,7 +6,7 @@ import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerAutoHostCompatibili
 import kr.toxicity.hud.bootstrap.fabric.compatibility.PolymerResourcePackCompatibility
 import kr.toxicity.hud.bootstrap.fabric.compatibility.TextPlaceholderAPICompatibility
 import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.handle
+import kr.toxicity.hud.util.handleFailure
 import net.fabricmc.loader.api.FabricLoader
 import java.util.function.Function
 
@@ -51,8 +51,8 @@ object CompatibilityManager {
                     obj.triggers.forEach { entry ->
                         PLUGIN.triggerManager.addTrigger("${namespace}_${entry.key}", entry.value)
                     }
-                }.onFailure { e ->
-                    e.handle("Unable to load ${it.key} support. check this: ${obj.website}")
+                }.handleFailure {
+                    "Unable to load ${it.key} support. check this: ${obj.website}"
                 }
             }
         }

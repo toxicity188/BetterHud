@@ -18,6 +18,7 @@ import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.bedrock.FloodgateAdapter
 import kr.toxicity.hud.bedrock.GeyserAdapter
 import kr.toxicity.hud.bootstrap.bukkit.manager.CompatibilityManager
@@ -25,7 +26,6 @@ import kr.toxicity.hud.bootstrap.bukkit.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.bukkit.player.HudPlayerBukkit
 import kr.toxicity.hud.bootstrap.bukkit.player.head.SkinsRestorerSkinProvider
 import kr.toxicity.hud.bootstrap.bukkit.player.location.GPSLocationProvider
-import kr.toxicity.hud.bootstrap.bukkit.util.MinecraftVersion
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.bootstrap.bukkit.util.call
 import kr.toxicity.hud.bootstrap.bukkit.util.registerListener
@@ -35,14 +35,13 @@ import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.placeholder.PlaceholderTask
 import kr.toxicity.hud.player.head.HttpSkinProvider
 import kr.toxicity.hud.player.head.MineToolsProvider
-import kr.toxicity.hud.scheduler.PaperScheduler
 import kr.toxicity.hud.scheduler.BukkitScheduler
+import kr.toxicity.hud.scheduler.PaperScheduler
 import kr.toxicity.hud.util.*
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -73,8 +72,11 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         true
     }.getOrDefault(false)
 
-    private val scheduler = if (isPaper) PaperScheduler(this) else BukkitScheduler(this)
+    private val scheduler = if (isFolia) PaperScheduler(this) else BukkitScheduler(this)
     private val updateTask = ArrayList<PlaceholderTask>()
+    private val minecraftVersion = Bukkit.getBukkitVersion()
+        .substringBefore('-')
+        .toMinecraftVersion()
 
     private val log = object : BetterHudLogger {
         override fun info(vararg message: String) {
@@ -98,10 +100,14 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     private val core = BetterHudImpl(this).apply {
         BetterHudAPI.inst(this)
         addReloadStartTask {
-            PluginReloadStartEvent().call()
+            scheduler.asyncTask {
+                PluginReloadStartEvent().call()
+            }
         }
         addReloadEndTask {
-            PluginReloadedEvent(it).call()
+            scheduler.asyncTask {
+                PluginReloadedEvent(it).call()
+            }
         }
         addReloadStartTask {
             HandlerList.unregisterAll(listener)
@@ -151,10 +157,20 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
     }
 
-    private lateinit var bedrockAdapter: BedrockAdapter
     private lateinit var nms: NMS
-    private lateinit var audiences: BukkitAudiences
-    private var latest: String? = null
+
+    private val bedrockAdapter by lazy {
+        Bukkit.getPluginManager().run {
+            if (isPluginEnabled("Geyser-Spigot")) {
+                GeyserAdapter()
+            } else if (isPluginEnabled("floodgate")) {
+                FloodgateAdapter()
+            } else BedrockAdapter { false }
+        }
+    }
+    private val audiences by lazy {
+        BukkitAudiences.create(this)
+    }
 
     override fun isFolia(): Boolean = isFolia
     override fun volatileCode(): NMS = nms
@@ -170,20 +186,20 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
-        nms = when (MinecraftVersion.current) {
-            MinecraftVersion.version1_21_5 -> kr.toxicity.hud.nms.v1_21_R4.NMSImpl()
-            MinecraftVersion.version1_21_4 -> kr.toxicity.hud.nms.v1_21_R3.NMSImpl()
-            MinecraftVersion.version1_21_2, MinecraftVersion.version1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
-            MinecraftVersion.version1_21, MinecraftVersion.version1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
-            MinecraftVersion.version1_20_5, MinecraftVersion.version1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
-            MinecraftVersion.version1_20_3, MinecraftVersion.version1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
-            MinecraftVersion.version1_20_2 -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
-            MinecraftVersion.version1_20, MinecraftVersion.version1_20_1 -> kr.toxicity.hud.nms.v1_20_R1.NMSImpl()
-            MinecraftVersion.version1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
-            MinecraftVersion.version1_19_2, MinecraftVersion.version1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
-            MinecraftVersion.version1_19, MinecraftVersion.version1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
+        nms = when (minecraftVersion) {
+            MinecraftVersion.V1_21_5 -> kr.toxicity.hud.nms.v1_21_R4.NMSImpl()
+            MinecraftVersion.V1_21_4 -> kr.toxicity.hud.nms.v1_21_R3.NMSImpl()
+            MinecraftVersion.V1_21_2, MinecraftVersion.V1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
+            MinecraftVersion.V1_21, MinecraftVersion.V1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
+            MinecraftVersion.V1_20_5, MinecraftVersion.V1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
+            MinecraftVersion.V1_20_3, MinecraftVersion.V1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
+            MinecraftVersion.V1_20_2 -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
+            MinecraftVersion.V1_20, MinecraftVersion.V1_20_1 -> kr.toxicity.hud.nms.v1_20_R1.NMSImpl()
+            MinecraftVersion.V1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
+            MinecraftVersion.V1_19_2, MinecraftVersion.V1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
+            MinecraftVersion.V1_19, MinecraftVersion.V1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
             else -> {
-                warn("Unsupported minecraft version: ${MinecraftVersion.current}")
+                warn("Unsupported minecraft version: $minecraftVersion")
                 pluginManager.disablePlugin(this)
                 return
             }
@@ -191,15 +207,12 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         nms.registerCommand(CommandManager.module)
     }
 
+    private var latest = emptyList<Component>()
+
     override fun onEnable() {
         nms.handleReloadCommand(CommandManager.module)
         val pluginManager = Bukkit.getPluginManager()
-        bedrockAdapter = if (pluginManager.isPluginEnabled("Geyser-Spigot")) {
-            GeyserAdapter()
-        } else if (pluginManager.isPluginEnabled("floodgate")) {
-            FloodgateAdapter()
-        } else BedrockAdapter { false }
-        audiences = BukkitAudiences.create(this)
+        audiences
         if (pluginManager.isPluginEnabled("GPS")) PlayerManagerImpl.addLocationProvider(GPSLocationProvider())
         pluginManager.registerEvents(object : Listener {
             @EventHandler(priority = EventPriority.HIGHEST)
@@ -243,13 +256,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach {
             register(it)
         }
-        core.isOldVersion {
-            warn(
-                "New version found: $it",
-                "Download: https://www.spigotmc.org/resources/115559"
-            )
-            latest = it
-        }
+        latest = handleLatestVersion()
         core.start()
         registerListener(object : Listener {
             @EventHandler
@@ -261,7 +268,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
                     }
                 }
                 log.info(
-                    "Minecraft version: ${MinecraftVersion.current}, NMS version: ${nms.version}",
+                    "Minecraft version: $minecraftVersion, NMS version: ${nms.version}",
                     "Platform: ${when {
                         isFolia -> "Folia"
                         isPaper -> "Paper"
@@ -296,16 +303,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             }
             impl
         }
-        if (player.isOp && ConfigManagerImpl.versionCheck && latest != null) {
-            audience.info("New BetterHud version found: $latest")
-            audience.info(
-                Component.text("Download: https://www.spigotmc.org/resources/115559")
-                    .clickEvent(
-                        ClickEvent.clickEvent(
-                            ClickEvent.Action.OPEN_URL,
-                            "https://www.spigotmc.org/resources/115559"
-                        )))
-        }
+        if (player.hasPermission(VERSION_CHECK_PERMISSION) && ConfigManagerImpl.versionCheck) latest.forEach(audience::info)
     }
 
     override fun resource(path: String): InputStream? = getResource(path)
@@ -348,7 +346,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         }
     }
 
-    override fun minecraftVersion(): String = MinecraftVersion.current.toString()
+    override fun minecraftVersion(): MinecraftVersion = minecraftVersion
     override fun mcmetaVersion(): Int = nms.version.metaVersion
     override fun triggerListener(): Listener = listener
 
@@ -362,7 +360,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
         WorldWrapper(it.name)
     }
 
-    override fun loader(): URLClassLoader {
+    override fun classloader(): URLClassLoader {
         return javaClass.classLoader as URLClassLoader
     }
 }

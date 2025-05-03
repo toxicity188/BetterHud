@@ -23,7 +23,7 @@ public interface PlayerManager {
 
     /**
      * Gets all player's instance.
-     * @return all player
+     * @return all players
      */
     @NotNull
     @Unmodifiable

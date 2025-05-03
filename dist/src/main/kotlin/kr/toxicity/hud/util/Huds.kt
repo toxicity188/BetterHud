@@ -1,6 +1,8 @@
 package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.configuration.HudObject
+import kr.toxicity.hud.api.configuration.HudObjectType
 import kr.toxicity.hud.layout.HudLayout
 import kr.toxicity.hud.manager.ImageManager
 import kr.toxicity.hud.manager.PlayerHeadManager
@@ -29,3 +31,16 @@ fun image(group: HudLayout.Identifier, creator: () -> WidthComponent) = ImageMan
 fun head(group: HudLayout.Identifier, creator: () -> String) = PlayerHeadManager.getHead(group) ?: creator().apply {
     PlayerHeadManager.setHead(group, this)
 }
+
+fun <T : HudObject> Collection<String>.toNonDefaultName(mapper: HudObjectType<T>) = asSequence()
+    .mapNotNull(mapper::byName)
+    .filter { !it.isDefault }
+    .toList()
+
+fun Collection<HudObject>.toNonDefaultNames() = asSequence()
+    .filter { !it.isDefault }
+    .map { it.name }
+    .toList()
+fun Collection<String>.toNonDefaultHud() = toNonDefaultName(HudObjectType.HUD)
+fun Collection<String>.toNonDefaultPopup() = toNonDefaultName(HudObjectType.POPUP)
+fun Collection<String>.toNonDefaultCompass() =toNonDefaultName(HudObjectType.COMPASS)

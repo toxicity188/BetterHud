@@ -1,9 +1,11 @@
 package kr.toxicity.hud.util
 
+import java.util.concurrent.ConcurrentHashMap
+
 class OverridableSet<K, V>(
     private val keyMapper: (V) -> K,
     mapCreator: () -> MutableMap<K, V> = {
-        HashMap()
+        ConcurrentHashMap()
     }
 ) : MutableSet<V> {
     private val map = mapCreator()
