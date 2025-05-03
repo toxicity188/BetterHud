@@ -45,7 +45,7 @@ public interface Popup extends HudObject {
     }
 
     /**
-     * Gets a last index of popup.
+     * Gets a last index of the popup.
      * It equals getMaxStack() - 1
      * @return last index
      */
@@ -54,7 +54,7 @@ public interface Popup extends HudObject {
     }
 
     /**
-     * Gets frame type.
+     * Gets a frame type.
      * @return frame type
      */
     @NotNull FrameType frameType();

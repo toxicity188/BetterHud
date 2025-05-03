@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public interface HudListener {
     /**
      * Gets the index of given player.
-     * value must be 0..1.
+     * The value must be 0..1.
      * @param player target player
      * @return index range
      */
@@ -27,7 +27,7 @@ public interface HudListener {
 
     /**
      * Clears listener value of player.
-     * It is basically empty method.
+     * It is basically an empty method.
      * @param player player
      */
     default void clear(@NotNull HudPlayer player) {

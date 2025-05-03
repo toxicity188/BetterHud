@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import kr.toxicity.hud.api.plugin.ReloadInfo
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.layout.TextLayout
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.text.ImageTextScale
@@ -8,7 +9,6 @@ import kr.toxicity.hud.util.*
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
@@ -50,20 +50,19 @@ object MinecraftManager : BetterHudManager {
     override fun start() {
     }
 
-    private var previous = ""
+    private var previous: MinecraftVersion? = null
 
     override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         if (ConfigManagerImpl.loadMinecraftDefaultTextures) {
-            val current = if (ConfigManagerImpl.minecraftJarVersion == "bukkit") BOOTSTRAP.minecraftVersion() else ConfigManagerImpl.minecraftJarVersion
+            val current = ConfigManagerImpl.minecraftJarVersion ?: BOOTSTRAP.minecraftVersion()
             if (assetsMap.isEmpty() || previous != current) {
                 previous = current
             } else return
             assetsMap.clear()
             val cache = DATA_FOLDER.subFolder(".cache")
-            runCatching {
-                val client = HttpClient.newHttpClient()
+            httpClient {
                 info("Getting minecraft default version...")
-                val json = InputStreamReader(client.send(HttpRequest.newBuilder()
+                val json = InputStreamReader(send(HttpRequest.newBuilder()
                     .uri(URI.create("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
                     .GET()
                     .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
@@ -74,12 +73,12 @@ object MinecraftManager : BetterHudManager {
                 if (!file.exists() || file.length() == 0L) {
                     info("$current.jar doesn't exist. so download it...")
                     ZipOutputStream(file.outputStream().buffered()).use { outputStream ->
-                        ZipInputStream(client.send(HttpRequest.newBuilder()
-                            .uri(URI.create(InputStreamReader(client.send(HttpRequest.newBuilder()
+                        ZipInputStream(send(HttpRequest.newBuilder()
+                            .uri(URI.create(InputStreamReader(send(HttpRequest.newBuilder()
                                 .uri(URI.create(json.getAsJsonArray("versions").map {
                                     it.asJsonObject
                                 }.first {
-                                    it.getAsJsonPrimitive("id").asString == current
+                                    it.getAsJsonPrimitive("id").asString.toMinecraftVersion() == current
                                 }.getAsJsonPrimitive("url").asString))
                                 .GET()
                                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
@@ -129,8 +128,8 @@ object MinecraftManager : BetterHudManager {
                         }
                     }
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load minecraft default textures.")
+            }.handleFailure(info) {
+                "Unable to load minecraft default textures."
             }
         } else assetsMap.clear()
     }

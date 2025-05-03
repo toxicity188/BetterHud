@@ -40,9 +40,9 @@ class PopupImpl(
     private val index: ((UpdateEvent) -> (HudPlayer) -> Int)? = section["index"]?.asString()?.let {
         PlaceholderManagerImpl.find(it, this).assertNumber {
             "this index is not a number. it is ${clazz.simpleName}."
-        }.let {
+        }.let { placeholderBuilder ->
             { reason ->
-                (it build reason).let { placeholder ->
+                (placeholderBuilder build reason).let { placeholder ->
                     { player ->
                         (placeholder(player) as Number).toInt()
                     }

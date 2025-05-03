@@ -10,6 +10,7 @@ import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.util.PLUGIN
+import kr.toxicity.hud.util.handle
 import kr.toxicity.hud.util.info
 import kr.toxicity.hud.util.warn
 
@@ -39,14 +40,7 @@ class PolymerResourcePackCompatibility : Compatibility {
                     info("Polymer generation detected - reload completed: (${state.time} ms)")
                 }
                 is Failure -> {
-                    val reason = mutableListOf(
-                        "Fail to merge the resource pack with Polymer.",
-                        "Reason: ${state.throwable.message ?: state.throwable.javaClass.simpleName}"
-                    )
-                    if (ConfigManagerImpl.debug()) {
-                        reason.add(state.throwable.stackTraceToString())
-                    }
-                    warn(*reason.toTypedArray())
+                    state.throwable.handle("Fail to merge the resource pack with Polymer.")
                 }
                 is OnReload -> warn("This mod is still on reload!")
             }

@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public final class BetterHudAPI {
 
-    //Private constructor for dummy class.
+    //Nn initializer
     private BetterHudAPI() {
         throw new RuntimeException();
     }

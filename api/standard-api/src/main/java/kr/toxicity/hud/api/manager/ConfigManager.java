@@ -33,7 +33,7 @@ public interface ConfigManager {
          */
         MANAGER,
         /**
-         * Shows assets creation.
+         * Shows asset creation.
          */
         ASSETS,
         /**
@@ -48,7 +48,7 @@ public interface ConfigManager {
     /**
      * Checks this level is higher than others.
      * @param debugLevel target level
-     * @return whether this has higher order than others.
+     * @return whether this has a higher order than others.
      */
     static boolean checkAvailable(@NotNull DebugLevel debugLevel) {
         var manager = BetterHudAPI.inst().getConfigManager();

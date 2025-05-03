@@ -4,7 +4,7 @@ import kr.toxicity.hud.bootstrap.bukkit.module.MODULE_BUKKIT
 import kr.toxicity.hud.manager.ListenerManagerImpl
 import kr.toxicity.hud.manager.PlaceholderManagerImpl
 import kr.toxicity.hud.manager.TriggerManagerImpl
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.handleFailure
 import java.util.function.Function
 
 object ModuleManager {
@@ -34,11 +34,8 @@ object ModuleManager {
                 value.booleans.forEach { boolean ->
                     PlaceholderManagerImpl.booleanContainer.addPlaceholder(module.key.key(boolean.key), boolean.value)
                 }
-            }.onFailure { e ->
-                warn(
-                    "Unable to load this module: ${module.key}",
-                    "Reason: ${e.message}"
-                )
+            }.handleFailure {
+                "Unable to load this module: ${module.key}"
             }
         }
     }

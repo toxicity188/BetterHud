@@ -37,6 +37,7 @@ This project implements a server-side HUD.
 - [expiring map](https://github.com/jhalterman/expiringmap): Implements cache map.
 - [HikariCP](https://github.com/brettwooldridge/HikariCP): Implements comfortable DB handling.
 - [mysql-connector-j](https://github.com/mysql/mysql-connector-j): Implements MySQL connector.
+- [semver4j](https://github.com/semver4j/semver4j): Implements semver parser and comparator. 
 
 
 ### Dependency

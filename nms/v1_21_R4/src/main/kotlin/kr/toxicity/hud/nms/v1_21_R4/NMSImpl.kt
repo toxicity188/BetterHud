@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.command.impl.CommandModule
@@ -20,6 +21,7 @@ import kr.toxicity.hud.nms.v1_21_R4.entity.CraftLivingEntityView
 import kr.toxicity.hud.nms.v1_21_R4.entity.createAdaptedFieldGetter
 import kr.toxicity.hud.nms.v1_21_R4.entity.unsafeHandle
 import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.pointer.Pointers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -149,6 +151,7 @@ class NMSImpl : NMS {
         }
     }
 
+    @Suppress("UnstableApiUsage")
     override fun getFoliaAdaptedPlayer(player: Player): Player {
         val craftPlayer = player as CraftPlayer
         return object : CraftPlayer(Bukkit.getServer() as CraftServer, craftPlayer.unsafeHandle as ServerPlayer) {
@@ -189,6 +192,12 @@ class NMSImpl : NMS {
             override fun getEnderChest(): Inventory {
                 return player.enderChest
             }
+            override fun getCooldown(key: Key): Int {
+                return player.getCooldown(key)
+            }
+            override fun setCooldown(key: Key, i: Int) {
+                player.setCooldown(key, i)
+            }
             override fun isOp(): Boolean {
                 return player.isOp
             }
@@ -227,6 +236,13 @@ class NMSImpl : NMS {
             override fun sendMessage(message: String) {
                 player.sendMessage(message)
             }
+
+            override fun <T : Any> getData(p0: DataComponentType.Valued<T>): T? = player.getData(p0)
+            override fun <T : Any> getDataOrDefault(
+                p0: DataComponentType.Valued<out T>,
+                p1: T?
+            ): T? = player.getDataOrDefault(p0, p1)
+            override fun hasData(p0: DataComponentType): Boolean = player.hasData(p0)
         }
     }
 

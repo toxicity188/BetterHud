@@ -35,8 +35,8 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
                         CompassType.valueOf(uppercase()).build(resource, assets, s, c)
                     }
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this compass: $s in ${f.name}")
+            }.handleFailure(info) {
+                "Unable to load this compass: $s in ${f.name}"
             }
         }
     }
@@ -48,10 +48,6 @@ object CompassManagerImpl : BetterHudManager, CompassManager {
         compassMap[name]
     }
     override fun getAllNames(): Set<String> = Collections.unmodifiableSet(compassMap.keys)
-
-    override fun getDefaultCompasses(): Set<Compass> = compassMap.values.filter {
-        it.isDefault
-    }.toSet()
 
     override fun getAllCompasses(): Set<Compass> = compassMap.values.toSet()
 }

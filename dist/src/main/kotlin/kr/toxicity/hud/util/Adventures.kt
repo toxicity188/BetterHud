@@ -151,7 +151,7 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
         list += WidthComponent(it, i)
         i = 0
     }
-    val shouldApplySpace = option.space > 0
+    val shouldApplySpace = option.space != 0
     fun Component.parse(target: SplitBuilder, bold: Boolean, italic: Boolean) {
         if (this is TextComponent) {
             var style = style()

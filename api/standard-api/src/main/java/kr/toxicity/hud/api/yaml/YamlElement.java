@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface YamlElement extends YamlConfiguration {
     /**
-     * Gets original raw object
+     * Gets an original raw object
      * @return raw object
      */
     @NotNull Object get();
@@ -37,7 +37,7 @@ public interface YamlElement extends YamlConfiguration {
      */
     double asDouble();
     /**
-     * Gets this element as a long
+     * Gets this element as along
      * @throws UnsupportedOperationException if type is different.
      * @return long
      */

@@ -11,12 +11,12 @@ import java.util.Objects;
  */
 public interface HudObject {
     /**
-     * Gets an internal name of object.
+     * Gets an internal name of an object.
      * @return id
      */
     @NotNull String getName();
     /**
-     * Returns this object is default object or not.
+     * Returns this object is a default object or not.
      * @return whether to default
      */
     boolean isDefault();

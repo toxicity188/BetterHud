@@ -41,7 +41,7 @@ public record PointedLocation(
 
 
     /**
-     * Finds location from yaml.
+     * Finds location from YAML.
      * @param data raw data
      * @return location
      */
@@ -54,7 +54,7 @@ public record PointedLocation(
         );
     }
     /**
-     * Finds location from json.
+     * Finds location from JSON.
      * @param data raw data
      * @return location
      */

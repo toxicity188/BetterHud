@@ -33,7 +33,7 @@ fabricModJson {
     }))
     license = listOf("MIT")
     entrypoints = listOf(
-        mainEntrypoint("kr.toxicity.hud.api.fabric.Main")
+        mainEntrypoint("$group.api.fabric.Main")
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),

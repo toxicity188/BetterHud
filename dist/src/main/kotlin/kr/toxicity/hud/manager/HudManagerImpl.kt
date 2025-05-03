@@ -32,8 +32,8 @@ object HudManagerImpl : BetterHudManager, HudManager {
                 hudMap.putSync("hud") {
                     HudImpl(s, resource, yamlObject)
                 }
-            }.onFailure {
-                it.handle(info.sender, "Unable to load this hud: $s in ${file.name}")
+            }.handleFailure(info) {
+                "Unable to load this hud: $s in ${file.name}"
             }
         }
     }
@@ -45,10 +45,6 @@ object HudManagerImpl : BetterHudManager, HudManager {
     }
 
     override fun getAllNames(): MutableSet<String> = Collections.unmodifiableSet(hudMap.keys)
-
-    override fun getDefaultHuds(): Set<Hud> = hudMap.values.filter {
-        it.isDefault
-    }.toSet()
 
     override fun getAllHuds(): Set<Hud> {
         return hudMap.values.toSet()

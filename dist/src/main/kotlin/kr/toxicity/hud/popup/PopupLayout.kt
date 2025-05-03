@@ -48,9 +48,9 @@ class PopupLayout(
     fun getComponent(reason: UpdateEvent, frameSupplier: (HudPlayer) -> Long = { it.tick }): (HudPlayer, Int) -> Runner<WidthComponent> {
         val build = layout.conditions build reason
         val map = groups.map {
-            it.getComponent(reason, frameSupplier).let {
+            it.getComponent(reason, frameSupplier).let { componentBuilder ->
                 { player: HudPlayer ->
-                    if (build(player)) it(player) else Runner {
+                    if (build(player)) componentBuilder(player) else Runner {
                         EMPTY_WIDTH_COMPONENT
                     }
                 }

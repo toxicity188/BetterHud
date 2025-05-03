@@ -62,9 +62,9 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             val initialValue: (UpdateEvent) -> (HudPlayer) -> Double = section["initial-value"]?.asString()?.let {
                 PlaceholderManagerImpl.find(it, PlaceholderSource.Impl(section)).assertNumber {
                     "this index is not a number. it is ${this.clazz.simpleName}."
-                }.let {
+                }.let { placeholderBuilder ->
                     { reason ->
-                        (it build reason).let { placeholder ->
+                        (placeholderBuilder build reason).let { placeholder ->
                             { player ->
                                 (placeholder(player) as Number).toDouble()
                             }
@@ -115,7 +115,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
         val cache: ExpiringMap<LazyValueKey, LazyValueAccess> = ExpiringMap.builder()
             .expirationPolicy(ExpirationPolicy.ACCESSED)
             .expiration(section.getAsLong("expiring-second", 5).coerceAtLeast(1), TimeUnit.SECONDS)
-            .build<LazyValueKey, LazyValueAccess>()
+            .build()
     }
 
     private class LazyListener(
