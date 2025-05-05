@@ -15,6 +15,7 @@ object PackUploader {
 
     interface PackServer {
         fun stop()
+        fun start()
         val uuid: UUID
         val url: String
         val digest: ByteArray
@@ -23,7 +24,9 @@ object PackUploader {
     var server: PackServer? = null
         private set(value) {
             field?.stop()
-            field = value
+            field = value?.apply {
+                start()
+            }
         }
 
     fun stop(): Boolean {
@@ -38,26 +41,32 @@ object PackUploader {
             val url = "http://$body:$host/${packUUID.hash}.zip"
             runCatching {
                 packUUID.save()
-                val http = HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
-                    createContext("/") { exec ->
-                        exec.use { exchange ->
-                            if (exchange.requestURI.path != "/${packUUID.hash}.zip") {
-                                exchange.responseHeaders.set("Content-Type", "application/json")
-                                val byte = JsonPrimitive("Invalid file name.").toByteArray()
-                                exchange.sendResponseHeaders(200, byte.size.toLong())
-                                exchange.responseBody.write(byte)
-                            } else {
-                                exchange.responseHeaders.set("Content-Type", "application/zip")
-                                exchange.sendResponseHeaders(200, byteArray.size.toLong())
-                                exchange.responseBody.write(byteArray)
+                server = object : PackServer {
+                    private val http by lazy {
+                        HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
+                            createContext("/") { exec ->
+                                exec.use { exchange ->
+                                    if (exchange.requestURI.path != "/${packUUID.hash}.zip") {
+                                        exchange.responseHeaders.set("Content-Type", "application/json")
+                                        val byte = JsonPrimitive("Invalid file name.").toByteArray()
+                                        exchange.sendResponseHeaders(200, byte.size.toLong())
+                                        exchange.responseBody.write(byte)
+                                    } else {
+                                        exchange.responseHeaders.set("Content-Type", "application/zip")
+                                        exchange.sendResponseHeaders(200, byteArray.size.toLong())
+                                        exchange.responseBody.write(byteArray)
+                                    }
+                                }
                             }
                         }
                     }
-                    start()
-                }
-                server = object : PackServer {
+
                     override fun stop() {
                         http.stop(0)
+                    }
+
+                    override fun start() {
+                        http.start()
                     }
 
                     override val uuid: UUID = packUUID.uuid

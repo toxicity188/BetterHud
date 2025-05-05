@@ -5,11 +5,10 @@ plugins {
 }
 
 repositories {
-    //kyori snapshot
-//    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-//        name = "sonatype-oss-snapshots1"
-//        mavenContent { snapshotsOnly() }
-//    }
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") { //Kyori snapshot
+        name = "sonatype-oss-snapshots1"
+        mavenContent { snapshotsOnly() }
+    }
 }
 
 dependencies {
@@ -22,7 +21,7 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${property("kyori_mod_implementation")}")
-    modImplementation("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")
+    modImplementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
     implementation(include(project(":api:standard-api"))!!)
 }
 
@@ -60,7 +59,6 @@ tasks {
     remapJar {
         archiveBaseName = "betterhud-${project.name}"
         archiveClassifier = ""
-        nestedJars.from(files("libs/adventure-platform-fabric-6.4.0-SNAPSHOT.jar"))
     }
     runServer {
         enabled = false

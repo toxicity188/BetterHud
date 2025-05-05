@@ -7,13 +7,13 @@ plugins {
 }
 
 repositories {
-    //placeholderapi
-    maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
-    //kyori snapshot
-//    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-//        name = "sonatype-oss-snapshots1"
-//        mavenContent { snapshotsOnly() }
-//    }
+    maven("https://maven.nucleoid.xyz/") { //placeholderapi, polymer
+        name = "Nucleoid"
+    }
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") { //Kyori snapshot
+        name = "sonatype-oss-snapshots1"
+        mavenContent { snapshotsOnly() }
+    }
 }
 
 val minecraft = property("minecraft_version")

@@ -2,7 +2,6 @@ package kr.toxicity.hud.bootstrap.bukkit.compatibility.nexo
 
 import com.nexomc.nexo.api.events.resourcepack.NexoPrePackGenerateEvent
 import com.nexomc.nexo.configs.Settings
-import com.nexomc.nexo.pack.server.PackServerType
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.plugin.ReloadState.*
@@ -24,19 +23,14 @@ import org.bukkit.event.Listener
 
 class NexoCompatibility : Compatibility {
     override val website: String = "https://polymart.org/resource/nexo.6901"
-    override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
-        get() = mapOf()
-    override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
-        get() = mapOf()
-    override val numbers: Map<String, HudPlaceholder<Number>>
-        get() = mapOf()
-    override val strings: Map<String, HudPlaceholder<String>>
-        get() = mapOf()
-    override val booleans: Map<String, HudPlaceholder<Boolean>>
-        get() = mapOf()
+    override val triggers: Map<String, (YamlObject) -> HudTrigger<*>> = mapOf()
+    override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener> = mapOf()
+    override val numbers: Map<String, HudPlaceholder<Number>> = mapOf()
+    override val strings: Map<String, HudPlaceholder<String>> = mapOf()
+    override val booleans: Map<String, HudPlaceholder<Boolean>> = mapOf()
 
     override fun start() {
-        if (Settings.PACK_SERVER_TYPE.value != PackServerType.NONE.name) (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
+        if (Settings.PACK_SERVER_TYPE.value != "NONE") (BOOTSTRAP as BukkitBootstrapImpl).skipInitialReload = true
         registerListener(object : Listener {
             @EventHandler
             fun NexoPrePackGenerateEvent.generate() {
