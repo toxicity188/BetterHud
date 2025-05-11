@@ -33,7 +33,7 @@ public interface BetterHud {
     /**
      * Adventure platform version.
      */
-    String PLATFORM_VERSION = "4.3.4";
+    String PLATFORM_VERSION = "4.4.0";
     /**
      * Examination version.
      */
