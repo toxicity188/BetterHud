@@ -86,5 +86,10 @@ public interface HudObject {
         public int hashCode() {
             return source.getName().hashCode();
         }
+
+        @Override
+        public @NotNull String toString() {
+            return source.getName();
+        }
     }
 }
