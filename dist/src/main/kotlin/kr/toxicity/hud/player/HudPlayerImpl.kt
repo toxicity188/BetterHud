@@ -13,6 +13,7 @@ import kr.toxicity.hud.api.popup.PopupUpdater
 import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.text.Component
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.forEach
 
@@ -31,6 +32,7 @@ abstract class HudPlayerImpl : HudPlayer {
     private val pointers: MutableSet<PointedLocation> = OverridableSet(keyMapper = {
         it.name
     })
+    private val componentCache = ConcurrentHashMap<Component, Long>()
 
     private val task = HudPlayerTask {
         val speed = ConfigManagerImpl.tickSpeed
@@ -125,7 +127,7 @@ abstract class HudPlayerImpl : HudPlayer {
                 } else compList += comp
             }
         }
-        if (compList.isNotEmpty() || additionalComp != null) {
+        val component = if (compList.isNotEmpty() || additionalComp != null) {
             additionalComp?.let {
                 compList += (-it.width / 2).toSpaceComponent() + it
             }
@@ -136,8 +138,18 @@ abstract class HudPlayerImpl : HudPlayer {
             }
             last = comp.finalizeFont()
 
-            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build())
-        } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
+            comp.component.build()
+        } else EMPTY_COMPONENT
+
+        val last = componentCache.getOrDefault(component, -1L)
+        val now = System.currentTimeMillis()
+        if (last != -1L && now - last < 1000) {
+            return
+        }
+
+        componentCache[component] = System.currentTimeMillis()
+        val compact = component.compact()
+        VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, compact)
     }
 
     override fun reload() {
@@ -150,6 +162,7 @@ abstract class HudPlayerImpl : HudPlayer {
         popupKey.clear()
         componentMap.clear()
         popupGroup.clear()
+        componentCache.clear()
 
         HudObjectType.types().forEach { type ->
             type.defaultObjects().forEach { it.add(this) }
@@ -167,6 +180,7 @@ abstract class HudPlayerImpl : HudPlayer {
         cancelTick()
         autoSave.cancel()
         locationProvide.cancel()
+        componentCache.clear()
     }
 
     override fun type(): SenderType = SenderType.PLAYER
