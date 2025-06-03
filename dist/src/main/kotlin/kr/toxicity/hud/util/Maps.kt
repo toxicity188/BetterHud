@@ -1,8 +1,6 @@
 package kr.toxicity.hud.util
 
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectSet
@@ -17,8 +15,8 @@ fun <V : HudConfiguration> MutableMap<String, V>.putSync(name: String, v: () -> 
     }
 }
 
-fun Map<Int, Int>.toIntMap() = Int2IntArrayMap(this)
-fun <V> Map<Int, V>.toIntKeyMap() = Int2ObjectArrayMap<V>(this)
+fun Map<Int, Int>.toIntMap() = Int2IntOpenHashMap(this)
+fun <V> Map<Int, V>.toIntKeyMap() = Int2ObjectOpenHashMap<V>(this)
 
 fun intMapOf() = Int2IntOpenHashMap()
 fun <V> intKeyMapOf() = Int2ObjectOpenHashMap<V>()
