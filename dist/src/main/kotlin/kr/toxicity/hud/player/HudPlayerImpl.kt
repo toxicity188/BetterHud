@@ -136,7 +136,7 @@ abstract class HudPlayerImpl : HudPlayer {
             }
             last = comp.finalizeFont()
 
-            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build())
+            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build().compact())
         } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
     }
 

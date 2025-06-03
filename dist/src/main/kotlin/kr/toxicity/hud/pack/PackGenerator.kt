@@ -4,8 +4,11 @@ import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
+import kr.toxicity.hud.util.forEach
 import java.io.File
 import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 
 object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
@@ -15,26 +18,13 @@ object PackGenerator {
             var meta = PackMeta.default
             ConfigManagerImpl.mergeOtherFolders.forEach {
                 val mergeTarget = DATA_FOLDER.parentFile.subFolder(it)
-                val mergeLength = mergeTarget.path.length + 1
-                fun addFile(target: File) {
-                    if (target.isDirectory) target.forEach { t ->
-                        addFile(t)
-                    } else {
-                        addTask(target.path.substring(mergeLength).split(File.separatorChar)) {
-                            target.inputStream().buffered().use { stream ->
-                                stream.readAllBytes()
-                            }
-                        }
+                when {
+                    mergeTarget.isDirectory -> mergeFolder(mergeTarget) { subMeta ->
+                        meta += subMeta
                     }
-                }
-                mergeTarget.forEach { target ->
-                    if (target.name == "pack.mcmeta") {
-                        runCatching {
-                            meta += PackMeta.fromFile(target)
-                        }.getOrElse { e ->
-                            e.handle("Invalid pack.mcmeta: ${target.path}")
-                        }
-                    } else addFile(target)
+                    mergeTarget.extension == "zip" -> mergeZip(mergeTarget) { subMeta ->
+                        meta += subMeta
+                    }
                 }
             }
             runCatching {
@@ -59,6 +49,54 @@ object PackGenerator {
         }
         tasks.clear()
         return resourcePack
+    }
+
+    private fun mergeFolder(mergeTarget: File, metaBlock: (PackMeta) -> Unit) {
+        val mergeLength = mergeTarget.path.length + 1
+        fun addFile(target: File) {
+            if (target.isDirectory) target.forEach { t ->
+                addFile(t)
+            } else {
+                addTask(target.path.substring(mergeLength).split(File.separatorChar)) {
+                    target.inputStream().buffered().use { stream ->
+                        stream.readAllBytes()
+                    }
+                }
+            }
+        }
+        mergeTarget.forEach { target ->
+            if (target.name == "pack.mcmeta") {
+                runCatching {
+                    metaBlock(PackMeta.from(target))
+                }.getOrElse { e ->
+                    e.handle("Invalid pack.mcmeta: ${target.path}")
+                }
+            } else addFile(target)
+        }
+    }
+
+    private fun mergeZip(mergeTarget: File, metaBlock: (PackMeta) -> Unit) {
+        ZipInputStream(mergeTarget.inputStream().buffered()).use {
+            var entry: ZipEntry?
+            do {
+                entry = it.nextEntry
+                entry?.let { e ->
+                    val read = it.readAllBytes()
+                    if (e.name == "pack.mcmeta") {
+                        runCatching {
+                            metaBlock(PackMeta.from(read))
+                        }.getOrElse { e ->
+                            e.handle("Invalid pack.mcmeta: ${mergeTarget.path}")
+                        }
+                    } else {
+                        addTask(e.name.split("[/,\\\\]".toRegex())) {
+                            read
+                        }
+                    }
+                    it.closeEntry()
+                }
+            } while (entry != null)
+        }
     }
 
     fun addTask(dir: Iterable<String>, byteArray: () -> ByteArray) {

@@ -1,14 +1,11 @@
 package kr.toxicity.hud.pack
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
+import com.google.gson.*
 import com.google.gson.annotations.SerializedName
 import kr.toxicity.hud.util.BOOTSTRAP
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.InputStreamReader
 import java.lang.reflect.Type
 import java.util.zip.ZipEntry
 import kotlin.math.max
@@ -47,7 +44,10 @@ data class PackMeta(
         }
         val zipEntry = ZipEntry("pack.mcmeta")
 
-        fun fromFile(file: File): PackMeta = file.bufferedReader().use {
+        fun from(array: ByteArray): PackMeta = InputStreamReader(ByteArrayInputStream(array)).use {
+            gson.fromJson(it, PackMeta::class.java)
+        }
+        fun from(file: File): PackMeta = file.bufferedReader().use {
             gson.fromJson(it, PackMeta::class.java)
         }
     }
