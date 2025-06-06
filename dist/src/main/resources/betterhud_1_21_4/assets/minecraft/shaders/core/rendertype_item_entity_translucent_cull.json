@@ -1,19 +1,6 @@
 {
-    "blend": {
-        "func": "add",
-        "srcrgb": "srcalpha",
-        "dstrgb": "1-srcalpha"
-    },
     "vertex": "minecraft:core/rendertype_item_entity_translucent_cull",
     "fragment": "minecraft:core/rendertype_item_entity_translucent_cull",
-    "attributes": [
-        "Position",
-        "Color",
-        "UV0",
-        "UV1",
-        "UV2",
-        "Normal"
-    ],
     "samplers": [
         { "name": "Sampler0" },
         { "name": "Sampler1" },

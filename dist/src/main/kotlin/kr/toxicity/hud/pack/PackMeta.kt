@@ -49,7 +49,9 @@ data class PackMeta(
                     "BetterHud's default resource pack.",
                     VersionRange(9, 99)
                 ),
-                Overlay(PackOverlay.entries.map {
+                Overlay(PackOverlay.entries.filter {
+                    it.ordinal > 0
+                }.map {
                     OverlayEntry(
                         VersionRange(it.minVersion, it.maxVersion),
                         it.overlayName
