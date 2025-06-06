@@ -65,7 +65,7 @@ class CircleCompass(
         GuiLocation(section["gui"]?.asObject().ifNull { "gui value not set." }),
         RenderScale.fromConfig(pixel, section),
         section.getAsInt("layer", 0),
-        section.getAsBoolean("outline", false),
+        section.getShadow("outline"),
         pixel.opacity,
         ShaderProperty.properties(section["properties"]?.asArray())
     )
@@ -329,6 +329,7 @@ class CircleCompass(
                 }
             }
             return (-comp.width / 2).toSpaceComponent() + comp
+                .shadow(shader.outline)
         }
     }
 

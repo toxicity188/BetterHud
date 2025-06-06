@@ -33,6 +33,7 @@ include(
     "nms:v1_21_R2",
     "nms:v1_21_R3",
     "nms:v1_21_R4",
+    //"nms:v1_21_R5", TODO - Add it when Spigot 1.21.6 is released.
 
     "scheduler:standard",
     "scheduler:paper",

@@ -17,4 +17,12 @@ public record WidthComponent(@NotNull TextComponent.Builder component, int width
     public @NotNull WidthComponent plus(@NotNull WidthComponent other) {
         return other.component.content().isEmpty() && other.component.children().isEmpty() ? this : new WidthComponent(component.append(other.component), width + other.width);
     }
+
+    /**
+     * Copy component
+     * @return copied component
+     */
+    public @NotNull WidthComponent copy() {
+        return new WidthComponent(component.build().toBuilder(), width);
+    }
 }

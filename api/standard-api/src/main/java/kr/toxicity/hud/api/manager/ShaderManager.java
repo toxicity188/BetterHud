@@ -148,14 +148,6 @@ public interface ShaderManager {
          * item fsh
          */
         ITEM_FRAGMENT("item.fsh", "rendertype_item_entity_translucent_cull.fsh"),
-        /**
-         * block vsh
-         */
-        BLOCK_VERTEX("block.vsh", "rendertype_entity_cutout.vsh"),
-        /**
-         * block fsh
-         */
-        BLOCK_FRAGMENT("block.fsh", "rendertype_entity_cutout.fsh"),
 
         ;
         private final @NotNull String fileName;

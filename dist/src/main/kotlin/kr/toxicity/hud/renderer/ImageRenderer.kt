@@ -18,7 +18,7 @@ class ImageRenderer(
     private val followHudPlayer = follow?.let {
         PlaceholderManagerImpl.find(it, this).assertString("This placeholder is not a string: $it")
     }
-    private val component = component applyColor color
+    private val component = component.apply(outline, color)
 
     override fun render(event: UpdateEvent): TickProvider<HudPlayer, PixelComponent> {
         val cond = conditions build event

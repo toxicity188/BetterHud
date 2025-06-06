@@ -132,7 +132,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency SEMVER4J = new BetterHudDependency(
             "org{}semver4j",
             "semver4j",
-            "5.7.0",
+            "5.7.1",
             false,
             BetterHudPlatform.ALL
     );

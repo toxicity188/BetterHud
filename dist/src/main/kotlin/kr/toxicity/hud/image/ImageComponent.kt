@@ -7,6 +7,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.element.ImageElement
 import kr.toxicity.hud.util.applyColor
 import kr.toxicity.hud.util.ifNull
+import kr.toxicity.hud.util.shadow
 import net.kyori.adventure.text.format.TextColor
 
 class ImageComponent(
@@ -30,14 +31,14 @@ class ImageComponent(
 
     infix fun choose(index: Long) = original.animationType.choose(images, index)
 
-    infix fun applyColor(color: TextColor): ImageComponent = ImageComponent(
+    fun apply(shadow: Int, color: TextColor): ImageComponent = ImageComponent(
         original,
         parent,
         images.map {
-            it applyColor color
+            it.copy() shadow shadow applyColor color
         },
         entries.associate { (name, component) ->
-            name to (component applyColor color)
+            name to component.apply(shadow, color)
         }
     )
 

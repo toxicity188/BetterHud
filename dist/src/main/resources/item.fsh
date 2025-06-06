@@ -1,15 +1,27 @@
 #version 150
 
+#CreateConstant
+
+#if SHADER_VERSION >= 1
+#moj_import <minecraft:fog.glsl>
+#else
 #moj_import <fog.glsl>
+#endif
 
-uniform sampler2D Sampler0;
-
+#if SHADER_VERSION == 3
+#moj_import <minecraft:dynamictransforms.glsl>
+in float sphericalVertexDistance;
+in float cylindricalVertexDistance;
+#else
 uniform vec4 ColorModulator;
 uniform float FogStart;
 uniform float FogEnd;
 uniform vec4 FogColor;
-
 in float vertexDistance;
+#endif
+
+uniform sampler2D Sampler0;
+
 in vec4 vertexColor;
 in vec2 texCoord0;
 in vec2 texCoord1;
@@ -22,10 +34,14 @@ void main() {
     vec4 texColor = texture(Sampler0, texCoord0);
     vec4 color = texColor * vertexColor * ColorModulator;
 
-#GenerateOtherMainMethod
+    #GenerateOtherMainMethod
 
     if (color.a < 0.1) {
         discard;
     }
+#if SHADER_VERSION == 3
+    fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
+#else
     fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
+#endif
 }

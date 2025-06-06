@@ -32,6 +32,7 @@ dependencies {
     }
     rootProject.project("nms").subprojects.forEach {
         compileOnly(shade(project(":nms:${it.name}", configuration = "reobf"))!!)
+        //compileOnly(shade(it)!!)
     }
     compileOnly(libs.bstatsBukkit)
     shade(libs.bstatsBukkit)

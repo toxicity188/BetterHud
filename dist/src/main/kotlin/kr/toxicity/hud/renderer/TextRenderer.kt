@@ -114,7 +114,7 @@ class TextRenderer(
                 }
                 widthComp = widthComp plusWithAlign finalComp
             }
-            widthComp.applyColor(colorApply(targetHudPlayer)).toPixelComponent(when (align) {
+            widthComp.shadow(outline).applyColor(colorApply(targetHudPlayer)).toPixelComponent(when (align) {
                 LayoutAlign.LEFT -> x
                 LayoutAlign.CENTER -> x - max / 2
                 LayoutAlign.RIGHT -> x - max

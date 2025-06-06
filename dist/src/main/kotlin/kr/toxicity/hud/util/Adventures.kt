@@ -2,12 +2,14 @@ package kr.toxicity.hud.util
 
 import kr.toxicity.hud.api.component.PixelComponent
 import kr.toxicity.hud.api.component.WidthComponent
+import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
@@ -210,24 +212,29 @@ fun Component.split(option: SplitOption, charWidth: (Pair<Style, Int>) -> Int?):
     return list
 }
 
-infix fun PixelComponent.applyColor(color: TextColor?): PixelComponent = if (color == null) this else PixelComponent(
-    component.applyColor(color),
-    pixel
-)
+infix fun PixelComponent.applyColor(color: TextColor?): PixelComponent = if (color == null) this else apply {
+    component applyColor color
+}
+infix fun PixelComponent.shadow(shadow: Int): PixelComponent = apply {
+    component shadow shadow
+}
+
+infix fun WidthComponent.shadow(shadow: Int) = apply {
+    if (PLUGIN.bootstrap().minecraftVersion() >= MinecraftVersion.V1_21_4) component.shadowColor(ShadowColor.shadowColor(shadow))
+}
 
 infix fun WidthComponent.applyColor(color: TextColor?): WidthComponent = when (color?.value()) {
     null -> this
     NamedTextColor.WHITE.value() -> WidthComponent(
-        component.build().toBuilder().color(null),
+        component,
         width
     )
     else -> {
-        val build = component.build()
-        val finalColor = build.color()?.let {
+        val finalColor = component.build().color()?.let {
             it * color
         } ?: color
         WidthComponent(
-            build.toBuilder().color(finalColor),
+            component.color(finalColor),
             width
         )
     }

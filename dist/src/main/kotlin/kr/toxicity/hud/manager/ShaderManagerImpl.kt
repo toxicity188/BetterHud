@@ -5,6 +5,7 @@ import kr.toxicity.hud.api.manager.ShaderManager.*
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
+import kr.toxicity.hud.pack.PackOverlay
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
@@ -15,6 +16,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
+import kotlin.collections.plus
 
 object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
@@ -32,39 +34,12 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             }
         },
         "CreateLayout" to {
-            ArrayList<String>().apply {
-                hudShaders.entries.forEachIndexed { index, entry ->
-                    addAll(ArrayList<String>().apply {
-                        val shader = entry.key
-                        val id = index + 1
-                        add("case ${id}:")
-                        if (shader.property > 0) add("    property = ${shader.property};")
-                        if (shader.opacity < 1.0) add("    opacity = ${shader.opacity.toFloat()};")
-                        val static = shader.renderScale.scale.staticScale
-                        fun applyScale(offset: Int, scale: Double, pos: String) {
-                            if (scale != 1.0 || static) {
-                                val scaleFloat = scale.toFloat()
-                                add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset});")
-                            }
-                        }
-                        applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")
-                        applyScale(shader.renderScale.relativeOffset.y, shader.renderScale.scale.y, "y")
-                        if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
-                        if (shader.gui.y != 0.0) add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
-                        if (shader.layer != 0) add("    layer = ${shader.layer};")
-                        if (shader.outline) add("    outline = true;")
-                        add("    break;")
-                        entry.value.forEach {
-                            it(id)
-                        }
-                    })
-                }
-                hudShaders.clear()
-            }
+            compiledLayout
         },
     )
 
     private val hudShaders = TreeMap<HudShader, MutableList<(Int) -> Unit>>()
+    private var compiledLayout = arrayListOf<String>()
 
     private val tagSupplierMap = ConcurrentHashMap<ShaderType, ShaderTagSupplier>()
 
@@ -85,6 +60,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
     }
 
     private val constants = mutableMapOf<String, String>()
+    private var replaceSet = mutableSetOf<String>()
 
     private val shaderConstants = mutableMapOf(
         "HEIGHT_BIT" to HUD_DEFAULT_BIT.toString(),
@@ -104,14 +80,10 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
     override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
         constants.clear()
+        replaceSet = mutableSetOf()
+        constants += shaderConstants
+        constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarResourcePackLine - 1)}"
         runCatching {
-            val shaders = ShaderType.entries.map {
-                it to it.lines()
-            }
-            constants += shaderConstants
-            constants["DEFAULT_OFFSET"] = "${10 + 17 * (ConfigManagerImpl.bossbarResourcePackLine - 1)}"
-            val replaceList = mutableSetOf<String>()
-
             val yaml = PluginConfiguration.SHADER.create()
             barColor = yaml["bar-color"]?.asString()?.let {
                 runCatching {
@@ -155,12 +127,10 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     }.toByteArray()
                 }
             }
-
-            if (yaml.getAsBoolean("disable-level-text", false)) replaceList += "HideExp"
-
+            if (yaml.getAsBoolean("disable-level-text", false)) replaceSet += "HideExp"
             yaml["hotbar"]?.asObject()?.let {
                 if (it.getAsBoolean("enable-hotbar-relocation", false)) {
-                    replaceList += "RemapHotBar"
+                    replaceSet += "RemapHotBar"
                     val locations =
                         it.get("locations")?.asObject().ifNull { "locations configuration not set." }
                     (1..10).map { index ->
@@ -183,51 +153,90 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     }
                 }
             }
+            compileShader(resource)
+        }.handleFailure(info) {
+            "Unable to load shader.yml"
+        }
+    }
 
-            shaders.forEach { (key, args) ->
-                val tagSupplier = (tagSupplierMap[key] ?: EMPTY_SUPPLIER).get()
-                val byte = buildString {
-                    args.forEach write@{ string ->
-                        var s = string
-                        if (s.startsWith("//")) {
-                            val get = s.substringBefore(' ')
-                            if (replaceList.contains(get.substring(2))) s = s.substring(get.length)
-                        }
-                        if (s.isEmpty()) return@write
-                        val tagMatcher = tagPattern.matcher(s)
-                        if (tagMatcher.find()) {
-                            val group = tagMatcher.group("name")
-                            (tagBuilders[group]?.invoke() ?: tagSupplier[group])?.let {
-                                it.forEach apply@ { methodString ->
-                                    if (methodString.isEmpty() || methodString.startsWith("//")) return@apply
-                                    val appendEnter = methodString.first() == '#'
-                                    if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
-                                    append(methodString.replace("  ", ""))
-                                    if (appendEnter) append('\n')
-                                }
-                                return@write
-                            }
-                        }
-                        var tr = s.trim()
-                        if (tr.isNotEmpty()) {
-                            if (isNotEmpty() && tr.first() == '#') {
-                                if (last() != '\n') tr = '\n' + tr
-                                tr += '\n'
-                            }
-                            append(tr.substringBeforeLast("//"))
-                        }
+    private fun compileShader(resource: GlobalResource) {
+        compiledLayout = hudShaders.entries.foldIndexed(arrayListOf()) { index, arr, entry ->
+            arr.addAll(ArrayList<String>().apply {
+                val shader = entry.key
+                val id = index + 1
+                add("case ${id}:")
+                if (shader.property > 0) add("    property = ${shader.property};")
+                if (shader.opacity < 1.0) add("    opacity = ${shader.opacity.toFloat()};")
+                val static = shader.renderScale.scale.staticScale
+                fun applyScale(offset: Int, scale: Double, pos: String) {
+                    if (scale != 1.0 || static) {
+                        val scaleFloat = scale.toFloat()
+                        add("    pos.$pos = (pos.$pos - (${offset})) * ${if (static) "$scaleFloat * uiScreen.$pos" else scaleFloat} + (${offset});")
                     }
-                }.toByteArray()
-                PackGenerator.addTask(resource.core + key.shadersCoreName) {
-                    byte
                 }
-                //+1.21.2
-                PackGenerator.addTask(resource.shaders + key.shadersCoreName) {
+                applyScale(shader.renderScale.relativeOffset.x, shader.renderScale.scale.x, "x")
+                applyScale(shader.renderScale.relativeOffset.y, shader.renderScale.scale.y, "y")
+                if (shader.gui.x != 0.0) add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
+                if (shader.gui.y != 0.0) add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
+                if (shader.layer != 0) add("    layer = ${shader.layer};")
+                if (shader.outline != 0) add("    outline = true;")
+                add("    break;")
+                entry.value.forEach {
+                    it(id)
+                }
+            })
+            arr
+        }
+        for (overlay in PackOverlay.entries) {
+            loadShaders(overlay).forEach { (key, byte) ->
+                PackGenerator.addTask(listOf(overlay.overlayName) + resource.core + key) {
                     byte
                 }
             }
-        }.handleFailure(info) {
-            "Unable to load shader.yml"
+        }
+        compiledLayout = arrayListOf()
+        hudShaders.clear()
+    }
+
+    private fun loadShaders(overlay: PackOverlay): List<Pair<String, ByteArray>> {
+        constants["SHADER_VERSION"] = overlay.ordinal.toString()
+        val shaders = ShaderType.entries.map {
+            it to it.lines()
+        }
+        return shaders.map { (key, args) ->
+            val tagSupplier = (tagSupplierMap[key] ?: EMPTY_SUPPLIER).get()
+            key.shadersCoreName to buildString {
+                args.forEach write@ { string ->
+                    var s = string
+                    if (s.startsWith("//")) {
+                        val get = s.substringBefore(' ')
+                        if (replaceSet.contains(get.substring(2))) s = s.substring(get.length)
+                    }
+                    if (s.isEmpty()) return@write
+                    val tagMatcher = tagPattern.matcher(s)
+                    if (tagMatcher.find()) {
+                        val group = tagMatcher.group("name")
+                        (tagBuilders[group]?.invoke() ?: tagSupplier[group])?.let {
+                            it.forEach apply@ { methodString ->
+                                if (methodString.isEmpty() || methodString.startsWith("//")) return@apply
+                                val appendEnter = methodString.first() == '#'
+                                if (appendEnter && (isEmpty() || last() != '\n')) append('\n')
+                                append(methodString.replace("  ", ""))
+                                if (appendEnter) append('\n')
+                            }
+                            return@write
+                        }
+                    }
+                    var tr = s.trim()
+                    if (tr.isNotEmpty()) {
+                        if (isNotEmpty() && tr.first() == '#') {
+                            if (last() != '\n') tr = '\n' + tr
+                            tr += '\n'
+                        }
+                        append(tr.substringBeforeLast("//"))
+                    }
+                }
+            }.toByteArray()
         }
     }
 

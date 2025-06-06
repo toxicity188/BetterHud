@@ -118,13 +118,15 @@ class HeadRenderer(
                 targetPlayerHead = head
             }
             if (cond(targetPlayer)) {
-                WidthComponent(pixelType.render(targetPlayerHead, colorApply(targetPlayer)), pixel).toPixelComponent(
-                    when (align) {
-                        LayoutAlign.LEFT -> x
-                        LayoutAlign.CENTER -> x - pixel / 2
-                        LayoutAlign.RIGHT -> x - pixel
-                    }
-                )
+                WidthComponent(pixelType.render(targetPlayerHead, colorApply(targetPlayer)), pixel)
+                    .shadow(outline)
+                    .toPixelComponent(
+                        when (align) {
+                            LayoutAlign.LEFT -> x
+                            LayoutAlign.CENTER -> x - pixel / 2
+                            LayoutAlign.RIGHT -> x - pixel
+                        }
+                    )
             } else EMPTY_PIXEL_COMPONENT
         }
     }

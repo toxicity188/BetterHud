@@ -89,3 +89,9 @@ fun YamlObject.toColorOverrides(source: PlaceholderSource) = get("color-override
 fun YamlObject.getTEquation(key: String) = get(key)?.asString()?.let {
     TEquation(it)
 }
+
+fun YamlObject.getShadow(key: String) = when (val value = getAsString(key, "0")) {
+    "false" -> 0
+    "true" -> 0xFF shl 24
+    else -> (value.toLong(16) and 0xFFFFFFFF).toInt()
+}

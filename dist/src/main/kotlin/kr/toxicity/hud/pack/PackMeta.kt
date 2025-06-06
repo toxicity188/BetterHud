@@ -3,6 +3,7 @@ package kr.toxicity.hud.pack
 import com.google.gson.*
 import com.google.gson.annotations.SerializedName
 import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.jsonArrayOf
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStreamReader
@@ -17,7 +18,7 @@ data class PackMeta(
     companion object {
         private val gson = GsonBuilder()
             .registerTypeAdapter(VersionRange::class.java, object : JsonDeserializer<VersionRange> {
-                override fun deserialize(p0: JsonElement, p1: Type, p2: JsonDeserializationContext): VersionRange? {
+                override fun deserialize(p0: JsonElement, p1: Type, p2: JsonDeserializationContext): VersionRange {
                     return when (p0) {
                         is JsonObject -> VersionRange(
                             p0.getAsJsonPrimitive("min_inclusive").asInt,
@@ -31,6 +32,14 @@ data class PackMeta(
                     }
                 }
             })
+            .registerTypeAdapter(VersionRange::class.java, object : JsonSerializer<VersionRange> {
+                override fun serialize(p0: VersionRange, p1: Type, p2: JsonSerializationContext): JsonElement {
+                    return jsonArrayOf(
+                        p0.min,
+                        p0.max
+                    )
+                }
+            })
             .create()
 
         val default by lazy {
@@ -38,8 +47,14 @@ data class PackMeta(
                 Pack(
                     BOOTSTRAP.mcmetaVersion(),
                     "BetterHud's default resource pack.",
-                    VersionRange(9, 55)
-                )
+                    VersionRange(9, 99)
+                ),
+                Overlay(PackOverlay.entries.map {
+                    OverlayEntry(
+                        VersionRange(it.minVersion, it.maxVersion),
+                        it.overlayName
+                    )
+                })
             )
         }
         val zipEntry = ZipEntry("pack.mcmeta")
@@ -106,19 +121,16 @@ data class PackMeta(
     }
 
     data class VersionRange(
-        @SerializedName("min_inclusive") val min: Int,
-        @SerializedName("max_inclusive") val max: Int
+        val min: Int,
+        val max: Int
     ) : Comparable<VersionRange> {
-
-        val range get() = max - min
-
         infix fun min(other: VersionRange?) = if (other != null) VersionRange(
             min.coerceAtMost(other.min),
             max.coerceAtMost(other.max)
         ) else this
 
         override fun compareTo(other: VersionRange): Int {
-            return range.compareTo(other.range)
+            return max.compareTo(other.max)
         }
     }
 }

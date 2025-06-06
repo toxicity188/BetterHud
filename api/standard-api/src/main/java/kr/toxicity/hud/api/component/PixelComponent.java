@@ -20,4 +20,13 @@ public record PixelComponent(@NotNull WidthComponent component, int pixel) {
                 pixel
         );
     }
+
+
+    /**
+     * Copy component
+     * @return copied component
+     */
+    public @NotNull PixelComponent copy() {
+        return new PixelComponent(component.copy(), pixel);
+    }
 }

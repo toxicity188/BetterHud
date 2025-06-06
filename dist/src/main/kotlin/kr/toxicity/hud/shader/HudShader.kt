@@ -6,7 +6,7 @@ data class HudShader(
     val gui: GuiLocation,
     val renderScale: RenderScale,
     val layer: Int,
-    val outline: Boolean,
+    val outline: Int,
     val opacity: Double,
     val property: Int,
 ) : Comparable<HudShader> {
@@ -34,7 +34,7 @@ data class HudShader(
         gui,
         renderScale,
         layer - 1,
-        false,
+        0,
         opacity * otherOpacity,
         property
     )
@@ -43,7 +43,7 @@ data class HudShader(
         gui,
         renderScale * 1.125,
         layer + 1,
-        true,
+        0x8F shl 24,
         opacity,
         property
     )

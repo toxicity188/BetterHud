@@ -6,6 +6,7 @@ import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
+import kr.toxicity.hud.pack.PackOverlay
 import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.resource.KeyResource
@@ -111,11 +112,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
                 }
             }
         }
-        PLUGIN.loadAssets("pack") { n, i ->
-            val read = i.readAllBytes()
-            PackGenerator.addTask(n.split('/')) {
-                read
-            }
+        PackOverlay.entries.forEach {
+            it.loadAssets()
         }
     }
 
