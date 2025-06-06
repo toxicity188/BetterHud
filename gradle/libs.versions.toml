@@ -13,7 +13,7 @@ resourceFactory = "1.3.0"
 loom = "1.10-SNAPSHOT"
 paperweight = "2.0.0-SNAPSHOT"
 minotaur = "2.8.7"
-semver4j = "5.7.0"
+semver4j = "5.7.1"
 
 asm = "9.8"
 hikariCP = "6.3.0"
