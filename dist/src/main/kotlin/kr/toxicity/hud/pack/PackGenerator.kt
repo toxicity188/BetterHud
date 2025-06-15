@@ -27,8 +27,20 @@ object PackGenerator {
                     }
                 }
             }
+            PackOverlay.entries.forEach {
+                it.loadAssets()
+            }
+            addTask(listOf("pack.mcmeta")) {
+                meta.toByteArray()
+            }
+            BOOTSTRAP.resource("icon.png")?.buffered()?.use {
+                val read = it.readAllBytes()
+                addTask(listOf("pack.png")) {
+                    read
+                }
+            }
             runCatching {
-                ConfigManagerImpl.packType.createGenerator(meta, info).use { saveTask ->
+                ConfigManagerImpl.packType.createGenerator(info).use { saveTask ->
                     tasks.values.forEachAsync { t ->
                         runCatching {
                             saveTask(t)

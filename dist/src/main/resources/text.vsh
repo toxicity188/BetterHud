@@ -8,7 +8,7 @@
 #moj_import <fog.glsl>
 #endif
 
-#if SHADER_VERSION == 3
+#if SHADER_VERSION >= 3
 #moj_import <minecraft:dynamictransforms.glsl>
 #moj_import <minecraft:projection.glsl>
 out float sphericalVertexDistance;
@@ -215,7 +215,7 @@ void main() {
 
     #GenerateOtherMainMethod
 
-#if SHADER_VERSION == 3
+#if SHADER_VERSION >= 3
     sphericalVertexDistance = fog_spherical_distance(pos);
     cylindricalVertexDistance = fog_cylindrical_distance(pos);
 #else

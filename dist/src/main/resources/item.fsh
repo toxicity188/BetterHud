@@ -8,7 +8,7 @@
 #moj_import <fog.glsl>
 #endif
 
-#if SHADER_VERSION == 3
+#if SHADER_VERSION >= 3
 #moj_import <minecraft:dynamictransforms.glsl>
 in float sphericalVertexDistance;
 in float cylindricalVertexDistance;
@@ -39,7 +39,7 @@ void main() {
     if (color.a < 0.1) {
         discard;
     }
-#if SHADER_VERSION == 3
+#if SHADER_VERSION >= 3
     fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 #else
     fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
