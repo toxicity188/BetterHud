@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.21"
 
-adventure = "4.22.0"
+adventure = "4.23.0"
 adventurePlatform = "4.4.0"
 snakeyaml = "2.4"
 gson = "2.13.1"
