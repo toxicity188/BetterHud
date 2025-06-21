@@ -1,5 +1,6 @@
 package kr.toxicity.hud.bootstrap.fabric.util
 
+import kr.toxicity.hud.api.fabric.FabricInitializer
 import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.fabric.event.FabricEvent
 import kr.toxicity.hud.api.fabric.event.PlayerEvent
@@ -8,7 +9,6 @@ import kr.toxicity.hud.api.fabric.update.FabricUpdateEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import net.fabricmc.loader.api.FabricLoader
-import net.kyori.adventure.platform.modcommon.impl.NonWrappingComponentSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.luckperms.api.LuckPermsProvider
 import net.minecraft.network.chat.Component
@@ -36,8 +36,8 @@ inline fun <reified T : FabricEvent<*>, R : Any> UpdateEvent.unwrap(block: (T) -
     } else throw RuntimeException("Unsupported update found: ${javaClass.simpleName}")
 }
 
-fun Component.toAdventure() = NonWrappingComponentSerializer.INSTANCE.deserialize(this)
-fun net.kyori.adventure.text.Component.toMinecraft() = NonWrappingComponentSerializer.INSTANCE.serialize(this)
+fun Component.toAdventure() = FabricInitializer.toAdventure(this)
+fun net.kyori.adventure.text.Component.toMinecraft(): Component = FabricInitializer.toVanilla(this)
 
 fun Component.toMiniMessageString() = MiniMessage.miniMessage().serialize(toAdventure())
 

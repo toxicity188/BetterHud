@@ -102,7 +102,7 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
     /**
      * Latest
      */
-    public static final MinecraftVersion LATEST = V1_21_5;
+    public static final MinecraftVersion LATEST = V1_21_6;
 
     /**
      * Parses version from string

@@ -72,7 +72,7 @@ class HudPlayerFabric(
         listener.player.yRot
     )
 
-    override fun world(): WorldWrapper = (BOOTSTRAP as FabricBootstrapImpl).wrap(listener.player.serverLevel())
+    override fun world(): WorldWrapper = (BOOTSTRAP as FabricBootstrapImpl).wrap(listener.player.level())
 
     override fun handle(): Any = listener.player
 }

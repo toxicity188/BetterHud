@@ -23,7 +23,7 @@ class HttpSkinProvider : PlayerSkinProvider {
     private fun getUUID(playerName: String): String? {
         return httpClient {
             InputStreamReader(send(HttpRequest.newBuilder()
-                .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/$playerName?at=${System.currentTimeMillis() / 1000}"))
+                .uri(URI.create("https://api.minecraftservices.com/minecraft/profile/lookup/name/$playerName"))
                 .GET()
                 .build(), HttpResponse.BodyHandlers.ofInputStream()).body()).buffered().use {
                 parseJson(it)

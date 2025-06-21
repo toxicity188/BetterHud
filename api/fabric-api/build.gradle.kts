@@ -21,7 +21,8 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${property("kyori_mod_implementation")}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
+    //modImplementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
+    modImplementation("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")
     implementation(include(project(":api:standard-api"))!!)
 }
 
@@ -41,7 +42,7 @@ fabricModJson {
     }))
     license = listOf("MIT")
     entrypoints = listOf(
-        mainEntrypoint("$group.api.fabric.Main")
+        mainEntrypoint("$group.api.fabric.FabricInitializer")
     )
     depends = mapOf(
         "fabricloader" to listOf("*"),
@@ -59,6 +60,7 @@ tasks {
     remapJar {
         archiveBaseName = "betterhud-${project.name}"
         archiveClassifier = ""
+        nestedJars.from(file("libs/adventure-platform-fabric-6.5.0-SNAPSHOT.jar"))
     }
     runServer {
         enabled = false
