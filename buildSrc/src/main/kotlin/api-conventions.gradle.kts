@@ -35,6 +35,7 @@ tasks.jar {
 }
 
 mavenPublishing {
+    publishToMavenCentral()
     signAllPublications()
     coordinates("io.github.toxicity188", publishName, project.version as String)
     configure(JavaLibrary(
