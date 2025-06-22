@@ -17,7 +17,7 @@ semver4j = "5.7.1"
 
 asm = "9.8"
 hikariCP = "6.3.0"
-fastUtil = "8.5.15"
+fastUtil = "8.5.16"
 
 [libraries]
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
