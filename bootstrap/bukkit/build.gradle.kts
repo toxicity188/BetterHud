@@ -11,7 +11,6 @@ repositories {
     maven("https://repo.skriptlang.org/releases") //Skript
     maven("https://repo.alessiodp.com/releases/") //Parties
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
-    maven("https://repo.nexomc.com/releases/") //Nexo
     maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
     maven("https://jitpack.io") //Vault
 }
@@ -57,9 +56,6 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.11.2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.6.8")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("com.nexomc:nexo:1.8.0") {
-        exclude("team.unnamed")
-    }
 }
 
 bukkitPluginYaml {
@@ -88,7 +84,6 @@ bukkitPluginYaml {
         "SkinsRestorer",
         "Parties",
         "GPS",
-        "Nexo",
         "BetterModel",
     )
     permissions {

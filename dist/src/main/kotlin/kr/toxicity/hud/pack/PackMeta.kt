@@ -8,7 +8,6 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStreamReader
 import java.lang.reflect.Type
-import java.util.zip.ZipEntry
 import kotlin.math.max
 
 data class PackMeta(
@@ -24,17 +23,22 @@ data class PackMeta(
                             p0.getAsJsonPrimitive("min_inclusive").asInt,
                             p0.getAsJsonPrimitive("max_inclusive").asInt
                         )
+                        is JsonPrimitive -> {
+                            p0.asInt.let {
+                                VersionRange(it, it)
+                            }
+                        }
                         is JsonArray -> VersionRange(
                             p0.get(0).asInt,
                             p0.get(1).asInt
                         )
-                        else -> throw RuntimeException("VersionRage must be json array or json object.")
+                        else -> throw RuntimeException("VersionRage must be json array, integer or json object.")
                     }
                 }
             })
             .registerTypeAdapter(VersionRange::class.java, object : JsonSerializer<VersionRange> {
                 override fun serialize(p0: VersionRange, p1: Type, p2: JsonSerializationContext): JsonElement {
-                    return jsonArrayOf(
+                    return if (p0.min == p0.max) JsonPrimitive(p0.min) else jsonArrayOf(
                         p0.min,
                         p0.max
                     )
@@ -59,7 +63,6 @@ data class PackMeta(
                 })
             )
         }
-        val zipEntry = ZipEntry("pack.mcmeta")
 
         fun from(array: ByteArray): PackMeta = InputStreamReader(ByteArrayInputStream(array)).use {
             gson.fromJson(it, PackMeta::class.java)

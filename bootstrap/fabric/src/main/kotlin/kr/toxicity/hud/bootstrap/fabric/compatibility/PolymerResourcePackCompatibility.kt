@@ -9,10 +9,8 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.pack.PackType
-import kr.toxicity.hud.util.PLUGIN
-import kr.toxicity.hud.util.handle
-import kr.toxicity.hud.util.info
-import kr.toxicity.hud.util.warn
+import kr.toxicity.hud.util.*
+import net.minecraft.util.InclusiveRange
 
 class PolymerResourcePackCompatibility : Compatibility {
 
@@ -34,8 +32,17 @@ class PolymerResourcePackCompatibility : Compatibility {
             ConfigManagerImpl.preReload()
             if (ConfigManagerImpl.packType == PackType.NONE) when (val state = PLUGIN.reload()) {
                 is Success -> {
-                    state.resourcePack.forEach {
-                        builder.addData(it.key, it.value)
+                    state.resourcePack.forEach { (path, data) ->
+                        when (path) {
+                            "pack.png" -> {}
+                            "pack.mcmeta" -> data.toMcmeta().overlays?.entries?.forEach {
+                                builder.packMcMetaBuilder.addOverlay(
+                                    InclusiveRange(it.formats.min, it.formats.max),
+                                    it.directory
+                                )
+                            }
+                            else -> builder.addData(path, data)
+                        }
                     }
                     info("Polymer generation detected - reload completed: (${state.time} ms)")
                 }

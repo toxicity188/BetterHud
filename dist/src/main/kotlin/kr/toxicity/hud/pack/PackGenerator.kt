@@ -79,7 +79,7 @@ object PackGenerator {
         mergeTarget.forEach { target ->
             if (target.name == "pack.mcmeta") {
                 runCatching {
-                    metaBlock(PackMeta.from(target))
+                    metaBlock(target.toMcmeta())
                 }.getOrElse { e ->
                     e.handle("Invalid pack.mcmeta: ${target.path}")
                 }
@@ -96,7 +96,7 @@ object PackGenerator {
                     val read = it.readAllBytes()
                     if (e.name == "pack.mcmeta") {
                         runCatching {
-                            metaBlock(PackMeta.from(read))
+                            metaBlock(read.toMcmeta())
                         }.getOrElse { e ->
                             e.handle("Invalid pack.mcmeta: ${mergeTarget.path}")
                         }

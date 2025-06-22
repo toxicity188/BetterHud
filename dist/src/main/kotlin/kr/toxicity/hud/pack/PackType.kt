@@ -174,8 +174,7 @@ enum class PackType {
         override fun createGenerator(info: ReloadInfo): Generator {
             val builder = Builder()
             return object : Generator {
-                override val resourcePack: Map<String, ByteArray>
-                    get() = Collections.unmodifiableMap(builder.byteArrayMap)
+                override val resourcePack: Map<String, ByteArray> = Collections.unmodifiableMap(builder.byteArrayMap)
 
                 override fun close() {
                     if (PackUploader.stop()) info("Resource pack host is stopped.")

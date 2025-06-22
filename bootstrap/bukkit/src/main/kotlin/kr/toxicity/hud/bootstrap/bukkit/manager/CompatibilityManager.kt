@@ -5,7 +5,6 @@ import kr.toxicity.hud.bootstrap.bukkit.compatibility.mmocore.MMOCoreCompatibili
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mmoitems.MMOItemsCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mythiclib.MythicLibCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.mythicmobs.MythicMobsCompatibility
-import kr.toxicity.hud.bootstrap.bukkit.compatibility.nexo.NexoCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.parties.PartiesCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.skript.SkriptCompatibility
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.vault.VaultCompatibility
@@ -41,9 +40,6 @@ object CompatibilityManager {
         },
         "Parties" to {
             PartiesCompatibility()
-        },
-        "Nexo" to {
-            NexoCompatibility()
         }
     )
 
