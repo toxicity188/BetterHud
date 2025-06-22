@@ -141,7 +141,7 @@ public interface BetterHudBootstrap {
 
     /**
      * Target platform's minecraft protocol version.
-     * @return version like "1.21.5"
+     * @return version like "1.21.6"
      */
     @NotNull
     MinecraftVersion minecraftVersion();

@@ -122,7 +122,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency FAST_UTIL = new BetterHudDependency(
             "it{}unimi{}dsi",
             "fastutil",
-            "8.5.15",
+            "8.5.16",
             false,
             List.of(BetterHudPlatform.VELOCITY)
     );

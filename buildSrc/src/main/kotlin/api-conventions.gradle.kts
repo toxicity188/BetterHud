@@ -1,7 +1,5 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
-import gradle.kotlin.dsl.accessors._4ec6706ce94ba69b33c34f58ef32a627.compileOnly
 
 plugins {
     id("standard-conventions")
@@ -37,7 +35,6 @@ tasks.jar {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
     coordinates("io.github.toxicity188", publishName, project.version as String)
     configure(JavaLibrary(

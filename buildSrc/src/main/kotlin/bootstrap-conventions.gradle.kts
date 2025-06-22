@@ -1,5 +1,3 @@
-import gradle.kotlin.dsl.accessors._71500ebfd02aecedbeba1ea751aee542.compileOnly
-
 plugins {
     id("standard-conventions")
     id("com.modrinth.minotaur")

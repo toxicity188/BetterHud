@@ -12,7 +12,6 @@ repositories {
     maven("https://repo.alessiodp.com/releases/") //Parties
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
     maven("https://repo.nexomc.com/releases/") //Nexo
-    maven("https://repo.oraxen.com/releases") //Oraxen
     maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
     maven("https://jitpack.io") //Vault
 }
@@ -47,10 +46,12 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.14") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
+        exclude("it.unimi.dsi")
     }
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
+        exclude("it.unimi.dsi")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.github.SkriptLang:Skript:2.11.2")
@@ -59,7 +60,6 @@ dependencies {
     compileOnly("com.nexomc:nexo:1.8.0") {
         exclude("team.unnamed")
     }
-    compileOnly("io.th0rgal:oraxen:1.190.0")
 }
 
 bukkitPluginYaml {
@@ -89,7 +89,6 @@ bukkitPluginYaml {
         "Parties",
         "GPS",
         "Nexo",
-        "Oraxen",
         "BetterModel",
     )
     permissions {
