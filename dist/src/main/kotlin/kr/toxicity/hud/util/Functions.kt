@@ -25,7 +25,7 @@ fun <T> httpClient(block: HttpClient.() -> T) = runCatching {
     CLIENT.block()
 }
 
-fun String.toSemver() = Semver(this)
+fun String.toSemver() = Semver.coerce(this).ifNull { "Cannot parse this semver: $this" }
 fun String.toMinecraftVersion() = MinecraftVersion(this)
 
 fun String.toEquation() = TEquation(this)
