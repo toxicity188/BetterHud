@@ -24,6 +24,10 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
     }
 
     /**
+     * 1.21.7
+     */
+    public static final MinecraftVersion V1_21_7 = new MinecraftVersion(1, 21, 7);
+    /**
      * 1.21.6
      */
     public static final MinecraftVersion V1_21_6 = new MinecraftVersion(1, 21, 6);
@@ -106,14 +110,14 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
 
     /**
      * Parses version from string
-     * @param version version like "1.21.6"
+     * @param version version like "1.21.7"
      */
     public MinecraftVersion(@NotNull String version) {
         this(version.split("\\."));
     }
     /**
      * Parses version from a string array
-     * @param version version array like ["1", "21", "6"]
+     * @param version version array like ["1", "21", "7"]
      */
     public MinecraftVersion(@NotNull String[] version) {
         this(
