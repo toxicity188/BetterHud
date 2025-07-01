@@ -35,7 +35,7 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
         })
         val injector = DependencyInjector(bootstrap.version(), bootstrap.dataFolder(), bootstrap.logger(), bootstrap.classloader())
         BetterHudDependency.dependencies().forEach {
-            if (it.platforms.any { p ->
+            if (it.availablePlatforms.any { p ->
                 p.match(bootstrap)
             }) injector.load(it)
         }

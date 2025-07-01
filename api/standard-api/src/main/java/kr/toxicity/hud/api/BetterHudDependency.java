@@ -4,9 +4,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A BetterHud's library
@@ -20,20 +18,20 @@ public class BetterHudDependency {
     private final @NotNull String name;
     private final @NotNull String version;
     private final boolean relocate;
-    private final @NotNull @Unmodifiable List<BetterHudPlatform> platforms;
+    private final @NotNull @Unmodifiable Set<BetterHudPlatform> availablePlatforms;
 
     private BetterHudDependency(
             @NotNull String group,
             @NotNull String name,
             @NotNull String version,
             boolean relocate,
-            @NotNull @Unmodifiable List<BetterHudPlatform> platforms
+            @NotNull @Unmodifiable Set<BetterHudPlatform> availablePlatforms
     ) {
         this.group = group;
         this.name = name;
         this.version = version;
         this.relocate = relocate;
-        this.platforms = platforms;
+        this.availablePlatforms = availablePlatforms;
 
         DEPENDENCIES.add(this);
     }
@@ -54,7 +52,9 @@ public class BetterHudDependency {
             "gson",
             "2.13.1",
             false,
-            List.of(BetterHudPlatform.VELOCITY)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.VELOCITY
+            ))
     );
     /**
      * Snakeyaml
@@ -64,7 +64,10 @@ public class BetterHudDependency {
             "snakeyaml",
             "2.4",
             false,
-            List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.VELOCITY,
+                    BetterHudPlatform.FABRIC
+            ))
     );
     /**
      * Mysql connector
@@ -74,7 +77,10 @@ public class BetterHudDependency {
             "mysql-connector-j",
             "9.2.0",
             false,
-            List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.FABRIC)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.VELOCITY,
+                    BetterHudPlatform.FABRIC
+            ))
     );
     /**
      * Asm commons
@@ -84,7 +90,10 @@ public class BetterHudDependency {
             "asm-commons",
             "9.8",
             false,
-            List.of(BetterHudPlatform.VELOCITY, BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.VELOCITY,
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Exp4j
@@ -124,7 +133,9 @@ public class BetterHudDependency {
             "fastutil",
             "8.5.16",
             false,
-            List.of(BetterHudPlatform.VELOCITY)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.VELOCITY
+            ))
     );
     /**
      * Semver4j
@@ -144,7 +155,9 @@ public class BetterHudDependency {
             "adventure-api",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -154,7 +167,9 @@ public class BetterHudDependency {
             "adventure-key",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -164,7 +179,9 @@ public class BetterHudDependency {
             "adventure-text-logger-slf4j",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -174,7 +191,9 @@ public class BetterHudDependency {
             "adventure-text-serializer-ansi",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -184,7 +203,9 @@ public class BetterHudDependency {
             "adventure-text-serializer-gson",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -194,7 +215,9 @@ public class BetterHudDependency {
             "adventure-text-serializer-plain",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -204,7 +227,10 @@ public class BetterHudDependency {
             "adventure-text-serializer-legacy",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.FABRIC)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.FABRIC
+            ))
     );
     /**
      * Adventure
@@ -214,7 +240,9 @@ public class BetterHudDependency {
             "adventure-text-serializer-json",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -224,7 +252,9 @@ public class BetterHudDependency {
             "adventure-text-minimessage",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Examination
@@ -234,7 +264,9 @@ public class BetterHudDependency {
             "examination-api",
             BetterHud.EXAMINATION_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Examination
@@ -244,7 +276,9 @@ public class BetterHudDependency {
             "examination-string",
             BetterHud.EXAMINATION_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Option
@@ -254,7 +288,9 @@ public class BetterHudDependency {
             "option",
             "1.1.0",
             false,
-            List.of(BetterHudPlatform.BUKKIT)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT
+            ))
     );
     /**
      * Adventure
@@ -264,7 +300,10 @@ public class BetterHudDependency {
             "adventure-nbt",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
     /**
      * Adventure
@@ -274,7 +313,10 @@ public class BetterHudDependency {
             "adventure-text-serializer-gson-legacy-impl",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
     /**
      * Adventure
@@ -284,7 +326,10 @@ public class BetterHudDependency {
             "adventure-text-serializer-json-legacy-impl",
             BetterHud.ADVENTURE_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
 
     /**
@@ -295,7 +340,10 @@ public class BetterHudDependency {
             "adventure-platform-bukkit",
             BetterHud.PLATFORM_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
     /**
      * Adventure-platform
@@ -305,7 +353,10 @@ public class BetterHudDependency {
             "adventure-platform-api",
             BetterHud.PLATFORM_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
     /**
      * Adventure-platform
@@ -315,6 +366,9 @@ public class BetterHudDependency {
             "adventure-platform-facet",
             BetterHud.PLATFORM_VERSION,
             false,
-            List.of(BetterHudPlatform.BUKKIT, BetterHudPlatform.PAPER)
+            Collections.unmodifiableSet(EnumSet.of(
+                    BetterHudPlatform.BUKKIT,
+                    BetterHudPlatform.PAPER
+            ))
     );
 }

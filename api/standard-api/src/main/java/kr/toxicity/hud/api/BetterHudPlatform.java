@@ -5,8 +5,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -35,7 +34,7 @@ public enum BetterHudPlatform {
     /**
      * All platform.
      */
-    public static final @NotNull @Unmodifiable List<BetterHudPlatform> ALL = Arrays.stream(values()).toList();
+    public static final @NotNull @Unmodifiable Set<BetterHudPlatform> ALL = Collections.unmodifiableSet(EnumSet.allOf(BetterHudPlatform.class));
 
     private final @NotNull Predicate<BetterHudBootstrap> predicate;
 
