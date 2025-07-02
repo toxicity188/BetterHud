@@ -66,14 +66,14 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         override fun info(vararg message: String) {
             synchronized(LOGGER) {
                 message.forEach {
-                    LOGGER.info(it)
+                    LOGGER.info("[BetterHud] $it")
                 }
             }
         }
         override fun warn(vararg message: String) {
             synchronized(LOGGER) {
                 message.forEach {
-                    LOGGER.warn(it)
+                    LOGGER.warn("[BetterHud] $it")
                 }
             }
         }
