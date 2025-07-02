@@ -11,6 +11,7 @@
 #if SHADER_VERSION >= 3
 #moj_import <minecraft:dynamictransforms.glsl>
 #moj_import <minecraft:projection.glsl>
+#moj_import <minecraft:globals.glsl>
 out float sphericalVertexDistance;
 out float cylindricalVertexDistance;
 #else
@@ -18,6 +19,8 @@ uniform mat4 ProjMat;
 uniform mat4 ModelViewMat;
 uniform int FogShape;
 out float vertexDistance;
+uniform vec2 ScreenSize;
+uniform float GameTime;
 #endif
 
 in vec3 Position;
@@ -28,8 +31,6 @@ in ivec2 UV2;
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler2;
 
-uniform vec2 ScreenSize;
-uniform float GameTime;
 uniform vec3 ChunkOffset;
 
 out vec4 vertexColor;
