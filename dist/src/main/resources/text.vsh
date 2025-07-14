@@ -2,11 +2,7 @@
 
 #CreateConstant
 
-#if SHADER_VERSION >= 1
-#moj_import <minecraft:fog.glsl>
-#else
 #moj_import <fog.glsl>
-#endif
 
 #if SHADER_VERSION >= 3
 #moj_import <minecraft:dynamictransforms.glsl>
@@ -55,12 +51,6 @@ bool checkElement(float z) {
     else if (z == 1000) return true; //>=1.20.5 vanilla
     else if (z == -90) return true; //<=1.20.4 forge
     else if (z == 2800) return true; //neoforge
-    return false;
-}
-
-bool checkExp(float z) {
-    if (z == 0) return true; //<=1.20.4 vanilla
-    else if (z == 600) return true; //>=1.20.5 vanilla
     return false;
 }
 
@@ -147,71 +137,71 @@ void main() {
 
         }
     } else {
-        //HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
-        //HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && checkExp(pos.z) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
-        //HideExp            vertexColor = vec4(0);
-        //HideExp        }
-        //RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && ui.y - pos.y <= 20) {
-        //RemapHotBar            float hotbarX = 0;
-        //RemapHotBar            float hotbarY = 0;
-        //RemapHotBar
-        //RemapHotBar            float center = 0.5 * ui.x;
-        //RemapHotBar
-        //RemapHotBar            if (pos.x + 85 < center && pos.x + 125 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_1_GUI_X) + (HOTBAR_1_PIXEL_X) - center + 110;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_1_GUI_Y) + (HOTBAR_1_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x + 65 < center && pos.x + 85 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_2_GUI_X) + (HOTBAR_2_PIXEL_X) - center + 80;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_2_GUI_Y) + (HOTBAR_2_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x + 45 < center && pos.x + 65 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_3_GUI_X) + (HOTBAR_3_PIXEL_X) - center + 60;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_3_GUI_Y) + (HOTBAR_3_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x + 25 < center && pos.x + 45 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_4_GUI_X) + (HOTBAR_4_PIXEL_X) - center + 40;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_4_GUI_Y) + (HOTBAR_4_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x + 5 < center && pos.x + 25 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_5_GUI_X) + (HOTBAR_5_PIXEL_X) - center + 20;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_5_GUI_Y) + (HOTBAR_5_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x - 15 < center && pos.x + 5 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_6_GUI_X) + (HOTBAR_6_PIXEL_X) - center;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_6_GUI_Y) + (HOTBAR_6_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x - 35 < center && pos.x - 5 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_7_GUI_X) + (HOTBAR_7_PIXEL_X) - center - 20;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_7_GUI_Y) + (HOTBAR_7_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x - 55 < center && pos.x - 25 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_8_GUI_X) + (HOTBAR_8_PIXEL_X) - center - 40;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_8_GUI_Y) + (HOTBAR_8_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x - 75 < center && pos.x - 45 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_9_GUI_X) + (HOTBAR_9_PIXEL_X) - center - 60;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_9_GUI_Y) + (HOTBAR_9_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            } else if (pos.x - 95 < center && pos.x - 65 > center) {
-        //RemapHotBar
-        //RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_10_GUI_X) + (HOTBAR_10_PIXEL_X) - center - 80;
-        //RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_10_GUI_Y) + (HOTBAR_10_PIXEL_Y) - ui.y;
-        //RemapHotBar
-        //RemapHotBar            }
-        //RemapHotBar
-        //RemapHotBar            pos.x += hotbarX;
-        //RemapHotBar            pos.y += hotbarY;
-        //RemapHotBar        }
+//HideExp        vec3 exp = vec3(128.0, 255.0, 32.0);
+//HideExp        if (ProjMat[3].x == -1 && range(pos.y, ui.y - 60, ui.y - 20) && range(pos.x, ui.x / 2 - 60, ui.x / 2 + 60) && (range(color, exp / 256, exp / 254) || color == vec3(0))) {
+//HideExp            vertexColor = vec4(0);
+//HideExp        }
+//RemapHotBar        if ((int(pos.z) == 200 || int(pos.z) == 600) && ProjMat[3].x == -1 && ui.y - pos.y <= 20) {
+//RemapHotBar            float hotbarX = 0;
+//RemapHotBar            float hotbarY = 0;
+//RemapHotBar
+//RemapHotBar            float center = 0.5 * ui.x;
+//RemapHotBar
+//RemapHotBar            if (pos.x + 85 < center && pos.x + 125 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_1_GUI_X) + (HOTBAR_1_PIXEL_X) - center + 110;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_1_GUI_Y) + (HOTBAR_1_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x + 65 < center && pos.x + 85 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_2_GUI_X) + (HOTBAR_2_PIXEL_X) - center + 80;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_2_GUI_Y) + (HOTBAR_2_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x + 45 < center && pos.x + 65 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_3_GUI_X) + (HOTBAR_3_PIXEL_X) - center + 60;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_3_GUI_Y) + (HOTBAR_3_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x + 25 < center && pos.x + 45 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_4_GUI_X) + (HOTBAR_4_PIXEL_X) - center + 40;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_4_GUI_Y) + (HOTBAR_4_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x + 5 < center && pos.x + 25 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_5_GUI_X) + (HOTBAR_5_PIXEL_X) - center + 20;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_5_GUI_Y) + (HOTBAR_5_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x - 15 < center && pos.x + 5 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_6_GUI_X) + (HOTBAR_6_PIXEL_X) - center;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_6_GUI_Y) + (HOTBAR_6_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x - 35 < center && pos.x - 5 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_7_GUI_X) + (HOTBAR_7_PIXEL_X) - center - 20;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_7_GUI_Y) + (HOTBAR_7_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x - 55 < center && pos.x - 25 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_8_GUI_X) + (HOTBAR_8_PIXEL_X) - center - 40;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_8_GUI_Y) + (HOTBAR_8_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x - 75 < center && pos.x - 45 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_9_GUI_X) + (HOTBAR_9_PIXEL_X) - center - 60;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_9_GUI_Y) + (HOTBAR_9_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            } else if (pos.x - 95 < center && pos.x - 65 > center) {
+//RemapHotBar
+//RemapHotBar                hotbarX += ui.x / 100.0 * (HOTBAR_10_GUI_X) + (HOTBAR_10_PIXEL_X) - center - 80;
+//RemapHotBar                hotbarY += ui.y / 100.0 * (HOTBAR_10_GUI_Y) + (HOTBAR_10_PIXEL_Y) - ui.y;
+//RemapHotBar
+//RemapHotBar            }
+//RemapHotBar
+//RemapHotBar            pos.x += hotbarX;
+//RemapHotBar            pos.y += hotbarY;
+//RemapHotBar        }
     }
 
     #GenerateOtherMainMethod

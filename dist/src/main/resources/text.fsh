@@ -2,11 +2,7 @@
 
 #CreateConstant
 
-#if SHADER_VERSION >= 1
-#moj_import <minecraft:fog.glsl>
-#else
 #moj_import <fog.glsl>
-#endif
 
 #if SHADER_VERSION >= 3
 #moj_import <minecraft:dynamictransforms.glsl>

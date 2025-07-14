@@ -11,11 +11,11 @@ val targetJavaVersion = 21
 
 repositories {
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
+    maven("https://maven.fabricmc.net/") //Fabric
     maven("https://repo.papermc.io/repository/maven-public/") //Paper
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
     maven("https://repo.codemc.org/repository/maven-public/")
     maven("https://repo.opencollab.dev/main/")
-    maven("https://maven.fabricmc.net/") //Fabric
 }
 
 dependencies {
