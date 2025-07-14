@@ -16,5 +16,5 @@ dependencies {
     }
     implementation(libs.bundles.asm)
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0")
-    implementation("com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.33.0")
+    implementation("com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.34.0")
 }
