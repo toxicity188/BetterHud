@@ -32,7 +32,8 @@ val SUPPORTED_MINECRAFT_VERSION = listOf(
     "1.21.4",
     "1.21.5",
     "1.21.6",
-    "1.21.7"
+    "1.21.7",
+    "1.21.8"
 )
 
 val Project.libs
