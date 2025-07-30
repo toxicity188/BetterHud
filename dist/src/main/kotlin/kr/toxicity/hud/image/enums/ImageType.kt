@@ -127,7 +127,7 @@ enum class ImageType {
                     it.asString()
                 } ?: emptyList()).ifEmpty {
                     throw RuntimeException("files are empty.")
-                }.map { string ->
+                }.flatMap { string ->
                     val matcher = multiFrameRegex.matcher(string)
                     var fileName = string
                     var frame = 1
@@ -146,7 +146,7 @@ enum class ImageType {
                     (0..<(frame * globalFrame).coerceAtLeast(1)).map {
                         targetImage
                     }
-                }.sum(),
+                },
                 this,
                 yamlObject["setting"]?.asObject() ?: emptySetting
             )

@@ -15,14 +15,6 @@ fun <T> List<T>.split(splitSize: Int): List<List<T>> {
     return result
 }
 
-fun <T> List<List<T>>.sum(): List<T> {
-    val result = ArrayList<T>()
-    forEach {
-        result += it
-    }
-    return result
-}
-
 fun <T> Collection<T>.forEachAsync(block: (T) -> Unit) {
     toList().forEachAsync(block)
 }

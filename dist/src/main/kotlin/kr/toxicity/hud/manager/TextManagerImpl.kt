@@ -674,7 +674,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
                             save(target)
                         } else {
                             val split = target.split(CHAR_LENGTH)
-                            save(split.subList(0, split.lastIndex).sum())
+                            save(split.subList(0, split.lastIndex).flatten())
                             save(split.last())
                         }
                     }

@@ -10,7 +10,6 @@ import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.EMPTY_WIDTH_COMPONENT
 import kr.toxicity.hud.util.Runner
-import kr.toxicity.hud.util.sum
 
 class HudParser(
     hud: HudImpl,
@@ -33,7 +32,7 @@ class HudParser(
         imageElement,
         textElement,
         headElement
-    ).sum()
+    ).flatten()
 
     val conditions = layout.conditions build UpdateEvent.EMPTY
 

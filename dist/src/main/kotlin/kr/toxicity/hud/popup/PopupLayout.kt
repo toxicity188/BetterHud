@@ -329,6 +329,6 @@ class PopupLayout(
             image,
             texts,
             heads
-        ).sum()
+        ).flatten()
     }
 }
