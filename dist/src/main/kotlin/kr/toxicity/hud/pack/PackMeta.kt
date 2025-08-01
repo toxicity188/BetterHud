@@ -50,8 +50,7 @@ data class PackMeta(
             PackMeta(
                 Pack(
                     BOOTSTRAP.mcmetaVersion(),
-                    "BetterHud's default resource pack.",
-                    VersionRange(9, 99)
+                    "BetterHud's default resource pack."
                 ),
                 Overlay(PackOverlay.entries.filter {
                     it.ordinal > 0
@@ -90,14 +89,12 @@ data class PackMeta(
 
     data class Pack(
         @SerializedName("pack_format") val packFormat: Int,
-        val description: String,
-        @SerializedName("supported_formats") val supportedFormats: VersionRange?
+        val description: String
     ) {
         operator fun plus(other: Pack): Pack {
             return Pack(
                 max(packFormat, other.packFormat),
-                other.description,
-                supportedFormats?.min(other.supportedFormats)
+                other.description
             )
         }
     }

@@ -55,7 +55,7 @@ class VelocityBootstrapImpl @Inject constructor(
     private val logger: Logger,
     private val factory: Factory,
     private val description: PluginDescription,
-    @DataDirectory private val dataFolder: Path
+    @param:DataDirectory private val dataFolder: Path
 ): VelocityBootstrap {
 
     private val scheduler = object : HudScheduler {
