@@ -16,7 +16,7 @@ minotaur = "2.8.8"
 semver4j = "6.0.0"
 
 asm = "9.8"
-hikariCP = "7.0.0"
+hikariCP = "7.0.1"
 fastUtil = "8.5.16"
 
 [libraries]
