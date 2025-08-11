@@ -121,7 +121,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency HIKARICP = new BetterHudDependency(
             "com{}zaxxer",
             "HikariCP",
-            "7.0.0",
+            "7.0.1",
             false,
             BetterHudPlatform.ALL
     );

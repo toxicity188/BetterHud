@@ -8,6 +8,7 @@ import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.bukkit.compatibility.Compatibility
+import kr.toxicity.hud.bootstrap.bukkit.compatibility.cooldown
 import kr.toxicity.hud.bootstrap.bukkit.util.bukkitPlayer
 import kr.toxicity.hud.util.ifNull
 import net.Indyuce.mmocore.MMOCore
@@ -37,56 +38,56 @@ class MMOCoreCompatibility : Compatibility {
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
         get() = mapOf(
             "mana" to { _ ->
-                {
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.mana / mmo.stats.getStat("MAX_MANA")
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    mmo.mana / mmo.stats.getStat("MAX_MANA")
+                }.run {
+                    { this }
                 }
             },
             "stamina" to { _ ->
-                {
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.stamina / mmo.stats.getStat("MAX_STAMINA")
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    mmo.stamina / mmo.stats.getStat("MAX_STAMINA")
+                }.run {
+                    { this }
                 }
             },
             "stellium" to { _ ->
-                {
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.stellium / mmo.stats.getStat("MAX_STELLIUM") * 100
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    mmo.stellium / mmo.stats.getStat("MAX_STELLIUM") * 100
+                }.run {
+                    { this }
                 }
             },
             "experience" to { _ ->
-                {
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.experience / mmo.levelUpExperience
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    mmo.experience / mmo.levelUpExperience
+                }.run {
+                    { this }
                 }
             },
-            "cooldown_slot" to search@ { c ->
+            "cooldown_slot" to { c ->
                 val slot = c.getAsInt("slot", 0)
-                return@search {
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.getBoundSkill(slot)?.let {
-                            mmo.cooldownMap.getCooldown(it) / mmo.modifier(it.skill, "cooldown").coerceAtLeast(0.0)
-                        } ?: 0.0
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    mmo.getBoundSkill(slot)?.let {
+                        (mmo.cooldown(it) / mmo.modifier(it.skill, "cooldown")).coerceAtLeast(0.0)
+                    } ?: 0.0
+                }.run {
+                    { this }
                 }
             },
-            "cooldown_skill" to search@ { c ->
+            "cooldown_skill" to { c ->
                 val name = c["skill"]?.asString().ifNull { "skill value not set." }
                 val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull { "the skill named \"$name\" doesn't exist." }
-                return@search { _: UpdateEvent ->
-                    HudListener { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
-                        mmo.cooldownMap.getCooldown("skill_" + skill.handler.id) / mmo.modifier(skill, "cooldown").coerceAtLeast(0.0)
-                    }
+                HudListener { p ->
+                    val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
+                    (mmo.cooldown(skill) / mmo.modifier(skill, "cooldown")).coerceAtLeast(0.0)
+                }.run {
+                    { this }
                 }
             }
         )
@@ -241,8 +242,7 @@ class MMOCoreCompatibility : Compatibility {
                 .function { args, _ ->
                     val skill = skill(args[0])
                     Function { p ->
-                        val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
-                        mmo.cooldownMap.getCooldown("skill_" + skill.handler.id)
+                        p.bukkitPlayer.toMMOCore()?.cooldown(skill) ?: return@Function 0.0
                     }
                 }
                 .build(),

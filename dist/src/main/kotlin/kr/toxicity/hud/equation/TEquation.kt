@@ -12,13 +12,7 @@ import kotlin.math.roundToInt
 
 class TEquation(expression: String) {
     companion object {
-        val t = TEquation("t")
-        val one = TEquation("1")
-        val zero = TEquation("0")
-    }
-
-    private val expression = ExpressionBuilder(expression)
-        .functions(
+        private val builtInFunction = arrayOf(
             object : Function("min", 2) {
                 override fun apply(vararg p0: Double): Double = min(p0[0], p0[1])
             },
@@ -29,6 +23,14 @@ class TEquation(expression: String) {
                 override fun apply(vararg p0: Double): Double = clamp(p0[0], p0[1], p0[2])
             }
         )
+
+        val t = TEquation("t")
+        val one = TEquation("1")
+        val zero = TEquation("0")
+    }
+
+    private val expression = ExpressionBuilder(expression)
+        .functions(*builtInFunction)
         .variables(setOf(
             "t",
             "pi",
