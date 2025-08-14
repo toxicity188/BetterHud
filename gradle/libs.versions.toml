@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 
 adventure = "4.24.0"
 adventurePlatform = "4.4.1"
