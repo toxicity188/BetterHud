@@ -12,7 +12,7 @@ betterCommand = "1.4.3"
 resourceFactory = "1.3.0"
 loom = "1.11-SNAPSHOT"
 paperweight = "2.0.0-beta.18"
-minotaur = "2.8.8"
+minotaur = "2.8.10"
 semver4j = "6.0.0"
 
 asm = "9.8"
