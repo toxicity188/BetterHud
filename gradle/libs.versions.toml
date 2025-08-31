@@ -3,7 +3,7 @@ kotlin = "2.2.10"
 
 adventure = "4.24.0"
 adventurePlatform = "4.4.1"
-snakeyaml = "2.4"
+snakeyaml = "2.5"
 gson = "2.13.1"
 exp4j = "0.4.8"
 expiringmap = "0.5.11"
