@@ -53,7 +53,7 @@ dependencies {
         exclude("it.unimi.dsi")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.SkriptLang:Skript:2.12.1")
+    compileOnly("com.github.SkriptLang:Skript:2.12.2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.7.10")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
 }
