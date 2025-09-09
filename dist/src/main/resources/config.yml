@@ -13,7 +13,7 @@ bossbar-resource-pack-line: 0
 merge-boss-bar: true
 disable-to-bedrock-player: true
 build-folder-location: "BetterHud/build"
-pack-type: folder #folder, zip, none
+pack-type: zip #folder, zip, none
 enable-protection: false
 enable-self-host: false
 force-update: false
@@ -36,3 +36,4 @@ legacy-serializer: ampersand #section, ampersand, both
 minecraft-jar-version: bukkit #1.21, 1.20.4, etc.
 remove-default-hotbar: false
 disable-legacy-offset: true
+merge-with-external-resources: true

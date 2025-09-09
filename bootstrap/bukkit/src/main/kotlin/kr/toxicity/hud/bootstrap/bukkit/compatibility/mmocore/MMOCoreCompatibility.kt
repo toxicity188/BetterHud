@@ -27,7 +27,7 @@ class MMOCoreCompatibility : Compatibility {
     }
 
     private fun PlayerData.modifier(skill: RegisteredSkill, key: String) = getSkillLevel(skill).let { level ->
-        profess.getSkill(skill.handler.id)?.getParameter(key, level) ?: skill.getModifier(key, level)
+        profess.getSkill(skill.handler.id)?.getParameter(key, level, this) ?: skill.getParameterInfo(key).evaluate(level, this)
     }
     
     private fun skill(name: String) = MMOCore.plugin.skillManager.getSkill(name) ?: throw RuntimeException("Unable to find that skill: $name")
@@ -219,9 +219,7 @@ class MMOCoreCompatibility : Compatibility {
                     val i = args[0].toInt()
                     Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
-                        mmo.getBoundSkill(i)?.let {
-                            it.getParameter("cooldown", mmo.getSkillLevel(it.skill))
-                        } ?: -1
+                        mmo.getBoundSkill(i)?.getParameter("cooldown", mmo) ?: -1
                     }
                 }
                 .build(),
@@ -231,9 +229,7 @@ class MMOCoreCompatibility : Compatibility {
                     val i = args[0].toInt()
                     Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
-                        mmo.getBoundSkill(i)?.let {
-                            it.getParameter("cooldown", mmo.getSkillLevel(it.skill))
-                        } ?: -1
+                        mmo.getBoundSkill(i)?.getParameter("cooldown", mmo) ?: -1
                     }
                 }
                 .build(),

@@ -56,7 +56,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
 
     var mergeBossBar = true
         private set
-    var packType = PackType.FOLDER
+    var packType = PackType.ZIP
         private set
     var enableSelfHost = false
         private set
@@ -97,6 +97,9 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
 
     val namespace
         get() = key.namespace
+
+    var mergeWithExternalResources = false
+        private set
 
     override fun start() {
         preReload()
@@ -208,6 +211,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             }
             removeDefaultHotbar = yaml.getAsBoolean("remove-default-hotbar", false)
             disableLegacyOffset = yaml.getAsBoolean("disable-legacy-offset", false)
+            mergeWithExternalResources = yaml.getAsBoolean("merge-with-external-resources", true)
         }.handleFailure {
             "Unable to load config.yml"
         }

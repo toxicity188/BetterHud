@@ -13,10 +13,6 @@ import java.util.*;
 @Getter
 public enum ReloadFlagType {
     /**
-     * Prevents resource pack generation.
-     */
-    PREVENT_GENERATE_RESOURCE_PACK("prevent-generate-resource-pack"),
-    /**
      * Forces resource pack generation.
      */
     FORCE_GENERATE_RESOURCE_PACK("force-generate-resource-pack")

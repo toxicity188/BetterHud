@@ -1,6 +1,5 @@
 package kr.toxicity.hud.pack
 
-import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
@@ -12,6 +11,7 @@ import java.util.zip.ZipInputStream
 
 object PackGenerator {
     private val tasks = TreeMap<String, PackFile>()
+
     fun generate(info: ReloadInfo): Map<String, ByteArray> {
         val sender = info.sender
         val resourcePack = runCatching {
@@ -39,21 +39,13 @@ object PackGenerator {
                     read
                 }
             }
-            runCatching {
-                ConfigManagerImpl.packType.createGenerator(info).use { saveTask ->
-                    tasks.values.forEachAsync { t ->
-                        runCatching {
-                            saveTask(t)
-                            debug(ConfigManager.DebugLevel.FILE,"Pack file ${t.path} is generated.")
-                        }.onFailure {
-                            it.handle(sender, "Unable to save this file: ${t.path}")
-                        }
+            TreeMap<String, ByteArray>().apply {
+                tasks.values.forEachAsync {
+                    val get = it()
+                    synchronized(this) {
+                        put(it.path, get)
                     }
-                    saveTask.resourcePack
                 }
-            }.getOrElse {
-                it.handle(sender, "Unable to finalized resource pack build.")
-                emptyMap()
             }
         }.getOrElse {
             it.handle(sender, "Unable to make a resource pack.")

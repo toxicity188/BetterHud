@@ -1,8 +1,10 @@
 package kr.toxicity.hud.api.plugin;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -11,10 +13,11 @@ import java.util.Map;
 public sealed interface ReloadState {
     /**
      * Reload success.
-     * @param time reload time
      * @param resourcePack resource packs path and byte
+     * @param directory directory
+     * @param time reload time
      */
-    record Success(long time, @NotNull @Unmodifiable Map<String, byte[]> resourcePack) implements ReloadState {
+    record Success(@NotNull @Unmodifiable Map<String, byte[]> resourcePack, @Nullable File directory, long time) implements ReloadState {
     }
 
     /**

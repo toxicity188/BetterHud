@@ -122,7 +122,18 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
             managers.forEach {
                 it.postReload()
             }
-            Success(System.currentTimeMillis() - time, PackGenerator.generate(info))
+            PackGenerator.generate(info).run {
+                Success(
+                    this,
+                    runCatching {
+                        ConfigManagerImpl.packType.generate(this)
+                    }.getOrElse {
+                        it.handle("Unable to pack file.")
+                        null
+                    },
+                    System.currentTimeMillis() - time
+                )
+            }
         }.getOrElse {
             it.handle(info.sender, "Unable to reload.")
             Failure(it)

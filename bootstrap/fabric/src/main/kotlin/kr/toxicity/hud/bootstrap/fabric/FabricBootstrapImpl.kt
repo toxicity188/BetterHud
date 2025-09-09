@@ -9,7 +9,6 @@ import kr.toxicity.hud.api.adapter.WorldWrapper
 import kr.toxicity.hud.api.fabric.FabricBootstrap
 import kr.toxicity.hud.api.fabric.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
-import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.version.MinecraftVersion
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
@@ -18,15 +17,10 @@ import kr.toxicity.hud.bootstrap.fabric.manager.ModuleManager
 import kr.toxicity.hud.bootstrap.fabric.player.HudPlayerFabric
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.manager.*
-import kr.toxicity.hud.pack.PackType
 import kr.toxicity.hud.pack.PackUploader
 import kr.toxicity.hud.player.head.HttpSkinProvider
 import kr.toxicity.hud.player.head.MineToolsProvider
-import kr.toxicity.hud.util.VERSION_CHECK_PERMISSION
-import kr.toxicity.hud.util.asyncTask
-import kr.toxicity.hud.util.handleLatestVersion
-import kr.toxicity.hud.util.info
-import kr.toxicity.hud.util.task
+import kr.toxicity.hud.util.*
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -136,7 +130,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload || ConfigManagerImpl.packType != PackType.NONE) core.reload(ReloadFlagType.PREVENT_GENERATE_RESOURCE_PACK)
+                if (!skipInitialReload) core.reload()
                 logger.info(
                     "Platform: Fabric",
                     "Mod enabled."

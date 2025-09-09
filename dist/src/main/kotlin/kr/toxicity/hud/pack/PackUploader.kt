@@ -40,7 +40,6 @@ object PackUploader {
             val host = ConfigManagerImpl.selfHostPort
             val url = "http://$body:$host/${packUUID.hash}.zip"
             runCatching {
-                packUUID.save()
                 server = object : PackServer {
                     private val http by lazy {
                         HttpServer.create(InetSocketAddress(InetAddress.getLocalHost(), host), 0).apply {
@@ -87,7 +86,7 @@ object PackUploader {
                     .GET()
                     .build(), HttpResponse.BodyHandlers.ofString()).thenAccept {
                     val body = it.body()
-                    openServer(body.substring(0, body.length - 1))
+                    openServer(body.dropLast(1))
                 }
             }.onFailure {
                 it.handle("Unable to open server.")
