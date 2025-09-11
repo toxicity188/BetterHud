@@ -50,7 +50,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency GSON = new BetterHudDependency(
             "com{}google{}code{}gson",
             "gson",
-            "2.13.1",
+            "2.13.2",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY

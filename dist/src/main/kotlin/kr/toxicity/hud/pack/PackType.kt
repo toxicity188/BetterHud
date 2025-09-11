@@ -70,7 +70,7 @@ enum class PackType {
                     .let { DigestOutputStream(it, digest) }
                     .let { ZipOutputStream(it) }
                     .use { zip ->
-                        zip.setComment("BetterHud resource pack.")
+                        zip.setComment("BetterHud's resource pack.")
                         zip.setLevel(Deflater.BEST_COMPRESSION)
                         byteMap.forEach {
                             val entry = ZipEntry(it.key)
@@ -83,6 +83,7 @@ enum class PackType {
                             }
                         }
                     }
+                info("Zip packed: ${file.length().mbFormat()}")
                 PackUUID.from(digest).apply {
                     save()
                 }
@@ -95,7 +96,6 @@ enum class PackType {
                     })
                 }
             }
-            info("Zip packed: ${byteMap.values.sumOf { it.size.toLong() }.mbFormat()}")
             return file
         }
     },
