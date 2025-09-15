@@ -12,6 +12,7 @@ repositories {
     maven("https://repo.alessiodp.com/releases/") //Parties
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
     maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
+    maven("https://repo.momirealms.net/releases/") //CraftEngine
     maven("https://repo.nexomc.com/releases/") //Nexo
     maven("https://jitpack.io") //Vault
 }
@@ -57,6 +58,8 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.12.2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.7.10")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
+    compileOnly("net.momirealms:craft-engine-core:0.0.63")
+    compileOnly("net.momirealms:craft-engine-bukkit:0.0.63")
     compileOnly("com.nexomc:nexo:1.11.0-dev")
 }
 
@@ -87,6 +90,7 @@ bukkitPluginYaml {
         "Parties",
         "GPS",
         "BetterModel",
+        "CraftEngine",
         "Nexo"
     )
     permissions {
