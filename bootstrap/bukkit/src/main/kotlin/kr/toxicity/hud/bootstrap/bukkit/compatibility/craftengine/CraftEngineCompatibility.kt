@@ -37,10 +37,7 @@ class CraftEngineCompatibility : Compatibility {
                 when (val result = PLUGIN.reload()) {
                     is ReloadState.Success -> {
                         result.directory()?.let {
-                            when {
-                                it.isFile -> cacheData().externalZips().add(it.toPath())
-                                it.isDirectory -> cacheData().externalFolders().add(it.toPath())
-                            }
+                            registerExternalResourcePack(it.toPath())
                             info("Successfully merged with CraftEngine.")
                         }
                     }
