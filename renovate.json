@@ -13,5 +13,15 @@
   ],
   "baseBranches": [
     "dev"
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": [
+        "net.momirealms:craft-engine-core",
+        "net.momirealms:craft-engine-bukkit"
+      ],
+      "versioning": "semver",
+      "allowedVersions": "/^(?<major>\\\\d+)(?:\\\\.(?<minor>\\\\d+)(?:\\\\.(?<patch>\\\\d+))?)?$/"
+    }
   ]
 }
