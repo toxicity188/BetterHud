@@ -12,11 +12,11 @@ val publishName = "${rootProject.name}-${project.name}"
 dependencies {
     compileOnly(libs.bundles.adventure)
 
-    compileOnly("org.projectlombok:lombok:1.18.40")
-    annotationProcessor("org.projectlombok:lombok:1.18.40")
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.40")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.40")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 }
 
 java {
