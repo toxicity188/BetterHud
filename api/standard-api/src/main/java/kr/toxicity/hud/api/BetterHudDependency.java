@@ -88,7 +88,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency ASM_COMMONS = new BetterHudDependency(
             "org{}ow2{}asm",
             "asm-commons",
-            "9.8",
+            "9.9",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY,
@@ -131,7 +131,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency FAST_UTIL = new BetterHudDependency(
             "it{}unimi{}dsi",
             "fastutil",
-            "8.5.16",
+            "8.5.18",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY

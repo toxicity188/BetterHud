@@ -38,9 +38,7 @@ object PlayerHeadManager : BetterHudManager {
     private val headNameComponent = ConcurrentHashMap<HudLayout.Identifier, String>()
 
 
-    @Synchronized
     fun getHead(group: HudLayout.Identifier) = headNameComponent[group]
-    @Synchronized
     fun setHead(group: HudLayout.Identifier, string: String) {
         headNameComponent[group] = string
     }

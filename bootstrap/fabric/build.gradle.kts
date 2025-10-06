@@ -26,9 +26,9 @@ dependencies {
         parchment("org.parchmentmc.data:${property("parchment")}")
     })
     //Other mod dependency
-    modCompileOnly("eu.pb4:polymer-resource-pack:0.13.8+1.21.8")
-    modCompileOnly("eu.pb4:polymer-autohost:0.13.8+1.21.8")
-    modCompileOnly("eu.pb4:placeholder-api:2.7.1+1.21.6")
+    modCompileOnly("eu.pb4:polymer-resource-pack:0.14.2+1.21.9")
+    modCompileOnly("eu.pb4:polymer-autohost:0.14.2+1.21.9")
+    modCompileOnly("eu.pb4:placeholder-api:2.8.0+1.21.9")
     modCompileOnly("net.luckperms:api:5.5")
 
     //Kyori

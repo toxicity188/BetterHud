@@ -9,6 +9,7 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.util.*
+import net.minecraft.server.packs.metadata.pack.PackFormat
 import net.minecraft.util.InclusiveRange
 
 class PolymerResourcePackCompatibility : Compatibility {
@@ -37,7 +38,7 @@ class PolymerResourcePackCompatibility : Compatibility {
                                 "pack.png" -> {}
                                 "pack.mcmeta" -> data.toMcmeta().overlays?.entries?.forEach {
                                     builder.packMcMetaBuilder.addOverlay(
-                                        InclusiveRange(it.formats.min, it.formats.max),
+                                        InclusiveRange(PackFormat(it.formats.min, it.formats.max)),
                                         it.directory
                                     )
                                 }
