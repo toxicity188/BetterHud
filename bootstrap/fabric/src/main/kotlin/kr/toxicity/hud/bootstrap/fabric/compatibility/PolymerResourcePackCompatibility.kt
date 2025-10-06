@@ -30,28 +30,30 @@ class PolymerResourcePackCompatibility : Compatibility {
     override fun start() {
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register { builder ->
             ConfigManagerImpl.preReload()
-            if (ConfigManagerImpl.mergeWithExternalResources) {
-                when (val state = PLUGIN.reload()) {
-                    is Success -> {
-                        state.resourcePack.forEach { (path, data) ->
-                            when (path) {
-                                "pack.png" -> {}
-                                "pack.mcmeta" -> data.toMcmeta().overlays?.entries?.forEach {
-                                    builder.packMcMetaBuilder.addOverlay(
-                                        InclusiveRange(PackFormat(it.formats.min, it.formats.max)),
-                                        it.directory
-                                    )
-                                }
-                                else -> builder.addData(path, data)
+            if (!ConfigManagerImpl.mergeWithExternalResources) return@register
+            when (val state = PLUGIN.reload()) {
+                is Success -> {
+                    state.resourcePack.forEach { (path, data) ->
+                        when (path) {
+                            "pack.png" -> {}
+                            "pack.mcmeta" -> data.toMcmeta().overlays?.entries?.forEach {
+                                builder.packMcMetaBuilder.addOverlay(
+                                    InclusiveRange(
+                                        PackFormat(it.formats.min, 0),
+                                        PackFormat(it.formats.max, 0)
+                                    ),
+                                    it.directory
+                                )
                             }
+                            else -> builder.addData(path, data)
                         }
-                        info("Polymer generation detected - reload completed: (${state.time} ms)")
                     }
-                    is Failure -> {
-                        state.throwable.handle("Fail to merge the resource pack with Polymer.")
-                    }
-                    is OnReload -> warn("This mod is still on reload!")
+                    info("Polymer generation detected - reload completed: (${state.time} ms)")
                 }
+                is Failure -> {
+                    state.throwable.handle("Fail to merge the resource pack with Polymer.")
+                }
+                is OnReload -> warn("This mod is still on reload!")
             }
         }
         info(

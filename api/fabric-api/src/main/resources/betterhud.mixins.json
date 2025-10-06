@@ -10,6 +10,7 @@
     "entity.EntityMixin",
     "entity.LivingEntityMixin",
     "player.ConnectionMixin",
-    "player.ServerCommonPacketListenerImplMixin"
+    "player.ServerCommonPacketListenerImplMixin",
+    "pack.IntermediaryFormatMixin"
   ]
 }
