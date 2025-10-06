@@ -9,10 +9,6 @@ import java.util.Optional;
 
 @Mixin(PackFormat.IntermediaryFormat.class)
 public class IntermediaryFormatMixin {
-    /**
-     * @author toxicity188
-     * @reason for Polymer
-     */
     @Overwrite
     public static PackFormat.IntermediaryFormat fromRange(InclusiveRange<PackFormat> range, int versionThreshold) {
         return new PackFormat.IntermediaryFormat(

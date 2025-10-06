@@ -14,7 +14,7 @@ class CraftEntityView(
     val source: CraftEntity
 ) : CraftEntity(Bukkit.getServer() as CraftServer, source.unsafeHandle) {
 
-    override fun getHandle(): Entity? {
+    override fun getHandle(): Entity {
         return source.unsafeHandle
     }
 

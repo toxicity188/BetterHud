@@ -19,7 +19,7 @@ class CraftEntityView(
         return source.type
     }
 
-    override fun getHandle(): Entity? {
+    override fun getHandle(): Entity {
         return source.unsafeHandle
     }
 
