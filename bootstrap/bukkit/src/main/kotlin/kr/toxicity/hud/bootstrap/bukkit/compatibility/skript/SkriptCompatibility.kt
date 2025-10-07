@@ -7,6 +7,7 @@ import ch.njol.skript.lang.ExpressionType
 import ch.njol.skript.lang.ParseContext
 import ch.njol.skript.lang.VariableString
 import ch.njol.skript.registrations.Classes
+import kr.toxicity.hud.api.bukkit.event.HudUpdateEvent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
@@ -61,30 +62,27 @@ class SkriptCompatibility : Compatibility {
         Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
     }
 
-    override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
-        get() = mapOf()
-    override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
-        get() = mapOf()
-    override val numbers: Map<String, HudPlaceholder<Number>>
-        get() = mapOf()
-    override val strings: Map<String, HudPlaceholder<String>>
-        get() = mapOf(
-            "variable" to HudPlaceholder.builder<String>()
-                .requiredArgsLength(1)
-                .function { args, reason ->
-                    val value = VariableString.newInstance(args.joinToString(",")).ifNull { "Invalid variable." }
-                    if (reason.type == UpdateReason.EMPTY) {
-                        Function {
-                            value.getSingle(kr.toxicity.hud.api.bukkit.event.HudUpdateEvent(it)) ?: "<none>"
-                        }
-                    } else reason.unwrap<Event, Function<HudPlayer, String>> { e ->
-                        Function {
-                            value.getSingle(e) ?: "<none>"
-                        }
+    override val triggers: Map<String, (YamlObject) -> HudTrigger<*>> = mapOf()
+    override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener> = mapOf()
+    override val numbers: Map<String, HudPlaceholder<Number>> = mapOf()
+    override val strings: Map<String, HudPlaceholder<String>> = mapOf(
+        "variable" to HudPlaceholder.builder<String>()
+            .requiredArgsLength(1)
+            .function { args, reason ->
+                val value by lazy {
+                    VariableString.newInstance(args.joinToString(",")).ifNull { "Invalid variable." }
+                }
+                if (reason.type == UpdateReason.EMPTY) {
+                    Function {
+                        value.getSingle(HudUpdateEvent(it)) ?: "<none>"
+                    }
+                } else reason.unwrap<Event, Function<HudPlayer, String>> { e ->
+                    Function {
+                        value.getSingle(e) ?: "<none>"
                     }
                 }
-                .build()
-        )
-    override val booleans: Map<String, HudPlaceholder<Boolean>>
-        get() = mapOf()
+            }
+            .build()
+    )
+    override val booleans: Map<String, HudPlaceholder<Boolean>> = mapOf()
 }
