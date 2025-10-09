@@ -14,7 +14,7 @@ import java.net.URLClassLoader
 
 class DependencyInjector(version: String, dataFolder: File, private val logger: BetterHudLogger, classLoader: URLClassLoader) {
     companion object {
-        private const val CENTRAL = "https://repo1.maven.org/maven2"
+        private const val CENTRAL = "https://maven-central.storage-download.googleapis.com/maven2"
     }
 
     private fun interface UrlProcessor : (URL) -> Unit
