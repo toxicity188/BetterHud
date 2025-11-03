@@ -1,6 +1,7 @@
 package kr.toxicity.hud.manager
 
 import com.google.gson.JsonArray
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.manager.TextManager
 import kr.toxicity.hud.api.plugin.ReloadInfo
@@ -53,7 +54,7 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
     private val unicodeRange = 0..0x10FFFF
 
-    private val defaultLatin = HashSet<Int>().apply {
+    private val defaultLatin = IntOpenHashSet().apply {
         addAll(0x0021..0x0026)
         addAll(0x0028..0x002F)
         addAll(0x003A..0x0040)
@@ -70,29 +71,29 @@ object TextManagerImpl : BetterHudManager, TextManager {
     }
 
     private val languageCodepointRange = mapOf(
-        "korean" to HashSet<Int>().apply {
+        "korean" to IntOpenHashSet().apply {
             addAll(0x1100..0x1112)
             addAll(0x1161..0x1175)
             addAll(0x11A8..0x11C2)
             addAll(0xAC00..0xD7A3)
         },
-        "japan" to HashSet<Int>().apply {
+        "japan" to IntOpenHashSet().apply {
             addAll(0x3041..0x3096)
             addAll(0x30A1..0x30FA)
         },
-        "china" to HashSet<Int>().apply {
+        "china" to IntOpenHashSet().apply {
             addAll(0x4E00..0x9FFF) // CJK Unified Ideographs
             addAll(0xFF00..0xFFFE) // Fullwidth Forms
             addAll(0x3000..0x306F) // CJK Symbols and Punctuation
             addAll(0x2000..0x206F) // General Punctuation
         },
-        "russia" to HashSet<Int>().apply {
+        "russia" to IntOpenHashSet().apply {
             addAll(0x0400..0x045F)
         },
-        "bengal" to HashSet<Int>().apply {
+        "bengal" to IntOpenHashSet().apply {
             addAll(0x0985..0x09B9)
         },
-        "thailand" to HashSet<Int>().apply {
+        "thailand" to IntOpenHashSet().apply {
             addAll(0x20..0x25)
             addAll(0x27..0x3A)
             addAll(0x3C..0x3E)
@@ -112,23 +113,23 @@ object TextManagerImpl : BetterHudManager, TextManager {
             addAll(0x2032..0x2033)
             add(0x20AC)
         },
-        "greece" to HashSet<Int>().apply {
+        "greece" to IntOpenHashSet().apply {
             addAll(0x0390..0x03CE)
         },
-        "hindi" to HashSet<Int>().apply {
+        "hindi" to IntOpenHashSet().apply {
             addAll(0x0900..0x094F)
             addAll(0x0966..0x096F)
             addAll(0x0671..0x06D3)
             addAll(0x06F0..0x06F9)
         },
-        "arab" to HashSet<Int>().apply {
+        "arab" to IntOpenHashSet().apply {
             addAll(0x0620..0x064A)
             addAll(0x0660..0x0669)
         },
-        "hebrew" to HashSet<Int>().apply {
+        "hebrew" to IntOpenHashSet().apply {
             addAll(0x05D0..0x05EA)
         },
-        "turkish" to HashSet<Int>().apply {
+        "turkish" to IntOpenHashSet().apply {
             addAll(0x20..0x5F)
             addAll(0x61..0x70)
             addAll(0x72..0x76)

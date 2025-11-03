@@ -7,7 +7,6 @@ import kr.toxicity.hud.configuration.PluginConfiguration
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackOverlay
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.shader.HotBarShader
 import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
@@ -16,7 +15,6 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-import kotlin.collections.plus
 
 object ShaderManagerImpl : BetterHudManager, ShaderManager {
 
@@ -128,31 +126,6 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                 }
             }
             if (yaml.getAsBoolean("disable-level-text", false)) replaceSet += "HideExp"
-            yaml["hotbar"]?.asObject()?.let {
-                if (it.getAsBoolean("enable-hotbar-relocation", false)) {
-                    replaceSet += "RemapHotBar"
-                    val locations =
-                        it.get("locations")?.asObject().ifNull { "locations configuration not set." }
-                    (1..10).map { index ->
-                        locations.get(index.toString())?.asObject()?.let { shaderConfig ->
-                            HotBarShader(
-                                shaderConfig["gui"]?.asObject()?.let { gui ->
-                                    gui.getAsDouble("x", 0.0) to gui.getAsDouble("y", 0.0)
-                                } ?: (0.0 to 0.0),
-                                shaderConfig["pixel"]?.asObject()?.let { pixel ->
-                                    pixel.getAsInt("x", 0) to pixel.getAsInt("y", 0)
-                                } ?: (0 to 0),
-                            )
-                        } ?: HotBarShader.empty
-                    }.forEachIndexed { index, hotBarShader ->
-                        val i = index + 1
-                        constants["HOTBAR_${i}_GUI_X"] = hotBarShader.gui.first.toFloat().toString()
-                        constants["HOTBAR_${i}_GUI_Y"] = hotBarShader.gui.second.toFloat().toString()
-                        constants["HOTBAR_${i}_PIXEL_X"] = hotBarShader.pixel.first.toFloat().toString()
-                        constants["HOTBAR_${i}_PIXEL_Y"] = hotBarShader.pixel.second.toFloat().toString()
-                    }
-                }
-            }
             compileShader(resource)
         }.handleFailure(info) {
             "Unable to load shader.yml"

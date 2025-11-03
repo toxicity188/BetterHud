@@ -15,9 +15,10 @@ enum class PackOverlay(
     fun loadAssets() {
         PLUGIN.loadAssets(overlayName) { n, i ->
             val read = i.readAllBytes()
-            val first = ordinal == 0
-            val split = n.split('/')
-            PackGenerator.addTask(if (first) split else listOf(overlayName) + split) {
+            PackGenerator.addTask(buildList {
+                add(overlayName)
+                addAll(n.split('/'))
+            }) {
                 read
             }
         }

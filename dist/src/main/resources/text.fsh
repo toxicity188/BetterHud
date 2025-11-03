@@ -5,7 +5,7 @@
 #moj_import <fog.glsl>
 
 #if SHADER_VERSION >= 3
-#moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <dynamictransforms.glsl>
 in float sphericalVertexDistance;
 in float cylindricalVertexDistance;
 #else

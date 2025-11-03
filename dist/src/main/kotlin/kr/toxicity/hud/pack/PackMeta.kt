@@ -51,7 +51,7 @@ data class PackMeta(
                 Pack(
                     BOOTSTRAP.mcmetaVersion(),
                     "BetterHud's default resource pack.",
-                    VersionRange(9, 64),
+                    VersionRange(9, BOOTSTRAP.mcmetaVersion()),
                     VersionFormat(9),
                     VersionFormat(BOOTSTRAP.mcmetaVersion())
                 ),
@@ -73,7 +73,7 @@ data class PackMeta(
             gson.fromJson(it, PackMeta::class.java)
         }
 
-        fun VersionRange?.orDefault() = this ?: VersionRange(9, 64)
+        fun VersionRange?.orDefault() = this ?: VersionRange(9, BOOTSTRAP.mcmetaVersion())
         fun VersionFormat?.or(int: Int) = this ?: VersionFormat(int)
     }
 

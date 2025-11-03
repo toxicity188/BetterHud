@@ -139,15 +139,7 @@ public interface ShaderManager {
         /**
          * text fsh
          */
-        TEXT_FRAGMENT("text.fsh", "rendertype_text.fsh"),
-        /**
-         * item vsh
-         */
-        ITEM_VERTEX("item.vsh", "rendertype_item_entity_translucent_cull.vsh"),
-        /**
-         * item fsh
-         */
-        ITEM_FRAGMENT("item.fsh", "rendertype_item_entity_translucent_cull.fsh"),
+        TEXT_FRAGMENT("text.fsh", "rendertype_text.fsh")
 
         ;
         private final @NotNull String fileName;

@@ -193,11 +193,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.V1_21, MinecraftVersion.V1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
             MinecraftVersion.V1_20_5, MinecraftVersion.V1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
             MinecraftVersion.V1_20_3, MinecraftVersion.V1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
-            MinecraftVersion.V1_20_2 -> kr.toxicity.hud.nms.v1_20_R2.NMSImpl()
-            MinecraftVersion.V1_20, MinecraftVersion.V1_20_1 -> kr.toxicity.hud.nms.v1_20_R1.NMSImpl()
-            MinecraftVersion.V1_19_4 -> kr.toxicity.hud.nms.v1_19_R3.NMSImpl()
-            MinecraftVersion.V1_19_2, MinecraftVersion.V1_19_3 -> kr.toxicity.hud.nms.v1_19_R2.NMSImpl()
-            MinecraftVersion.V1_19, MinecraftVersion.V1_19_1 -> kr.toxicity.hud.nms.v1_19_R1.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: $minecraftVersion")
                 pluginManager.disablePlugin(this)
