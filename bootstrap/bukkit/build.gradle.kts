@@ -39,7 +39,7 @@ dependencies {
     compileOnly(libs.adventurePlatformBukkit)
     compileOnly(shade(rootProject.fileTree("shaded"))!!)
 
-    compileOnly("io.lumine:Mythic-Dist:5.11.0")
+    compileOnly("io.lumine:Mythic-Dist:5.11.1")
     compileOnly("io.lumine:MythicLib-dist:1.7.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
