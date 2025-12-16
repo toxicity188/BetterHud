@@ -12,7 +12,6 @@ import kr.toxicity.hud.api.bukkit.event.HudPlayerQuitEvent
 import kr.toxicity.hud.api.bukkit.event.PluginReloadStartEvent
 import kr.toxicity.hud.api.bukkit.event.PluginReloadedEvent
 import kr.toxicity.hud.api.bukkit.nms.NMS
-import kr.toxicity.hud.api.bukkit.nms.NMSVersion
 import kr.toxicity.hud.api.manager.ConfigManager
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.player.HudPlayer
@@ -185,6 +184,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (minecraftVersion) {
+            //MinecraftVersion.V1_21_11 -> kr.toxicity.hud.nms.v1_21_R7.NMSImpl()
             MinecraftVersion.V1_21_9, MinecraftVersion.V1_21_10 -> kr.toxicity.hud.nms.v1_21_R6.NMSImpl()
             MinecraftVersion.V1_21_6, MinecraftVersion.V1_21_7, MinecraftVersion.V1_21_8 -> kr.toxicity.hud.nms.v1_21_R5.NMSImpl()
             MinecraftVersion.V1_21_5 -> kr.toxicity.hud.nms.v1_21_R4.NMSImpl()
@@ -318,23 +318,13 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     override fun sendResourcePack(player: HudPlayer) {
         PackUploader.server?.let {
-            if (nms.version >= NMSVersion.V1_20_R3) {
-                (player.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
-            } else {
-                (player.handle() as Player).setResourcePack(it.url, it.digest, null, false)
-            }
+            (player.handle() as Player).setResourcePack(it.uuid, it.url, it.digest, null, false)
         }
     }
     override fun sendResourcePack() {
         PackUploader.server?.let {
-            if (nms.version >= NMSVersion.V1_20_R3) {
-                Bukkit.getOnlinePlayers().forEach { player ->
-                    player.setResourcePack(it.uuid, it.url, it.digest, null, false)
-                }
-            } else {
-                Bukkit.getOnlinePlayers().forEach { player ->
-                    player.setResourcePack(it.url, it.digest, null, false)
-                }
+            Bukkit.getOnlinePlayers().forEach { player ->
+                player.setResourcePack(it.uuid, it.url, it.digest, null, false)
             }
         }
     }

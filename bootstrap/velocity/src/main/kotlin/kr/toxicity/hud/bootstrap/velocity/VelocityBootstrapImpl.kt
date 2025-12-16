@@ -214,7 +214,7 @@ class VelocityBootstrapImpl @Inject constructor(
     }
 
     override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
-    override fun mcmetaVersion(): Int = 69
+    override fun mcmetaVersion(): Int = 75
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()

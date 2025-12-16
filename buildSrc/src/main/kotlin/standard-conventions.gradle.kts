@@ -42,15 +42,7 @@ kotlin {
 }
 
 dokka {
-    val list = mutableListOf(project.name)
-    var parent: Project? = project.parent
-    do {
-        parent?.let {
-            list.add(it.name)
-        }
-        parent = parent?.parent
-    } while (parent != null)
-    moduleName = list.reversed().joinToString("/")
+    moduleName = project.name
     dokkaSourceSets.configureEach {
         displayName = project.name
     }

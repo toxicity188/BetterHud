@@ -15,7 +15,7 @@ dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:${property("parchment")}")
+        parchment("io.papermc.parchment.data:parchment:${property("parchment")}")
     })
     //Kyori
     modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")

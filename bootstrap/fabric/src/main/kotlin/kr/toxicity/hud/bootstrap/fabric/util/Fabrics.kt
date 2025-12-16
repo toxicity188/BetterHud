@@ -13,6 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.luckperms.api.LuckPermsProvider
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.permissions.Permissions
 import net.minecraft.world.entity.ai.attributes.Attributes
 import java.util.*
 import java.util.function.BiConsumer
@@ -23,7 +24,7 @@ private val PERMISSION_GETTER: (ServerPlayer, String) -> Boolean = if (FabricLoa
     }
 } else {
     { player: ServerPlayer, _: String ->
-        player.hasPermissions(2)
+        player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)
     }
 }
 

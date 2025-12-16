@@ -88,7 +88,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency ASM_COMMONS = new BetterHudDependency(
             "org{}ow2{}asm",
             "asm-commons",
-            "9.9",
+            "9.9.1",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY,

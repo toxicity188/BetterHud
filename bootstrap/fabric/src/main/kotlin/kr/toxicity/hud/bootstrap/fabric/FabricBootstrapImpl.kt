@@ -32,7 +32,7 @@ import net.kyori.adventure.text.Component
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -228,17 +228,17 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
 
-    override fun mcmetaVersion(): Int = 69
+    override fun mcmetaVersion(): Int = 75
 
     fun wrap(world: ServerLevel): WorldWrapper {
-        val levelName = world.dimension().location().path
+        val levelName = world.dimension().identifier().path
         return WorldWrapper(
             levelName
         )
     }
 
     override fun world(name: String): WorldWrapper? {
-        return server.getLevel(ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace(name)))?.let {
+        return server.getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace(name)))?.let {
             wrap(it)
         }
     }

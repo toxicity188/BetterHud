@@ -24,6 +24,10 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
     }
 
     /**
+     * 1.21.11
+     */
+    public static final MinecraftVersion V1_21_11 = new MinecraftVersion(1, 21, 11);
+    /**
      * 1.21.10
      */
     public static final MinecraftVersion V1_21_10 = new MinecraftVersion(1, 21, 10);
@@ -83,38 +87,7 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
      * 1.20.3
      */
     public static final MinecraftVersion V1_20_3 = new MinecraftVersion(1, 20, 3);
-    /**
-     * 1.20.2
-     */
-    public static final MinecraftVersion V1_20_2 = new MinecraftVersion(1, 20, 2);
-    /**
-     * 1.20.1
-     */
-    public static final MinecraftVersion V1_20_1 = new MinecraftVersion(1, 20, 1);
-    /**
-     * 1.20
-     */
-    public static final MinecraftVersion V1_20 = new MinecraftVersion(1, 20, 0);
-    /**
-     * 1.19.4
-     */
-    public static final MinecraftVersion V1_19_4 = new MinecraftVersion(1, 19, 4);
-    /**
-     * 1.19.3
-     */
-    public static final MinecraftVersion V1_19_3 = new MinecraftVersion(1, 19, 3);
-    /**
-     * 1.19.2
-     */
-    public static final MinecraftVersion V1_19_2 = new MinecraftVersion(1, 19, 2);
-    /**
-     * 1.19.1
-     */
-    public static final MinecraftVersion V1_19_1 = new MinecraftVersion(1, 19, 1);
-    /**
-     * 1.19
-     */
-    public static final MinecraftVersion V1_19 = new MinecraftVersion(1, 19, 0);
+
     /**
      * Latest
      */
@@ -122,14 +95,14 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
 
     /**
      * Parses version from string
-     * @param version version like "1.21.10"
+     * @param version version like "1.21.11"
      */
     public MinecraftVersion(@NotNull String version) {
         this(version.split("\\."));
     }
     /**
      * Parses version from a string array
-     * @param version version array like ["1", "21", "10"]
+     * @param version version array like ["1", "21", "11"]
      */
     public MinecraftVersion(@NotNull String[] version) {
         this(

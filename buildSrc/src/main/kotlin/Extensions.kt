@@ -10,16 +10,7 @@ import java.time.LocalDateTime
 val BUILD_NUMBER: String? = System.getenv("BUILD_NUMBER")
 
 val SUPPORTED_MINECRAFT_VERSION = listOf(
-    //1.19
-    "1.19",
-    "1.19.1",
-    "1.19.2",
-    "1.19.3",
-    "1.19.4",
     //1.20
-    "1.20",
-    "1.20.1",
-    "1.20.2",
     "1.20.3",
     "1.20.4",
     "1.20.5",
@@ -35,7 +26,8 @@ val SUPPORTED_MINECRAFT_VERSION = listOf(
     "1.21.7",
     "1.21.8",
     "1.21.9",
-    "1.21.10"
+    "1.21.10",
+    "1.21.11"
 )
 
 val Project.libs

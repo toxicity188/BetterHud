@@ -11,7 +11,7 @@ import kr.toxicity.hud.bootstrap.fabric.util.armor
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
 import kr.toxicity.hud.bootstrap.fabric.util.hasPermission
 import kr.toxicity.hud.bootstrap.fabric.util.toMiniMessageString
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.ItemStack
@@ -160,7 +160,7 @@ class FabricStandardModule : FabricModule {
             "potion_effect_duration" to HudPlaceholder.builder<Number>()
                 .requiredArgsLength(1)
                 .function { args, _ ->
-                    val location = ResourceLocation.withDefaultNamespace(args[0])
+                    val location = Identifier.withDefaultNamespace(args[0])
                     Function { p ->
                         p.fabricPlayer.activeEffects.firstOrNull {
                             it.effect.`is`(location)
