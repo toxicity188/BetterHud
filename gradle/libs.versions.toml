@@ -15,7 +15,7 @@ paperweight = "2.0.0-beta.19"
 minotaur = "2.8.10"
 semver4j = "6.0.0"
 
-asm = "9.9"
+asm = "9.9.1"
 hikariCP = "7.0.2"
 fastUtil = "8.5.18"
 
