@@ -9,7 +9,8 @@
     "eu.pb4:placeholder-api",
     "eu.pb4:polymer-autohost",
     "eu.pb4:polymer-resource-pack",
-    "com.mojang:minecraft"
+    "com.mojang:minecraft",
+    "io.papermc.parchment.data:parchment"
   ],
   "baseBranches": [
     "dev"
