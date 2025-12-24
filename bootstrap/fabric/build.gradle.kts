@@ -26,8 +26,8 @@ dependencies {
         parchment("io.papermc.parchment.data:parchment:${property("parchment")}")
     })
     //Other mod dependency
-    modCompileOnly("eu.pb4:polymer-resource-pack:0.14.3+1.21.10")
-    modCompileOnly("eu.pb4:polymer-autohost:0.14.3+1.21.10")
+    modCompileOnly("eu.pb4:polymer-resource-pack:0.15.1+1.21.11")
+    modCompileOnly("eu.pb4:polymer-autohost:0.15.1+1.21.11")
     modCompileOnly("eu.pb4:placeholder-api:2.8.1+1.21.10")
     modCompileOnly("net.luckperms:api:5.5")
     compileOnly("org.checkerframework:checker-qual:3.52.1")
