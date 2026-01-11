@@ -49,7 +49,7 @@ dependencies {
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.15") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
