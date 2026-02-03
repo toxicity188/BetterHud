@@ -43,7 +43,7 @@ dependencies {
     compileOnly("io.lumine:MythicLib-dist:1.7.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.12.0")
+    compileOnly("me.clip:placeholderapi:2.12.1")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.0") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
