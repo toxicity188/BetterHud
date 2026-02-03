@@ -56,7 +56,7 @@ dependencies {
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.github.SkriptLang:Skript:2.14.1")
-    compileOnly("net.skinsrestorer:skinsrestorer-api:15.9.3")
+    compileOnly("net.skinsrestorer:skinsrestorer-api:15.10.0")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:0.0.66")
     compileOnly("net.momirealms:craft-engine-bukkit:0.0.66")
