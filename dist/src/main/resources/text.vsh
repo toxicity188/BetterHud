@@ -133,7 +133,7 @@ void main() {
 
             pos.x += xGui;
             pos.y += yGui;
-            pos.z += layer;
+            //pos.z += layer;
 
         }
     } else {
