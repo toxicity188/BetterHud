@@ -60,7 +60,7 @@ dependencies {
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:0.0.66")
     compileOnly("net.momirealms:craft-engine-bukkit:0.0.66")
-    compileOnly("com.nexomc:nexo:1.18.0")
+    compileOnly("com.nexomc:nexo:1.19.1")
 }
 
 bukkitPluginYaml {
