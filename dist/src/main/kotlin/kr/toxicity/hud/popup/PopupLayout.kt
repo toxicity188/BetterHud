@@ -276,9 +276,9 @@ class PopupLayout(
             headLayout.layer to HeadRenderer(
                 headLayout,
                 parent.getOrCreateSpace(-1),
-                parent.getOrCreateSpace(-(headLayout.source.pixel * headLayout.source.resolution + 1)),
+                parent.getOrCreateSpace(-(headLayout.source.pixel * 8 + 1)),
                 parent.getOrCreateSpace(-(headLayout.source.pixel + 1)),
-                (0 until headLayout.source.resolution).map { i ->
+                (0..7).map { i ->
                     val encode = "pixel_${headLayout.source.pixel}".encodeKey(EncodeManager.EncodeNamespace.TEXTURES)
                     val fileName = "$NAME_SPACE_ENCODED:$encode.png"
                     val char = parent.newChar
@@ -320,7 +320,7 @@ class PopupLayout(
                     }
                 },
                 parent.imageKey,
-                headLayout.source.pixel * headLayout.source.resolution,
+                headLayout.source.pixel * 8,
                 pixel.x
             )
         }
