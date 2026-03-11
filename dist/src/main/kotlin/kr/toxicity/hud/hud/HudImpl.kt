@@ -98,9 +98,23 @@ class HudImpl(
                 runByTick(tick, { player.tick }, p.getComponent(player))
             }
         }
+        val stateMap = java.util.Collections.synchronizedMap(java.util.WeakHashMap<HudPlayer, Pair<Boolean, Long>>())
         return HudComponentSupplier.of(this) {
-            if (conditions(player)) map.map { (type, element) ->
-                type.choose(element, player.tick)()
+            val currentCond = conditions(player)
+            val currentState = stateMap[player] ?: (false to -1L)
+            var lastCond = currentState.first
+            var startFrame = currentState.second
+
+            if (currentCond && !lastCond) {
+                startFrame = player.tick
+            }
+            lastCond = currentCond
+            stateMap[player] = lastCond to startFrame
+
+            val adjustedFrame = if (startFrame != -1L) player.tick - startFrame else player.tick
+
+            if (currentCond) map.map { (type, element) ->
+                type.choose(element, adjustedFrame)()
             } else emptyList()
         }
     }
