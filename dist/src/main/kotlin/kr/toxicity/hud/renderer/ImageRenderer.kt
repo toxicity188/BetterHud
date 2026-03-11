@@ -31,6 +31,8 @@ class ImageRenderer(
         val mapper = component mapper event
         val colorApply = colorOverrides(event)
 
+        val stateMap = java.util.Collections.synchronizedMap(java.util.WeakHashMap<HudPlayer, Pair<Boolean, Long>>())
+
         return tickProvide(tick) build@ { player, frame ->
             val selected = mapper(player)
 
@@ -45,20 +47,34 @@ class ImageRenderer(
                     if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
                 }
             }
-            if (cond(target)) {
+            
+            val currentCond = cond(target)
+            val currentState = stateMap[player] ?: (false to -1L)
+            var lastCond = currentState.first
+            var startFrame = currentState.second
+
+            if (currentCond && !lastCond) {
+                startFrame = frame
+            }
+            lastCond = currentCond
+            stateMap[player] = lastCond to startFrame
+
+            val adjustedFrame = if (startFrame != -1L) frame - startFrame else frame
+
+            if (currentCond) {
                 if (maxStackFrame > 1) {
                     if (stackFrame <= 0.0) return@build EMPTY_PIXEL_COMPONENT
                     var empty = EMPTY_PIXEL_COMPONENT
                     val range = 0..<maxStackFrame
                     for (i in if (reversed) range.reversed() else range) {
-                        val frame = ((stackFrame - i - 0.1) * selected.images.size)
+                        val f = ((stackFrame - i - 0.1) * selected.images.size)
                             .roundToInt()
                             .coerceAtLeast(0)
                             .coerceAtMost(selected.images.lastIndex)
-                        empty = empty.append(space, selected.images[frame])
+                        empty = empty.append(space, selected.images[f])
                     }
                     empty.applyColor(colorApply(target))
-                } else component.type.getComponent(listen, frame, selected, target).applyColor(colorApply(target))
+                } else component.type.getComponent(listen, adjustedFrame, selected, target).applyColor(colorApply(target))
             } else {
                 if (clearListener) listen.clear(player)
                 EMPTY_PIXEL_COMPONENT
