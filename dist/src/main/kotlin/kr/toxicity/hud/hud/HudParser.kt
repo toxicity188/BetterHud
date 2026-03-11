@@ -19,25 +19,25 @@ class HudParser(
     pixel: PixelLocation
 ) {
     private val imageElement = layout.image.map { image ->
-        HudImageParser(hud, image, gui, pixel)
+        image.layer to HudImageParser(hud, image, gui, pixel)
     }
     private val textElement = layout.text.mapIndexed { index, textLayout ->
-        HudTextParser(index + 1, hud, resource, textLayout, gui, pixel)
+        textLayout.layer to HudTextParser(index + 1, hud, resource, textLayout, gui, pixel)
     }
-    private val headElement = layout.head.map { image ->
-        HudHeadParser(hud, image, gui, pixel)
+    private val headElement = layout.head.map { head ->
+        head.layer to HudHeadParser(hud, head, gui, pixel)
     }
 
     private val elements = listOf(
         imageElement,
         textElement,
         headElement
-    ).flatten()
+    ).flatten().sortedBy { it.first }.map { it.second }
 
     val conditions = layout.conditions build UpdateEvent.EMPTY
 
     private val max = imageElement.maxOfOrNull {
-        it.max
+        it.second.max
     } ?: 0
 
     fun getComponent(player: HudPlayer): Runner<WidthComponent> {
