@@ -150,7 +150,7 @@ class PopupLayout(
                     it.key to it.value.toComponent()
                 })
             }
-            ImageRenderer(
+            target.layer to ImageRenderer(
                 target,
                 try {
                     target.source.toComponent()
@@ -161,7 +161,7 @@ class PopupLayout(
         }
 
         private val max = image.maxOfOrNull {
-            it.max()
+            it.second.max()
         } ?: 0
 
         val texts = layout.text.map { textLayout ->
@@ -244,7 +244,7 @@ class PopupLayout(
                     )
                 }
             }
-            TextRenderer(
+            textLayout.layer to TextRenderer(
                 textLayout,
                 HudTextData(
                     keys,
@@ -273,7 +273,7 @@ class PopupLayout(
                 pixel.opacity,
                 headLayout.property
             )
-            HeadRenderer(
+            headLayout.layer to HeadRenderer(
                 headLayout,
                 parent.getOrCreateSpace(-1),
                 parent.getOrCreateSpace(-(headLayout.source.pixel * 8 + 1)),
@@ -329,6 +329,6 @@ class PopupLayout(
             image,
             texts,
             heads
-        ).flatten()
+        ).flatten().sortedBy { it.first }.map { it.second }
     }
 }
