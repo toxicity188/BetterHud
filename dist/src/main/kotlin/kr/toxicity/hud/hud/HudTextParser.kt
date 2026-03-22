@@ -27,9 +27,9 @@ class HudTextParser(
     private val text: TextLayout,
     gui: GuiLocation,
     pixel: PixelLocation
-) : HudSubParser {
+) {
 
-    private val renderer = run {
+    private val data = run {
         val loc = text.location + pixel
         val render = text.renderScale + pixel
         val shader = HudShader(
@@ -81,7 +81,6 @@ class HudTextParser(
                 }
                 BackgroundKey(
                     key,
-                    //TODO replace it to proper background in the future.
                     text.background.source?.let {
                         fun getString(image: LoadedImage, file: String): WidthComponent {
                             val result = (++textIndex).parseChar()
@@ -98,7 +97,7 @@ class HudTextParser(
                             }
                             return WidthComponent(Component.text()
                                 .content(result)
-                                .append(NEGATIVE_ONE_SPACE_COMPONENT.finalizeFont().component), (image.image.width.toDouble() * div).roundToInt())
+                                .append((-2).toSpaceComponent().finalizeFont().component), ((image.image.width.toDouble() * div).roundToInt() - 1).coerceAtLeast(1))
                         }
                         BackgroundLayout(
                             it.location.x,
@@ -110,23 +109,23 @@ class HudTextParser(
                 )
             }
         }
-        TextRenderer(
-            text,
-            HudTextData(
-                keys,
-                (scaledMap.entries.associate { (k, v) ->
-                    k to v.normalizedWidth
-                } + scaledImageMap.entries.associate { (k, v) ->
-                    k to v.normalizedWidth
-                }).toIntMap(),
-                scaledImageMap.map {
-                    it.value.name to it.key
-                }.toMap(),
-                text.splitWidth,
-            ),
-            loc.x
+        HudTextData(
+            keys,
+            (scaledMap.entries.associate { (k, v) ->
+                k to v.normalizedWidth
+            } + scaledImageMap.entries.associate { (k, v) ->
+                k to v.normalizedWidth
+            }).toIntMap(),
+            scaledImageMap.map {
+                it.value.name to it.key
+            }.toMap(),
+            text.splitWidth,
         )
-    }.render(UpdateEvent.EMPTY)
+    }
 
-    override fun render(player: HudPlayer): (Long) -> PixelComponent = renderer(player)
+    private val textRenderer = TextRenderer(text, data, (text.location + pixel).x, false).render(UpdateEvent.EMPTY)
+    private val backgroundRenderer = TextRenderer(text, data, (text.location + pixel).x, true).render(UpdateEvent.EMPTY)
+
+    val textSubParser: HudSubParser = HudSubParser { player -> textRenderer(player) }
+    val backgroundSubParser: HudSubParser = HudSubParser { player -> backgroundRenderer(player) }
 }
