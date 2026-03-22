@@ -28,6 +28,7 @@ class TextRenderer(
     layout: TextLayout,
     private val data: HudTextData,
     private val x: Int,
+    private val isBackground: Boolean = false
 ) : TextLayout by layout, HudRenderer {
 
     companion object {
@@ -93,23 +94,31 @@ class TextRenderer(
                 val backgroundKey = data.font[index]
                 var finalComp = comp
                 finalComp.component.font(backgroundKey.key)
-                //TODO replace it to proper background in the future.
-                backgroundKey.background?.let {
-                    val builder = Component.text().append(it.left.component)
+                backgroundKey.background?.let { bg ->
                     var length = 0
                     while (length < comp.width) {
-                        builder.append(it.body.component)
-                        length += it.body.width
+                        length += bg.body.width
                     }
-                    val total = it.left.width + length + it.right.width
-                    val minus = -total + (length - comp.width) / 2 + it.left.width - it.x
+                    val total = bg.left.width + length + bg.right.width
+                    if (max < total) max = total
 
-                    var build = EMPTY_WIDTH_COMPONENT.finalizeFont()
-                    if (it.x != 0) build += it.x.toSpaceComponent()
-                    build += WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total)
-                    if (max < build.width) max = build.width
-                    finalComp = build + minus.toSpaceComponent() + finalComp + (-minus - finalComp.width).toSpaceComponent()
+                    if (isBackground) {
+                        val builder = Component.text().append(bg.left.component)
+                        var bLen = 0
+                        while (bLen < comp.width) {
+                            builder.append(bg.body.component)
+                            bLen += bg.body.width
+                        }
+                        var build = EMPTY_WIDTH_COMPONENT.finalizeFont()
+                        if (bg.x != 0) build += bg.x.toSpaceComponent()
+                        finalComp = build + WidthComponent(builder.append(bg.right.component).font(backgroundKey.key), total)
+                    } else {
+                        val paddingLeft = (length - comp.width) / 2 + bg.left.width - bg.x
+                        val paddingRight = total - paddingLeft - comp.width
+                        finalComp = paddingLeft.toSpaceComponent() + finalComp + paddingRight.toSpaceComponent()
+                    }
                 } ?: run {
+                    if (isBackground) return@forEachIndexed
                     if (max < finalComp.width) max = finalComp.width
                 }
                 widthComp = widthComp plusWithAlign finalComp
