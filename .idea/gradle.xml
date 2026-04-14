@@ -34,7 +34,6 @@
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/dist" />
             <option value="$PROJECT_DIR$/nms" />
-            <option value="$PROJECT_DIR$/nms/v1_20_R3" />
             <option value="$PROJECT_DIR$/nms/v1_20_R4" />
             <option value="$PROJECT_DIR$/nms/v1_21_R1" />
             <option value="$PROJECT_DIR$/nms/v1_21_R2" />
@@ -43,6 +42,7 @@
             <option value="$PROJECT_DIR$/nms/v1_21_R5" />
             <option value="$PROJECT_DIR$/nms/v1_21_R6" />
             <option value="$PROJECT_DIR$/nms/v1_21_R7" />
+            <option value="$PROJECT_DIR$/nms/v26_R1" />
             <option value="$PROJECT_DIR$/scheduler" />
             <option value="$PROJECT_DIR$/scheduler/paper" />
             <option value="$PROJECT_DIR$/scheduler/standard" />

@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 
 plugins {
     id("standard-conventions")
@@ -19,11 +20,6 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.44")
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 signing {
     useGpgCmd()
 }
@@ -39,8 +35,8 @@ mavenPublishing {
     signAllPublications()
     coordinates("io.github.toxicity188", publishName, project.version as String)
     configure(JavaLibrary(
-        javadocJar = JavadocJar.None(),
-        sourcesJar = true,
+        javadocJar = JavadocJar.Javadoc(),
+        sourcesJar = SourcesJar.Sources(),
     ))
     pom {
         name = publishName

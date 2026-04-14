@@ -5,18 +5,6 @@ plugins {
     alias(libs.plugins.resourceFactoryBukkit)
 }
 
-repositories {
-    maven("https://maven.enginehub.org/repo/") //WorldEdit, WorldGuard
-    maven("https://nexus.phoenixdevt.fr/repository/maven-public/") //MMOItems, MMOCore, MythicLib
-    maven("https://repo.skriptlang.org/releases") //Skript
-    maven("https://repo.alessiodp.com/releases/") //Parties
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") //PlaceholderAPI
-    maven("https://mvn.lumine.io/repository/maven/") //MythicMobs
-    maven("https://repo.momirealms.net/releases/") //CraftEngine
-    maven("https://repo.nexomc.com/releases/") //Nexo
-    maven("https://jitpack.io") //Vault
-}
-
 dependencies {
     compileOnly("org.spigotmc:spigot-api:${property("minecraft_version")}-R0.1-SNAPSHOT")
     compileOnly(libs.bundles.adventure)
@@ -30,10 +18,16 @@ dependencies {
     rootProject.project("scheduler").subprojects.forEach {
         compileOnly(shade(it)!!)
     }
-    rootProject.project("nms").subprojects.forEach {
-        compileOnly(shade(project(":nms:${it.name}", configuration = "reobf"))!!)
-        //compileOnly(shade(it)!!)
-    }
+    compileOnly(shade(project(":nms:v1_20_R4", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R1", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R2", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R3", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R4", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R5", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R6", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v1_21_R7", configuration = "reobf"))!!)
+    compileOnly(shade(project(":nms:v26_R1"))!!)
+
     compileOnly(libs.bstatsBukkit)
     shade(libs.bstatsBukkit)
     compileOnly(libs.adventurePlatformBukkit)
@@ -58,8 +52,8 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.14.1")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.11.1")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("net.momirealms:craft-engine-core:0.0.66")
-    compileOnly("net.momirealms:craft-engine-bukkit:0.0.66")
+    compileOnly("net.momirealms:craft-engine-core:0.0.67")
+    compileOnly("net.momirealms:craft-engine-bukkit:0.0.67")
     compileOnly("com.nexomc:nexo:1.21.0")
 }
 

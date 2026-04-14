@@ -19,6 +19,8 @@ asm = "9.9.1"
 hikariCP = "7.0.2"
 fastUtil = "8.5.18"
 
+neoform = "26.1.2-1"
+
 [libraries]
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMinimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
@@ -57,7 +59,6 @@ resourceFactoryFabric = { id = "xyz.jpenilla.resource-factory-fabric-convention"
 resourceFactoryVelocity = { id = "xyz.jpenilla.resource-factory-velocity-convention", version.ref = "resourceFactory" }
 resourceFactoryBukkit = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
 
-loom = { id = "fabric-loom", version.ref = "loom" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 
 [bundles]

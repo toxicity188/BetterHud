@@ -184,6 +184,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (minecraftVersion) {
+            MinecraftVersion.V26_1, MinecraftVersion.V26_1_1, MinecraftVersion.V26_1_2 -> kr.toxicity.hud.nms.v26_R1.NMSImpl()
             MinecraftVersion.V1_21_11 -> kr.toxicity.hud.nms.v1_21_R7.NMSImpl()
             MinecraftVersion.V1_21_9, MinecraftVersion.V1_21_10 -> kr.toxicity.hud.nms.v1_21_R6.NMSImpl()
             MinecraftVersion.V1_21_6, MinecraftVersion.V1_21_7, MinecraftVersion.V1_21_8 -> kr.toxicity.hud.nms.v1_21_R5.NMSImpl()
@@ -192,7 +193,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.V1_21_2, MinecraftVersion.V1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
             MinecraftVersion.V1_21, MinecraftVersion.V1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
             MinecraftVersion.V1_20_5, MinecraftVersion.V1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
-            MinecraftVersion.V1_20_3, MinecraftVersion.V1_20_4 -> kr.toxicity.hud.nms.v1_20_R3.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: $minecraftVersion")
                 pluginManager.disablePlugin(this)

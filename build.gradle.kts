@@ -73,10 +73,10 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.6.0")
-            hangar("ViaBackwards", "5.6.0")
-            hangar("PlaceholderAPI", "2.11.7")
-            hangar("Skript", "2.13.2")
+            hangar("ViaVersion", "5.8.1")
+            hangar("ViaBackwards", "5.8.1")
+            hangar("PlaceholderAPI", "2.12.2")
+            hangar("Skript", "2.14.2")
         }
     }
     build {
@@ -112,7 +112,7 @@ hangarPublish {
             }
             register(Platforms.VELOCITY) {
                 jar = file("build/libs/${project.name}-velocity-${project.version}.jar")
-                platformVersions = listOf("3.3", "3.4")
+                platformVersions = listOf("3.3", "3.4", "3.5")
             }
         }
     }

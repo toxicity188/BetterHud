@@ -11,8 +11,6 @@ val BUILD_NUMBER: String? = System.getenv("BUILD_NUMBER")
 
 val SUPPORTED_MINECRAFT_VERSION = listOf(
     //1.20
-    "1.20.3",
-    "1.20.4",
     "1.20.5",
     "1.20.6",
     //1.21
@@ -27,7 +25,10 @@ val SUPPORTED_MINECRAFT_VERSION = listOf(
     "1.21.8",
     "1.21.9",
     "1.21.10",
-    "1.21.11"
+    "1.21.11",
+    "26.1",
+    "26.1.1",
+    "26.1.2"
 )
 
 val Project.libs

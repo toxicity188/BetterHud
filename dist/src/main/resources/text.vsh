@@ -3,6 +3,7 @@
 #CreateConstant
 
 #moj_import <fog.glsl>
+#moj_import <sample_lightmap.glsl>
 
 #if SHADER_VERSION >= 3
 #moj_import <dynamictransforms.glsl>
@@ -64,7 +65,6 @@ float fogDistance(vec3 pos, int shape) {
     }
 }
 
-
 #GenerateOtherDefinedMethod
 
 void main() {
@@ -73,7 +73,7 @@ void main() {
     vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
     applyColor = 0;
-    vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
+    vertexColor = Color * sample_lightmap(Sampler2, UV2);
     if (pos.y >= ui.y && ProjMat[3].x == -1) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
@@ -96,9 +96,9 @@ void main() {
             }
 
 #if SHADER_VERSION < 2
-            vertexColor = (checkElement(pos.z) && !outline) ? vec4(0) : Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
+            vertexColor = (checkElement(pos.z) && !outline) ? vec4(0) : Color * sample_lightmap(Sampler2, UV2) * vec4(1, 1, 1, opacity);
 #else
-            vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0) * vec4(1, 1, 1, opacity);
+            vertexColor = Color * sample_lightmap(Sampler2, UV2) * vec4(1, 1, 1, opacity);
 #endif
 
             //Wave

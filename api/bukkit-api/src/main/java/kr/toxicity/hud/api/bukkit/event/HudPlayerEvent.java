@@ -11,5 +11,5 @@ public interface HudPlayerEvent extends BetterHudEvent {
      * Gets called player
      * @return player
      */
-    @NotNull HudPlayer getHudPlayer();
+    @NotNull HudPlayer player();
 }

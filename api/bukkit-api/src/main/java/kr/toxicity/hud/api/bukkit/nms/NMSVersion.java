@@ -1,18 +1,12 @@
 package kr.toxicity.hud.api.bukkit.nms;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Represents server's version.
  */
-@RequiredArgsConstructor
 @Getter
 public enum NMSVersion {
-    /**
-     * 1.20.3-1.20.4
-     */
-    V1_20_R3(20,3, 22),
     /**
      * 1.20.5-1.20.6
      */
@@ -44,7 +38,11 @@ public enum NMSVersion {
     /**
      * 1.21.11
      */
-    V1_21_R7(21,7, 75)
+    V1_21_R7(21,7, 75),
+    /**
+     * 26.1
+     */
+    V26_R1(26,1, 84)
     ;
     /**
      * Main version.
@@ -58,4 +56,10 @@ public enum NMSVersion {
      * That client version's resource pack mcmeta version.
      */
     private final int metaVersion;
+
+    NMSVersion(int version, int subVersion, int metaVersion) {
+        this.version = version;
+        this.subVersion = subVersion;
+        this.metaVersion = metaVersion;
+    }
 }

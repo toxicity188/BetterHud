@@ -3,17 +3,7 @@ import xyz.jpenilla.resourcefactory.fabric.Environment
 plugins {
     alias(libs.plugins.bootstrapConvention)
     alias(libs.plugins.resourceFactoryFabric)
-    alias(libs.plugins.loom)
-}
-
-repositories {
-    maven("https://maven.nucleoid.xyz/") { //placeholderapi, polymer
-        name = "Nucleoid"
-    }
-    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") { //Kyori snapshot
-        name = "sonatype-oss-snapshots1"
-        mavenContent { snapshotsOnly() }
-    }
+    id("net.fabricmc.fabric-loom")
 }
 
 val minecraft = property("minecraft_version")
@@ -21,30 +11,19 @@ val supportedVersion = property("supported_version")
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("io.papermc.parchment.data:parchment:${property("parchment")}")
-    })
     //Other mod dependency
-    modCompileOnly("eu.pb4:polymer-resource-pack:0.15.1+1.21.11")
-    modCompileOnly("eu.pb4:polymer-autohost:0.15.1+1.21.11")
-    modCompileOnly("eu.pb4:placeholder-api:2.8.1+1.21.10")
-    modCompileOnly("net.luckperms:api:5.5")
+    compileOnly("eu.pb4:polymer-resource-pack:0.16.2+26.1.1")
+    compileOnly("eu.pb4:polymer-autohost:0.16.2+26.1.1")
+    compileOnly("eu.pb4:placeholder-api:3.0.0+26.1")
+    compileOnly("net.luckperms:api:5.5")
     compileOnly("org.checkerframework:checker-qual:3.55.1")
 
     //Kyori
-    modCompileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
-    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:${property("kyori_mod_implementation")}")
-    modImplementation("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")
+    compileOnly("net.fabricmc:fabric-loader:${property("loader_version")}")
+    compileOnly("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
+    implementation("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")
     compileOnly(project(":api:standard-api"))
     implementation(include(project(":api:fabric-api"))!!)
-}
-
-loom {
-    decompilerOptions.named("vineflower") {
-        options.put("win", "0")
-    }
 }
 
 fabricModJson {
@@ -77,10 +56,6 @@ fabricModJson {
 
 tasks {
     jar {
-        archiveClassifier = "dev"
-    }
-    remapJar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveBaseName = "${rootProject.name}-fabric+$minecraft"
         destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
         archiveClassifier = ""
@@ -92,7 +67,7 @@ tasks {
 
 
 modrinth {
-    uploadFile.set(tasks.remapJar)
+    uploadFile.set(tasks.jar)
     versionName = "BetterHud ${project.version} for Fabric"
     gameVersions = SUPPORTED_MINECRAFT_VERSION.subList(
         SUPPORTED_MINECRAFT_VERSION.indexOf(supportedVersion),

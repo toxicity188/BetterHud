@@ -7,16 +7,7 @@ plugins {
 group = "kr.toxicity.hud"
 version = property("version").toString() + (BUILD_NUMBER?.let { "-SNAPSHOT-$it" } ?: "")
 
-val targetJavaVersion = 21
-
-repositories {
-    mavenCentral()
-    maven("https://maven.fabricmc.net/") //Fabric
-    maven("https://repo.papermc.io/repository/maven-public/") //Paper
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") //Spigot
-    maven("https://repo.codemc.org/repository/maven-public/")
-    maven("https://repo.opencollab.dev/main/")
-}
+val targetJavaVersion = 25
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
@@ -33,6 +24,7 @@ tasks {
 }
 
 java {
+    disableAutoTargetJvm()
     toolchain.vendor = JvmVendorSpec.ADOPTIUM
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
 }

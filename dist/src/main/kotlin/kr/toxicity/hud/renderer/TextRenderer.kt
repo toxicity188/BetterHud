@@ -14,6 +14,7 @@ import kr.toxicity.hud.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.minimessage.Context
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -106,7 +107,7 @@ class TextRenderer(
 
                     var build = EMPTY_WIDTH_COMPONENT.finalizeFont()
                     if (it.x != 0) build += it.x.toSpaceComponent()
-                    build += WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total)
+                    build += WidthComponent(builder.append(it.right.component).font(backgroundKey.key), total).shadow(0)
                     if (max < build.width) max = build.width
                     finalComp = build + minus.toSpaceComponent() + finalComp + (-minus - finalComp.width).toSpaceComponent()
                 } ?: run {
