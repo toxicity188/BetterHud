@@ -24,7 +24,7 @@ dependencies {
     })
 
     shade(project(":dist")) { isTransitive = false }
-    shade(project(":api:standard-api")) { isTransitive = false }
+    shade(project(":api")) { isTransitive = false }
     shade(libs.betterCommand) { isTransitive = false }
 }
 

@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly(project(":api:standard-api"))
+    compileOnly(project(":api"))
     compileOnly("io.papermc.paper:paper-api:${property("minecraft_version")}.build.+")
 }

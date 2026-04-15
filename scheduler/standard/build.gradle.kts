@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly(project(":api:standard-api"))
+    compileOnly(project(":api"))
     compileOnly("org.spigotmc:spigot-api:${property("minecraft_version")}-R0.1-SNAPSHOT")
 }
