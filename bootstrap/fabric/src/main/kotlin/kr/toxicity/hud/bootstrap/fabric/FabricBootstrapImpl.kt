@@ -6,8 +6,8 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.BetterHudLogger
 import kr.toxicity.hud.api.adapter.WorldWrapper
-import kr.toxicity.hud.api.fabric.FabricBootstrap
-import kr.toxicity.hud.api.fabric.event.EventRegistry
+import kr.toxicity.hud.api.mod.ModBootstrap
+import kr.toxicity.hud.api.mod.event.EventRegistry
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.scheduler.HudScheduler
 import kr.toxicity.hud.api.version.MinecraftVersion
@@ -44,7 +44,7 @@ import java.io.InputStream
 import java.net.URI
 import java.net.URLClassLoader
 
-class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
+class FabricBootstrapImpl : ModBootstrap, DedicatedServerModInitializer {
 
     companion object {
         @JvmStatic
@@ -109,10 +109,10 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
             core = BetterHudImpl(this).apply {
                 BetterHudAPI.inst(this)
                 addReloadStartTask {
-                    FabricBootstrap.PRE_RELOAD_EVENT.call(EventRegistry.UNIT)
+                    ModBootstrap.PRE_RELOAD_EVENT.call(EventRegistry.UNIT)
                 }
                 addReloadEndTask { state ->
-                    FabricBootstrap.POST_RELOAD_EVENT.call(state)
+                    ModBootstrap.POST_RELOAD_EVENT.call(state)
                 }
             }
             volatileCode = FabricVolatileCode()

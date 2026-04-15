@@ -1,10 +1,10 @@
 package kr.toxicity.hud.bootstrap.fabric.util
 
-import kr.toxicity.hud.api.fabric.event.EventRegistry
-import kr.toxicity.hud.api.fabric.event.FabricEvent
-import kr.toxicity.hud.api.fabric.event.PlayerEvent
-import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
-import kr.toxicity.hud.api.fabric.update.FabricUpdateEvent
+import kr.toxicity.hud.api.mod.event.EventRegistry
+import kr.toxicity.hud.api.mod.event.ModEvent
+import kr.toxicity.hud.api.mod.event.PlayerEvent
+import kr.toxicity.hud.api.mod.trigger.HudModEventTrigger
+import kr.toxicity.hud.api.mod.update.ModUpdateEvent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import net.fabricmc.loader.api.FabricLoader
@@ -28,9 +28,9 @@ private val PERMISSION_GETTER: (ServerPlayer, String) -> Boolean = if (FabricLoa
     }
 }
 
-inline fun <reified T : FabricEvent<*>, R : Any> UpdateEvent.unwrap(block: (T) -> R): R {
+inline fun <reified T : ModEvent<*>, R : Any> UpdateEvent.unwrap(block: (T) -> R): R {
     val evt = source()
-    return if (evt is FabricUpdateEvent) {
+    return if (evt is ModUpdateEvent) {
         val e = evt.event
         if (e is T) block(e)
         else throw RuntimeException("Unsupported event found: ${e.javaClass.simpleName}")
@@ -42,18 +42,18 @@ fun net.kyori.adventure.text.Component.toMinecraft(): Component = NonWrappingCom
 
 fun Component.toMiniMessageString() = MiniMessage.miniMessage().serialize(toAdventure())
 
-fun <T : FabricEvent<*>> createFabricTrigger(
+fun <T : ModEvent<*>> createFabricTrigger(
     registry: EventRegistry<T>,
     valueMapper: (T) -> UUID? = { if (it is PlayerEvent<*>) it.player().uuid else null },
     keyMapper: (T) -> Any = { UUID.randomUUID() }
-): HudFabricEventTrigger<T> {
-    return object : HudFabricEventTrigger<T> {
+): HudModEventTrigger<T> {
+    return object : HudModEventTrigger<T> {
         override fun registry(): EventRegistry<T> = registry
         override fun getKey(t: T): Any = keyMapper(t)
         override fun registerEvent(eventConsumer: BiConsumer<UUID, UpdateEvent>) {
             registry.registerTemp {
                 valueMapper(it)?.let { uuid ->
-                    val wrapper = FabricUpdateEvent(
+                    val wrapper = ModUpdateEvent(
                         it,
                         keyMapper(it)
                     )

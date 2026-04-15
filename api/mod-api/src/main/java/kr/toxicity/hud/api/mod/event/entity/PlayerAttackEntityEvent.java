@@ -1,8 +1,8 @@
-package kr.toxicity.hud.api.fabric.event.entity;
+package kr.toxicity.hud.api.mod.event.entity;
 
-import kr.toxicity.hud.api.fabric.event.EntityEvent;
-import kr.toxicity.hud.api.fabric.event.EventRegistry;
-import kr.toxicity.hud.api.fabric.event.PlayerEvent;
+import kr.toxicity.hud.api.mod.event.EntityEvent;
+import kr.toxicity.hud.api.mod.event.EventRegistry;
+import kr.toxicity.hud.api.mod.event.PlayerEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;

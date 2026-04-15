@@ -1,12 +1,12 @@
-package kr.toxicity.hud.api.fabric.event;
+package kr.toxicity.hud.api.mod.event;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * All supertype of fabric event.
+ * All supertype of Mod event.
  * @param <T> registry type
  */
-public interface FabricEvent<T extends FabricEvent<?>> {
+public interface ModEvent<T extends ModEvent<?>> {
     /**
      * Gets registry of this event.
      * @return registry

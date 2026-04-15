@@ -29,7 +29,7 @@ dependencies {
 
     // Include
     implementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
-    implementation(include(project(":api:fabric-api"))!!)
+    implementation(include(project(":api:mod-api"))!!)
 }
 
 fabricModJson {

@@ -1,9 +1,9 @@
 package kr.toxicity.hud.bootstrap.fabric.mixin.entity;
 
-import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity;
-import kr.toxicity.hud.api.fabric.event.entity.PlayerAttackEntityEvent;
-import kr.toxicity.hud.api.fabric.event.entity.PlayerDamageByEntityEvent;
-import kr.toxicity.hud.api.fabric.event.entity.PlayerKillEntityEvent;
+import kr.toxicity.hud.api.mod.entity.ModLivingEntity;
+import kr.toxicity.hud.api.mod.event.entity.PlayerAttackEntityEvent;
+import kr.toxicity.hud.api.mod.event.entity.PlayerDamageByEntityEvent;
+import kr.toxicity.hud.api.mod.event.entity.PlayerKillEntityEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin implements FabricLivingEntity {
+public class LivingEntityMixin implements ModLivingEntity {
 
     @Shadow protected float lastHurt;
     @Unique private double lastHealth;

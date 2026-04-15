@@ -1,12 +1,12 @@
 package kr.toxicity.hud.bootstrap.fabric.module.fabric
 
-import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity
-import kr.toxicity.hud.api.fabric.event.EntityEvent
-import kr.toxicity.hud.api.fabric.event.entity.PlayerAttackEntityEvent
-import kr.toxicity.hud.api.fabric.event.entity.PlayerDamageByEntityEvent
-import kr.toxicity.hud.api.fabric.event.entity.PlayerDeathEvent
-import kr.toxicity.hud.api.fabric.event.entity.PlayerKillEntityEvent
-import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
+import kr.toxicity.hud.api.mod.entity.ModLivingEntity
+import kr.toxicity.hud.api.mod.event.EntityEvent
+import kr.toxicity.hud.api.mod.event.entity.PlayerAttackEntityEvent
+import kr.toxicity.hud.api.mod.event.entity.PlayerDamageByEntityEvent
+import kr.toxicity.hud.api.mod.event.entity.PlayerDeathEvent
+import kr.toxicity.hud.api.mod.event.entity.PlayerKillEntityEvent
+import kr.toxicity.hud.api.mod.trigger.HudModEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.update.UpdateEvent
@@ -24,7 +24,7 @@ import java.util.function.Function
 
 class FabricEntityModule : FabricModule {
 
-    override val triggers: Map<String, (YamlObject) -> HudFabricEventTrigger<*>>
+    override val triggers: Map<String, (YamlObject) -> HudModEventTrigger<*>>
         get() = mapOf(
             "attack" to {
                 createFabricTrigger(PlayerAttackEntityEvent.REGISTRY, {
@@ -83,21 +83,21 @@ class FabricEntityModule : FabricModule {
             "last_damage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? FabricLivingEntity)?.`betterHud$getLastDamage`()
+                        (e.entity() as? ModLivingEntity)?.`betterHud$getLastDamage`()
                     }
                 }
             },
             "last_health" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? FabricLivingEntity)?.`betterHud$getLastHealth`()
+                        (e.entity() as? ModLivingEntity)?.`betterHud$getLastHealth`()
                     }
                 }
             },
             "last_health_percentage" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent<*> ->
                     Function {
-                        (e.entity() as? FabricLivingEntity)?.let {
+                        (e.entity() as? ModLivingEntity)?.let {
                             it.`betterHud$getLastHealth`() / (it as LivingEntity).maxHealth
                         }
                     }

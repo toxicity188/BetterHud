@@ -1,13 +1,13 @@
-package kr.toxicity.hud.api.fabric;
+package kr.toxicity.hud.api.mod;
 
 import kr.toxicity.hud.api.BetterHudBootstrap;
-import kr.toxicity.hud.api.fabric.event.EventRegistry;
+import kr.toxicity.hud.api.mod.event.EventRegistry;
 import kr.toxicity.hud.api.plugin.ReloadState;
 
 /**
- * Welcome to BetterHud Fabric API!
+ * Welcome to BetterHud Mod API!
  */
-public interface FabricBootstrap extends BetterHudBootstrap {
+public interface ModBootstrap extends BetterHudBootstrap {
 
     /**
      * BetterHud pre-reload event

@@ -1,7 +1,7 @@
 package kr.toxicity.hud.bootstrap.fabric.module.fabric
 
-import kr.toxicity.hud.api.fabric.entity.FabricLivingEntity
-import kr.toxicity.hud.api.fabric.trigger.HudFabricEventTrigger
+import kr.toxicity.hud.api.mod.entity.ModLivingEntity
+import kr.toxicity.hud.api.mod.trigger.HudModEventTrigger
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.update.UpdateEvent
@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack
 import java.util.function.Function
 
 class FabricStandardModule : FabricModule {
-    override val triggers: Map<String, (YamlObject) -> HudFabricEventTrigger<*>>
+    override val triggers: Map<String, (YamlObject) -> HudModEventTrigger<*>>
         get() = mapOf()
     override val listeners: Map<String, (YamlObject) -> (UpdateEvent) -> HudListener>
         get() = mapOf(
@@ -83,17 +83,17 @@ class FabricStandardModule : FabricModule {
             },
             "last_damage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastDamage`()
+                    (p.fabricPlayer as ModLivingEntity).`betterHud$getLastDamage`()
                 }
             },
             "last_health" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).`betterHud$getLastHealth`()
+                    (p.fabricPlayer as ModLivingEntity).`betterHud$getLastHealth`()
                 }
             },
             "last_health_percentage" to HudPlaceholder.of { _, _ ->
                 Function { p ->
-                    (p.fabricPlayer as FabricLivingEntity).let {
+                    (p.fabricPlayer as ModLivingEntity).let {
                         it.`betterHud$getLastHealth`() / (it as LivingEntity).maxHealth
                     }
                 }

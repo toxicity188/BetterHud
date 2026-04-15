@@ -52,7 +52,7 @@ gradle.startParameter.isParallelProjectExecutionEnabled = true
 include(
     "api:bukkit-api",
     "api:velocity-api",
-    "api:fabric-api",
+    "api:mod-api",
 
     "dist",
     "nms:v1_21_R2",

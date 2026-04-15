@@ -1,4 +1,4 @@
-package kr.toxicity.hud.api.fabric.event;
+package kr.toxicity.hud.api.mod.event;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

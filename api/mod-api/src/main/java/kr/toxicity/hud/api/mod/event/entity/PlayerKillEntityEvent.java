@@ -1,8 +1,8 @@
-package kr.toxicity.hud.api.fabric.event.entity;
+package kr.toxicity.hud.api.mod.event.entity;
 
-import kr.toxicity.hud.api.fabric.event.EntityEvent;
-import kr.toxicity.hud.api.fabric.event.EventRegistry;
-import kr.toxicity.hud.api.fabric.event.FabricEvent;
+import kr.toxicity.hud.api.mod.event.EntityEvent;
+import kr.toxicity.hud.api.mod.event.EventRegistry;
+import kr.toxicity.hud.api.mod.event.ModEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * @param player player
  * @param entity entity
  */
-public record PlayerKillEntityEvent(@NotNull ServerPlayer player, @NotNull LivingEntity entity) implements FabricEvent<PlayerKillEntityEvent>, EntityEvent<PlayerKillEntityEvent> {
+public record PlayerKillEntityEvent(@NotNull ServerPlayer player, @NotNull LivingEntity entity) implements ModEvent<PlayerKillEntityEvent>, EntityEvent<PlayerKillEntityEvent> {
     /**
      * Event registry
      */

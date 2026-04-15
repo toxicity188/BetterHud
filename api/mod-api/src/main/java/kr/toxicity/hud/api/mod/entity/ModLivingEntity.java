@@ -1,10 +1,10 @@
-package kr.toxicity.hud.api.fabric.entity;
+package kr.toxicity.hud.api.mod.entity;
 
 /**
  * Provides additional function about living entity.
  */
 
-public interface FabricLivingEntity {
+public interface ModLivingEntity {
     /**
      * Gets last damage.
      * @return last damage

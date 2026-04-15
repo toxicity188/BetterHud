@@ -21,7 +21,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/api/bukkit-api" />
-            <option value="$PROJECT_DIR$/api/fabric-api" />
+            <option value="$PROJECT_DIR$/api/mod-api" />
             <option value="$PROJECT_DIR$/api/velocity-api" />
             <option value="$PROJECT_DIR$/bedrock" />
             <option value="$PROJECT_DIR$/bedrock/floodgate" />

@@ -1,6 +1,6 @@
 package kr.toxicity.hud.bootstrap.fabric.mixin.entity;
 
-import kr.toxicity.hud.api.fabric.event.entity.PlayerDeathEvent;
+import kr.toxicity.hud.api.mod.event.entity.PlayerDeathEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

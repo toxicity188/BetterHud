@@ -8,7 +8,7 @@ import io.netty.channel.ChannelPromise
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
 import kr.toxicity.hud.api.component.WidthComponent
-import kr.toxicity.hud.api.fabric.player.FabricCommonPacketListener
+import kr.toxicity.hud.api.mod.player.ModCommonPacketListener
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.volatilecode.VolatileCodeHandler
 import kr.toxicity.hud.bootstrap.fabric.util.toAdventure
@@ -102,7 +102,7 @@ class FabricVolatileCode : VolatileCodeHandler {
         private var onUse = uuid to HudByteBuf(Unpooled.buffer())
 
         init {
-            val pipeLine = (listener as FabricCommonPacketListener).`betterHud$channel`().pipeline()
+            val pipeLine = (listener as ModCommonPacketListener).`betterHud$channel`().pipeline()
             pipeLine.toMap().forEach {
                 if (it.value is Connection) pipeLine.addBefore(it.key, INJECT_NAME, this)
             }
