@@ -65,11 +65,16 @@ fabricModJson {
     )
 }
 
+val targetAttribute = manifestAttribute
+
 tasks {
     jar {
         archiveBaseName = "${rootProject.name}-fabric+$minecraft"
         destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
         archiveClassifier = ""
+        manifest {
+            attributes(targetAttribute)
+        }
     }
     runServer {
         enabled = false
