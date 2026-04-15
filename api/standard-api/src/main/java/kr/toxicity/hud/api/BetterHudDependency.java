@@ -102,7 +102,7 @@ public class BetterHudDependency {
             "net{}objecthunter",
             "exp4j",
             "0.4.8",
-            true,
+            false,
             BetterHudPlatform.ALL
     );
     /**
@@ -112,7 +112,7 @@ public class BetterHudDependency {
             "net{}jodah",
             "expiringmap",
             "0.5.11",
-            true,
+            false,
             BetterHudPlatform.ALL
     );
     /**

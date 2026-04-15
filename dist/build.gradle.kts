@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.standardConvention)
+    alias(libs.plugins.conventions.standard)
 }
 
 val api = rootProject.project("api:standard-api")

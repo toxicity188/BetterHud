@@ -1,36 +1,33 @@
 import xyz.jpenilla.resourcefactory.bukkit.Permission
 
 plugins {
-    alias(libs.plugins.bootstrapConvention)
-    alias(libs.plugins.resourceFactoryBukkit)
+    alias(libs.plugins.conventions.bootstrap)
+    alias(libs.plugins.conventions.bukkit)
+    alias(libs.plugins.resourcefactory.bukkit)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:${property("minecraft_version")}-R0.1-SNAPSHOT")
-    compileOnly(libs.bundles.adventure)
+    shade(project(":api:bukkit-api")) { isTransitive = false }
 
-    compileOnly(shade(project(":api:standard-api"))!!)
-    compileOnly(shade(project(":api:bukkit-api"))!!)
-    testImplementation(project(":api:bukkit-api"))
-    rootProject.project("bedrock").subprojects.forEach {
-        compileOnly(shade(it)!!)
-    }
-    rootProject.project("scheduler").subprojects.forEach {
-        compileOnly(shade(it)!!)
-    }
-    compileOnly(shade(project(":nms:v1_20_R4", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R1", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R2", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R3", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R4", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R5", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R6", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v1_21_R7", configuration = "reobf"))!!)
-    compileOnly(shade(project(":nms:v26_R1"))!!)
+    shade(project(":bedrock:geyser")) { isTransitive = false }
+    shade(project(":bedrock:floodgate")) { isTransitive = false }
 
-    compileOnly(libs.bstatsBukkit)
-    shade(libs.bstatsBukkit)
-    compileOnly(libs.adventurePlatformBukkit)
+    shade(project(":scheduler:standard")) { isTransitive = false }
+    shade(project(":scheduler:paper")) { isTransitive = false }
+
+    shade(project(":nms:v1_21_R2", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v1_21_R3", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v1_21_R4", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v1_21_R5", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v1_21_R6", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v1_21_R7", configuration = "reobf")) { isTransitive = false }
+    shade(project(":nms:v26_R1")) { isTransitive = false }
+
+    shade(libs.bstats.bukkit)
+    shade(libs.kotlinStdlib)
+
+    compileOnly(libs.adventure.platform.bukkit)
     compileOnly(shade(rootProject.fileTree("shaded"))!!)
 
     compileOnly("io.lumine:Mythic-Dist:5.11.2")
@@ -148,17 +145,38 @@ bukkitPluginYaml {
     }
 }
 
-tasks.jar {
-    archiveBaseName = "${rootProject.name}-bukkit"
-    destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
-    manifest {
-        attributes["paperweight-mappings-namespace"] = "spigot"
+val shade = configurations.getByName("shade")
+val targetAttribute = manifestAttribute + mapOf("paperweight-mappings-namespace" to "spigot")
+val groupString = group.toString()
+
+tasks {
+    jar {
+        finalizedBy(shadowJar)
+    }
+    shadowJar {
+        configurations = listOf(shade)
+        archiveBaseName = "${rootProject.name}-bukkit"
+        archiveClassifier = ""
+        destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
+        manifest {
+            attributes(targetAttribute)
+        }
+        dependencies {
+            exclude(dependency("org.jetbrains:annotations:13.0"))
+        }
+        fun prefix(pattern: String) {
+            relocate(pattern, "$groupString.shaded.$pattern")
+        }
+        prefix("kotlin")
+        prefix("kr.toxicity.command.impl")
+        prefix("org.bstats")
+        prefix("me.lucko.jarrelocator")
     }
 }
 
 
 modrinth {
-    uploadFile.set(tasks.jar)
+    uploadFile.set(tasks.shadowJar)
     versionName = "BetterHud ${project.version} for Bukkit"
     gameVersions = SUPPORTED_MINECRAFT_VERSION
     loaders = listOf("bukkit", "spigot", "paper", "folia", "purpur")

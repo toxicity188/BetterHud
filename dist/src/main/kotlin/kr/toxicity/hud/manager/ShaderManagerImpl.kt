@@ -161,7 +161,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         for (overlay in PackOverlay.entries) {
             loadShaders(overlay).forEach { (key, byte) ->
                 val path = resource.core + key
-                PackGenerator.addTask(if (overlay.ordinal == 0) path else listOf(overlay.overlayName) + path) {
+                PackGenerator.addTask(listOf(overlay.overlayName) + path) {
                     byte
                 }
             }

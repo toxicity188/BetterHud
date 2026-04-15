@@ -1,8 +1,9 @@
 plugins {
-    alias(libs.plugins.conventions.standard)
+    id("standard-conventions")
 }
 
 dependencies {
-    compileOnly(project(":api:standard-api"))
     compileOnly("org.spigotmc:spigot-api:${property("minecraft_version")}-R0.1-SNAPSHOT")
+    compileOnly("com.mojang:brigadier:1.3.10")
+    api(libs.bundles.adventure)
 }

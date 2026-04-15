@@ -1,7 +1,7 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
-    alias(libs.plugins.standardConvention)
+    alias(libs.plugins.conventions.standard)
     id("com.modrinth.minotaur")
     id("xyz.jpenilla.run-paper") version "3.0.2"
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -19,19 +19,6 @@ dependencies {
     searchAll(rootProject)
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.classes)
-    fun getProjectSource(project: Project): Array<File> {
-        return if (project.subprojects.isEmpty()) project.sourceSets.main.get().allSource.srcDirs.toTypedArray() else ArrayList<File>().apply {
-            project.subprojects.forEach {
-                addAll(getProjectSource(it))
-            }
-        }.toTypedArray()
-    }
-    archiveClassifier = "sources"
-    from(*getProjectSource(project))
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
 val javadocJar by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaGenerate)
     archiveClassifier = "javadoc"
@@ -68,7 +55,7 @@ tasks.register("modrinthPublish") {
 tasks {
     runServer {
         version(minecraft)
-        pluginJars(bukkit.tasks.jar.flatMap {
+        pluginJars(bukkit.tasks.named<Jar>("shadowJar").flatMap {
             it.archiveFile
         })
         pluginJars(fileTree("plugins"))
@@ -86,7 +73,6 @@ tasks {
             velocity.tasks.build
         )
         finalizedBy(
-            sourcesJar,
             javadocJar
         )
     }

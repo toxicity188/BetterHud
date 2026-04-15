@@ -105,7 +105,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
                 .toFile()
             version = FabricLoader.getInstance().getModContainer(MOD_ID).map { c ->
                 c.metadata.version.friendlyString
-            }.orElse("unknown")
+            }.orElse("unknown")!!
             core = BetterHudImpl(this).apply {
                 BetterHudAPI.inst(this)
                 addReloadStartTask {
@@ -228,7 +228,7 @@ class FabricBootstrapImpl : FabricBootstrap, DedicatedServerModInitializer {
 
     override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
 
-    override fun mcmetaVersion(): Int = 75
+    override fun mcmetaVersion(): Int = 84
 
     fun wrap(world: ServerLevel): WorldWrapper {
         val levelName = world.dimension().identifier().path

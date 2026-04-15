@@ -71,9 +71,11 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
 
     private val scheduler = if (isFolia) PaperScheduler(this) else BukkitScheduler(this)
     private val updateTask = ArrayList<PlaceholderTask>()
-    private val minecraftVersion = Bukkit.getBukkitVersion()
-        .substringBefore('-')
-        .toMinecraftVersion()
+    private val minecraftVersion by lazy {
+        Bukkit.getBukkitVersion()
+            .substringBefore('-')
+            .toMinecraftVersion()
+    }
 
     private val log = object : BetterHudLogger {
         override fun info(vararg message: String) {
@@ -191,8 +193,6 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             MinecraftVersion.V1_21_5 -> kr.toxicity.hud.nms.v1_21_R4.NMSImpl()
             MinecraftVersion.V1_21_4 -> kr.toxicity.hud.nms.v1_21_R3.NMSImpl()
             MinecraftVersion.V1_21_2, MinecraftVersion.V1_21_3 -> kr.toxicity.hud.nms.v1_21_R2.NMSImpl()
-            MinecraftVersion.V1_21, MinecraftVersion.V1_21_1 -> kr.toxicity.hud.nms.v1_21_R1.NMSImpl()
-            MinecraftVersion.V1_20_5, MinecraftVersion.V1_20_6 -> kr.toxicity.hud.nms.v1_20_R4.NMSImpl()
             else -> {
                 warn("Unsupported minecraft version: $minecraftVersion")
                 pluginManager.disablePlugin(this)

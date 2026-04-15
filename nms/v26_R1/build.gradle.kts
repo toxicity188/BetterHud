@@ -1,6 +1,5 @@
 plugins {
-    alias(libs.plugins.paperweightConvention)
-    alias(libs.plugins.paperweight)
+    alias(libs.plugins.conventions.paperweight)
 }
 
 dependencies {

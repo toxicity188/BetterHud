@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.apiConvention)
+    alias(libs.plugins.conventions.api)
     id("net.neoforged.moddev")
 }
 

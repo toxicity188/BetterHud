@@ -55,9 +55,7 @@ data class PackMeta(
                     VersionFormat(9),
                     VersionFormat(BOOTSTRAP.mcmetaVersion())
                 ),
-                Overlay(PackOverlay.entries.filter {
-                    it.ordinal > 0
-                }.map {
+                Overlay(PackOverlay.entries.map {
                     OverlayEntry(
                         VersionRange(it.minVersion, it.maxVersion),
                         it.overlayName

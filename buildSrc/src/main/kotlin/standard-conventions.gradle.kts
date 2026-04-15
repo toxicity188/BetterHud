@@ -11,7 +11,7 @@ val targetJavaVersion = 25
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    implementation(libs.betterCommand)
+    api(libs.betterCommand)
 }
 
 tasks {
