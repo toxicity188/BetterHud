@@ -46,7 +46,7 @@ dependencies {
         exclude("it.unimi.dsi")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.SkriptLang:Skript:2.14.1")
+    compileOnly("com.github.SkriptLang:Skript:2.15.0-pre2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.0")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:0.0.67")
