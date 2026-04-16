@@ -4,25 +4,15 @@
     "config:recommended"
   ],
   "ignoreDeps": [
+    "org.jetbrains:annotations",
     "net.fabricmc.fabric-api:fabric-api",
-    "fabric-loom",
+    "net.fabricmc.fabric-loom-repositories",
     "eu.pb4:placeholder-api",
     "eu.pb4:polymer-autohost",
     "eu.pb4:polymer-resource-pack",
-    "com.mojang:minecraft",
-    "io.papermc.parchment.data:parchment"
+    "com.mojang:minecraft"
   ],
   "baseBranches": [
     "dev"
-  ],
-  "packageRules": [
-    {
-      "matchDepNames": [
-        "net.momirealms:craft-engine-core",
-        "net.momirealms:craft-engine-bukkit"
-      ],
-      "versioning": "semver",
-      "allowedVersions": "/^(?<major>\\\\d+)(?:\\\\.(?<minor>\\\\d+)(?:\\\\.(?<patch>\\\\d+))?)?$/"
-    }
   ]
 }
