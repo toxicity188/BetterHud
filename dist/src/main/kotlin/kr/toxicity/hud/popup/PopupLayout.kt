@@ -93,7 +93,7 @@ class PopupLayout(
                 }
                 Runner {
                     val frame = frameSupplier()
-                    LayoutComponentContainer(layout.offset, layout.align, max)
+                    LayoutComponentContainer(layout.offset, layout.align, layout.flow, layout.flowGap, max)
                         .append(result.map {
                             it(frame)
                         })
