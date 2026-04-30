@@ -49,7 +49,7 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.15.0")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.0")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("net.momirealms:craft-engine-core:0.0.67")
+    compileOnly("net.momirealms:craft-engine-core:0.0.67.11")
     compileOnly("net.momirealms:craft-engine-bukkit:0.0.67")
     compileOnly("com.nexomc:nexo:1.21.0")
 }
