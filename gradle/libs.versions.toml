@@ -8,7 +8,8 @@ minotaur = "2.9.0"
 
 # library
 adventure = "4.26.1"
-adventure-platform = "4.4.1"
+adventure-platform-bukkit = "4.4.1"
+adventure-platform-mod = "6.9.0"
 snakeyaml = "2.6"
 gson = "2.14.0"
 exp4j = "0.4.8"
@@ -20,7 +21,7 @@ hikariCP = "7.0.2"
 fastUtil = "8.5.18"
 
 # mod
-fabric-api = "0.147.0+26.1.2"
+fabric-api = "0.149.0+26.1.2"
 fabric-loader = "0.19.2"
 fabric-language-kotlin = "1.13.11+kotlin.2.3.21"
 neoform = "26.1.2-1"
@@ -34,7 +35,8 @@ adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "ad
 adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
-adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-platform" }
+adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
+adventure-platform-fabric = { group = "net.kyori", name = "adventure-platform-fabric", version.ref = "adventure-platform-mod" }
 
 kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 betterCommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "betterCommand" }

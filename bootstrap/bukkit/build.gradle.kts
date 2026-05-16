@@ -40,18 +40,20 @@ dependencies {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
+        exclude("org.apache.logging.log4j")
     }
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.16") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
+        exclude("org.apache.logging.log4j")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.github.SkriptLang:Skript:2.15.2")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.0")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
-    compileOnly("net.momirealms:craft-engine-core:0.0.67")
-    compileOnly("net.momirealms:craft-engine-bukkit:0.0.67")
+    compileOnly("net.momirealms:craft-engine-core:26.5")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.5")
     compileOnly("com.nexomc:nexo:1.21.0")
 }
 

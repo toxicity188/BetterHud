@@ -10,6 +10,9 @@ val minecraft = property("minecraft_version")
 val supportedVersion = property("supported_version")
 
 configurations {
+    implementation {
+        extendsFrom(include.get())
+    }
     include {
         extendsFrom(shade.get())
     }
@@ -28,8 +31,8 @@ dependencies {
     implementation(libs.bundles.fabric)
 
     // Include
-    implementation(include("net.kyori:adventure-platform-fabric:${property("kyori_mod_implementation")}")!!)
-    implementation(include(project(":api:mod-api"))!!)
+    include(libs.adventure.platform.fabric)
+    include(project(":api:mod-api"))
 }
 
 fabricModJson {
