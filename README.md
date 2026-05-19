@@ -22,9 +22,9 @@ This project implements a server-side HUD.
 - Supports animation.
 
 ### Platform
-- Bukkit(with Folia) 1.20.4–1.21.11
-- Velocity 3.3-3.4
-- Fabric server 1.21.11
+- Bukkit(with Folia) 1.21–26.1.x
+- Velocity 3.3-3.5
+- Fabric server 26.1.x
 
 ### Library
 - [kotlin stdlib](https://github.com/JetBrains/kotlin): Implements better functional programming.
@@ -46,7 +46,7 @@ This project implements a server-side HUD.
 - Fabric server: [Fabric API](https://modrinth.com/mod/fabric-api)
 
 ### Build
-Requires Java 21 Eclipse Adoptium.
+Requires Java 25 Eclipse Adoptium.
 
 - Build all available jar: ./gradlew build  
 - Build Bukkit plugin: ./gradlew pluginJar
@@ -56,11 +56,6 @@ Requires Java 21 Eclipse Adoptium.
 - Build dokka-based docs jar: ./gradlew javadocJar
 
 ### API
-Get from maven central
-
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-standard-api?style=for-the-badge) (BetterHud)  
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterCommand?style=for-the-badge) (BetterCommand)
-
 [Bukkit example plugin](https://github.com/toxicity188/BetterHud-MMOCore)  
 ![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-bukkit-api) (BetterHud for Bukkit)
 ``` kotlin
@@ -69,38 +64,19 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.github.toxicity188:BetterHud-standard-api:VERSION") //Standard api
-    compileOnly("io.github.toxicity188:BetterHud-bukkit-api:VERSION") //Platform api
-    compileOnly("io.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
+    compileOnly("io.github.toxicity188:BetterHud-bukkit-api:VERSION") //Bukkit api
 }
 ```
 
 [Fabric example mod](https://github.com/toxicity188/betterhud-fabric-example)  
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-fabric-api) (BetterHud for Fabric)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.toxicity188/BetterHud-mod-api) (BetterHud for Fabric)
 ``` kotlin
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("io.github.toxicity188:BetterHud-standard-api:VERSION") //Standard api
-    modCompileOnly("io.github.toxicity188:BetterHud-fabric-api:VERSION") //Platform api
-    compileOnly("io.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
-}
-```
-
-Get from Jitpack  
-[![](https://jitpack.io/v/toxicity188/BetterHud.svg)](https://jitpack.io/#toxicity188/BetterHud)
-``` kotlin
-repositories {
-    mavenCentral()
-    maven("https://jitpack.io")
-}
-
-dependencies {
-    compileOnly("net.kyori:adventure-api:VERSION") //Adventure api
-    compileOnly("com.github.toxicity188:BetterHud:VERSION") //BetterHud
-    compileOnly("com.github.toxicity188:BetterCommand:VERSION") //BetterCommand library
+    compileOnly("io.github.toxicity188:BetterHud-mod-api:VERSION") //Platform api
 }
 ```
 
