@@ -21,6 +21,7 @@ interface ImageLayout : HudLayout<ImageElement> {
     val maxStack: PlaceholderBuilder<*>?
     val reversed: Boolean
     val clearListener: Boolean
+    val alwaysShowStack: Boolean
 
     fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
         return ImageIdentifier(
@@ -81,5 +82,6 @@ interface ImageLayout : HudLayout<ImageElement> {
         }
         override val reversed: Boolean = yamlObject.getAsBoolean("reversed", false)
         override val clearListener: Boolean = yamlObject.getAsBoolean("clear-listener", false)
+        override val alwaysShowStack: Boolean = yamlObject.getAsBoolean("always-show-stack", false)
     }
 }
