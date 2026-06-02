@@ -25,7 +25,7 @@ dependencies {
     implementation("eu.pb4:polymer-autohost:0.16.4+26.1.2")
     implementation("eu.pb4:placeholder-api:3.0.0+26.1")
     implementation("net.luckperms:api:5.5")
-    implementation("org.checkerframework:checker-qual:4.1.0")
+    implementation("org.checkerframework:checker-qual:4.2.0")
 
     // Fabric
     implementation(libs.bundles.fabric)
