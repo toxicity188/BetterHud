@@ -56,7 +56,7 @@ build-minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotau
 build-resourcefactory = { module = "xyz.jpenilla:resource-factory", version.ref = "resourcefactory" }
 build-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.4.3"
 build-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.2.0"
-build-publish = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.36.0"
+build-publish = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"
 build-paperweight = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
 
 [plugins]
