@@ -19,7 +19,7 @@ dependencies {
     searchAll(rootProject)
 }
 
-val javadocJar by tasks.registering(Jar::class) {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     dependsOn(tasks.dokkaGenerate)
     archiveClassifier = "javadoc"
     from(layout.buildDirectory.dir("dokka/html").orNull?.asFile)
@@ -60,10 +60,10 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.9.1")
-            hangar("ViaBackwards", "5.9.1")
+            hangar("ViaVersion", "5.10.0")
+            hangar("ViaBackwards", "5.10.0")
             hangar("PlaceholderAPI", "2.12.2")
-            hangar("Skript", "2.15.2")
+            hangar("Skript", "2.15.3")
         }
     }
     build {

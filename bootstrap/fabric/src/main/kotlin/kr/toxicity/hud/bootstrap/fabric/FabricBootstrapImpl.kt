@@ -228,7 +228,7 @@ class FabricBootstrapImpl : ModBootstrap, DedicatedServerModInitializer {
 
     override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
 
-    override fun mcmetaVersion(): Int = 84
+    override fun mcmetaVersion(): Int = 88
 
     fun wrap(world: ServerLevel): WorldWrapper {
         val levelName = world.dimension().identifier().path

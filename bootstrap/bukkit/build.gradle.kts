@@ -24,6 +24,7 @@ dependencies {
     shade(project(":nms:v1_21_R6", configuration = "reobf")) { isTransitive = false }
     shade(project(":nms:v1_21_R7", configuration = "reobf")) { isTransitive = false }
     shade(project(":nms:v26_R1")) { isTransitive = false }
+    shade(project(":nms:v26_R2")) { isTransitive = false }
 
     shade(libs.bstats.bukkit)
     shade(libs.kotlinStdlib)
@@ -53,7 +54,7 @@ dependencies {
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.3")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:26.6.4")
-    compileOnly("net.momirealms:craft-engine-bukkit:26.5")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.6.4")
     compileOnly("com.nexomc:nexo:1.21.0")
 }
 

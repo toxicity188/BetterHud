@@ -186,6 +186,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
     override fun onLoad() {
         val pluginManager = Bukkit.getPluginManager()
         nms = when (minecraftVersion) {
+            MinecraftVersion.V26_2 -> kr.toxicity.hud.nms.v26_R2.NMSImpl()
             MinecraftVersion.V26_1, MinecraftVersion.V26_1_1, MinecraftVersion.V26_1_2 -> kr.toxicity.hud.nms.v26_R1.NMSImpl()
             MinecraftVersion.V1_21_11 -> kr.toxicity.hud.nms.v1_21_R7.NMSImpl()
             MinecraftVersion.V1_21_9, MinecraftVersion.V1_21_10 -> kr.toxicity.hud.nms.v1_21_R6.NMSImpl()
