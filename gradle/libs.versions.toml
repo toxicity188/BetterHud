@@ -9,7 +9,7 @@ minotaur = "2.9.0"
 # library
 adventure = "5.2.0"
 adventure-platform-bukkit = "4.4.1"
-adventure-platform-mod = "7.0.0"
+adventure-platform-mod = "7.1.0"
 snakeyaml = "2.6"
 gson = "2.14.0"
 exp4j = "0.4.8"
