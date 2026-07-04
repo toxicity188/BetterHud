@@ -27,6 +27,13 @@ dependencies {
 
     shade(libs.bstats.bukkit)
     shade(libs.kotlinStdlib)
+    // expiringmap is normally fetched at runtime by DependencyInjector, but on some
+    // Paper/Purpur builds the reflective addURL/Unsafe classloader injection it falls back
+    // to silently has no effect, so PlayerHeadManager's <clinit> throws
+    // NoClassDefFoundError(net.jodah.expiringmap.ExpiringMap) on every enable even though
+    // the jar is present in .libraries. Shading it in at build time removes the dependency
+    // on that runtime injection path entirely.
+    shade("net.jodah:expiringmap:0.5.11")
 
     compileOnly(libs.adventure.platform.bukkit)
     compileOnly(shade(fileTree("shaded"))!!)
