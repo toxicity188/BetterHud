@@ -29,11 +29,7 @@ public interface BetterHud {
     /**
      * Adventure api version.
      */
-    String ADVENTURE_VERSION = "4.26.1";
-    /**
-     * Adventure platform version.
-     */
-    String PLATFORM_VERSION = "4.4.1";
+    String ADVENTURE_VERSION = "5.2.0";
     /**
      * Examination version.
      */
