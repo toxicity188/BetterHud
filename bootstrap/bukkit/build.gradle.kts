@@ -37,7 +37,7 @@ dependencies {
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.12.3")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.3") {
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.4") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
