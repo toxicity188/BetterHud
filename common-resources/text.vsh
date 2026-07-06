@@ -1,11 +1,11 @@
-#version 150
+#version 330
 
 #CreateConstant
 
 #moj_import <fog.glsl>
 #moj_import <sample_lightmap.glsl>
 
-#if SHADER_VERSION >= 3
+#if SHADER_VERSION >= 2
 #moj_import <dynamictransforms.glsl>
 #moj_import <projection.glsl>
 #moj_import <globals.glsl>
@@ -73,7 +73,7 @@ void main() {
     vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
     applyColor = 0;
-    vertexColor = Color * sample_lightmap(Sampler2, UV2);
+    vertexColor = Color;
     if (pos.y >= ui.y && ProjMat[3].x == -1) {
         int bit = int(pos.y) >> HEIGHT_BIT;
 
@@ -95,10 +95,10 @@ void main() {
                 #CreateLayout
             }
 
-#if SHADER_VERSION < 2
-            vertexColor = (checkElement(pos.z) && !outline) ? vec4(0) : Color * sample_lightmap(Sampler2, UV2) * vec4(1, 1, 1, opacity);
+#if SHADER_VERSION < 1
+            vertexColor = (checkElement(pos.z) && !outline) ? vec4(0) : Color * vec4(1, 1, 1, opacity);
 #else
-            vertexColor = Color * sample_lightmap(Sampler2, UV2) * vec4(1, 1, 1, opacity);
+            vertexColor = Color * vec4(1, 1, 1, opacity);
 #endif
 
             //Wave
@@ -142,10 +142,13 @@ void main() {
 //HideExp            vertexColor = vec4(0);
 //HideExp        }
     }
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
+    vertexColor *= sample_lightmap(Sampler2, UV2);
+#endif
 
     #GenerateOtherMainMethod
 
-#if SHADER_VERSION >= 3
+#if SHADER_VERSION >= 2
     sphericalVertexDistance = fog_spherical_distance(pos);
     cylindricalVertexDistance = fog_cylindrical_distance(pos);
 #else

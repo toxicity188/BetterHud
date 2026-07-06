@@ -1,10 +1,10 @@
-#version 150
+#version 330
 
 #CreateConstant
 
 #moj_import <fog.glsl>
 
-#if SHADER_VERSION >= 3
+#if SHADER_VERSION >= 2
 #moj_import <dynamictransforms.glsl>
 in float sphericalVertexDistance;
 in float cylindricalVertexDistance;
@@ -26,15 +26,27 @@ out vec4 fragColor;
 #GenerateOtherDefinedMethod
 
 void main() {
+#ifdef IS_GRAYSCALE
+    vec4 texColor = texture(Sampler0, texCoord0).rrrr;
+#else
     vec4 texColor = texture(Sampler0, texCoord0);
+#endif
+#ifdef IS_SEE_THROUGH
+    vec4 color = texColor * vertexColor;
+#else
     vec4 color = texColor * vertexColor * ColorModulator;
+#endif
 
     #GenerateOtherMainMethod
 
     if (color.a < 0.1) {
         discard;
     }
-#if SHADER_VERSION >= 3
+#ifdef IS_SEE_THROUGH
+    fragColor = color * ColorModulator;
+#elif defined(IS_GUI)
+    fragColor = color;
+#elif SHADER_VERSION >= 2
     fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 #else
     fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);

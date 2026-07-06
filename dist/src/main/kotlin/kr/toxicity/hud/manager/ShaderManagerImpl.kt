@@ -175,9 +175,9 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         val shaders = ShaderType.entries.map {
             it to it.lines()
         }
-        return shaders.map { (key, args) ->
+        return shaders.flatMap { (key, args) ->
             val tagSupplier = (tagSupplierMap[key] ?: EMPTY_SUPPLIER).get()
-            key.shadersCoreName to buildString {
+            val bytes = buildString {
                 args.forEach write@ { string ->
                     var s = string
                     if (s.startsWith("//")) {
@@ -209,6 +209,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     }
                 }
             }.toByteArray()
+            key.shadersCoreNames.map { it to bytes }
         }
     }
 

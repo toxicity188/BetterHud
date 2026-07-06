@@ -2,7 +2,6 @@ package kr.toxicity.hud.api.manager;
 
 import kr.toxicity.hud.api.BetterHudAPI;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,21 +128,25 @@ public interface ShaderManager {
     /**
      * Represents BetterHud's shader files.
      */
-    @RequiredArgsConstructor
     @Getter
     enum ShaderType {
         /**
          * text vsh
          */
-        TEXT_VERTEX("text.vsh", "rendertype_text.vsh"),
+        TEXT_VERTEX("text.vsh", "rendertype_text.vsh", "text.vsh"),
         /**
          * text fsh
          */
-        TEXT_FRAGMENT("text.fsh", "rendertype_text.fsh")
+        TEXT_FRAGMENT("text.fsh", "rendertype_text.fsh", "text.fsh")
 
         ;
         private final @NotNull String fileName;
-        private final @NotNull String shadersCoreName;
+        private final @NotNull String[] shadersCoreNames;
+
+        ShaderType(@NotNull String fileName, @NotNull String... shadersCoreNames) {
+            this.fileName = fileName;
+            this.shadersCoreNames = shadersCoreNames;
+        }
 
         /**
          * Reads the all line of shader file.
