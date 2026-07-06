@@ -54,7 +54,7 @@ bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref 
 build-kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 build-minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.gradle.plugin", version.ref = "minotaur"}
 build-resourcefactory = { module = "xyz.jpenilla:resource-factory", version.ref = "resourcefactory" }
-build-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.4.3"
+build-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.5.1"
 build-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.2.0"
 build-publish = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"
 build-paperweight = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
