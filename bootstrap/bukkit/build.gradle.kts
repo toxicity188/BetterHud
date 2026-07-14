@@ -54,7 +54,7 @@ dependencies {
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.4")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:26.7.3")
-    compileOnly("net.momirealms:craft-engine-bukkit:26.7.2")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.7.3")
     compileOnly("com.nexomc:nexo:1.25.0")
 }
 
