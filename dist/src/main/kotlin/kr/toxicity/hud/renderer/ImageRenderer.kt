@@ -47,7 +47,7 @@ class ImageRenderer(
             }
             if (cond(target)) {
                 if (maxStackFrame > 1) {
-                    if (stackFrame <= 0.0) return@build EMPTY_PIXEL_COMPONENT
+                    if (stackFrame <= 0.0 && !alwaysShowStack) return@build EMPTY_PIXEL_COMPONENT
                     var empty = EMPTY_PIXEL_COMPONENT
                     val range = 0..<maxStackFrame
                     for (i in if (reversed) range.reversed() else range) {
