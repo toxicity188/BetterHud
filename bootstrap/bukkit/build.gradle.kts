@@ -50,7 +50,7 @@ dependencies {
         exclude("org.apache.logging.log4j")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.SkriptLang:Skript:2.15.3")
+    compileOnly("com.github.SkriptLang:Skript:2.16.1")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.5")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.16")
     compileOnly("net.momirealms:craft-engine-core:26.7.4")
