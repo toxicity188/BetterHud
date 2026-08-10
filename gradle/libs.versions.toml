@@ -18,7 +18,7 @@ bstats = "3.2.1"
 betterCommand = "1.4.3"
 semver4j = "6.0.0"
 hikariCP = "7.1.0"
-fastUtil = "8.5.18"
+fastUtil = "8.5.19"
 
 # mod
 fabric-api = "0.153.0+26.2"
