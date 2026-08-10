@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 plugins {
     alias(libs.plugins.conventions.standard)
     id("com.modrinth.minotaur")
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
 }
 
