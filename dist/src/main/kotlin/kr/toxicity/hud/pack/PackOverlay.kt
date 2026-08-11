@@ -9,7 +9,8 @@ enum class PackOverlay(
 ) {
     V1_21_2("betterhud_1_21_2", 9, 45),
     V1_21_4("betterhud_1_21_4", 46, 55),
-    V1_21_6("betterhud_1_21_6", 56, 83),
+    V1_21_6("betterhud_1_21_6", 56, 74),
+    V1_21_11("betterhud_1_21_11", 75, 83),
     V26_1("betterhud_26_1", 84, 99)
     ;
     fun loadAssets() {
