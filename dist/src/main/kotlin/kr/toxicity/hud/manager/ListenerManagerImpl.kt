@@ -31,13 +31,15 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             val source = PlaceholderSource.Impl(c)
             val v = PlaceholderManagerImpl.find(c["value"]?.asString().ifNull { "value value not set." }, source)
             val m = PlaceholderManagerImpl.find(c["max"]?.asString().ifNull { "max value not set." }, source)
+            val minValue = c["min"]?.asDouble() ?: 0.0
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
                 if (value.clazz == max.clazz && value.clazz == Number::class.javaObjectType) {
                     HudListener {
                         runCatching {
-                            (value(it) as Number).toDouble() / (max(it) as Number).toDouble()
+                            val ratio = (value(it) as Number).toDouble() / (max(it) as Number).toDouble()
+                            minValue + ratio * (1.0 - minValue)
                         }.getOrNull() ?: 0.0
                     }
                 } else throw RuntimeException("this type is not a number: ${value.clazz.simpleName} and ${max.clazz.simpleName}")
