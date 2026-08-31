@@ -1,7 +1,6 @@
 package kr.toxicity.hud.api.bukkit.event;
 
 import kr.toxicity.hud.api.player.HudPlayer;
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
@@ -10,18 +9,24 @@ import org.jetbrains.annotations.NotNull;
 /**
  * player update event.
  */
-@Getter
 public class HudUpdateEvent extends PlayerEvent implements HudPlayerEvent {
-    private final @NotNull HudPlayer hudPlayer;
+
+    private final @NotNull HudPlayer player;
 
     /**
      * Player's hud is updated.
-     * @param hudPlayer player
+     * @param player player
      */
-    public HudUpdateEvent(@NotNull HudPlayer hudPlayer) {
-        super((Player) hudPlayer.handle());
-        this.hudPlayer = hudPlayer;
+    public HudUpdateEvent(@NotNull HudPlayer player) {
+        super((Player) player.handle());
+        this.player = player;
     }
+
+    @Override
+    public @NotNull HudPlayer player() {
+        return player;
+    }
+
     /**
      * Gets event handler
      * @return handler

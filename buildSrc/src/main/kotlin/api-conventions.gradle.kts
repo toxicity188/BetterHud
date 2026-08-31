@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 
 plugins {
     id("standard-conventions")
@@ -12,16 +13,11 @@ val publishName = "${rootProject.name}-${project.name}"
 dependencies {
     compileOnly(libs.bundles.adventure)
 
-    compileOnly("org.projectlombok:lombok:1.18.42")
-    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.42")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
+    testCompileOnly("org.projectlombok:lombok:1.18.46")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.46")
 }
 
 signing {
@@ -39,8 +35,8 @@ mavenPublishing {
     signAllPublications()
     coordinates("io.github.toxicity188", publishName, project.version as String)
     configure(JavaLibrary(
-        javadocJar = JavadocJar.None(),
-        sourcesJar = true,
+        javadocJar = JavadocJar.Javadoc(),
+        sourcesJar = SourcesJar.Sources(),
     ))
     pom {
         name = publishName

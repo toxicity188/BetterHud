@@ -8,7 +8,6 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.placeholder.PlaceholderSource
 import kr.toxicity.hud.resource.GlobalResource
-import kr.toxicity.hud.util.JavaNumber
 import kr.toxicity.hud.util.ifNull
 import net.jodah.expiringmap.ExpirationPolicy
 import net.jodah.expiringmap.ExpiringMap
@@ -35,7 +34,7 @@ object ListenerManagerImpl : BetterHudManager, ListenerManager {
             return@placeholder { event ->
                 val value = v build event
                 val max = m build event
-                if (value.clazz == max.clazz && value.clazz == JavaNumber::class.java) {
+                if (value.clazz == max.clazz && value.clazz == Number::class.javaObjectType) {
                     HudListener {
                         runCatching {
                             (value(it) as Number).toDouble() / (max(it) as Number).toDouble()

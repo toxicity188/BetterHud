@@ -33,7 +33,7 @@ data class HudShader(
     fun toBackground(otherOpacity: Double) = HudShader(
         gui,
         renderScale,
-        layer - 1,
+        layer,
         0,
         opacity * otherOpacity,
         property

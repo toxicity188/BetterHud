@@ -24,7 +24,7 @@ class FabricScheduler : HudScheduler {
                 it.isCancelled
             }
         }
-        ServerTickEvents.START_WORLD_TICK.register {
+        ServerTickEvents.START_LEVEL_TICK.register {
             worldTasks.values.removeIfSync { list ->
                 list.removeIfSync {
                     it.run()

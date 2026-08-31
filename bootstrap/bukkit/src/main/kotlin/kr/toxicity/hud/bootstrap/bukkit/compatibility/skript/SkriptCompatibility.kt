@@ -3,10 +3,10 @@ package kr.toxicity.hud.bootstrap.bukkit.compatibility.skript
 import ch.njol.skript.Skript
 import ch.njol.skript.classes.ClassInfo
 import ch.njol.skript.classes.Parser
-import ch.njol.skript.lang.ExpressionType
 import ch.njol.skript.lang.ParseContext
 import ch.njol.skript.lang.VariableString
 import ch.njol.skript.registrations.Classes
+import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.bukkit.event.HudUpdateEvent
 import kr.toxicity.hud.api.hud.Hud
 import kr.toxicity.hud.api.listener.HudListener
@@ -26,6 +26,9 @@ import kr.toxicity.hud.manager.PopupManagerImpl
 import kr.toxicity.hud.util.ifNull
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
+import org.skriptlang.skript.registration.DefaultSyntaxInfos
+import org.skriptlang.skript.registration.SyntaxInfo
+import org.skriptlang.skript.registration.SyntaxRegistry
 import java.util.function.Function
 
 class SkriptCompatibility : Compatibility {
@@ -52,14 +55,39 @@ class SkriptCompatibility : Compatibility {
             override fun toVariableNameString(p0: Popup): String = p0.name
         }))
 
-
-        Skript.registerEffect(EffShowPopup::class.java, "[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]")
-        Skript.registerEffect(EffCallPopupEvent::class.java, "call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]")
-        Skript.registerEffect(EffClearPopup::class.java, "clear popup of %players%")
-        Skript.registerEffect(EffUpdateHud::class.java, "update hud of %players%")
-        Skript.registerEffect(EffPointAdd::class.java, "point add %location% named %string% [with icon %-string%] to %players%")
-        Skript.registerEffect(EffPointRemove::class.java, "point remove %string% to %players%")
-        Skript.registerExpression(ExprHudPlayer::class.java, Player::class.java, ExpressionType.SIMPLE, "hud player")
+        Skript.instance().registerAddon(BetterHud::class.java, "betterhud").syntaxRegistry().run {
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffShowPopup::class.java).addPattern("[show] popup %string% to %players% [with [variable] [of] %-objects%] [keyed by %-object%]").build()
+            )
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffCallPopupEvent::class.java).addPattern("call popup event for %players% named %string% [with [variable] [of] %-objects%] [keyed by %-object%]").build()
+            )
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffClearPopup::class.java).addPattern("clear popup of %players%").build()
+            )
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffUpdateHud::class.java).addPattern("update hud of %players%").build()
+            )
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffPointAdd::class.java).addPattern("point add %location% named %string% [with icon %-string%] to %players%").build()
+            )
+            register(
+                SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffPointRemove::class.java).addPattern("point remove %string% to %players%").build()
+            )
+            register(
+                SyntaxRegistry.EXPRESSION,
+                DefaultSyntaxInfos.Expression.builder(ExprHudPlayer::class.java, Player::class.java)
+                    .priority(DefaultSyntaxInfos.Expression.SIMPLE)
+                    .addPattern("hud player")
+                    .build()
+            )
+        }
     }
 
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>> = mapOf()

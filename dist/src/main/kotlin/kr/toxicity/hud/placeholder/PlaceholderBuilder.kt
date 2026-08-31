@@ -1,17 +1,14 @@
 package kr.toxicity.hud.placeholder
 
 import kr.toxicity.hud.api.update.UpdateEvent
-import kr.toxicity.hud.util.JavaBoolean
-import kr.toxicity.hud.util.JavaNumber
-import kr.toxicity.hud.util.JavaString
 
 interface PlaceholderBuilder<T : Any> {
     val clazz: Class<out T>
     infix fun build(reason: UpdateEvent): Placeholder<T>
 
-    val isNumber get() = JavaNumber::class.java.isAssignableFrom(clazz)
-    val isBoolean get() = JavaBoolean::class.java.isAssignableFrom(clazz)
-    val isString get() = JavaString::class.java.isAssignableFrom(clazz)
+    val isNumber get() = Number::class.javaObjectType.isAssignableFrom(clazz)
+    val isBoolean get() = Boolean::class.javaObjectType.isAssignableFrom(clazz)
+    val isString get() = String::class.javaObjectType.isAssignableFrom(clazz)
 
     fun assertNumber(message: String) = assertNumber { message }
     fun assertBoolean(message: String) = assertBoolean { message }

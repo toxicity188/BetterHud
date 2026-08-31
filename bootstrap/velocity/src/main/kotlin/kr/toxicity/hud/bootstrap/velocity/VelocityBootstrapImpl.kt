@@ -127,7 +127,7 @@ class VelocityBootstrapImpl @Inject constructor(
     override fun core(): BetterHud = core
     override fun console(): Audience = proxyServer.consoleCommandSource
     override fun volatileCode(): VolatileCodeHandler = volatileCode
-    override fun version(): String = description.version.orElse("unknown")
+    override fun version(): String = description.version.orElse("unknown")!!
     override fun resource(path: String): InputStream? = javaClass.getResourceAsStream("/$path")?.buffered()
 
     private var latest = emptyList<Component>()
@@ -214,7 +214,7 @@ class VelocityBootstrapImpl @Inject constructor(
     }
 
     override fun minecraftVersion(): MinecraftVersion = MinecraftVersion.LATEST
-    override fun mcmetaVersion(): Int = 75
+    override fun mcmetaVersion(): Int = 84
 
     override fun world(name: String): WorldWrapper? = null
     override fun worlds(): List<WorldWrapper> = emptyList()

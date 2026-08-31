@@ -1,7 +1,9 @@
 package kr.toxicity.hud.bootstrap.bukkit.compatibility.mmocore
 
+import io.lumine.mythic.lib.MythicLib
 import io.lumine.mythic.lib.api.stat.modifier.StatModifier
 import io.lumine.mythic.lib.player.modifier.ModifierSource
+import io.lumine.mythic.lib.skill.handler.SkillHandler
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.trigger.HudTrigger
@@ -14,7 +16,6 @@ import kr.toxicity.hud.util.ifNull
 import net.Indyuce.mmocore.MMOCore
 import net.Indyuce.mmocore.api.player.PlayerData
 import net.Indyuce.mmocore.api.player.stats.PlayerStats
-import net.Indyuce.mmocore.skill.RegisteredSkill
 import org.bukkit.entity.Player
 import java.util.function.Function
 
@@ -26,11 +27,11 @@ class MMOCoreCompatibility : Compatibility {
         return MMOCore.plugin.playerDataManager.getOrNull(uniqueId)
     }
 
-    private fun PlayerData.modifier(skill: RegisteredSkill, key: String) = getSkillLevel(skill).let { level ->
-        profess.getSkill(skill.handler.id)?.getParameter(key, level, this) ?: skill.getParameterInfo(key).evaluate(level, this)
+    private fun PlayerData.modifier(skill: SkillHandler<*>, key: String) = getSkillLevel(skill).let { level ->
+        profess.getSkill(skill.id)?.getParameter(key, level, this) ?: skill.getDefaultFormula(key).evaluate(level, player)
     }
     
-    private fun skill(name: String) = MMOCore.plugin.skillManager.getSkill(name) ?: throw RuntimeException("Unable to find that skill: $name")
+    private fun skill(name: String) = MythicLib.plugin.skills.getHandler(name) ?: throw RuntimeException("Unable to find that skill: $name")
 
     override val triggers: Map<String, (YamlObject) -> HudTrigger<*>>
         get() = mapOf()
@@ -81,8 +82,7 @@ class MMOCoreCompatibility : Compatibility {
                 }
             },
             "cooldown_skill" to { c ->
-                val name = c["skill"]?.asString().ifNull { "skill value not set." }
-                val skill = MMOCore.plugin.skillManager.getSkill(name).ifNull { "the skill named \"$name\" doesn't exist." }
+                val skill = skill(c["skill"]?.asString().ifNull { "skill value not set." })
                 HudListener { p ->
                     val mmo = p.bukkitPlayer.toMMOCore() ?: return@HudListener 0.0
                     (mmo.cooldown(skill) / mmo.modifier(skill, "cooldown")).coerceAtLeast(0.0)
@@ -269,7 +269,7 @@ class MMOCoreCompatibility : Compatibility {
                     Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function 0.0
                         (0..8).firstOrNull {
-                            mmo.getBoundSkill(it)?.skill?.handler?.id == skill.handler.id
+                            mmo.getBoundSkill(it)?.skill?.id == skill.id
                         } ?: -1
                     }
                 }
@@ -291,7 +291,7 @@ class MMOCoreCompatibility : Compatibility {
                         val bar = p.bukkitPlayer.inventory.heldItemSlot
                         var i = 0
                         for ((index, entry) in (p.bukkitPlayer.toMMOCore() ?: return@Function 0.0).boundSkills.entries.withIndex()) {
-                            if (entry.value.classSkill.skill.handler.id == skill.handler.id) {
+                            if (entry.value.classSkill.skill.id == skill.id) {
                                 i = entry.key
                                 if (index >= bar) i++
                                 break
@@ -378,7 +378,7 @@ class MMOCoreCompatibility : Compatibility {
                     Function { p ->
                         val mmo = p.bukkitPlayer.toMMOCore() ?: return@Function false
                         mmo.boundSkills.any {
-                            it.value.classSkill.skill.handler.id == args[0]
+                            it.value.classSkill.skill.id == args[0]
                         }
                     }
                 }

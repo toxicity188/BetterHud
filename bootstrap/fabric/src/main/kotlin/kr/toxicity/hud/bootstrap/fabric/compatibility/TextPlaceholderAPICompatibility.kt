@@ -1,7 +1,8 @@
 package kr.toxicity.hud.bootstrap.fabric.compatibility
 
 import eu.pb4.placeholders.api.PlaceholderContext
-import eu.pb4.placeholders.api.Placeholders
+import eu.pb4.placeholders.api.node.TextNode
+import eu.pb4.placeholders.api.parsers.ParserBuilder
 import kr.toxicity.hud.api.listener.HudListener
 import kr.toxicity.hud.api.placeholder.HudPlaceholder
 import kr.toxicity.hud.api.trigger.HudTrigger
@@ -9,11 +10,15 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.bootstrap.fabric.util.fabricPlayer
 import kr.toxicity.hud.bootstrap.fabric.util.toMiniMessageString
-import net.minecraft.network.chat.MutableComponent
-import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents
 import java.util.function.Function
 
 class TextPlaceholderAPICompatibility : Compatibility {
+
+    private val builder by lazy {
+        ParserBuilder.of()
+            .serverPlaceholders()
+            .build()
+    }
 
     override val website: String = "https://modrinth.com/mod/placeholder-api"
 
@@ -28,9 +33,9 @@ class TextPlaceholderAPICompatibility : Compatibility {
             "parse" to HudPlaceholder.builder<String>()
                 .requiredArgsLength(1)
                 .function { args, _ ->
-                    val comp = MutableComponent.create(LiteralContents("%${args[0]}%"))
+                    val node = TextNode.of("%${args[0]}%")
                     Function {
-                        Placeholders.parseText(comp, PlaceholderContext.of(it.fabricPlayer)).toMiniMessageString()
+                        builder.parseComponent(node, PlaceholderContext.of(it.fabricPlayer).asParserContext()).toMiniMessageString()
                     }
                 }
                 .build()

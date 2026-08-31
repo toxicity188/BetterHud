@@ -116,6 +116,7 @@ class NMSImpl : NMS {
         return if (value.isNotEmpty()) value.first().value else ""
     }
 
+
     override fun registerCommand(module: CommandModule<BetterCommandSource>) {
         val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
         val bootstrap = BetterHudAPI.inst().bootstrap()

@@ -44,9 +44,9 @@ object Operations {
     ) : Map<String, (T, T) -> Boolean> by map
 
     private val types: Map<Class<*>, Operation<*>> = mapOf(
-        java.lang.Boolean::class.java to boolean,
-        java.lang.Number::class.java to number,
-        java.lang.String::class.java to string
+        Boolean::class.javaObjectType to boolean,
+        Number::class.javaObjectType to number,
+        String::class.javaObjectType to string
     )
 
     @Suppress("UNCHECKED_CAST")

@@ -20,7 +20,7 @@ import java.net.http.HttpResponse
 private val VERSION_GSON = GsonBuilder()
     .registerTypeAdapter(MinecraftVersion::class.java, object : JsonDeserializer<MinecraftVersion> {
         override fun deserialize(p0: JsonElement, p1: Type, p2: JsonDeserializationContext): MinecraftVersion =
-            MinecraftVersion(p0.asString)
+            MinecraftVersion.of(p0.asString)
     })
     .registerTypeAdapter(Semver::class.java, object : JsonDeserializer<Semver> {
         override fun deserialize(p0: JsonElement, p1: Type, p2: JsonDeserializationContext): Semver =
