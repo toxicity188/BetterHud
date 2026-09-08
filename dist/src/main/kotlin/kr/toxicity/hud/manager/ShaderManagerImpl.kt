@@ -180,6 +180,9 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             val bytes = buildString {
                 args.forEach write@ { string ->
                     var s = string
+                    if (s.startsWith("#version")) {
+                        s = if (overlay.ordinal < 2) "#version 150" else "#version 330"
+                    }
                     if (s.startsWith("//")) {
                         val get = s.substringBefore(' ')
                         if (replaceSet.contains(get.substring(2))) s = s.substring(get.length)
