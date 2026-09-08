@@ -2,8 +2,10 @@
 
 #CreateConstant
 
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 #moj_import <fog.glsl>
 #moj_import <sample_lightmap.glsl>
+#endif
 
 #if SHADER_VERSION >= 2
 #moj_import <dynamictransforms.glsl>
@@ -23,17 +25,17 @@ uniform float GameTime;
 in vec3 Position;
 in vec4 Color;
 in vec2 UV0;
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 in ivec2 UV2;
+#endif
 
 uniform sampler2D Sampler0;
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 uniform sampler2D Sampler2;
-
-uniform vec3 ChunkOffset;
+#endif
 
 out vec4 vertexColor;
 out vec2 texCoord0;
-
-out float applyColor;
 
 bool range(float t, float m1, float m2) {
     return t >= m1 && t <= m2;
@@ -72,7 +74,6 @@ void main() {
     vec2 ui = ceil(2 / vec2(ProjMat[0][0], -ProjMat[1][1]));
     vec2 uiScreen = ui / ScreenSize;
     vec3 color = Color.xyz;
-    applyColor = 0;
     vertexColor = Color;
     if (pos.y >= ui.y && ProjMat[3].x == -1) {
         int bit = int(pos.y) >> HEIGHT_BIT;
@@ -149,8 +150,10 @@ void main() {
     #GenerateOtherMainMethod
 
 #if SHADER_VERSION >= 2
+    #if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
     sphericalVertexDistance = fog_spherical_distance(pos);
     cylindricalVertexDistance = fog_cylindrical_distance(pos);
+    #endif
 #else
     vertexDistance = fogDistance(pos, FogShape);
 #endif

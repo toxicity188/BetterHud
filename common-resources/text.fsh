@@ -2,7 +2,9 @@
 
 #CreateConstant
 
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 #moj_import <fog.glsl>
+#endif
 
 #if SHADER_VERSION >= 2
 #moj_import <dynamictransforms.glsl>
