@@ -2,7 +2,7 @@
 # plugin
 kotlin = "2.4.20"
 
-resourcefactory = "1.3.1"
+resourcefactory = "1.4.0"
 paperweight = "2.0.0-beta.23"
 minotaur = "2.10.0"
 
