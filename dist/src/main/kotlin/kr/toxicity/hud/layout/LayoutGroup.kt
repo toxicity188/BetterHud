@@ -4,6 +4,7 @@ import kr.toxicity.command.BetterCommandSource
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.layout.enums.LayoutAlign
+import kr.toxicity.hud.layout.enums.LayoutFlow
 import kr.toxicity.hud.layout.enums.LayoutOffset
 import kr.toxicity.hud.animation.AnimationLocation
 import kr.toxicity.hud.location.PixelLocation
@@ -32,6 +33,14 @@ class LayoutGroup(
             it.handle(sender, "Unable to find that offset: $it")
         }.getOrNull()
     } ?: LayoutOffset.CENTER
+    val flow = section["flow"]?.asString()?.let {
+        runCatching {
+            LayoutFlow.valueOf(it.uppercase())
+        }.onFailure {
+            it.handle(sender, "Unable to find that flow: $it")
+        }.getOrNull()
+    } ?: LayoutFlow.NONE
+    val flowGap = section.getAsInt("flow-gap", 0)
 
     val image = section["images"]?.asObject()?.mapSubConfiguration { s, yamlObject ->
         ImageLayout.Impl(s, this, yamlObject, loc)
