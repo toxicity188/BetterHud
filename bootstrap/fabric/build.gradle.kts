@@ -96,4 +96,5 @@ modrinth {
     required.version("fabric-api", libs.versions.fabric.api.get())
     required.version("fabric-language-kotlin", libs.versions.fabric.language.kotlin.get())
     optional.project("polymer", "placeholder-api", "luckperms")
+    environment = "server_only"
 }
