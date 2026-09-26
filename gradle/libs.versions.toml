@@ -21,7 +21,7 @@ hikariCP = "7.1.0"
 fastUtil = "8.5.19"
 
 # mod
-fabric-api = "0.160.7+26.3"
+fabric-api = "0.161.0+26.3"
 fabric-loader = "0.19.5"
 fabric-language-kotlin = "1.14.1+kotlin.2.4.20"
 neoform = "26.3-1"
