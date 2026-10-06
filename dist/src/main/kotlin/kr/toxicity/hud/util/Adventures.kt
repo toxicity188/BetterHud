@@ -220,7 +220,7 @@ infix fun PixelComponent.shadow(shadow: Int): PixelComponent = apply {
 }
 
 infix fun WidthComponent.shadow(shadow: Int) = apply {
-    if (PLUGIN.bootstrap().minecraftVersion() >= MinecraftVersion.V1_21_4) component.shadowColor(ShadowColor.shadowColor(shadow))
+    component.shadowColor(ShadowColor.shadowColor(shadow))
 }
 
 infix fun WidthComponent.applyColor(color: TextColor?): WidthComponent = when (color?.value()) {

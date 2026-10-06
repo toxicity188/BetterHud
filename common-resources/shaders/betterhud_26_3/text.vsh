@@ -66,7 +66,6 @@ void main() {
             float yGui = 0;
             float layer = 0;
             float opacity = 1;
-            bool outline = false;
             int property = 0;
 
             switch (id) {

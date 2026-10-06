@@ -151,7 +151,6 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             if (shader.gui.x != 0.0) arr.add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
             if (shader.gui.y != 0.0) arr.add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
             if (shader.layer != 0) arr.add("    layer = ${shader.layer};")
-            if (shader.outline != 0) arr.add("    outline = true;")
             arr.add("    break;")
             entry.value.forEach {
                 it(id)

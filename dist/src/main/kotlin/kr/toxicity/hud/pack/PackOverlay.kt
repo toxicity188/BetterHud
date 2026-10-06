@@ -8,7 +8,6 @@ enum class PackOverlay(
     val minVersion: Int,
     val maxVersion: Int
 ) {
-    V1_21_2("betterhud_1_21_2", "rendertype_text",9, 45),
     V1_21_4("betterhud_1_21_4", "rendertype_text",46, 55),
     V1_21_6("betterhud_1_21_6", "rendertype_text",56, 83),
     V26_1("betterhud_26_1", "rendertype_text",84, 87),
