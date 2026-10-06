@@ -1,39 +1,35 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
 #CreateConstant
 
-#moj_import <fog.glsl>
-#moj_import <sample_lightmap.glsl>
-
-#if SHADER_VERSION >= 2
-#moj_import <dynamictransforms.glsl>
-#moj_import <projection.glsl>
-#moj_import <globals.glsl>
-out float sphericalVertexDistance;
-out float cylindricalVertexDistance;
-#else
-uniform mat4 ProjMat;
-uniform mat4 ModelViewMat;
-uniform int FogShape;
-out float vertexDistance;
-uniform vec2 ScreenSize;
-uniform float GameTime;
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
+#include <minecraft:fog.glsl>
+#include <minecraft:sample_lightmap.glsl>
 #endif
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
-in ivec2 UV2;
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
+#include <minecraft:globals.glsl>
 
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec2 UV0;
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
+layout(location = 3) in ivec2 UV2;
+#endif
+
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler2;
+layout(location = 0) out float sphericalVertexDistance;
+layout(location = 1) out float cylindricalVertexDistance;
+#endif
 
-uniform vec3 ChunkOffset;
+layout(location = 2) out vec4 vertexColor;
+layout(location = 3) out vec2 texCoord0;
 
-out vec4 vertexColor;
-out vec2 texCoord0;
-
-out float applyColor;
+layout(location = 4) out float applyColor;
 
 bool range(float t, float m1, float m2) {
     return t >= m1 && t <= m2;
@@ -45,24 +41,6 @@ bool range(vec2 t, vec2 m1, vec2 m2) {
 
 bool range(vec3 t, vec3 m1, vec3 m2) {
     return range(t.x, m1.x, m2.x) && range(t.y, m1.y, m2.y) && range(t.z, m1.z, m2.z);
-}
-
-bool checkElement(float z) {
-    if (z == 0) return true; //<=1.20.4 vanilla
-    else if (z == 1000) return true; //>=1.20.5 vanilla
-    else if (z == -90) return true; //<=1.20.4 forge
-    else if (z == 2800) return true; //neoforge
-    return false;
-}
-
-float fogDistance(vec3 pos, int shape) {
-    if (shape == 0) {
-        return length(pos);
-    } else {
-        float distXZ = length(pos.xz);
-        float distY = abs(pos.y);
-        return max(distXZ, distY);
-    }
 }
 
 #GenerateOtherDefinedMethod
@@ -95,11 +73,7 @@ void main() {
                 #CreateLayout
             }
 
-#if SHADER_VERSION < 1
-            vertexColor = (checkElement(pos.z) && !outline) ? vec4(0) : Color * vec4(1, 1, 1, opacity);
-#else
-            vertexColor = Color * vec4(1, 1, 1, opacity);
-#endif
+            vertexColor *= vec4(1, 1, 1, opacity);
 
             //Wave
             if ((property & 1) > 0) {
@@ -144,16 +118,11 @@ void main() {
     }
 #if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
     vertexColor *= sample_lightmap(Sampler2, UV2);
+    sphericalVertexDistance = fog_spherical_distance(pos);
+    cylindricalVertexDistance = fog_cylindrical_distance(pos);
 #endif
 
     #GenerateOtherMainMethod
-
-#if SHADER_VERSION >= 2
-    sphericalVertexDistance = fog_spherical_distance(pos);
-    cylindricalVertexDistance = fog_cylindrical_distance(pos);
-#else
-    vertexDistance = fogDistance(pos, FogShape);
-#endif
 
     texCoord0 = UV0;
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);

@@ -2,18 +2,15 @@
 
 #CreateConstant
 
-#moj_import <fog.glsl>
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
+#moj_import <minecraft:fog.glsl>
+#endif
 
-#if SHADER_VERSION >= 2
-#moj_import <dynamictransforms.glsl>
+#moj_import <minecraft:dynamictransforms.glsl>
+
+#if !defined(IS_GUI) && !defined(IS_SEE_THROUGH)
 in float sphericalVertexDistance;
 in float cylindricalVertexDistance;
-#else
-uniform vec4 ColorModulator;
-uniform float FogStart;
-uniform float FogEnd;
-uniform vec4 FogColor;
-in float vertexDistance;
 #endif
 
 uniform sampler2D Sampler0;
@@ -46,9 +43,7 @@ void main() {
     fragColor = color * ColorModulator;
 #elif defined(IS_GUI)
     fragColor = color;
-#elif SHADER_VERSION >= 2
-    fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 #else
-    fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
+    fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 #endif
 }
