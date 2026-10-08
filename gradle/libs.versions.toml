@@ -1,6 +1,6 @@
 [versions]
 # plugin
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 
 resourcefactory = "1.4.0"
 paperweight = "2.0.0-beta.23"
