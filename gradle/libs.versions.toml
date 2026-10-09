@@ -23,7 +23,7 @@ fastUtil = "8.5.19"
 # mod
 fabric-api = "0.161.0+26.3"
 fabric-loader = "0.19.5"
-fabric-language-kotlin = "1.14.1+kotlin.2.4.20"
+fabric-language-kotlin = "1.14.2+kotlin.2.4.21"
 neoform = "26.3-1"
 
 [libraries]
