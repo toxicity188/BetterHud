@@ -19,6 +19,7 @@ import kotlin.collections.forEach
 abstract class HudPlayerImpl : HudPlayer {
     private val locationSet = HashSet<PointedLocation>()
     private val componentMap = ConcurrentHashMap<HudObject.Identifier, HudComponentSupplier<*>>()
+    private val renderCache = HudRenderCache()
 
     private var tick = 0L
     private var last: WidthComponent = EMPTY_WIDTH_COMPONENT
@@ -125,7 +126,7 @@ abstract class HudPlayerImpl : HudPlayer {
                 } else compList += comp
             }
         }
-        if (compList.isNotEmpty() || additionalComp != null) {
+        val component = if (compList.isNotEmpty() || additionalComp != null) {
             additionalComp?.let {
                 compList += (-it.width / 2).toSpaceComponent() + it
             }
@@ -135,12 +136,16 @@ abstract class HudPlayerImpl : HudPlayer {
                 comp += (-it.width).toSpaceComponent()
             }
             last = comp.finalizeFont()
-
-            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build().compact())
-        } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
+            comp.component.build()
+        } else EMPTY_COMPONENT
+        val barColor = color ?: ShaderManagerImpl.barColor
+        if (renderCache.shouldUpdate(component, barColor, ConfigManagerImpl.forceUpdate)) {
+            VOLATILE_CODE.showBossBar(this, barColor, component.compact())
+        }
     }
 
     override fun reload() {
+        renderCache.invalidate()
         autoSave.restart()
         locationProvide.restart()
         startTick()

@@ -7,6 +7,7 @@ dependencies {
     compileOnly(libs.bundles.adventure)
     compileOnly(libs.bundles.library)
 
+    testImplementation(libs.bundles.adventure)
     testImplementation(libs.bundles.library)
 
     compileOnly("me.lucko:jar-relocator:1.7")
