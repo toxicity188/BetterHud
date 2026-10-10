@@ -25,7 +25,7 @@ dependencies {
     implementation("eu.pb4:polymer-autohost:0.17.1+26.2")
     implementation("eu.pb4:placeholder-api:3.1.0-beta.1+26.2")
     implementation("net.luckperms:api:5.5")
-    implementation("org.checkerframework:checker-qual:4.2.1")
+    implementation("org.checkerframework:checker-qual:4.2.3")
 
     // Fabric
     implementation(libs.bundles.fabric)
@@ -96,4 +96,5 @@ modrinth {
     required.version("fabric-api", libs.versions.fabric.api.get())
     required.version("fabric-language-kotlin", libs.versions.fabric.language.kotlin.get())
     optional.project("polymer", "placeholder-api", "luckperms")
+    environment = "server_only"
 }

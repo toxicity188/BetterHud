@@ -26,6 +26,10 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
     }
 
     /**
+     * 26.3
+     */
+    public static final MinecraftVersion V26_3 = new MinecraftVersion(26, 3, 0);
+    /**
      * 26.2
      */
     public static final MinecraftVersion V26_2 = new MinecraftVersion(26, 2, 0);
@@ -73,27 +77,11 @@ public record MinecraftVersion(int first, int second, int third) implements Comp
      * 1.21.4
      */
     public static final MinecraftVersion V1_21_4 = new MinecraftVersion(1, 21, 4);
-    /**
-     * 1.21.3
-     */
-    public static final MinecraftVersion V1_21_3 = new MinecraftVersion(1, 21, 3);
-    /**
-     * 1.21.2
-     */
-    public static final MinecraftVersion V1_21_2 = new MinecraftVersion(1, 21, 2);
-    /**
-     * 1.21.1
-     */
-    public static final MinecraftVersion V1_21_1 = new MinecraftVersion(1, 21, 1);
-    /**
-     * 1.21
-     */
-    public static final MinecraftVersion V1_21 = new MinecraftVersion(1, 21, 0);
 
     /**
      * Latest
      */
-    public static final MinecraftVersion LATEST = V26_2;
+    public static final MinecraftVersion LATEST = V26_3;
 
     /**
      * Parses version from string

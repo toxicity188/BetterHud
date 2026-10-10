@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 plugins {
     alias(libs.plugins.conventions.standard)
     id("com.modrinth.minotaur")
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
 }
 
@@ -60,10 +60,10 @@ tasks {
         })
         pluginJars(fileTree("plugins"))
         downloadPlugins {
-            hangar("ViaVersion", "5.10.0")
-            hangar("ViaBackwards", "5.10.0")
-            hangar("PlaceholderAPI", "2.12.2")
-            hangar("Skript", "2.15.4")
+            hangar("ViaVersion", "5.12.0")
+            hangar("ViaBackwards", "5.12.0")
+            hangar("PlaceholderAPI", "2.12.3")
+            hangar("Skript", "2.16.2")
         }
     }
     build {

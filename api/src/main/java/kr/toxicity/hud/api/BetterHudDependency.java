@@ -62,7 +62,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency SNAKEYAML = new BetterHudDependency(
             "org{}yaml",
             "snakeyaml",
-            "2.6",
+            "2.7",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY,

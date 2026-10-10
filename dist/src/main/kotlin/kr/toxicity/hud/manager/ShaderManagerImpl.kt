@@ -151,7 +151,6 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
             if (shader.gui.x != 0.0) arr.add("    xGui = ui.x * ${shader.gui.x.toFloat()} / 100.0;")
             if (shader.gui.y != 0.0) arr.add("    yGui = ui.y * ${shader.gui.y.toFloat()} / 100.0;")
             if (shader.layer != 0) arr.add("    layer = ${shader.layer};")
-            if (shader.outline != 0) arr.add("    outline = true;")
             arr.add("    break;")
             entry.value.forEach {
                 it(id)
@@ -171,11 +170,10 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
     }
 
     private fun loadShaders(overlay: PackOverlay): List<Pair<String, ByteArray>> {
-        constants["SHADER_VERSION"] = overlay.ordinal.toString()
         val shaders = ShaderType.entries.map {
-            it to it.lines()
+            it to it.lines(overlay.overlayName)
         }
-        return shaders.flatMap { (key, args) ->
+        return shaders.map { (key, args) ->
             val tagSupplier = (tagSupplierMap[key] ?: EMPTY_SUPPLIER).get()
             val bytes = buildString {
                 args.forEach write@ { string ->
@@ -209,7 +207,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
                     }
                 }
             }.toByteArray()
-            key.shadersCoreNames.map { it to bytes }
+            "${overlay.shaderCoreName}.${key.extension}" to bytes
         }
     }
 
