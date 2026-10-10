@@ -7,7 +7,9 @@ import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.manager.PlayerManagerImpl
 import kr.toxicity.hud.util.BOOTSTRAP
+import kr.toxicity.hud.util.LEGACY_SECTION_SERIALIZER
 import kr.toxicity.hud.util.ifNull
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -23,6 +25,17 @@ val HudPlayer.bukkitPlayer
 
 val Player.hudPlayer
     get() = PlayerManagerImpl.getHudPlayer(uniqueId).ifNull { "Unable to find this player: $name" }
+
+/**
+ * Serializes this string into a MiniMessage-compatible representation.
+ * <p>
+ * Names obtained from the server (e.g. custom entity names) may contain legacy section formatting
+ * codes, which MiniMessage rejects at parse time. Deserializing through the legacy serializer and
+ * re-serializing through MiniMessage converts those codes into MiniMessage tags (and escapes
+ * MiniMessage-special characters), so the result can be safely embedded into a text pattern.
+ * </p>
+ */
+fun String.toMiniMessageString() = MiniMessage.miniMessage().serialize(LEGACY_SECTION_SERIALIZER.deserialize(this))
 
 fun Event.call(): Boolean {
     Bukkit.getPluginManager().callEvent(this)

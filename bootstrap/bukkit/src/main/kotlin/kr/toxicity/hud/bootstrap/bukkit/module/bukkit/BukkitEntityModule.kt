@@ -121,7 +121,7 @@ class BukkitEntityModule : BukkitModule {
             "name" to HudPlaceholder.of { _, u ->
                 u.unwrap { e: EntityEvent ->
                     Function {
-                        e.entity.name
+                        e.entity.name.toMiniMessageString()
                     }
                 }
             },
@@ -137,7 +137,7 @@ class BukkitEntityModule : BukkitModule {
                 u.unwrap { e: EntityEvent ->
                     val entity = e.entity.adapt
                     Function {
-                        entity.customName ?: entity.name
+                        (entity.customName ?: entity.name).toMiniMessageString()
                     }
                 }
             },
