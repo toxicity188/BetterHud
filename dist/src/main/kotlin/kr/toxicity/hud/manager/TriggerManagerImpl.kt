@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.manager.TriggerManager
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.trigger.HudTrigger
 import kr.toxicity.hud.api.yaml.YamlObject
+import kr.toxicity.hud.placeholder.MissingReferences
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.ifNull
 import java.io.File
@@ -29,7 +30,10 @@ object TriggerManagerImpl : BetterHudManager, TriggerManager {
 
     fun getTrigger(yamlObject: YamlObject): HudTrigger<*> {
         val clazz = yamlObject["class"]?.asString()?.ifNull { "class value not found." }
-        val builder = map[clazz].ifNull { "this class doesn't exist: $clazz" }
+        val builder = map[clazz] ?: run {
+            MissingReferences.warnOnce("trigger class", clazz.toString())
+            return MissingReferences.trigger
+        }
         return builder(yamlObject)
     }
 
