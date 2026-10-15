@@ -37,7 +37,7 @@ object PopupManagerImpl : BetterHudManager, PopupManager {
 
     override fun postReload() {
         popupMap.values.forEach {
-            it.array = null
+            it.releaseJson()
         }
     }
 

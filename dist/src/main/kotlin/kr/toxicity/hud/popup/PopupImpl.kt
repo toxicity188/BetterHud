@@ -16,6 +16,7 @@ import kr.toxicity.hud.manager.*
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.placeholder.PlaceholderSource
+import kr.toxicity.hud.renderer.bake.ElementHost
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 import java.util.*
@@ -24,7 +25,7 @@ class PopupImpl(
     override val id: String,
     resource: GlobalResource,
     section: YamlObject
-) : Popup, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
+) : Popup, HudConfiguration, ElementHost, PlaceholderSource by PlaceholderSource.Impl(section) {
     val gui = GuiLocation(section)
     val move = section["move"]?.asObject()?.let {
         EquationPairLocation(it)
@@ -56,25 +57,33 @@ class PopupImpl(
     }
 
     private val imageEncoded = "popup_${name}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
-    var array: JsonArray? = JsonArray()
-    val imageKey = createAdventureKey(imageEncoded)
+    private var array: JsonArray? = JsonArray()
+    override val imageKey = createAdventureKey(imageEncoded)
+    override val hostKind: String get() = "popup"
+    override val hostName: String get() = id
+    override val json: JsonArray? get() = array
 
     private val spaces = intKeyMapOf<String>()
     private var imageChar = 0xCE000
+    private var textIndex = 0
 
-    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
+    override fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 
-    val newChar
+    override val newChar
         get() = (++imageChar).parseChar()
+
+    override fun nextTextIndex(): Int = ++textIndex
+    override fun releaseJson() {
+        array = null
+    }
 
     private val sortType = section["sort"]?.asString()?.let {
         PopupSortType.valueOf(it.uppercase())
     } ?: PopupSortType.LAST
 
     private val layouts = section["layouts"]?.asObject()?.let {
-        val json = array.ifNull { "error is occurred." }
         var i = 0
         it.mapSubConfiguration { _, yamlObject ->
             val layout = yamlObject["name"]?.asString().ifNull { "name value not set." }
@@ -84,7 +93,6 @@ class PopupImpl(
             }
             PopupLayout(
                 ++i,
-                json,
                 LayoutManager.getLayout(layout).ifNull { "this layout doesn't exist: $layout" },
                 this@PopupImpl,
                 loc,

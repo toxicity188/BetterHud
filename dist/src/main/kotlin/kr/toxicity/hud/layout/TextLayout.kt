@@ -60,18 +60,19 @@ interface TextLayout : HudLayout<TextElement> {
         val scale: Double
     )
 
-    fun identifier(shader: HudShader, ascent: Int): HudLayout.Identifier {
+    fun identifier(shader: HudShader, ascent: Int, scale: Double = this.scale): HudLayout.Identifier {
         return TextIdentifier(
             ShaderGroup(shader, source.id, ascent),
+            scale,
             this
         )
     }
 
     class TextIdentifier(
         val delegate: HudLayout.Identifier,
+        val scale: Double,
         layout: TextLayout
     ) : HudLayout.Identifier by delegate {
-        val scale = layout.scale
         val background = layout.background
         val emoji = layout.emoji
 
