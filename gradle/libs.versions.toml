@@ -1,30 +1,30 @@
 [versions]
 # plugin
-kotlin = "2.3.21"
+kotlin = "2.4.20"
 
-resourcefactory = "1.3.1"
-paperweight = "2.0.0-beta.21"
-minotaur = "2.9.0"
+resourcefactory = "1.4.0"
+paperweight = "2.0.0-beta.23"
+minotaur = "2.10.0"
 
 # library
 adventure = "4.26.1"
-adventure-platform-bukkit = "4.4.1"
-adventure-platform-mod = "6.9.0"
-snakeyaml = "2.6"
+adventure-platform-bukkit = "5.2.0"
+adventure-platform-mod = "7.2.0"
+snakeyaml = "2.7"
 gson = "2.14.0"
 exp4j = "0.4.8"
 expiringmap = "0.5.11"
 bstats = "3.2.1"
 betterCommand = "1.4.3"
 semver4j = "6.0.0"
-hikariCP = "7.0.2"
-fastUtil = "8.5.18"
+hikariCP = "7.1.0"
+fastUtil = "8.5.19"
 
 # mod
-fabric-api = "0.149.0+26.1.2"
-fabric-loader = "0.19.2"
-fabric-language-kotlin = "1.13.11+kotlin.2.3.21"
-neoform = "26.1.2-1"
+fabric-api = "0.161.0+26.3"
+fabric-loader = "0.19.5"
+fabric-language-kotlin = "1.14.1+kotlin.2.4.20"
+neoform = "26.3-1"
 
 [libraries]
 fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
@@ -35,7 +35,7 @@ adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "ad
 adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
-adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
+adventure-platform-bukkit = { group = "io.github.toxicity188", name = "adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
 adventure-platform-fabric = { group = "net.kyori", name = "adventure-platform-fabric", version.ref = "adventure-platform-mod" }
 
 kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
@@ -54,9 +54,9 @@ bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref 
 build-kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 build-minotaur = { group = "com.modrinth.minotaur", name = "com.modrinth.minotaur.gradle.plugin", version.ref = "minotaur"}
 build-resourcefactory = { module = "xyz.jpenilla:resource-factory", version.ref = "resourcefactory" }
-build-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.4.1"
+build-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.6.1"
 build-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.2.0"
-build-publish = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.36.0"
+build-publish = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"
 build-paperweight = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
 
 [plugins]

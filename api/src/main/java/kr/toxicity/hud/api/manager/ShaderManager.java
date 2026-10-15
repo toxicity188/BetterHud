@@ -2,7 +2,6 @@ package kr.toxicity.hud.api.manager;
 
 import kr.toxicity.hud.api.BetterHudAPI;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,38 +128,42 @@ public interface ShaderManager {
     /**
      * Represents BetterHud's shader files.
      */
-    @RequiredArgsConstructor
     @Getter
     enum ShaderType {
         /**
          * text vsh
          */
-        TEXT_VERTEX("text.vsh", "rendertype_text.vsh"),
+        TEXT_VERTEX("vsh"),
         /**
          * text fsh
          */
-        TEXT_FRAGMENT("text.fsh", "rendertype_text.fsh")
+        TEXT_FRAGMENT("fsh")
 
         ;
-        private final @NotNull String fileName;
-        private final @NotNull String shadersCoreName;
+        private final @NotNull String extension;
+
+
+        ShaderType(@NotNull String extension) {
+            this.extension = extension;
+        }
 
         /**
          * Reads the all line of shader file.
          * @return all line.
          */
-        public @NotNull List<String> lines() {
+        public @NotNull List<String> lines(@NotNull String overlay) {
             var bootstrap = BetterHudAPI.inst().bootstrap();
             var dataFolder = bootstrap.dataFolder();
-            var shaderLocation = new File(dataFolder, "shaders");
+            var shaderLocation = new File(dataFolder, "shaders/" + overlay);
             if (!shaderLocation.exists() && !shaderLocation.mkdirs()) {
                 bootstrap.logger().warn("Unable to create folder BetterHud/shaders.");
             }
+            var fileName = "text." + extension;
             var dataFile = new File(shaderLocation, fileName);
             var lines = new ArrayList<String>();
             if (!dataFile.exists()) {
                 try (
-                        var resourceStream = Objects.requireNonNull(bootstrap.resource(fileName), "Unknown resource: " + fileName);
+                        var resourceStream = Objects.requireNonNull(bootstrap.resource("shaders/" + overlay + "/" + fileName), "Unknown resource: shaders/" + overlay + "/" + extension);
                         var fileStream = new FileOutputStream(dataFile);
                         var bufferedFileStream = new BufferedOutputStream(fileStream)
                 ) {

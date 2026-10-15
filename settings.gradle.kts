@@ -6,10 +6,16 @@ pluginManagement {
     }
 }
 
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
+    }
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-    id("net.fabricmc.fabric-loom-repositories") version "1.16-SNAPSHOT"
-    id("net.neoforged.moddev.repositories") version "2.0.141"
+    id("net.fabricmc.fabric-loom-repositories") version "1.18-SNAPSHOT"
+    id("net.neoforged.moddev.repositories") version "2.0.148"
 }
 
 dependencyResolutionManagement {
@@ -47,22 +53,19 @@ dependencyResolutionManagement {
 
 rootProject.name = "BetterHud"
 
-gradle.startParameter.isParallelProjectExecutionEnabled = true
-
 include(
     "api:bukkit-api",
     "api:velocity-api",
     "api:mod-api",
 
     "dist",
-    "nms:v1_21_R1",
-    "nms:v1_21_R2",
     "nms:v1_21_R3",
     "nms:v1_21_R4",
     "nms:v1_21_R5",
     "nms:v1_21_R6",
     "nms:v1_21_R7",
     "nms:v26_R1",
+    "nms:v26_R2",
 
     "scheduler:standard",
     "scheduler:paper",

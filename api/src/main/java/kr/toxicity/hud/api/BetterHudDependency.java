@@ -62,7 +62,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency SNAKEYAML = new BetterHudDependency(
             "org{}yaml",
             "snakeyaml",
-            "2.6",
+            "2.7",
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.VELOCITY,
@@ -121,7 +121,7 @@ public class BetterHudDependency {
     public static final BetterHudDependency HIKARICP = new BetterHudDependency(
             "com{}zaxxer",
             "HikariCP",
-            "7.0.2",
+            "7.1.0",
             false,
             BetterHudPlatform.ALL
     );
@@ -308,19 +308,6 @@ public class BetterHudDependency {
     /**
      * Adventure
      */
-    public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_GSON_LEGACY_IMPL = new BetterHudDependency(
-            "net{}kyori",
-            "adventure-text-serializer-gson-legacy-impl",
-            BetterHud.ADVENTURE_VERSION,
-            false,
-            Collections.unmodifiableSet(EnumSet.of(
-                    BetterHudPlatform.BUKKIT,
-                    BetterHudPlatform.PAPER
-            ))
-    );
-    /**
-     * Adventure
-     */
     public static final BetterHudDependency ADVENTURE_TEXT_SERIALIZER_JSON_LEGACY_IMPL = new BetterHudDependency(
             "net{}kyori",
             "adventure-text-serializer-json-legacy-impl",
@@ -336,9 +323,9 @@ public class BetterHudDependency {
      * Adventure-platform
      */
     public static final BetterHudDependency ADVENTURE_PLATFORM_BUKKIT = new BetterHudDependency(
-            "net{}kyori",
+            "io{}github{}toxicity188",
             "adventure-platform-bukkit",
-            BetterHud.PLATFORM_VERSION,
+            BetterHud.ADVENTURE_VERSION,
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.BUKKIT,
@@ -349,9 +336,9 @@ public class BetterHudDependency {
      * Adventure-platform
      */
     public static final BetterHudDependency ADVENTURE_PLATFORM_API = new BetterHudDependency(
-            "net{}kyori",
+            "io{}github{}toxicity188",
             "adventure-platform-api",
-            BetterHud.PLATFORM_VERSION,
+            BetterHud.ADVENTURE_VERSION,
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.BUKKIT,
@@ -362,9 +349,9 @@ public class BetterHudDependency {
      * Adventure-platform
      */
     public static final BetterHudDependency ADVENTURE_PLATFORM_FACET = new BetterHudDependency(
-            "net{}kyori",
+            "io{}github{}toxicity188",
             "adventure-platform-facet",
-            BetterHud.PLATFORM_VERSION,
+            BetterHud.ADVENTURE_VERSION,
             false,
             Collections.unmodifiableSet(EnumSet.of(
                     BetterHudPlatform.BUKKIT,

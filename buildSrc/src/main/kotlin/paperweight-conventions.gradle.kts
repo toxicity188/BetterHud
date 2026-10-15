@@ -8,7 +8,7 @@ plugins {
 // runs codebook/ASM 9.6, which cannot read JDK 25 platform classes (class major 69) and
 // fails for the older mojang-mapped versions (1.21.4/1.21.5/1.21.6). Those Minecraft
 // versions are Java 21 anyway, so remapping and compiling them on JDK 21 is correct.
-// Only nms:v26_R1 overrides this back to JDK 25 for Minecraft 26.1.
+// Only nms:v26_R1 / nms:v26_R2 override this back to JDK 25 for Minecraft 26.x.
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
