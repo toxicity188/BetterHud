@@ -46,6 +46,7 @@ object PackGenerator {
                         put(it.path, get)
                     }
                 }
+                info(PackReport.of(this).message())
             }
         }.getOrElse {
             it.handle(sender, "Unable to make a resource pack.")
