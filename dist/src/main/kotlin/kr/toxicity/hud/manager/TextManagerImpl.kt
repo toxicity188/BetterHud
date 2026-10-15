@@ -72,6 +72,21 @@ object TextManagerImpl : BetterHudManager, TextManager {
 
     private const val FULL_WIDTH = 16
 
+    private const val CHARS_FILE_PREFIX = "chars:"
+
+    /**
+     * `include` 裡的 `chars:<相對 BetterHud 資料夾的路徑>`：只收那個檔案裡出現的字。
+     * client 套用資源包的時間跟「每份字型的字數 × 字型份數」成正比，而文字每個 (y, 透明度) 就是一份字型；
+     * 整個語言區塊（`china` 兩萬多字）乘上一百多份會讓套用多十幾秒，所以改成只收實際會顯示的字。
+     */
+    private fun includedChars(path: String): Set<Int> = File(DATA_FOLDER, path)
+        .ifNotExist { "this chars file doesn't exist: $path" }
+        .readText()
+        .codePoints()
+        .filter { !Character.isWhitespace(it) }
+        .boxed()
+        .collect(java.util.stream.Collectors.toSet())
+
     private val languageCodepointRange = mapOf(
         "korean" to IntOpenHashSet().apply {
             addAll(0x1100..0x1112)
@@ -626,7 +641,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 supportedLanguage?.let { lang ->
                     val supportedCodepoint = HashSet(defaultLatin)
                     lang.forEach {
-                        languageCodepointRange[it]?.let { lang ->
+                        if (it.startsWith(CHARS_FILE_PREFIX)) {
+                            supportedCodepoint += includedChars(it.substring(CHARS_FILE_PREFIX.length))
+                        } else languageCodepointRange[it]?.let { lang ->
                             supportedCodepoint += lang
                         }
                     }
