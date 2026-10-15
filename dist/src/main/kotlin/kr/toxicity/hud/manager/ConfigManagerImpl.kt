@@ -53,6 +53,8 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
         private set
     var forceUpdate = false
         private set
+    var regenerateResourcePackOnStart = true
+        private set
 
     var mergeBossBar = true
         private set
@@ -181,6 +183,7 @@ object ConfigManagerImpl : BetterHudManager, ConfigManager {
             }
             selfHostPort = yaml.getAsInt("self-host-port", 8163)
             forceUpdate = yaml.getAsBoolean("force-update", false)
+            regenerateResourcePackOnStart = yaml.getAsBoolean("regenerate-resource-pack-on-start", true)
             resourcePackObfuscation = yaml.getAsBoolean("resourcepack-obfuscation", false)
             if (yaml.getAsBoolean("metrics", false)) {
                 BOOTSTRAP.startMetrics()

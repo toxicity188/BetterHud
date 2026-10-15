@@ -130,7 +130,7 @@ class FabricBootstrapImpl : ModBootstrap, DedicatedServerModInitializer {
         }
         ServerLifecycleEvents.SERVER_STARTED.register {
             scheduler.asyncTask {
-                if (!skipInitialReload) core.reload()
+                if (!skipInitialReload) core.initialReload()
                 logger.info(
                     "Platform: Fabric",
                     "Mod enabled."
