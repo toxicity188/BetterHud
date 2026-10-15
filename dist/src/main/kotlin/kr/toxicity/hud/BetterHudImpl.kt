@@ -4,6 +4,7 @@ import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudBootstrap
 import kr.toxicity.hud.api.BetterHudDependency
 import kr.toxicity.hud.api.manager.*
+import kr.toxicity.hud.api.plugin.ReloadFlagType
 import kr.toxicity.hud.api.plugin.ReloadInfo
 import kr.toxicity.hud.api.plugin.ReloadState
 import kr.toxicity.hud.api.plugin.ReloadState.Failure
@@ -95,7 +96,23 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
 
     private val onReload = AtomicBoolean()
 
-    override fun reload(info: ReloadInfo): ReloadState {
+    /**
+     * Reload triggered automatically by server startup.
+     * Loads all data, but skips writing the resource pack file
+     * when [ConfigManagerImpl.regenerateResourcePackOnStart] is disabled,
+     * unless the [ReloadFlagType.FORCE_GENERATE_RESOURCE_PACK] flag is present.
+     */
+    fun initialReload(): ReloadState {
+        val info = ReloadInfo(bootstrap.consoleSource(), emptySet())
+        return reload(
+            info,
+            generatePack = ConfigManagerImpl.regenerateResourcePackOnStart || info.has(ReloadFlagType.FORCE_GENERATE_RESOURCE_PACK)
+        )
+    }
+
+    override fun reload(info: ReloadInfo): ReloadState = reload(info, generatePack = true)
+
+    private fun reload(info: ReloadInfo, generatePack: Boolean): ReloadState {
         if (!onReload.compareAndSet(false, true)) return ReloadState.ON_RELOAD
         val time = System.currentTimeMillis()
         reloadStartTask.forEach {
@@ -125,10 +142,13 @@ class BetterHudImpl(val bootstrap: BetterHudBootstrap) : BetterHud {
             PackGenerator.generate(info).run {
                 Success(
                     this,
-                    runCatching {
+                    if (generatePack) runCatching {
                         ConfigManagerImpl.packType.generate(this)
                     }.getOrElse {
                         it.handle("Unable to pack file.")
+                        null
+                    } else {
+                        info("Skipped resource pack generation on startup (regenerate-resource-pack-on-start: false).")
                         null
                     },
                     System.currentTimeMillis() - time

@@ -8,6 +8,7 @@ import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.pack.PackOverlay
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.shader.HudShader
+import kr.toxicity.hud.shader.ShaderBudget
 import kr.toxicity.hud.util.*
 import net.kyori.adventure.bossbar.BossBar
 import java.awt.image.BufferedImage
@@ -133,6 +134,7 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
     }
 
     private fun compileShader(resource: GlobalResource) {
+        reportBudget(hudShaders.size)
         compiledLayout = hudShaders.entries.foldIndexed(arrayListOf()) { index, arr, entry ->
             val shader = entry.key
             val id = index + 1
@@ -167,6 +169,11 @@ object ShaderManagerImpl : BetterHudManager, ShaderManager {
         }
         compiledLayout = arrayListOf()
         hudShaders.clear()
+    }
+
+    private fun reportBudget(used: Int) {
+        val budget = ShaderBudget(used)
+        if (budget.exceeded) warn(budget.message()) else info(budget.message())
     }
 
     private fun loadShaders(overlay: PackOverlay): List<Pair<String, ByteArray>> {

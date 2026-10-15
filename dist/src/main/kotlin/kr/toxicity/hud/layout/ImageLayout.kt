@@ -22,18 +22,17 @@ interface ImageLayout : HudLayout<ImageElement> {
     val reversed: Boolean
     val clearListener: Boolean
 
-    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
+    fun identifier(shader: HudShader, ascent: Int, fileName: String, scale: Double = this.scale): HudLayout.Identifier {
         return ImageIdentifier(
             ShaderGroup(shader, fileName, ascent),
-            this
+            scale
         )
     }
 
     class ImageIdentifier(
         val delegate: HudLayout.Identifier,
-        layout: ImageLayout
+        val scale: Double
     ) : HudLayout.Identifier by delegate {
-        val scale = layout.scale
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is ImageIdentifier) return false

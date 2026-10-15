@@ -28,8 +28,10 @@ object Conditions {
 
     @Suppress("UNCHECKED_CAST")
     private fun parse0(section: YamlObject, source: PlaceholderSource): ConditionBuilder {
-        val first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull { "first value not set." }, source)
-        val second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull { "second value not set." }, source)
+        var first = PlaceholderManagerImpl.find(section["first"]?.asString().ifNull { "first value not set." }, source)
+        var second = PlaceholderManagerImpl.find(section["second"]?.asString().ifNull { "second value not set." }, source)
+        if (first is MissingPlaceholderBuilder && second !is MissingPlaceholderBuilder) first = first.typed(second.clazz)
+        if (second is MissingPlaceholderBuilder && first !is MissingPlaceholderBuilder) second = second.typed(first.clazz)
         val operationValue = section["operation"]?.asString().ifNull { "operation value not set" }
 
         if (first.clazz != second.clazz) throw RuntimeException("type mismatch: ${first.clazz.simpleName} and ${second.clazz.simpleName}")

@@ -70,6 +70,23 @@ object TextManagerImpl : BetterHudManager, TextManager {
         addAll(0x0100..0x017F)
     }
 
+    private const val FULL_WIDTH = 16
+
+    private const val CHARS_FILE_PREFIX = "chars:"
+
+    /**
+     * `include` 裡的 `chars:<相對 BetterHud 資料夾的路徑>`：只收那個檔案裡出現的字。
+     * client 套用資源包的時間跟「每份字型的字數 × 字型份數」成正比，而文字每個 (y, 透明度) 就是一份字型；
+     * 整個語言區塊（`china` 兩萬多字）乘上一百多份會讓套用多十幾秒，所以改成只收實際會顯示的字。
+     */
+    private fun includedChars(path: String): Set<Int> = File(DATA_FOLDER, path)
+        .ifNotExist { "this chars file doesn't exist: $path" }
+        .readText()
+        .codePoints()
+        .filter { !Character.isWhitespace(it) }
+        .boxed()
+        .collect(java.util.stream.Collectors.toSet())
+
     private val languageCodepointRange = mapOf(
         "korean" to IntOpenHashSet().apply {
             addAll(0x1100..0x1112)
@@ -444,14 +461,27 @@ object TextManagerImpl : BetterHudManager, TextManager {
         }
     }
 
+    /**
+     * unifont 的全形字（中日韓文字、全形標點）是 16px 方格，每個字本來就該一樣寬。
+     * 裁掉左右空白的話，「？」「一」會比「職」窄，整句中文字距忽寬忽窄。
+     * client 讀 bitmap 字型時也會自己裁掉右邊的空白欄，所以在最右欄放一個 alpha=1 的點撐住寬度；
+     * 文字 shader 會丟掉 alpha < 0.1 的像素，看不見。
+     */
+    private fun BufferedImage.keepFullWidth(): BufferedImage = apply {
+        if ((getRGB(width - 1, 0) ushr 24) == 0) setRGB(width - 1, 0, 0x01FFFFFF)
+    }
+
     private class UnifontBitmapProvider(scale: Int): FontBitmapProvider {
         override val height: Int = scale
         override fun provide(filter: (Int) -> Boolean, block: (CharImage) -> Unit) {
             unifont.filter {
                 filter(it.first)
             }.forEachAsync {
-                it.second.hexToImage().removeEmptyWidth()?.let { image ->
-                    block(CharImage(it.first, image.image))
+                val image = it.second.hexToImage()
+                if (image.width >= FULL_WIDTH) {
+                    block(CharImage(it.first, image.keepFullWidth()))
+                } else image.removeEmptyWidth()?.let { trimmed ->
+                    block(CharImage(it.first, trimmed.image))
                 }
             }
         }
@@ -611,7 +641,9 @@ object TextManagerImpl : BetterHudManager, TextManager {
                 supportedLanguage?.let { lang ->
                     val supportedCodepoint = HashSet(defaultLatin)
                     lang.forEach {
-                        languageCodepointRange[it]?.let { lang ->
+                        if (it.startsWith(CHARS_FILE_PREFIX)) {
+                            supportedCodepoint += includedChars(it.substring(CHARS_FILE_PREFIX.length))
+                        } else languageCodepointRange[it]?.let { lang ->
                             supportedCodepoint += lang
                         }
                     }

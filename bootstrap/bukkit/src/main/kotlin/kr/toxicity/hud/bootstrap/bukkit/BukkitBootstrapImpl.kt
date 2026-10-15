@@ -258,7 +258,7 @@ class BukkitBootstrapImpl : BukkitBootstrap, JavaPlugin() {
             fun ServerLoadEvent.load() {
                 debug(ConfigManager.DebugLevel.MANAGER,"Initialized: $type")
                 if (!skipInitialReload) {
-                    core.reload()
+                    core.initialReload()
                 }
                 log.info(
                     "Minecraft version: $minecraftVersion, NMS version: ${nms.version}",

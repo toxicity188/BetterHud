@@ -1,5 +1,7 @@
 package kr.toxicity.hud.layout
 
+import kr.toxicity.hud.animation.AnimationTrack
+import kr.toxicity.hud.animation.ScalePivot
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.element.HudElement
 import kr.toxicity.hud.location.PixelLocation
@@ -19,6 +21,8 @@ interface HudLayout<T : HudElement> : ConditionSource, PlaceholderSource {
     val cancelIfFollowerNotExists: Boolean
     val renderScale: RenderScale
     val tick: Long
+    val animation: AnimationTrack
+    val pivot: ScalePivot
 
     interface Identifier {
         val name: String
@@ -38,5 +42,7 @@ interface HudLayout<T : HudElement> : ConditionSource, PlaceholderSource {
         override val cancelIfFollowerNotExists: Boolean = yaml.getAsBoolean("cancel-if-follower-not-exists", true)
         override val renderScale = RenderScale.fromConfig(location, yaml)
         override val tick: Long = yaml.getAsLong("tick", 1)
+        override val animation: AnimationTrack = yaml["animations"]?.asObject()?.let(AnimationTrack::parse) ?: group.animation
+        override val pivot: ScalePivot = ScalePivot.parse(yaml["pivot"]?.asString())
     }
 }

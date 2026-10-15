@@ -26,6 +26,7 @@ dependencies {
 
     shade(libs.bstats.bukkit)
     shade(libs.kotlinStdlib)
+    shade(libs.expiringmap)
 
     compileOnly(libs.adventure.platform.bukkit)
     compileOnly(shade(fileTree("shaded"))!!)

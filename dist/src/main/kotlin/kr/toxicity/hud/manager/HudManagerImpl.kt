@@ -40,7 +40,7 @@ object HudManagerImpl : BetterHudManager, HudManager {
 
     override fun postReload() {
         hudMap.values.forEach {
-            it.jsonArray = null
+            it.releaseJson()
         }
     }
 

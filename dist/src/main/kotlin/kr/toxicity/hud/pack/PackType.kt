@@ -17,6 +17,7 @@ import java.util.function.Function
 import java.util.stream.Collectors
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.pathString
 
@@ -63,7 +64,7 @@ enum class PackType {
     ZIP {
         override fun generate(byteMap: Map<String, ByteArray>): File {
             val file = File(DATA_FOLDER.parentFile, "${ConfigManagerImpl.buildFolderLocation}.zip")
-            if (!byteMap.isSameHash(file)) {
+            if (!byteMap.matchesZip(file)) {
                 val digest = MessageDigest.getInstance("SHA-1")
                 file.outputStream()
                     .buffered()
@@ -111,6 +112,24 @@ enum class PackType {
 
         private fun Long.mbFormat(): String {
             return "${decimal.format(BigDecimal("$this.000") / BigDecimal("1048576.000"))}MB"
+        }
+
+        /**
+         * Compares against the zip actually on disk rather than the cached hash of the last pack this plugin wrote.
+         * The build location may be overwritten by something else (e.g. a template copy into Nexo's external_packs),
+         * in which case the cached hash still matches while the file on disk is stale, and the pack would never be rewritten.
+         */
+        private fun Map<String, ByteArray>.matchesZip(target: File): Boolean {
+            if (!target.isFile) return false
+            return runCatching {
+                val existing = HashMap<String, ByteArray>()
+                ZipInputStream(target.inputStream().buffered()).use { zip ->
+                    generateSequence { zip.nextEntry }.forEach { entry ->
+                        existing[entry.name] = zip.readAllBytes()
+                    }
+                }
+                existing.size == size && all { (path, bytes) -> existing[path]?.contentEquals(bytes) == true }
+            }.getOrDefault(false)
         }
 
         private fun Map<String, ByteArray>.isSameHash(target: File): Boolean {

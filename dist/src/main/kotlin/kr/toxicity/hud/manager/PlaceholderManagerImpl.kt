@@ -10,6 +10,8 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlElement
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.equation.TEquation
+import kr.toxicity.hud.placeholder.MissingPlaceholderBuilder
+import kr.toxicity.hud.placeholder.MissingReferences
 import kr.toxicity.hud.placeholder.Placeholder
 import kr.toxicity.hud.placeholder.PlaceholderBuilder
 import kr.toxicity.hud.placeholder.PlaceholderSource
@@ -261,7 +263,11 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
                 }
                 it to func
             }
-        } ?: throw RuntimeException("this placeholder not found: $first")
+        } ?: run {
+            if (first.startsWith('\'')) throw RuntimeException("this placeholder not found: $first")
+            MissingReferences.warnOnce("placeholder", first)
+            return MissingPlaceholderBuilder(first, types[group]?.clazz ?: String::class.java)
+        }
         if (get.second.requiredArgsLength > args.size) throw RuntimeException("the placeholder '$first' requires an argument sized by at least ${get.second.requiredArgsLength}.")
 
         val type = types[group]
@@ -364,6 +370,7 @@ object PlaceholderManagerImpl : PlaceholderManager, BetterHudManager {
     }
 
     override fun reload(workingDirectory: File, info: ReloadInfo, resource: GlobalResource) {
+        MissingReferences.reset()
     }
 
     override fun end() {

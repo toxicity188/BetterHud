@@ -9,13 +9,14 @@ import kr.toxicity.hud.api.update.UpdateEvent
 import kr.toxicity.hud.api.yaml.YamlObject
 import kr.toxicity.hud.configuration.HudConfiguration
 import kr.toxicity.hud.location.PixelLocation
-import kr.toxicity.hud.animation.AnimationType
 import kr.toxicity.hud.manager.ConfigManagerImpl
 import kr.toxicity.hud.manager.LayoutManager
 import kr.toxicity.hud.pack.PackGenerator
 import kr.toxicity.hud.location.GuiLocation
 import kr.toxicity.hud.manager.EncodeManager
 import kr.toxicity.hud.placeholder.PlaceholderSource
+import kr.toxicity.hud.renderer.bake.AnimatedLayout
+import kr.toxicity.hud.renderer.bake.ElementHost
 import kr.toxicity.hud.resource.GlobalResource
 import kr.toxicity.hud.util.*
 
@@ -23,25 +24,34 @@ class HudImpl(
     override val id: String,
     resource: GlobalResource,
     section: YamlObject
-) : Hud, HudConfiguration, PlaceholderSource by PlaceholderSource.Impl(section) {
+) : Hud, HudConfiguration, ElementHost, PlaceholderSource by PlaceholderSource.Impl(section) {
 
     private var imageChar = 0xCE000
 
-    val newChar
+    override val newChar
         get() = (++imageChar).parseChar()
 
     private val imageEncoded = "hud_${id}_image".encodeKey(EncodeManager.EncodeNamespace.FONT)
-    val imageKey = createAdventureKey(imageEncoded)
-    var jsonArray: JsonArray? = JsonArray()
+    override val imageKey = createAdventureKey(imageEncoded)
+    private var jsonArray: JsonArray? = JsonArray()
+    override val hostKind: String get() = "hud"
+    override val hostName: String get() = id
+    override val json: JsonArray? get() = jsonArray
     private val spaces = intKeyMapOf<String>()
     private val default = ConfigManagerImpl.defaultHud.contains(id) || section.getAsBoolean("default", false)
-    var textIndex = 0
+    private var textIndex = 0
     private val tick = section.getAsLong("tick", 1)
 
-    fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
+    override fun getOrCreateSpace(int: Int): String = spaces.computeIfAbsent(int) {
         newChar
     }
 
+    override fun nextTextIndex(): Int = ++textIndex
+    override fun releaseJson() {
+        jsonArray = null
+    }
+
+    private var layoutIndex = 0
     private val elements = section["layouts"]?.asObject().ifNull { "layout configuration not set." }.mapSubConfiguration { s, yamlObject ->
         val layout = yamlObject["name"]?.asString().ifNull { "name value not set: $s" }.let {
             LayoutManager.getLayout(it).ifNull { "this layout doesn't exist: $it" }
@@ -53,17 +63,13 @@ class HudImpl(
         val pixel = yamlObject["pixel"]?.asObject()?.let {
             PixelLocation(it)
         }  ?: PixelLocation.zero
-        HudAnimation(
-            layout.animation.type,
-            layout.animation.location.map {
-                HudParser(
-                    this@HudImpl,
-                    resource,
-                    layout,
-                    gui,
-                    it + pixel
-                )
-            }
+        AnimatedLayout(
+            this@HudImpl,
+            resource.font,
+            layout,
+            gui,
+            pixel,
+            ++layoutIndex
         )
     }.ifEmpty {
         throw RuntimeException("layout is empty.")
@@ -94,14 +100,10 @@ class HudImpl(
 
     override fun createRenderer(player: HudPlayer): HudComponentSupplier<Hud> {
         val map = elements.map {
-            it.animationType to it.elements.map { p ->
-                runByTick(tick, { player.tick }, p.getComponent(player))
-            }
+            runByTick(tick, { player.tick }, it.render(UpdateEvent.EMPTY)(player))
         }
         return HudComponentSupplier.of(this) {
-            if (conditions(player)) map.map { (type, element) ->
-                type.choose(element, player.tick)()
-            } else emptyList()
+            if (conditions(player)) map.map { it() } else emptyList()
         }
     }
 
@@ -120,9 +122,4 @@ class HudImpl(
     }
 
     override fun isDefault(): Boolean = default
-
-    private class HudAnimation(
-        val animationType: AnimationType,
-        val elements: List<HudParser>
-    )
 }
