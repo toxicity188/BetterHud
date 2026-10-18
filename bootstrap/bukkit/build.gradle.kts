@@ -41,7 +41,7 @@ dependencies {
         exclude("it.unimi.dsi")
         exclude("org.apache.logging.log4j")
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.19") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.20") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
