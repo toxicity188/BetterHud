@@ -35,25 +35,25 @@ dependencies {
     compileOnly("net.Indyuce:MMOCore-API:1.13.1-SNAPSHOT")
     compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.12.3")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.5") {
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.6") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
         exclude("org.apache.logging.log4j")
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.19") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.20") {
         exclude("com.google.guava")
         exclude("com.google.code.gson")
         exclude("it.unimi.dsi")
         exclude("org.apache.logging.log4j")
     }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.SkriptLang:Skript:2.16.2")
+    compileOnly("com.github.SkriptLang:Skript:2.17.1")
     compileOnly("net.skinsrestorer:skinsrestorer-api:15.12.6")
     compileOnly("com.alessiodp.parties:parties-bukkit:3.2.18")
     compileOnly("net.momirealms:craft-engine-core:26.9.1")
     compileOnly("net.momirealms:craft-engine-bukkit:26.9.1")
-    compileOnly("com.nexomc:nexo:1.29.0")
+    compileOnly("com.nexomc:nexo:1.29.1")
 }
 
 bukkitPluginYaml {
