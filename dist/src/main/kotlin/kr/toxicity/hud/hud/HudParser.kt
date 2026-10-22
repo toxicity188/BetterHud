@@ -47,7 +47,7 @@ class HudParser(
         return Runner {
             if (conditions(player)) {
                 val f = player.tick
-                LayoutComponentContainer(layout.offset, layout.align, max)
+                LayoutComponentContainer(layout.offset, layout.align, layout.flow, layout.flowGap, max)
                     .append(renderer.map {
                         it(f)
                     })
