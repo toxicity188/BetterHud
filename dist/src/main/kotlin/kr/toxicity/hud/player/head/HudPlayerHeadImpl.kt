@@ -11,6 +11,54 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.util.*
 
+
+private fun getSkinTextureUri(textureData: String): URI {
+    require(textureData.isNotBlank()) {
+        "Skin texture data is empty."
+    }
+
+    val decoded = String(
+        Base64.getDecoder().decode(textureData),
+        Charsets.UTF_8
+    )
+
+    val skinUrl = parseJson(decoded)
+        .asJsonObject
+        .getAsJsonObject("textures")
+        .getAsJsonObject("SKIN")
+        .getAsJsonPrimitive("url")
+        .asString
+
+    val uri = URI.create(skinUrl)
+
+    require(uri.scheme == "https" || uri.scheme == "http") {
+        "Invalid skin texture protocol."
+    }
+
+    require(uri.host == "textures.minecraft.net") {
+        "Unsupported skin texture host."
+    }
+
+    return uri
+}
+
+private fun loadSkinImage(textureData: String): BufferedImage {
+    val uri = getSkinTextureUri(textureData)
+
+    return httpClient {
+        send(
+            HttpRequest.newBuilder()
+                .uri(uri)
+                .GET()
+                .build(),
+            BodyHandlers.ofInputStream()
+        ).body().buffered().use {
+            it.toImage()
+        }
+    }.getOrThrow()
+}
+
+
 class HudPlayerHeadImpl(
     private val colorList: List<TextColor>,
     private val hairMap: Map<Int, TextColor?>
@@ -30,24 +78,7 @@ class HudPlayerHeadImpl(
         }.toIntKeyMap()
     )
     private constructor(playerName: String) : this(
-        httpClient {
-            send(
-                HttpRequest.newBuilder()
-                    .uri(URI.create(
-                        parseJson(String(Base64.getDecoder().decode(PlayerHeadManager.provideSkin(playerName))))
-                            .asJsonObject
-                            .getAsJsonObject("textures")
-                            .getAsJsonObject("SKIN")
-                            .getAsJsonPrimitive("url")
-                            .asString
-                    ))
-                    .GET()
-                    .build(),
-                BodyHandlers.ofInputStream()
-            ).body().buffered().use {
-                it.toImage()
-            }
-        }.getOrThrow()
+        loadSkinImage(PlayerHeadManager.provideSkin(playerName))
     )
 
     private val flatHead = (0..63).map {
@@ -63,6 +94,20 @@ class HudPlayerHeadImpl(
         }.getOrElse { e ->
             e.handle("Unable to get ${playerName}'s head.")
             allBlack
+        }
+        fun isTextureData(textureData: String): Boolean {
+            return runCatching {
+                getSkinTextureUri(textureData)
+            }.isSuccess
+        }
+
+        fun fromTextureData(textureData: String): HudPlayerHeadImpl {
+            return runCatching {
+                HudPlayerHeadImpl(loadSkinImage(textureData))
+            }.getOrElse { e ->
+                e.handle("Unable to load head from texture data.")
+                allBlack
+            }
         }
     }
 

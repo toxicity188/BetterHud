@@ -109,13 +109,17 @@ class HeadRenderer(
             var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
                 val value = it.value(player)
-                val (follow, head) = getHead(value.toString())
-                follow?.let { player ->
+                val result = getHead(value.toString())
+
+                result.player?.let { player ->
                     targetPlayer = player
                 } ?: run {
-                    if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
+                    if (!result.directTexture && cancelIfFollowerNotExists) {
+                        return@build EMPTY_PIXEL_COMPONENT
+                    }
                 }
-                targetPlayerHead = head
+
+                targetPlayerHead = result.head
             }
             if (cond(targetPlayer)) {
                 WidthComponent(pixelType.render(targetPlayerHead, colorApply(targetPlayer)), pixel)
@@ -131,7 +135,26 @@ class HeadRenderer(
         }
     }
 
-    private fun getHead(placeholderValue: String): Pair<HudPlayer?, HudPlayerHead> {
-        return PlayerManagerImpl.getHudPlayer(placeholderValue) to PlayerHeadManager.provideHead(placeholderValue)
+    private fun getHead(value: String): HeadResult {
+
+        if (PlayerHeadManager.isTextureData(value)) {
+            return HeadResult(
+                null,
+                PlayerHeadManager.provideHeadFromTextureData(value),
+                true
+            )
+        }
+
+        return HeadResult(
+            PlayerManagerImpl.getHudPlayer(value),
+            PlayerHeadManager.provideHead(value),
+            false
+        )
     }
 }
+
+private data class HeadResult(
+    val player: HudPlayer?,
+    val head: HudPlayerHead,
+    val directTexture: Boolean
+)

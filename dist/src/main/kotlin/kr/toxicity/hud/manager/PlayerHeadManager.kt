@@ -20,6 +20,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import java.security.MessageDigest
 
 object PlayerHeadManager : BetterHudManager {
 
@@ -37,6 +38,38 @@ object PlayerHeadManager : BetterHudManager {
 
     private val headNameComponent = ConcurrentHashMap<HudLayout.Identifier, String>()
 
+    private fun textureCacheKey(textureData: String): String {
+        val hash = MessageDigest.getInstance("SHA-256")
+            .digest(textureData.toByteArray(Charsets.UTF_8))
+
+        return "texture:" + hash.joinToString("") {
+            "%02x".format(it.toInt() and 0xff)
+        }
+    }
+
+    fun isTextureData(textureData: String): Boolean {
+        return HudPlayerHeadImpl.isTextureData(textureData)
+    }
+
+    fun provideHeadFromTextureData(
+        textureData: String
+    ): HudPlayerHead {
+
+        val key = textureCacheKey(textureData)
+
+        return headCache[key] ?: run {
+            headLock.computeIfAbsent(key) {
+                CompletableFuture.runAsync {
+                    val head = HudPlayerHeadImpl.fromTextureData(textureData)
+
+                    headCache[key] = head
+                    headLock.remove(key)
+                }
+
+                loadingHead()
+            }
+        }
+    }
 
     fun getHead(group: HudLayout.Identifier) = headNameComponent[group]
     fun setHead(group: HudLayout.Identifier, string: String) {
