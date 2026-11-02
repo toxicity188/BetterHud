@@ -217,14 +217,21 @@ class CircleCompass(
                 .ifNull { "invalid image: $fileName" }
                 .image
             val div = ceil(length.toDouble() / 2).toInt()
+            val evaluateIconScale: (Int) -> Double = { i ->
+                (
+                        scaleEquation.evaluate(i.toDouble()) * scale
+                        ).apply {
+                        if (this <= 0.0) {
+                            throw RuntimeException("custom icon scale must be <= 0.0")
+                        }
+                    }
+            }
             if (applyOpacity) {
                 (0..<div).associate { i ->
                     val reverse = div - i
                     CompassData(reverse) to getKey(
                         "compass_image_${id}_${imageName}_${i + 1}",
-                        scaleEquation.evaluate(i.toDouble()).apply {
-                            if (this < 0) throw RuntimeException("scale equation returns < 0")
-                        },
+                        evaluateIconScale(i),
                         colorEquation.evaluate(i.toDouble()),
                         image.withOpacity(sin(reverse.toDouble() / div.toDouble() * PI / 2) * opacity),
                         location.x,
@@ -234,9 +241,7 @@ class CircleCompass(
             } else (0..<div).associate { i ->
                 CompassData(div - i) to getKey(
                     "compass_image_${id}_${imageName}_${i + 1}",
-                    scaleEquation.evaluate(i.toDouble()).apply {
-                        if (this <= 0.0) throw RuntimeException("scale equation returns <= 0")
-                    } * scale,
+                    evaluateIconScale(i),
                     colorEquation.evaluate(i.toDouble()),
                     image.withOpacity(opacity),
                     location.x,

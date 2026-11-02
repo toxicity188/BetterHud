@@ -37,7 +37,7 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                 val ascent = final.y + i * head.source.pixel
                 val height = head.source.pixel
                 val char = parent.newChar
-                val mainChar = head(head.identifier(shader, ascent, fileName)) {
+                val mainChar = head(head.identifier(shader, ascent, fileName, parent.imageKey)) {
                     parent.jsonArray?.let { array ->
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
@@ -57,10 +57,10 @@ class HudHeadParser(parent: HudImpl, private val head: HeadLayout, gui: GuiLocat
                         val hair = shader.toFancyHead()
                         HeadKey(
                             mainChar,
-                            head(head.identifier(hair, ascent - head.source.pixel, fileName)) {
+                            head(head.identifier(hair, ascent, fileName, parent.imageKey)) {
                                 val twoChar = parent.newChar
                                 parent.jsonArray?.let { array ->
-                                    createAscent(hair, ascent - head.source.pixel) { y ->
+                                    createAscent(hair, ascent) { y ->
                                         array += jsonObjectOf(
                                             "type" to "bitmap",
                                             "file" to fileName,

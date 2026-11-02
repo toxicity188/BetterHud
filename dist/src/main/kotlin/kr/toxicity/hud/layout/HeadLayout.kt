@@ -10,14 +10,25 @@ import kr.toxicity.hud.shader.HudShader
 import kr.toxicity.hud.shader.ShaderGroup
 import kr.toxicity.hud.util.ifNull
 import kr.toxicity.hud.util.toLayoutAlign
+import net.kyori.adventure.key.Key
 
 interface HeadLayout : HudLayout<HeadElement> {
     val type: HeadRenderType
     val align: LayoutAlign
 
-    fun identifier(shader: HudShader, ascent: Int, fileName: String): HudLayout.Identifier {
-        return ShaderGroup(shader, fileName, ascent)
+    /**
+     * The glyph character of a head is only valid inside the font it was generated for
+     * (each popup / hud has its own font). The font must therefore be part of the cache key,
+     * otherwise a char generated for another popup is reused and shown as a random unicode char.
+     */
+    fun identifier(shader: HudShader, ascent: Int, fileName: String, font: Key): HudLayout.Identifier {
+        return HeadIdentifier(ShaderGroup(shader, fileName, ascent), font)
     }
+
+    data class HeadIdentifier(
+        val delegate: HudLayout.Identifier,
+        val font: Key
+    ) : HudLayout.Identifier by delegate
 
     class Impl(
         override val source: HeadElement,

@@ -98,10 +98,25 @@ class HudImpl(
                 runByTick(tick, { player.tick }, p.getComponent(player))
             }
         }
+
+        var animationStartTick: Long? = null
+
         return HudComponentSupplier.of(this) {
-            if (conditions(player)) map.map { (type, element) ->
-                type.choose(element, player.tick)()
-            } else emptyList()
+            if (!conditions(player)) {
+                animationStartTick = null
+                emptyList()
+            } else {
+                val startTick = animationStartTick ?: player.tick.also {
+                    animationStartTick = it
+                }
+
+                val animationTick = (player.tick - startTick)
+                    .coerceAtLeast(0L)
+
+                map.map { (type, element) ->
+                    type.choose(element, animationTick)()
+                }
+            }
         }
     }
 

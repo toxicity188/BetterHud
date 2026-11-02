@@ -7,6 +7,7 @@
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="org.jetbrains.annotations.NotNull" />
+    <option name="myOrdered" value="true" />
     <option name="myNullables">
       <value>
         <list size="14">

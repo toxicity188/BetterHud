@@ -36,9 +36,11 @@ class HeadRenderer(
 
     private inner class StandardPixelGetter : HeadPixelGetter {
         private val pixelGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            val key = components.getOrNull(index / 8)?.bodyKey
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(components[index / 8].bodyKey)
+                    append(key)
                     append(if (index < 63 && index % 8 == 7) nextPage else space)
                 })
                 .color(next)
@@ -48,9 +50,7 @@ class HeadRenderer(
             var i = 0
             head.flatHead().forEach { next ->
                 val index = i++
-                comp.append(pixelGetter(index, color?.let {
-                    next * it
-                } ?: next))
+                comp.append(pixelGetter(index, color?.let { next * it } ?: next))
             }
             return comp
         }
@@ -58,17 +58,22 @@ class HeadRenderer(
 
     private inner class FancyPixelGetter : HeadPixelGetter {
         private val headGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            val key = components.getOrNull(index / 8)?.bodyKey
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(components[index / 8].bodyKey)
+                    append(key)
                     append(negativePixel)
                 })
                 .color(next)
         }
         private val pixelGetter: (Int, TextColor, Boolean) -> ComponentLike = { index, next, isHair ->
+            val key = (if (isHair) components.getOrNull(index / 8)?.hairKey
+            else components.getOrNull(index / 8)?.bodyKey)
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(if (isHair) components[index / 8].hairKey else components[index / 8].bodyKey)
+                    append(key)
                     append(if (index < 63 && index % 8 == 7) nextPage else space)
                 })
                 .color(next)
@@ -78,14 +83,11 @@ class HeadRenderer(
             val main = head.mainHead()
             val hair = head.hairHead()
             for (index in 0..63) {
-                val next = color?.let {
-                    main[index] * it
-                } ?: main[index]
+                val next = color?.let { main[index] * it } ?: main[index]
                 hair[index]?.let {
                     comp.append(headGetter(index, next))
                         .append(pixelGetter(index, it, true))
                 } ?: comp.append(pixelGetter(index, next, false))
-
             }
             return comp
         }
@@ -109,13 +111,17 @@ class HeadRenderer(
             var targetPlayerHead: HudPlayerHead = player.head
             playerPlaceholder?.let {
                 val value = it.value(player)
-                val (follow, head) = getHead(value.toString())
-                follow?.let { player ->
+                val result = getHead(value.toString())
+
+                result.player?.let { player ->
                     targetPlayer = player
                 } ?: run {
-                    if (cancelIfFollowerNotExists) return@build EMPTY_PIXEL_COMPONENT
+                    if (!result.directTexture && cancelIfFollowerNotExists) {
+                        return@build EMPTY_PIXEL_COMPONENT
+                    }
                 }
-                targetPlayerHead = head
+
+                targetPlayerHead = result.head
             }
             if (cond(targetPlayer)) {
                 WidthComponent(pixelType.render(targetPlayerHead, colorApply(targetPlayer)), pixel)
@@ -131,7 +137,26 @@ class HeadRenderer(
         }
     }
 
-    private fun getHead(placeholderValue: String): Pair<HudPlayer?, HudPlayerHead> {
-        return PlayerManagerImpl.getHudPlayer(placeholderValue) to PlayerHeadManager.provideHead(placeholderValue)
+    private fun getHead(value: String): HeadResult {
+
+        if (PlayerHeadManager.isTextureData(value)) {
+            return HeadResult(
+                null,
+                PlayerHeadManager.provideHeadFromTextureData(value),
+                true
+            )
+        }
+
+        return HeadResult(
+            PlayerManagerImpl.getHudPlayer(value),
+            PlayerHeadManager.provideHead(value),
+            false
+        )
     }
 }
+
+private data class HeadResult(
+    val player: HudPlayer?,
+    val head: HudPlayerHead,
+    val directTexture: Boolean
+)
