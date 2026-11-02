@@ -36,9 +36,11 @@ class HeadRenderer(
 
     private inner class StandardPixelGetter : HeadPixelGetter {
         private val pixelGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            val key = components.getOrNull(index / 8)?.bodyKey
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(components[index / 8].bodyKey)
+                    append(key)
                     append(if (index < 63 && index % 8 == 7) nextPage else space)
                 })
                 .color(next)
@@ -48,9 +50,7 @@ class HeadRenderer(
             var i = 0
             head.flatHead().forEach { next ->
                 val index = i++
-                comp.append(pixelGetter(index, color?.let {
-                    next * it
-                } ?: next))
+                comp.append(pixelGetter(index, color?.let { next * it } ?: next))
             }
             return comp
         }
@@ -58,17 +58,22 @@ class HeadRenderer(
 
     private inner class FancyPixelGetter : HeadPixelGetter {
         private val headGetter: (Int, TextColor) -> ComponentLike = { index, next ->
+            val key = components.getOrNull(index / 8)?.bodyKey
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(components[index / 8].bodyKey)
+                    append(key)
                     append(negativePixel)
                 })
                 .color(next)
         }
         private val pixelGetter: (Int, TextColor, Boolean) -> ComponentLike = { index, next, isHair ->
+            val key = (if (isHair) components.getOrNull(index / 8)?.hairKey
+            else components.getOrNull(index / 8)?.bodyKey)
+                ?.takeIf { it.isNotBlank() } ?: "\uE000"
             Component.text()
                 .content(buildString {
-                    append(if (isHair) components[index / 8].hairKey else components[index / 8].bodyKey)
+                    append(key)
                     append(if (index < 63 && index % 8 == 7) nextPage else space)
                 })
                 .color(next)
@@ -78,14 +83,11 @@ class HeadRenderer(
             val main = head.mainHead()
             val hair = head.hairHead()
             for (index in 0..63) {
-                val next = color?.let {
-                    main[index] * it
-                } ?: main[index]
+                val next = color?.let { main[index] * it } ?: main[index]
                 hair[index]?.let {
                     comp.append(headGetter(index, next))
                         .append(pixelGetter(index, it, true))
                 } ?: comp.append(pixelGetter(index, next, false))
-
             }
             return comp
         }

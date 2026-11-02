@@ -284,7 +284,7 @@ class PopupLayout(
                     val char = parent.newChar
                     val ascent = pixel.y + i * headLayout.source.pixel
                     val height = headLayout.source.pixel
-                    val mainChar = head(headLayout.identifier(shader, ascent, fileName)) {
+                    val mainChar = head(headLayout.identifier(shader, ascent, fileName, parent.imageKey)) {
                         createAscent(shader, ascent) { y ->
                             array += jsonObjectOf(
                                 "type" to "bitmap",
@@ -302,7 +302,7 @@ class PopupLayout(
                             val fancy = shader.toFancyHead()
                             HeadKey(
                                 mainChar,
-                                head(headLayout.identifier(fancy, ascent - headLayout.source.pixel, fileName)) {
+                                head(headLayout.identifier(fancy, ascent - headLayout.source.pixel, fileName, parent.imageKey)) {
                                     val twoChar = parent.newChar
                                     createAscent(fancy, ascent - headLayout.source.pixel) { y ->
                                         array += jsonObjectOf(
