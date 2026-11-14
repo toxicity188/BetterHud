@@ -114,6 +114,7 @@ void main() {
 
     #GenerateOtherMainMethod
 
+    vertexColor *= sample_lightmap(Sampler2, UV2);
     sphericalVertexDistance = fog_spherical_distance(pos);
     cylindricalVertexDistance = fog_cylindrical_distance(pos);
 
