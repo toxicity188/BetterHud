@@ -17,6 +17,10 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.forEach
 
 abstract class HudPlayerImpl : HudPlayer {
+    private companion object {
+        const val RESEND_INTERVAL = 1000L
+    }
+
     private val locationSet = HashSet<PointedLocation>()
     private val componentMap = ConcurrentHashMap<HudObject.Identifier, HudComponentSupplier<*>>()
 
@@ -28,6 +32,22 @@ abstract class HudPlayerImpl : HudPlayer {
     private val popupKey = ConcurrentHashMap<Any, PopupUpdater>()
     private var color: BossBar.Color? = null
     private var enabled = true
+
+    //The last frame sent to this player. An identical frame is not sent again, except once per RESEND_INTERVAL.
+    private var sentDigest = 0L
+    private var sentColor: BossBar.Color? = null
+    private var sentTime = 0L
+    private var sent = false
+
+    private fun isSameFrame(digest: Long, barColor: BossBar.Color): Boolean {
+        val now = System.currentTimeMillis()
+        if (sent && digest == sentDigest && barColor == sentColor && now - sentTime < RESEND_INTERVAL) return true
+        sent = true
+        sentDigest = digest
+        sentColor = barColor
+        sentTime = now
+        return false
+    }
     private val pointers: MutableSet<PointedLocation> = OverridableSet(keyMapper = {
         it.name
     })
@@ -136,11 +156,19 @@ abstract class HudPlayerImpl : HudPlayer {
             }
             last = comp.finalizeFont()
 
-            VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, comp.component.build().compact())
-        } else VOLATILE_CODE.showBossBar(this, color ?: ShaderManagerImpl.barColor, EMPTY_COMPONENT)
+            val built = comp.component.build()
+            val barColor = color ?: ShaderManagerImpl.barColor
+            if (isSameFrame(built.frameDigest(), barColor)) return
+            VOLATILE_CODE.showBossBar(this, barColor, built.compact())
+        } else {
+            val barColor = color ?: ShaderManagerImpl.barColor
+            if (isSameFrame(0L, barColor)) return
+            VOLATILE_CODE.showBossBar(this, barColor, EMPTY_COMPONENT)
+        }
     }
 
     override fun reload() {
+        sent = false
         autoSave.restart()
         locationProvide.restart()
         startTick()
