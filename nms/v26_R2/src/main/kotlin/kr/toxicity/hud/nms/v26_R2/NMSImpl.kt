@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.papermc.paper.adventure.PaperAdventure
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import kr.toxicity.command.BetterCommandSource
@@ -18,6 +19,7 @@ import kr.toxicity.hud.api.component.WidthComponent
 import kr.toxicity.hud.api.player.HudPlayer
 import kr.toxicity.hud.nms.v26_R2.entity.CraftEntityView
 import kr.toxicity.hud.nms.v26_R2.entity.CraftLivingEntityView
+import kr.toxicity.hud.nms.v26_R2.entity.IS_PAPER
 import kr.toxicity.hud.nms.v26_R2.entity.createAdaptedFieldGetter
 import kr.toxicity.hud.nms.v26_R2.entity.unsafeHandle
 import net.kyori.adventure.bossbar.BossBar
@@ -80,10 +82,51 @@ class NMSImpl : NMS {
         private val getGameProfile: (net.minecraft.world.entity.player.Player) -> GameProfile = createAdaptedFieldGetter { it.gameProfile }
         private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = createAdaptedFieldGetter { it.connection }
 
+        //The bar uuid of a boss event packet, so BetterHud's own bars can be recognized without encoding them.
+        private val bossBarUUID = runCatching {
+            ClientboundBossEventPacket::class.java.declaredFields.first {
+                it.type == UUID::class.java && !java.lang.reflect.Modifier.isStatic(it.modifiers)
+            }.apply {
+                isAccessible = true
+            }
+        }.getOrNull()
+
         fun createBossBar(byteBuf: RegistryFriendlyByteBuf): ClientboundBossEventPacket = ClientboundBossEventPacket.STREAM_CODEC.decode(byteBuf)
 
         private fun toAdventure(component: net.minecraft.network.chat.Component) = GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(component))
-        private fun fromAdventure(component: Component) = CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(component))
+        private fun fromAdventureJson(component: Component) = CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(component))
+
+        //Converted vanilla styles. A HUD reuses a small set of font/color pairs, so each one is converted once.
+        private const val STYLE_CACHE_LIMIT = 16384
+        private val styleCache = ConcurrentHashMap<net.kyori.adventure.text.format.Style, net.minecraft.network.chat.Style>()
+
+        private fun fromAdventureStyle(style: net.kyori.adventure.text.format.Style): net.minecraft.network.chat.Style {
+            styleCache[style]?.let {
+                return it
+            }
+            val converted = PaperAdventure.asVanilla(style)
+            if (styleCache.size >= STYLE_CACHE_LIMIT) styleCache.clear()
+            styleCache[style] = converted
+            return converted
+        }
+
+        //Copies a text component tree node by node. Anything that is not a plain text component uses the JSON path.
+        private fun fromAdventureDirect(component: Component): net.minecraft.network.chat.Component {
+            if (component !is TextComponent) return fromAdventureJson(component)
+            val result = net.minecraft.network.chat.Component.literal(component.content())
+            val style = component.style()
+            if (!style.isEmpty) result.setStyle(fromAdventureStyle(style))
+            for (child in component.children()) result.append(fromAdventureDirect(child))
+            return result
+        }
+
+        private fun fromAdventure(component: Component): net.minecraft.network.chat.Component = if (IS_PAPER) {
+            runCatching {
+                fromAdventureDirect(component)
+            }.getOrElse {
+                fromAdventureJson(component)
+            }
+        } else fromAdventureJson(component)
         private fun getColor(color: BossBar.Color) =  when (color) {
             BossBar.Color.PINK -> BossEvent.BossBarColor.PINK
             BossBar.Color.BLUE -> BossEvent.BossBarColor.BLUE
@@ -484,6 +527,16 @@ class NMSImpl : NMS {
             if (msg is ClientboundBossEventPacket) {
 
                 if (BetterHudAPI.inst().isMergeBossBar) {
+                    //BetterHud's own bars are passed through as is. Encoding them here only to read the uuid means every HUD update is encoded twice.
+                    val barUUID = bossBarUUID?.let {
+                        runCatching {
+                            it[msg] as? UUID
+                        }.getOrNull()
+                    }
+                    if (barUUID != null && (barUUID == uuid || dummy.dummyBarsUUID.contains(barUUID))) {
+                        super.write(ctx, msg, promise)
+                        return
+                    }
                     val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
                         ClientboundBossEventPacket.STREAM_CODEC.encode(this, msg)
                     }
