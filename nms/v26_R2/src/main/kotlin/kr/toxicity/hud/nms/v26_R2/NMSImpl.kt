@@ -82,6 +82,15 @@ class NMSImpl : NMS {
         private val getGameProfile: (net.minecraft.world.entity.player.Player) -> GameProfile = createAdaptedFieldGetter { it.gameProfile }
         private val getConnection: (ServerCommonPacketListenerImpl) -> Connection = createAdaptedFieldGetter { it.connection }
 
+        //The bar uuid of a boss event packet, so BetterHud's own bars can be recognized without encoding them.
+        private val bossBarUUID = runCatching {
+            ClientboundBossEventPacket::class.java.declaredFields.first {
+                it.type == UUID::class.java && !java.lang.reflect.Modifier.isStatic(it.modifiers)
+            }.apply {
+                isAccessible = true
+            }
+        }.getOrNull()
+
         fun createBossBar(byteBuf: RegistryFriendlyByteBuf): ClientboundBossEventPacket = ClientboundBossEventPacket.STREAM_CODEC.decode(byteBuf)
 
         private fun toAdventure(component: net.minecraft.network.chat.Component) = GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(component))
@@ -518,6 +527,16 @@ class NMSImpl : NMS {
             if (msg is ClientboundBossEventPacket) {
 
                 if (BetterHudAPI.inst().isMergeBossBar) {
+                    //BetterHud's own bars are passed through as is. Encoding them here only to read the uuid means every HUD update is encoded twice.
+                    val barUUID = bossBarUUID?.let {
+                        runCatching {
+                            it[msg] as? UUID
+                        }.getOrNull()
+                    }
+                    if (barUUID != null && (barUUID == uuid || dummy.dummyBarsUUID.contains(barUUID))) {
+                        super.write(ctx, msg, promise)
+                        return
+                    }
                     val buf = HudByteBuf(Unpooled.buffer(1 shl 4)).apply {
                         ClientboundBossEventPacket.STREAM_CODEC.encode(this, msg)
                     }
